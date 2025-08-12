@@ -1,2 +1,2 @@
-
 - [x] Add "Back to Home" navigation to static policy pages (`terms`, `privacy`, `cookies`).
+- [x] Fix Sentry multiple initialization error by removing redundant config files.

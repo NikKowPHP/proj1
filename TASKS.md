@@ -1,4 +1,3 @@
-
 # Master Plan: Anonymous Cancer Risk Assessment Tool
 
 This document outlines the development plan for creating the Anonymous Cancer Risk Assessment Tool by adapting the existing Lexity codebase. The plan is divided into sequential phases, starting with the removal of legacy features and progressing to the implementation and refinement of the new application.
@@ -7,18 +6,18 @@ This document outlines the development plan for creating the Anonymous Cancer Ri
 
 **Objective:** To remove all functionality related to user accounts, persistent data, monetization, and language learning, creating a clean, anonymous-first foundation.
 
-*   [ ] **Task 1: Remove Authentication System**
-    *   [ ] Delete directories: `src/app/login/`, `src/app/signup/`, `src/app/forgot-password/`, `src/app/reset-password/`.
-    *   [ ] Delete API route directory: `src/app/api/auth/`.
-    *   [ ] Delete components: `src/components/SignInForm.tsx`, `SignUpForm.tsx`, `AuthLinks.tsx`, etc.
-    *   [ ] Delete `src/lib/stores/auth.store.ts`.
-    *   [ ] Delete utility files: `src/lib/auth.ts`, `src/lib/user.ts`.
-    *   [ ] Delete E2E tests: `e2e/auth.setup.ts`, `e2e/auth.spec.ts`.
-    *   [ ] Refactor `middleware.ts` to remove all user authentication logic. Retain the Content Security Policy header logic.
+*   [x] **Task 1: Remove Authentication System**
+    *   [x] Delete directories: `src/app/login/`, `src/app/signup/`, `src/app/forgot-password/`, `src/app/reset-password/`.
+    *   [x] Delete API route directory: `src/app/api/auth/`.
+    *   [x] Delete components: `src/components/SignInForm.tsx`, `SignUpForm.tsx`, `AuthLinks.tsx`, etc.
+    *   [x] Delete `src/lib/stores/auth.store.ts`.
+    *   [x] Delete utility files: `src/lib/auth.ts`, `src/lib/user.ts`.
+    *   [x] Delete E2E tests: `e2e/auth.setup.ts`, `e2e/auth.spec.ts`.
+    *   [x] Refactor `middleware.ts` to remove all user authentication logic. Retain the Content Security Policy header logic.
 
-*   [ ] **Task 2: Reconfigure Database for Operational Use (No PII)**
-    *   [ ] **Step 1: Gut the Schema.** In `prisma/schema.prisma`, delete all existing user-related models.
-    *   [ ] **Step 2: Define New, Non-PII Models.** Add simple models for operational purposes. For example:
+*   [x] **Task 2: Reconfigure Database for Operational Use (No PII)**
+    *   [x] **Step 1: Gut the Schema.** In `prisma/schema.prisma`, delete all existing user-related models.
+    *   [x] **Step 2: Define New, Non-PII Models.** Add simple models for operational purposes. For example:
         ```prisma
         // prisma/schema.prisma
 
@@ -36,24 +35,24 @@ This document outlines the development plan for creating the Anonymous Cancer Ri
           createdAt DateTime @default(now())
         }
         ```
-    *   [ ] **Step 3: Create New Migration.** Generate a new migration to apply this clean schema: `npx prisma migrate dev --name reconfigure-for-operational-db`.
-    *   [ ] **Step 4: Prepare Seed Script.** Clear out the old `prisma/seed.cts` and prepare it for the new `Questionnaire` model.
+    *   [x] **Step 3: Create New Migration.** Generate a new migration to apply this clean schema: `npx prisma migrate dev --name reconfigure-for-operational-db`.
+    *   [x] **Step 4: Prepare Seed Script.** Clear out the old `prisma/seed.cts` and prepare it for the new `Questionnaire` model.
 
-*   [ ] **Task 3: Remove Monetization & Admin Features**
-    *   [ ] Delete directories: `src/app/pricing/`, `src/app/admin/`.
-    *   [ ] Delete API route directories: `src/app/api/billing/`, `src/app/api/admin/`.
-    *   [ ] Delete `src/lib/config/pricing.ts` and `src/lib/services/stripe.service.ts`.
-    *   [ ] Delete components: `src/components/PricingTable.tsx`, `src/components/AdminDashboard.tsx`, `src/components/AdminSettings.tsx`.
+*   [x] **Task 3: Remove Monetization & Admin Features**
+    *   [x] Delete directories: `src/app/pricing/`, `src/app/admin/`.
+    *   [x] Delete API route directories: `src/app/api/billing/`, `src/app/api/admin/`.
+    *   [x] Delete `src/lib/config/pricing.ts` and `src/lib/services/stripe.service.ts`.
+    *   [x] Delete components: `src/components/PricingTable.tsx`, `src/components/AdminDashboard.tsx`, `src/components/AdminSettings.tsx`.
 
-*   [ ] **Task 4: Purge Unused UI, APIs, and State**
-    *   [ ] Delete all language-learning pages and their corresponding API routes.
-    *   [ ] Delete all non-reusable UI components from `src/components/`.
-    *   [ ] Delete unused state stores: `src/lib/stores/onboarding.store.ts`, `src/lib/stores/language.store.ts`.
+*   [x] **Task 4: Purge Unused UI, APIs, and State**
+    *   [x] Delete all language-learning pages and their corresponding API routes.
+    *   [x] Delete all non-reusable UI components from `src/components/`.
+    *   [x] Delete unused state stores: `src/lib/stores/onboarding.store.ts`, `src/lib/stores/language.store.ts`.
 
-*   [ ] **Task 5: Finalize Cleanup**
-    *   [ ] Update `.env.example` to remove Supabase, Stripe, and other unused variables.
-    *   [ ] Run `npm prune` or manually audit `package.json` to remove orphaned dependencies.
-    *   [ ] Verify that the stripped-down application builds and runs without errors.
+*   [x] **Task 5: Finalize Cleanup**
+    *   [x] Update `.env.example` to remove Supabase, Stripe, and other unused variables.
+    *   [x] Run `npm prune` or manually audit `package.json` to remove orphaned dependencies.
+    *   [x] Verify that the stripped-down application builds and runs without errors.
 
 ---
 
@@ -156,4 +155,3 @@ This document outlines the development plan for creating the Anonymous Cancer Ri
     *   [ ] Scope the effort to add more cancer/health risk models.
     *   [ ] Investigate localization to support multiple languages.
     *   [ ] Brainstorm a secure, consent-based version for clinical use by healthcare providers.
-```

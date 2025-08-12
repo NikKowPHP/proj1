@@ -1,24 +1,2 @@
-export * from "./journalAnalysis.prompt";
-export * from "./questionGeneration.prompt";
-export * from "./answerEvaluation.prompt";
-export * from "./audioAnswerEvaluation.prompt";
-export * from "./sentenceCompletion.prompt";
-export * from "./titleGeneration.prompt";
-export * from "./journalingAids.prompt";
-export * from "./roleRefinement.prompt";
-export * from "./topicGeneration.prompt";
-export * from "./stuckWriter.prompt";
-export * from "./paragraphBreakdown.prompt";
-export * from "./textTranslation.prompt";
-export * from "./cerebrasTranslation.prompt";
-export * from "./groqTranslation.prompt";
-export * from "./contextualTranslation.prompt";
-export * from "./mistakeDrillDown.prompt";
-export * from "./drillDownAnswerEvaluation.prompt";
-export * from "./sentenceEvaluation.prompt";
-export * from "./readingMaterialGeneration.prompt";
-export * from "./readingTaskGeneration.prompt";
-export * from "./imageDescriptionGeneration.prompt";
-export * from "./tutorChat.prompt";
-export * from "./journalTutorChat.prompt";
-export * from "./dashboardTutorChat.prompt";
+// This file will be populated with new prompts in later phases.
+export {};

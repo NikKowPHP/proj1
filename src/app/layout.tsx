@@ -3,12 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/providers";
-import { CookieBanner } from "@/components/CookieBanner";
-import { AppShell } from "@/components/layout/AppShell";
-import StoreInitializer from "@/components/layout/StoreInitializer";
 import { Toaster } from "@/components/ui/toaster";
-import { PostHogProvider } from "@/providers/PostHogProvider";
-import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -70,13 +65,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <PostHogProvider>
-            <StoreInitializer />
-            <AppShell>{children}</AppShell>
-            <CookieBanner />
-            <PWAInstallPrompt />
-            <Toaster />
-          </PostHogProvider>
+          <main className="flex-1">{children}</main>
+          <Toaster />
         </Providers>
       </body>
     </html>

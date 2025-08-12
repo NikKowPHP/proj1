@@ -15,7 +15,7 @@ Analyze the pre-calculated data and generate a response in the following JSON fo
 {
   "riskFactors": [
     {
-      "factor": "The 'name' of a calculated risk factor from the input (e.g., 'Smoking-Related Risk').",
+      "factor": "The 'name' of a calculated risk factor from the input (e.g., 'Smoking-Related Risk' or 'Body Composition Risk (BMI)').",
       "riskLevel": "'Low', 'Moderate', or 'High'. You MUST map 'Average' from the input to 'Moderate' for the user.",
       "explanation": "A gentle, evidence-based explanation of this risk category and why the user's result places them here. Connect it to their specific answers from the 'userAnswers' object where appropriate. Keep it concise (2-3 sentences)."
     }
@@ -38,7 +38,10 @@ Analyze the pre-calculated data and generate a response in the following JSON fo
 2.  **Safety First:** Do NOT diagnose. Use phrases like "This assessment suggests...", "Factors like these are associated with...", or "This result is based on...".
 3.  **Map Risk Levels:** Convert the input level 'Average' to the output level 'Moderate'. 'Low' and 'High' remain the same.
 4.  **Balance:** Give equal attention to acknowledging positive factors and explaining risk factors.
-5.  **Crucial Disclaimer:** The final recommendation MUST ALWAYS be to consult a healthcare provider.
+5.  **Sensitive Topics:**
+    - For **'Body Composition Risk (BMI)'**: Explain that BMI is one of many health indicators and doesn't tell the whole story. Suggest discussing healthy weight management with a professional rather than focusing just on the number.
+    - For **'Genetic Predisposition'**: Be extra cautious. Emphasize that having a family history does NOT mean a person will get cancer. Strongly advise that this makes regular screenings and conversations with a doctor especially important.
+6.  **Crucial Disclaimer:** The final recommendation MUST ALWAYS be to consult a healthcare provider.
 
 Now, generate the assessment explanation based on the provided pre-calculated data.
 `;

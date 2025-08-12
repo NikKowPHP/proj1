@@ -27,6 +27,13 @@ function getRiskLevel(
   return "Low";
 }
 
+function getBmiCategory(bmi: number): string {
+  if (bmi < 18.5) return "Underweight";
+  if (bmi >= 18.5 && bmi < 25) return "Normal";
+  if (bmi >= 25 && bmi < 30) return "Overweight";
+  return "Obese"; // bmi >= 30
+}
+
 /**
  * Calculates a user's health risks based on their answers to a questionnaire.
  * This function uses a deterministic model defined in `risk-model-config.json`.
@@ -37,6 +44,37 @@ function getRiskLevel(
 export function calculateRisk(answers: Answers): CalculationResult {
   const calculatedFactors: CalculatedRiskFactor[] = [];
   const positiveFactors: IdentifiedPositiveFactor[] = [];
+  const processedAnswers = { ...answers };
+
+  // --- Start of BMI Calculation ---
+  const heightStr = processedAnswers.height;
+  const weightStr = processedAnswers.weight;
+  const units = processedAnswers.units;
+
+  if (heightStr && weightStr && units) {
+    let height = parseFloat(heightStr);
+    let weight = parseFloat(weightStr);
+
+    let heightInMeters: number;
+    let weightInKg: number;
+
+    if (units === "imperial") {
+      // Assuming height is in inches and weight is in pounds for imperial
+      heightInMeters = height * 0.0254;
+      weightInKg = weight * 0.453592;
+    } else {
+      // Assuming height is in cm and weight is in kg for metric
+      heightInMeters = height / 100;
+      weightInKg = weight;
+    }
+
+    if (heightInMeters > 0) {
+      const bmi = weightInKg / (heightInMeters * heightInMeters);
+      const bmiCategory = getBmiCategory(bmi);
+      processedAnswers.bmi_category = bmiCategory;
+    }
+  }
+  // --- End of BMI Calculation ---
 
   // 1. Calculate scores for each risk factor category
   for (const factorId in riskConfig.factors) {
@@ -45,7 +83,7 @@ export function calculateRisk(answers: Answers): CalculationResult {
     let score = 0;
 
     for (const questionId of factorInfo.questionIds) {
-      const answer = answers[questionId];
+      const answer = processedAnswers[questionId];
       if (answer) {
         const questionWeights =
           riskConfig.weights[questionId as keyof typeof riskConfig.weights];
@@ -67,7 +105,8 @@ export function calculateRisk(answers: Answers): CalculationResult {
       riskConfig.positiveFactors[
         factorId as keyof typeof riskConfig.positiveFactors
       ];
-    const triggerAnswer = answers[positiveFactorInfo.trigger.questionId];
+    const triggerAnswer =
+      processedAnswers[positiveFactorInfo.trigger.questionId];
 
     if (
       triggerAnswer &&
@@ -84,6 +123,6 @@ export function calculateRisk(answers: Answers): CalculationResult {
   return {
     riskFactors: calculatedFactors,
     positiveFactors: positiveFactors,
-    userAnswers: answers,
+    userAnswers: answers, // Return original answers for AI context
   };
 }

@@ -6,7 +6,17 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { calculateRisk } from "@/lib/services/risk-calculator.service";
 
-const answersSchema = z.record(z.string());
+const answersSchema = z
+  .object({
+    units: z.enum(["metric", "imperial"]),
+    height: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+      message: "Invalid height. Must be a positive number.",
+    }),
+    weight: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+      message: "Invalid weight. Must be a positive number.",
+    }),
+  })
+  .catchall(z.string().optional());
 
 // Zod schema for the AI response to ensure type safety remains the same
 const riskFactorSchema = z.object({
@@ -45,13 +55,13 @@ export async function POST(request: NextRequest) {
 
     if (!parsedAnswers.success) {
       return NextResponse.json(
-        { error: "Invalid answers format" },
+        { error: "Invalid answers format", details: parsedAnswers.error.flatten() },
         { status: 400 },
       );
     }
 
     // 1. Run deterministic calculation
-    const calculationResult = calculateRisk(parsedAnswers.data);
+    const calculationResult = calculateRisk(parsedAnswers.data as Record<string, string>);
 
     // 2. Get AI-powered explanation for the calculation
     const aiService = getAIService();

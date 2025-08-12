@@ -20,27 +20,27 @@ This plan details the necessary steps to upgrade the Health Risk Assessor's ques
 ### **Phase B: Backend Logic**
 *Goal: Retrofit the backend services to process and validate the new, richer data payload.*
 
-- **[ ] Task B.1: Update Risk Model Configuration**
+- **[x] Task B.1: Update Risk Model Configuration**
   - **File:** `src/lib/risk-model-config.json`
   - **Action:**
     1.  Add new `weights` objects for new question IDs: `smoking_status`, `diet_red_meat`, `family_history_cancer`, etc.
     2.  Add new `factors` objects for `"BODY_COMPOSITION"` and `"GENETIC_PREDISPOSITION"`.
     *(Note: Use medically-sound or placeholder weights approved for development).*
 
-- **[ ] Task B.2: Implement Server-Side Validation**
+- **[x] Task B.2: Implement Server-Side Validation**
   - **File:** `src/app/api/assess/route.ts`
   - **Action:** Enhance the `answersSchema` (Zod schema) to perform strict validation on the incoming `answers` object.
     - Validate that `height` and `weight` are strings that can be coerced to numbers and are within a logical range (e.g., `z.string().transform(Number).pipe(z.number().positive())`).
     - Validate that `units` is either `'metric'` or `'imperial'`.
 
-- **[ ] Task B.3: Enhance Risk Calculator Service**
+- **[x] Task B.3: Enhance Risk Calculator Service**
   - **File:** `src/lib/services/risk-calculator.service.ts`
   - **Action:** Modify the `calculateRisk` function:
     1.  **Unit Normalization:** Check for `answers.units`. If `'imperial'`, convert height (ft/in to m) and weight (lbs to kg) *before* any calculations.
     2.  **BMI Calculation:** Calculate BMI from the now-normalized height and weight.
     3.  **Score Calculation:** Add logic to calculate scores for the new `BODY_COMPOSITION` and `GENETIC_PREDISPOSITION` factors using the calculated BMI and new answers.
 
-- **[ ] Task B.4: Update AI Explanation Prompt**
+- **[x] Task B.4: Update AI Explanation Prompt**
   - **File:** `src/lib/ai/prompts/cancerRiskAssessment.prompt.ts`
   - **Action:** Update the prompt string to instruct the AI on how to sensitively and accurately explain the new risk factors, especially `GENETIC_PREDISPOSITION` and `BODY_COMPOSITION`.
 

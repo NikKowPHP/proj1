@@ -13,6 +13,7 @@ ${JSON.stringify(calculationResult, null, 2)}
 Analyze the pre-calculated data from all models and generate a response in the following single JSON format. The tone should be helpful, reassuring, and encouraging, not alarming.
 
 {
+  "overallSummary": "A high-level, 2-3 sentence summary of the key findings. Start by mentioning the most significant risk factor(s) across all models. For example: 'This assessment highlights that smoking is a primary factor influencing your risk profile across multiple areas. While your activity level is a positive, focusing on smoking cessation could offer the most significant health benefit.'",
   "modelAssessments": [
     {
       "modelName": "The 'name' of the first model from the input (e.g., 'General Cancer Risk').",
@@ -23,10 +24,6 @@ Analyze the pre-calculated data from all models and generate a response in the f
           "explanation": "A gentle, evidence-based explanation of this risk category and why the user's result places them here. Connect it to their specific answers from the 'userAnswers' object where appropriate. Keep it concise (2-3 sentences)."
         }
       ]
-    },
-    {
-      "modelName": "The 'name' of the second model from the input (e.g., 'Lung Cancer Risk').",
-      "riskFactors": [ ... ]
     }
   ],
   "positiveFactors": [
@@ -43,14 +40,14 @@ Analyze the pre-calculated data from all models and generate a response in the f
 }
 
 **GUIDELINES:**
-1.  **Group by Model:** The final JSON must have a 'modelAssessments' array. Each item in this array should correspond to a model from the input data, containing its name and its specific risk factors.
-2.  **Safety First:** Do NOT diagnose. Use phrases like "This assessment suggests...", "Factors like these are associated with...", or "This result is based on...".
-3.  **Map Risk Levels:** Convert the input level 'Average' from any model to the output level 'Moderate'. 'Low' and 'High' remain the same.
-4.  **Balance:** Acknowledge positive factors and explain risk factors.
+1.  **Synthesized Summary is Key:** The 'overallSummary' is the most important part. It should connect the dots between different models. For instance, if 'smoking' impacts multiple models, mention that.
+2.  **Group by Model:** The 'modelAssessments' array must group risk factors by their source model from the input.
+3.  **Safety First:** Do NOT diagnose. Use phrases like "This assessment suggests...", "Factors like these are associated with...".
+4.  **Map Risk Levels:** Convert the input level 'Average' to 'Moderate'. 'Low' and 'High' are the same.
 5.  **Sensitive Topics:**
-    - For **'Body Composition Risk (BMI)'**: Explain that BMI is one of many health indicators and doesn't tell the whole story.
-    - For **'Genetic Predisposition' / 'Family History'**: Be extra cautious. Emphasize that having a family history does NOT mean a person will get cancer. Strongly advise that this makes regular screenings and conversations with a doctor especially important.
-    - For **'Asbestos Exposure'**: Explain it is a known risk factor and that a healthcare professional can provide guidance on monitoring.
+    - **BMI**: Explain it's one indicator among many.
+    - **Family History / Genetics**: Emphasize this isn't a guarantee of illness and makes screening more important.
+    - **Asbestos/Blood Pressure/Diabetes**: Explain it's a known risk factor and a doctor can provide guidance.
 6.  **Crucial Disclaimer:** The final recommendation MUST ALWAYS be to consult a healthcare provider.
 
 Now, generate the structured assessment explanation based on the provided multi-model data.

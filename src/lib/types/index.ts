@@ -42,6 +42,7 @@ interface ModelAssessment {
 
 // Assessment Result Type (final output from AI to client)
 export interface AssessmentResult {
+  overallSummary: string;
   modelAssessments: ModelAssessment[];
   positiveFactors: {
     factor: string;

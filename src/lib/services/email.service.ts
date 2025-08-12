@@ -13,7 +13,12 @@ const resend = process.env.RESEND_API_KEY
   : null;
 
 function generateAssessmentHtml(assessmentData: AssessmentResult): string {
-  const { modelAssessments, positiveFactors, recommendations } = assessmentData;
+  const { overallSummary, modelAssessments, positiveFactors, recommendations } = assessmentData;
+
+  const overallSummaryHtml = overallSummary ? `
+    <h2 style="font-size: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-top: 24px;">Overall Summary</h2>
+    <p style="font-size: 14px; margin-bottom: 16px;">${overallSummary}</p>
+  ` : '';
 
   const modelAssessmentsHtml = modelAssessments
     .map(
@@ -59,6 +64,7 @@ function generateAssessmentHtml(assessmentData: AssessmentResult): string {
         <h1 style="font-size: 24px;">Your Anonymous Health Assessment Results</h1>
         <p>Thank you for using our tool. Here is a copy of your results. Please consider discussing them with a healthcare provider.</p>
         
+        ${overallSummaryHtml}
         ${modelAssessmentsHtml}
         
         ${

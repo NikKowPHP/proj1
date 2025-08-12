@@ -61,6 +61,30 @@
         "smoking_years_quit": { "Less than 1 year": 4, "1-5 years": 3, "6-10 years": 2, "More than 10 years": 1 },
         "asbestos_exposure": { "No": 0, "I don't know": 3, "Yes": 10 }
       }
+    },
+    "CARDIOVASCULAR_V1": {
+      "name": "Cardiovascular Risk",
+      "factors": {
+        "KEY_INDICATORS": {
+          "name": "Key Health Indicators",
+          "questionIds": ["age", "sex", "bmi_category", "known_blood_pressure", "has_diabetes"],
+          "thresholds": { "average": 10, "high": 18 }
+        },
+        "LIFESTYLE_IMPACT": {
+          "name": "Lifestyle Impact",
+          "questionIds": ["smoking_status", "activity"],
+          "thresholds": { "average": 5, "high": 10 }
+        }
+      },
+      "weights": {
+        "age": { "18-29": 0, "30-39": 2, "40-49": 4, "50-59": 7, "60+": 10 },
+        "sex": { "Male": 2, "Female": 0 },
+        "bmi_category": { "Underweight": 2, "Normal": 0, "Overweight": 4, "Obese": 8 },
+        "known_blood_pressure": { "No": 0, "I don't know": 2, "Yes": 10 },
+        "has_diabetes": { "No": 0, "I don't know": 3, "Yes": 10 },
+        "smoking_status": { "Never smoked": 0, "Former smoker": 3, "Current smoker": 10 },
+        "activity": { "0 days": 5, "1-2 days": 3, "3-4 days": 1, "5+ days": -2 }
+      }
     }
   },
   "positiveFactors": {

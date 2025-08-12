@@ -88,6 +88,23 @@
       ]
     },
     {
+      "title": "Health Conditions",
+      "questions": [
+        {
+          "id": "known_blood_pressure",
+          "text": "Have you been diagnosed with high blood pressure by a healthcare professional?",
+          "type": "select",
+          "options": ["Yes", "No", "I don't know"]
+        },
+        {
+          "id": "has_diabetes",
+          "text": "Have you been diagnosed with diabetes by a healthcare professional?",
+          "type": "select",
+          "options": ["Yes", "No", "I don't know"]
+        }
+      ]
+    },
+    {
       "title": "Environmental & Occupational History",
       "description": "This information helps assess risks related to your environment and work.",
       "questions": [

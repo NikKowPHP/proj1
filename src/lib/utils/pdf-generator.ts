@@ -27,6 +27,18 @@ export const generateAssessmentPdf = (assessmentData: AssessmentResult) => {
 
   let startY = 40;
 
+  // --- Overall Summary ---
+  if (assessmentData.overallSummary) {
+    doc.setFontSize(14);
+    doc.text("Overall Summary", 14, startY);
+    startY += 8;
+    doc.setFontSize(11);
+    const summaryLines = doc.splitTextToSize(assessmentData.overallSummary, 180);
+    doc.text(summaryLines, 14, startY);
+    startY += summaryLines.length * 5 + 10;
+  }
+
+
   // --- Risk Factors per Model ---
   assessmentData.modelAssessments.forEach((model) => {
     if (model.riskFactors.length > 0) {

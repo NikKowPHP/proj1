@@ -18,6 +18,7 @@ import {
   CheckCircle,
   Mail,
   Download,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -144,9 +145,23 @@ export default function ResultsPage() {
             provider.
           </p>
         </div>
+        
+        {assessment?.overallSummary && (
+          <Card className="bg-card">
+             <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-primary">
+                  <ShieldCheck className="h-5 w-5" />
+                  Overall Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">{assessment.overallSummary}</p>
+              </CardContent>
+          </Card>
+        )}
 
         <Tabs defaultValue={assessment?.modelAssessments?.[0]?.modelName} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
             {assessment?.modelAssessments.map((model) => (
               <TabsTrigger key={model.modelName} value={model.modelName}>
                 {model.modelName}
@@ -243,6 +258,7 @@ export default function ResultsPage() {
              <ul className="list-disc pl-5 space-y-2 text-sm">
                <li><a href="https://www.cancer.gov" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">National Cancer Institute (NCI)</a></li>
                <li><a href="https://www.cancer.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">American Cancer Society (ACS)</a></li>
+               <li><a href="https://www.heart.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">American Heart Association (AHA)</a></li>
              </ul>
           </CardContent>
         </Card>

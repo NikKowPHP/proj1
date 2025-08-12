@@ -40,9 +40,8 @@ export default function PrivacyPage() {
         </li>
         <li>
           <strong>Session-Based Data:</strong> The answers you provide to the
-          questionnaire are stored only in your browser's `sessionStorage`. This
-          data is automatically deleted when you close your browser tab or
-          window. It is never sent to our servers until you click "View
+          questionnaire are stored only in your browser's local storage. This
+          data is automatically deleted if you start a new assessment. It is never sent to our servers until you click "View
           Results".
         </li>
       </ul>

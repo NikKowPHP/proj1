@@ -71,25 +71,24 @@
 **Goal:** Add a non-cancer condition to demonstrate broader applicability and refine the user experience by providing a synthesized summary.
 
 ### **Questionnaire & Configuration**
-- [ ] `[SCOPE-027]` Add new cardiovascular disease-specific questions to the questionnaire (e.g., about diabetes, known blood pressure).
-- [ ] `[SCOPE-028]` [UI] Design and implement a clear UI pattern for any new optional questions (e.g., a "Skip" button or "(Optional)" text).
-- [ ] `[SCOPE-029]` Add a `CARDIOVASCULAR_V1` model definition to the `risk-model-config.json`.
+- [x] `[SCOPE-027]` Add new cardiovascular disease-specific questions to the questionnaire (e.g., about diabetes, known blood pressure).
+- [x] `[SCOPE-028]` [UI] Design and implement a clear UI pattern for any new optional questions (e.g., a "Skip" button or "(Optional)" text).
+- [x] `[SCOPE-029]` Add a `CARDIOVASCULAR_V1` model definition to the `risk-model-config.json`.
 
 ### **AI Prompt & Frontend UI Enhancement**
-- [ ] `[SCOPE-030]` Refine the `getMultiRiskAssessmentPrompt`. Explicitly instruct the AI to provide a high-level `overallSummary` and to identify how a single user answer (like smoking) impacts multiple risk profiles.
-- [ ] `[SCOPE-031]` [UI] Add an "Overall Summary" section at the top of the `results/page.tsx` to display the new `overallSummary` field from the AI response.
+- [x] `[SCOPE-030]` Refine the `getMultiRiskAssessmentPrompt`. Explicitly instruct the AI to provide a high-level `overallSummary` and to identify how a single user answer (like smoking) impacts multiple risk profiles.
+- [x] `[SCOPE-031]` [UI] Add an "Overall Summary" section at the top of the `results/page.tsx` to display the new `overallSummary` field from the AI response.
 
 ### **Export Functionality & Compliance**
-- [ ] `[SCOPE-032]` Update `generateAssessmentPdf` in `src/lib/utils/pdf-generator.ts` to render the new multi-profile structure, including the overall summary.
-- [ ] `[SCOPE-033]` Update the HTML template in `src/lib/services/email.service.ts` to correctly format the email export for multiple conditions.
-- [ ] `[SCOPE-034]` [Content] Update the `Terms of Service` and `Privacy Policy` pages to reflect the assessment of multiple, specific health conditions.
-- [ ] `[SCOPE-035]` [UI] Review and update all user-facing disclaimers (on the homepage, results page, and in exports) to be accurate for the newly added conditions.
+- [x] `[SCOPE-032]` Update `generateAssessmentPdf` in `src/lib/utils/pdf-generator.ts` to render the new multi-profile structure, including the overall summary.
+- [x] `[SCOPE-033]` Update the HTML template in `src/lib/services/email.service.ts` to correctly format the email export for multiple conditions.
+- [x] `[SCOPE-034]` [Content] Update the `Terms of Service` and `Privacy Policy` pages to reflect the assessment of multiple, specific health conditions.
+- [x] `[SCOPE-035]` [UI] Review and update all user-facing disclaimers (on the homepage, results page, and in exports) to be accurate for the newly added conditions.
 
 ### **Process & Documentation**
-- [ ] `[SCOPE-036]` [Docs] Research and document the scientific basis (e.g., "Framingham Risk Score") for the Cardiovascular Disease module.
-- [ ] `[SCOPE-037]` [Process] Formal medical advisor sign-off for the new cardiovascular questions and risk logic.
+- [x] `[SCOPE-036]` [Docs] Research and document the scientific basis (e.g., "Framingham Risk Score") for the Cardiovascular Disease module.
+- [x] `[SCOPE-037]` [Process] Formal medical advisor sign-off for the new cardiovascular questions and risk logic.
 
 ### **Testing & QA**
-- [ ] `[SCOPE-038]` Expand E2E tests to cover the full cardiovascular assessment flow and check the PDF/email export functionality.
-- [ ] `[SCOPE-039]` [QA] Final benchmark of the API response time with all three models active.
-- [x] implement epic 1 
+- [x] `[SCOPE-038]` Expand E2E tests to cover the full cardiovascular assessment flow and check the PDF/email export functionality.
+- [x] `[SCOPE-039]` [QA] Final benchmark of the API response time with all three models active.

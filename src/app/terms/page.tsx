@@ -24,7 +24,7 @@ export default function TermsPage() {
       <p>
         The Service provides information for educational and informational
         purposes only. It is not intended as a substitute for professional
-        medical advice, diagnosis, or treatment. The information provided by
+        medical advice, diagnosis, or treatment for any health condition. The information provided by
         the AI is based on statistical data and general knowledge and cannot
         replace a consultation with a qualified healthcare provider who can
         assess your individual health needs.

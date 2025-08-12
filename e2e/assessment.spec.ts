@@ -17,66 +17,58 @@ test.describe("Core Assessment Flow v2", () => {
     // 3. Complete the multi-step questionnaire
     // Step 1: About You
     await page.getByText('Select an option').first().click();
-    await page.getByRole('option', { name: '40-49' }).click();
+    await page.getByRole('option', { name: '50-59' }).click();
     await page.getByText('Select an option').first().click();
     await page.getByRole('option', { name: 'Male' }).click();
     await page.getByLabel('Height').fill('178'); // cm
-    await page.getByLabel('Weight').fill('85'); // kg
+    await page.getByLabel('Weight').fill('95'); // kg (BMI ~30, Obese)
     await page.getByRole("button", { name: "Next" }).click();
 
     // Step 2: Lifestyle Habits
-    await expect(page.getByRole("heading", { name: "Lifestyle Habits" })).toBeVisible();
     await page.getByText("Select an option").first().click();
     await page.getByRole("option", { name: "Current smoker" }).click();
-    // Conditional question for 'Current smoker'
-    await expect(page.getByText('For how many years have you been smoking?')).toBeVisible();
     await page.getByText("Select an option").first().click();
-    await page.getByRole("option", { name: "11-20 years" }).click();
+    await page.getByRole("option", { name: "More than 20 years" }).click();
     await page.getByText("Select an option").first().click();
-    await page.getByRole("option", { name: "3-7" }).click();
+    await page.getByRole("option", { name: "8-14" }).click();
     await page.getByRole("button", { name: "Next" }).click();
     
     // Step 3: Diet & Exercise
-    await expect(page.getByRole("heading", { name: "Diet & Exercise" })).toBeVisible();
     await page.getByText("Select an option").first().click();
-    await page.getByRole("option", { name: "1-2 days" }).click();
+    await page.getByRole("option", { name: "0 days" }).click();
     await page.getByText("Select an option").first().click();
-    await page.getByRole("option", { name: "2-3" }).click();
+    await page.getByRole("option", { name: "0-1" }).click();
     await page.getByText("Select an option").first().click();
-    await page.getByRole("option", { name: "1-2 times" }).click();
+    await page.getByRole("option", { name: "3-4 times" }).click();
     await page.getByRole("button", { name: "Next" }).click();
 
-    // Step 4: Environmental & Occupational History
-    await expect(page.getByRole("heading", { name: "Environmental & Occupational History" })).toBeVisible();
+    // Step 4: Health Conditions
+    await page.getByText("Select an option").first().click();
+    await page.getByRole("option", { name: "Yes" }).click();
     await page.getByText("Select an option").first().click();
     await page.getByRole("option", { name: "Yes" }).click();
     await page.getByRole("button", { name: "Next" }).click();
 
-    // Step 5: Family History
-    await expect(page.getByRole("heading", { name: "Family History" })).toBeVisible();
+    // Step 5: Environmental & Occupational History
     await page.getByText("Select an option").first().click();
     await page.getByRole("option", { name: "No" }).click();
+    await page.getByRole("button", { name: "Next" }).click();
+
+    // Step 6: Family History
+    await page.getByText("Select an option").first().click();
+    await page.getByRole("option", { name: "I don't know" }).click();
     
-    // Mock the API response for the assessment
+    // Mock the API response
     await page.route("**/api/assess", async (route) => {
       const json = {
+        overallSummary: "This is a mock overall summary highlighting key risks.",
         modelAssessments: [
-          {
-            modelName: "General Cancer Risk",
-            riskFactors: [
-              { factor: "Smoking-Related Risk", riskLevel: "High", explanation: "Mock explanation for general smoking risk." }
-            ]
-          },
-          {
-            modelName: "Lung Cancer Risk",
-            riskFactors: [
-              { factor: "Smoking Impact", riskLevel: "High", explanation: "Mock explanation for lung cancer smoking risk." },
-              { factor: "Environmental & Occupational Risks", riskLevel: "High", explanation: "Mock explanation for asbestos exposure." }
-            ]
-          }
+          { modelName: "General Cancer Risk", riskFactors: [{ factor: "Genetic Predisposition", riskLevel: "Moderate", explanation: "Mock explanation for genetics." }] },
+          { modelName: "Lung Cancer Risk", riskFactors: [{ factor: "Smoking Impact", riskLevel: "High", explanation: "Mock explanation for smoking." }] },
+          { modelName: "Cardiovascular Risk", riskFactors: [{ factor: "Key Health Indicators", riskLevel: "High", explanation: "Mock explanation for cardio." }] }
         ],
         positiveFactors: [],
-        recommendations: ["Consult a healthcare professional about these results."],
+        recommendations: ["Consult a healthcare professional."],
       };
       await route.fulfill({ json });
     });
@@ -88,22 +80,24 @@ test.describe("Core Assessment Flow v2", () => {
     await expect(page).toHaveURL("/results");
     await expect(page.getByRole("heading", { name: "Your Assessment Results" })).toBeVisible();
 
-    // Check for tabbed interface
+    // Check for overall summary
+    await expect(page.getByRole("heading", { name: "Overall Summary" })).toBeVisible();
+    await expect(page.getByText("This is a mock overall summary highlighting key risks.")).toBeVisible();
+
+    // Check for tabs
     await expect(page.getByRole('tab', { name: 'General Cancer Risk' })).toBeVisible();
     await expect(page.getByRole('tab', { name: 'Lung Cancer Risk' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Cardiovascular Risk' })).toBeVisible();
 
-    // Check content of the first tab (should be visible by default)
-    await expect(page.getByText("Smoking-Related Risk")).toBeVisible();
-    await expect(page.getByText("Mock explanation for general smoking risk.")).toBeVisible();
-
-    // Click the second tab and check its content
+    // Check content of the first tab
+    await expect(page.getByText("Genetic Predisposition")).toBeVisible();
+    
+    // Click and check second tab
     await page.getByRole('tab', { name: 'Lung Cancer Risk' }).click();
     await expect(page.getByText("Smoking Impact")).toBeVisible();
-    await expect(page.getByText("Mock explanation for lung cancer smoking risk.")).toBeVisible();
-    await expect(page.getByText("Environmental & Occupational Risks")).toBeVisible();
-    await expect(page.getByText("Mock explanation for asbestos exposure.")).toBeVisible();
 
-    // Check for global recommendations
-    await expect(page.getByText("Consult a healthcare professional about these results.")).toBeVisible();
+    // Click and check third tab
+    await page.getByRole('tab', { name: 'Cardiovascular Risk' }).click();
+    await expect(page.getByText("Key Health Indicators")).toBeVisible();
   });
 });

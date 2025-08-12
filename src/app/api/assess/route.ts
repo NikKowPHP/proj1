@@ -18,7 +18,7 @@ const answersSchema = z
   })
   .catchall(z.string().optional());
 
-// Zod schema for the AI response to ensure type safety remains the same
+// Zod schema for the AI response to ensure type safety
 const riskFactorSchema = z.object({
   factor: z.string(),
   riskLevel: z.enum(["Low", "Moderate", "High"]),
@@ -36,6 +36,7 @@ const positiveFactorSchema = z.object({
 });
 
 const aiResponseSchema = z.object({
+  overallSummary: z.string(),
   modelAssessments: z.array(modelAssessmentSchema),
   positiveFactors: z.array(positiveFactorSchema),
   recommendations: z.array(z.string()),

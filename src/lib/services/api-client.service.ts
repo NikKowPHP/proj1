@@ -9,8 +9,13 @@ export const apiClient = {
     },
   },
   assessment: {
-    assess: async (payload: { answers: Record<string, string> }) => {
-      const { data } = await axios.post("/api/assess", payload);
+    assess: async (payload: {
+      answers: Record<string, string>;
+    }): Promise<AssessmentResult> => {
+      const { data } = await axios.post<AssessmentResult>(
+        "/api/assess",
+        payload,
+      );
       return data;
     },
   },

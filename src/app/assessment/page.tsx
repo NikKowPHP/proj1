@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/services/api-client.service";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAssessmentStore } from "@/lib/stores/assessment.store.ts";
+import { useAssessmentStore } from "@/lib/stores/assessment.store";
 import { Button } from "@/components/ui/button";
 import {
   Card,

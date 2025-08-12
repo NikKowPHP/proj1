@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAssessmentStore } from "@/lib/stores/assessment.store.ts";
+import { useAssessmentStore } from "@/lib/stores/assessment.store";
 import { useRiskAssessment } from "@/lib/hooks/data/useRiskAssessment";
 import {
   Card,

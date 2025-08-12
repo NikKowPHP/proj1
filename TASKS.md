@@ -1,3 +1,47 @@
+The build is failing due to TypeScript errors in `src/app/results/page.tsx`. The errors indicate that parameters in several `.map()` calls have an implicit `any` type. This is because the `assessment` data object, which comes from the `useRiskAssessment` hook, is not correctly typed.
+
+My plan is to fix this by improving type safety at the data-fetching layer. I will modify `src/lib/services/api-client.service.ts` to specify the return type of the `assess` method. By annotating that `apiClient.assessment.assess` returns a `Promise<AssessmentResult>`, TanStack Query's `useMutation` hook will automatically infer this type. This will cause the `assessment` variable in the results page to be correctly typed, which will resolve all the implicit `any` errors in the component's render method.
+
+I will then add a new task to `TASKS.md` to record this fix.
+
+-------------------------------------------------------------------------------
+### src/lib/services/api-client.service.ts
+```typescript
+import axios from "axios";
+import type { AssessmentResult } from "@/lib/types";
+
+export const apiClient = {
+  questionnaire: {
+    getActive: async () => {
+      const { data } = await axios.get("/api/questionnaire");
+      return data;
+    },
+  },
+  assessment: {
+    assess: async (payload: {
+      answers: Record<string, string>;
+    }): Promise<AssessmentResult> => {
+      const { data } = await axios.post<AssessmentResult>(
+        "/api/assess",
+        payload,
+      );
+      return data;
+    },
+  },
+  export: {
+    email: async (payload: {
+      recipientEmail: string;
+      assessmentData: AssessmentResult;
+    }) => {
+      const { data } = await axios.post("/api/export/email", payload);
+      return data;
+    },
+  },
+};
+```
+-------------------------------------------------------------------------------
+### TASKS.md
+```markdown
 # Atomic Plan: Final Production Polish
 
 **Objective:** To address the final remaining issues related to medical logic externalization, user experience, and codebase cleanup to prepare the application for a production launch.
@@ -105,9 +149,3 @@
     *   **Action:** Change the `"name"` field from `"lexity"` to `"health-risk-assessor"`.
 
 *   [x] **Task 3.4: Final Verification**
-    *   **Action:** Run `npm install` to update the `package-lock.json` file.
-    *   **Action:** Build and run the application locally to ensure all changes are applied and no new errors have been introduced.
-
-- [x] Fix build error by correcting ThemeToggle import path.
-- [x] Fix Prisma seed script path error.
-- [x] Fix build error by removing unused audio evaluation logic.

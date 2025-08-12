@@ -21,7 +21,7 @@ export interface TextAIProvider {
   ): Promise<string>;
 }
 
-// Assessment Result Type
+// Assessment Result Type (final output from AI to client)
 export interface AssessmentResult {
   riskFactors: {
     factor: string;
@@ -33,4 +33,41 @@ export interface AssessmentResult {
     explanation: string;
   }[];
   recommendations: string[];
+}
+
+// --- New types for the deterministic calculation engine ---
+
+/**
+ * The risk level calculated by the deterministic engine.
+ * 'Average' will be translated to 'Moderate' by the AI for user-facing output.
+ */
+export type CalculatedRiskLevel = "Low" | "Average" | "High";
+
+/**
+ * Represents a single risk factor calculated by the deterministic engine.
+ */
+export interface CalculatedRiskFactor {
+  id: string; // e.g., 'SMOKING_RELATED'
+  name: string; // e.g., 'Smoking-Related Risk'
+  level: CalculatedRiskLevel;
+  score: number;
+}
+
+/**
+ * Represents a positive lifestyle factor identified by the deterministic engine.
+ */
+export interface IdentifiedPositiveFactor {
+  id: string; // e.g., 'EXERCISE'
+  name: string; // e.g., 'Regular Physical Activity'
+  description: string;
+}
+
+/**
+ * The data contract for the output of the deterministic risk calculation engine.
+ * This object is the "source of truth" that will be passed to the AI for explanation.
+ */
+export interface CalculationResult {
+  riskFactors: CalculatedRiskFactor[];
+  positiveFactors: IdentifiedPositiveFactor[];
+  userAnswers: Record<string, string>;
 }

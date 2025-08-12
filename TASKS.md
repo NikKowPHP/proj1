@@ -1,157 +1,73 @@
-# Master Plan: Anonymous Cancer Risk Assessment Tool
+### **Phase 0: Pre-Development (Prerequisites)**
 
-This document outlines the development plan for creating the Anonymous Cancer Risk Assessment Tool by adapting the existing Lexity codebase. The plan is divided into sequential phases, starting with the removal of legacy features and progressing to the implementation and refinement of the new application.
-
-## Phase 0: Foundation & Cleanup (Stripping Down Lexity)
-
-**Objective:** To remove all functionality related to user accounts, persistent data, monetization, and language learning, creating a clean, anonymous-first foundation.
-
-*   [x] **Task 1: Remove Authentication System**
-    *   [x] Delete directories: `src/app/login/`, `src/app/signup/`, `src/app/forgot-password/`, `src/app/reset-password/`.
-    *   [x] Delete API route directory: `src/app/api/auth/`.
-    *   [x] Delete components: `src/components/SignInForm.tsx`, `SignUpForm.tsx`, `AuthLinks.tsx`, etc.
-    *   [x] Delete `src/lib/stores/auth.store.ts`.
-    *   [x] Delete utility files: `src/lib/auth.ts`, `src/lib/user.ts`.
-    *   [x] Delete E2E tests: `e2e/auth.setup.ts`, `e2e/auth.spec.ts`.
-    *   [x] Refactor `middleware.ts` to remove all user authentication logic. Retain the Content Security Policy header logic.
-
-*   [x] **Task 2: Reconfigure Database for Operational Use (No PII)**
-    *   [x] **Step 1: Gut the Schema.** In `prisma/schema.prisma`, delete all existing user-related models.
-    *   [x] **Step 2: Define New, Non-PII Models.** Add simple models for operational purposes. For example:
-        ```prisma
-        // prisma/schema.prisma
-
-        model AssessmentLog {
-          id        String   @id @default(cuid())
-          createdAt DateTime @default(now())
-          status    String   // e.g., "SUCCESS", "AI_ERROR"
-        }
-
-        model Questionnaire {
-          id        String   @id @default(cuid())
-          version   Int      @unique
-          isActive  Boolean  @default(false)
-          content   Json
-          createdAt DateTime @default(now())
-        }
-        ```
-    *   [x] **Step 3: Create New Migration.** Generate a new migration to apply this clean schema: `npx prisma migrate dev --name reconfigure-for-operational-db`.
-    *   [x] **Step 4: Prepare Seed Script.** Clear out the old `prisma/seed.cts` and prepare it for the new `Questionnaire` model.
-
-*   [x] **Task 3: Remove Monetization & Admin Features**
-    *   [x] Delete directories: `src/app/pricing/`, `src/app/admin/`.
-    *   [x] Delete API route directories: `src/app/api/billing/`, `src/app/api/admin/`.
-    *   [x] Delete `src/lib/config/pricing.ts` and `src/lib/services/stripe.service.ts`.
-    *   [x] Delete components: `src/components/PricingTable.tsx`, `src/components/AdminDashboard.tsx`, `src/components/AdminSettings.tsx`.
-
-*   [x] **Task 4: Purge Unused UI, APIs, and State**
-    *   [x] Delete all language-learning pages and their corresponding API routes.
-    *   [x] Delete all non-reusable UI components from `src/components/`.
-    *   [x] Delete unused state stores: `src/lib/stores/onboarding.store.ts`, `src/lib/stores/language.store.ts`.
-
-*   [x] **Task 5: Finalize Cleanup**
-    *   [x] Update `.env.example` to remove Supabase, Stripe, and other unused variables.
-    *   [x] Run `npm prune` or manually audit `package.json` to remove orphaned dependencies.
-    *   [x] Verify that the stripped-down application builds and runs without errors.
+*   [x] **[ADDITION] Task 0: Finalize Medical Logic and Parameters**
+    *   **Action:** Work with the medical advisor to get the **exact, finalized calculation logic** for each risk factor. This must include:
+        *   The specific questions that influence a risk score.
+        *   The numerical points or weighting for each answer.
+        *   The formulas for combining scores.
+        *   The score thresholds for classifying risk as `Low`, `Average`, or `Higher than Average`.
+    *   **Output:** A definitive document or spreadsheet that a developer can implement without ambiguity. **(This is a hard blocker for Phase 1).**
 
 ---
 
-## Phase 1: MVP Implementation - Core Assessment Flow
+### **Phase 1: Backend Refactoring**
 
-**Objective:** To implement the core anonymous user journey from the welcome screen to the results dashboard.
+This phase focuses on creating the new calculation engine and rewiring the API and AI services to use it.
 
-*   [x] **Task 0: Content & Medical Review (CRITICAL PATH)**
-    *   [x] **Task 0a: Finalize Content.** Draft and receive final approval from the medical advisor for all questionnaire questions, logic, and disclaimers.
-    *   [x] **Task 0b: Structure Content.** A developer must convert the approved content into a structured JSON file (e.g., `src/lib/assessment-questions.json`).
-    *   [x] **Task 0c: Implement Seeding Script.** Update `prisma/seed.cts` to read the JSON file and populate the `Questionnaire` table with version 1. **(This is a blocker for API and UI development).**
+*   [x] **Task 1: Define Data Contracts in `types.ts`**
+    *   **File:** `src/lib/types/index.ts`
+    *   **Action:** Define the `CalculationResult` interface that the new engine will produce. This object will be the "source of truth" passed to the AI.
 
-*   [x] **Task 1: Create Welcome Page**
-    *   [x] Update `src/app/page.tsx` to become the welcome screen, including the approved disclaimer text.
-    *   [x] Add the `[ Start My Anonymous Assessment ]` button, linking to `/assessment`.
+*   [x] **[ADDITION] Task 2: Create Risk Model Configuration**
+    *   **File:** Create a new file `src/lib/risk-model-config.json` (or similar).
+    *   **Action:** Translate the finalized medical logic from the Pre-Development phase into a structured JSON configuration. This file will contain all the numerical weights, thresholds, and mappings. The code will read from this file.
 
-*   [x] **Task 2: Build the Questionnaire**
-    *   [x] Create the new route: `src/app/assessment/page.tsx`.
-    *   [x] The page will fetch the active questionnaire content from a new API endpoint (`/api/questionnaire`).
-    *   [x] Create a new Zustand store `src/lib/stores/assessment.store.ts` to hold answers, using `sessionStorage` for persistence.
-    *   [x] Implement the multi-step wizard UI that dynamically renders based on the fetched questionnaire JSON.
-    *   [x] Implement "Next" and "Back" navigation and a small notice about session-based progress saving.
+*   [ ] **Task 3: Create the Deterministic Calculation Engine**
+    *   **File:** Create a new file `src/lib/services/risk-calculator.service.ts`.
+    *   **Action:** Implement the risk calculation logic. This service will **load its parameters from `risk-model-config.json`** and apply them to the user's answers.
 
-*   [x] **Task 3: Implement the Results Dashboard**
-    *   [x] Create the new route: `src/app/results/page.tsx`.
-    *   [x] Create a `useRiskAssessment` hook using `@tanstack/react-query`.
-    *   [x] Implement a loading state and a user-friendly error state.
-    *   [x] Build the results UI with a card-based layout.
+*   [ ] **Task 4: Create Unit Tests for the Calculation Engine**
+    *   **File:** Create a new test file `src/lib/services/risk-calculator.service.test.ts`.
+    *   **Action:** Write comprehensive unit tests for the `calculateRisk` function to ensure its accuracy.
+    *   **Test Cases:** Test with "low-risk", "high-risk", and edge-case answer sets to verify the output matches the medical advisor's specification.
 
-*   [x] **Task 4: Develop Backend Assessment Logic**
-    *   [x] Create the new API route: `src/app/api/assess/route.ts`.
-    *   [x] Implement IP-based rate limiting on this endpoint.
-    *   [x] Create a new prompt file: `src/lib/ai/prompts/cancerRiskAssessment.prompt.ts`.
-    *   [x] Add a new method `getRiskAssessment(answers)` to `src/lib/ai/composite-ai.service.ts`.
-    *   [x] Implement Zod validation on the AI response.
-    *   [x] Upon success, create a new record in the `AssessmentLog` table.
+*   [ ] **Task 5: Refactor the AI Prompt**
+    *   **File:** `src/lib/ai/prompts/cancerRiskAssessment.prompt.ts`
+    *   **Action:** Rewrite the prompt. The new prompt will **receive** the `CalculationResult` and be asked to **explain** it, not calculate it.
 
----
+*   [ ] **Task 6: Refactor the Composite AI Service**
+    *   **File:** `src/lib/ai/composite-ai.service.ts`
+    *   **Action:** Rename `getRiskAssessment(answers)` to `getRiskAssessmentExplanation(calculationResult: CalculationResult)` and update it to use the new prompt.
 
-## Phase 2: Post-MVP Feature - Export & Actionability
-
-**Objective:** To add the optional PDF and email export features while strictly maintaining user anonymity.
-
-*   [x] **Task 1: Implement PDF Export**
-    *   [x] Install `jspdf` and `jspdf-autotable`.
-    *   [x] Create a new utility module: `src/lib/utils/pdf-generator.ts`.
-    *   [x] Add a `[ 📥 Download as PDF ]` button to the results page.
-
-*   [x] **Task 2: Implement "Send-and-Forget" Email Export**
-    *   [x] Add an `[ 📧 Email My Results ]` button to the results page that opens a `Dialog`.
-    *   [x] Create a new API route: `src/app/api/export/email/route.ts`.
-    *   [x] Design and build an HTML email template for the results report.
-    *   [x] Implement the "Send-and-Forget" logic.
-
-*   [x] **Task 3: Add In-App Resources**
-    *   [x] On the results page, add sections for "conversation starters" and links to health organizations.
+*   [ ] **Task 7: Orchestrate the Hybrid Flow in the API Route**
+    *   **File:** `src/app/api/assess/route.ts`
+    *   **Action:** Rewire the handler to use the new hybrid flow:
+        1.  Receive `answers` from the client.
+        2.  Call `calculateRisk(answers)` to get a `CalculationResult`.
+        3.  Pass this `CalculationResult` object to `aiService.getRiskAssessmentExplanation()`.
+        4.  Return the final, user-friendly JSON from the AI to the client after Zod validation.
 
 ---
 
-## Phase 3: Pre-Launch - Refinement & Testing
+### **Phase 2: Testing & Verification**
 
-**Objective:** To polish the application, ensure all ethical guidelines are met, and create a new, relevant testing suite.
+This phase ensures that the refactored system works correctly from end to end.
 
-*   [x] **Task 1: UI/UX & Theming**
-    *   [x] Update `src/app/globals.css` and `tailwind.config.ts` to implement the "calm, reassuring" color palette.
-    *   [x] Implement consistent loading and disabled states for all interactive elements.
+*   [ ] **Task 1: Update API Integration Tests**
+    *   **File:** The Jest test file for `/api/assess/route.ts`.
+    *   **Action:**
+        *   Mock the `risk-calculator.service`.
+        *   Assert that `calculateRisk` is called correctly.
+        *   Assert that `getRiskAssessmentExplanation` is called with the mock output from the calculator.
 
-*   [x] **Task 2: Legal & Compliance**
-    *   [x] Create static pages: `/privacy` and `/terms`.
-    *   [x] Populate pages with approved legal text.
-    *   [x] Add links to these pages in the application footer.
+*   [ ] **Task 2: Update End-to-End Tests**
+    *   **File:** `e2e/assessment.spec.ts`
+    *   **Action:** Update the `page.route()` mock for the `/api/assess` endpoint to return the final JSON structure that the new hybrid approach produces.
 
-*   [x] **Task 3: Overhaul E2E Test Suite**
-    *   [x] Delete all existing files in the `e2e/` directory.
-    *   [x] Create `e2e/assessment.spec.ts` and `e2e/export.spec.ts`.
+*   [ ] **[ADDITION] Task 3: Staging Environment Verification**
+    *   **Action:** Deploy the completed changes to a private staging environment.
+    *   **Action:** Have the client and, most importantly, the **medical advisor**, perform a User Acceptance Test (UAT) on the staging environment. They must verify that the results for a variety of inputs are accurate and communicated correctly.
 
-*   [x] **Task 4: Unit & Integration Testing**
-    *   [x] Write Jest tests for `pdf-generator.ts` and API endpoints.
-    *   [x] Perform an accessibility audit.
-
-*   [x] **Task 5: Pre-Launch Checklist**
-    *   [x] Finalize and document all required production environment variables.
-    *   [x] Configure production environment variables on Vercel.
-    *   [x] Configure DNS and domain settings.
-    *   [x] Final review of all disclaimer text with the medical advisor/client.
-    *   [x] Final sign-off on the production build.
-
----
-
-## Phase 4: Post-Launch & Future Scope
-
-**Objective:** To monitor the application's performance and plan for future enhancements.
-
-*   [x] **Task 1: Launch & Monitoring**
-    *   [x] Deploy the application to production via Vercel.
-    *   [x] Run `npx prisma db seed` as part of the initial deployment script.
-    *   [x] Monitor Sentry, Vercel Analytics, and the `AssessmentLog` table.
-
-*   [x] **Task 2: Future Feature Ideation (Post-Launch)**
-    *   [x] Scope the effort to add more cancer/health risk models.
-    *   [x] Investigate localization to support multiple languages.
-    *   [x] Brainstorm a secure, consent-based version for clinical use by healthcare providers.
+*   [ ] **Task 4: Final Review and Deployment**
+    *   **Action:** Manually test the full flow one last time.
+    *   **Action:** Merge the changes into the main branch for production deployment.

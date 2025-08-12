@@ -81,10 +81,50 @@ export class CerebrasService implements TextAIProvider {
       throw new Error("Invalid response structure from Cerebras API.");
     }
 
-    const cleanedContent = rawContent
-      .replace(/<think>[\s\S]*?<\/think>/, "")
-      .trim();
-    return JSON.parse(cleanedContent) as T;
+    // Robust JSON extraction: Find the last complete JSON object in the response.
+    const lastBrace = rawContent.lastIndexOf("}");
+    if (lastBrace === -1) {
+      logger.error(
+        "Cerebras response did not contain a valid JSON object (no closing brace).",
+        { rawContent, provider: this.providerName },
+      );
+      throw new Error("Response did not contain a valid JSON object.");
+    }
+
+    let braceCount = 0;
+    let firstBrace = -1;
+    for (let i = lastBrace; i >= 0; i--) {
+      if (rawContent[i] === "}") {
+        braceCount++;
+      }
+      if (rawContent[i] === "{") {
+        braceCount--;
+        if (braceCount === 0) {
+          firstBrace = i;
+          break;
+        }
+      }
+    }
+
+    if (firstBrace === -1) {
+      logger.error(
+        "Cerebras response did not contain a valid JSON object (no matching opening brace).",
+        { rawContent, provider: this.providerName },
+      );
+      throw new Error("Response did not contain a valid JSON object.");
+    }
+
+    const jsonString = rawContent.substring(firstBrace, lastBrace + 1);
+
+    try {
+      return JSON.parse(jsonString) as T;
+    } catch (e: any) {
+      logger.error("Failed to parse JSON from Cerebras response", {
+        jsonString,
+        error: e.message,
+      });
+      throw new Error(`Invalid JSON from ${this.providerName}: ${e.message}`);
+    }
   }
 
   async generateText(prompt: string, model: AIModel): Promise<string> {

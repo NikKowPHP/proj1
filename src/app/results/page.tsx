@@ -224,13 +224,13 @@ export default function ResultsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-4">
-            <Button className="flex-1" onClick={() => generateAssessmentPdf(assessment as AssessmentResult)}>
+            <Button size="lg" className="flex-1" onClick={() => generateAssessmentPdf(assessment as AssessmentResult)}>
               <Download className="mr-2 h-4 w-4" />
               Download as PDF
             </Button>
             <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="flex-1">
+                <Button size="lg" variant="outline" className="flex-1">
                   <Mail className="mr-2 h-4 w-4" />
                   Email My Results
                 </Button>
@@ -261,6 +261,7 @@ export default function ResultsPage() {
 
         <div className="text-center">
           <Button
+            size="lg"
             onClick={() => {
               reset();
               router.push("/");

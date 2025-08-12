@@ -38,8 +38,20 @@ export class GeminiService implements MultimodalAIProvider {
   readonly providerName = "Gemini";
 
   private cleanJsonString(text: string): string {
-    const cleaned = text.replace(/```json/g, "").replace(/```/g, "");
-    return cleaned.trim();
+    // Gemini often wraps JSON in ```json ... ``` or just ``` ... ```
+    const match = text.match(/```(?:json)?([\s\S]*?)```/);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+
+    // Fallback for raw JSON without code fences
+    const firstBrace = text.indexOf("{");
+    const lastBrace = text.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      return text.substring(firstBrace, lastBrace + 1);
+    }
+
+    return text.trim();
   }
 
   private async executeRequest<T>(
@@ -195,7 +207,17 @@ export class GeminiService implements MultimodalAIProvider {
 
         const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!text) throw new Error("Empty response from Gemini API");
-        return JSON.parse(this.cleanJsonString(text)) as T;
+
+        const jsonString = this.cleanJsonString(text);
+        try {
+          return JSON.parse(jsonString) as T;
+        } catch (e) {
+          logger.error("Failed to parse JSON from Gemini response", {
+            jsonString,
+            rawResponse: text,
+          });
+          throw new Error("Invalid JSON response from Gemini.");
+        }
       } finally {
         if (uploadedFile) {
           await this._deleteFile(apiKey, uploadedFile.name);
@@ -218,7 +240,17 @@ export class GeminiService implements MultimodalAIProvider {
       );
       const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("Empty response from Gemini API");
-      return JSON.parse(this.cleanJsonString(text)) as T;
+
+      const jsonString = this.cleanJsonString(text);
+      try {
+        return JSON.parse(jsonString) as T;
+      } catch (e) {
+        logger.error("Failed to parse JSON from Gemini response", {
+          jsonString,
+          rawResponse: text,
+        });
+        throw new Error("Invalid JSON response from Gemini.");
+      }
     });
   }
 

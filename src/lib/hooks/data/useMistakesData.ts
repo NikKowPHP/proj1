@@ -1,0 +1,28 @@
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/services/api-client.service";
+import { useAuthStore } from "@/lib/stores/auth.store";
+import { useLanguageStore } from "@/lib/stores/language.store";
+
+export const useMistakesData = (page: number, type?: string) => {
+  const authUser = useAuthStore((state) => state.user);
+  const activeTargetLanguage = useLanguageStore(
+    (state) => state.activeTargetLanguage,
+  );
+
+  return useQuery({
+    queryKey: [
+      "mistakes",
+      authUser?.id,
+      activeTargetLanguage,
+      page,
+      type,
+    ],
+    queryFn: () =>
+      apiClient.user.getMistakes({
+        targetLanguage: activeTargetLanguage!,
+        page,
+        type,
+      }),
+    enabled: !!authUser && !!activeTargetLanguage,
+  });
+};

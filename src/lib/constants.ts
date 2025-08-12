@@ -1,0 +1,15 @@
+export const SUPPORTED_LANGUAGES = [
+  { name: "English", value: "english", code: "en-US" },
+  { name: "Spanish", value: "spanish", code: "es-ES" },
+  { name: "French", value: "french", code: "fr-FR" },
+  { name: "German", value: "german", code: "de-DE" },
+  { name: "Polish", value: "polish", code: "pl-PL" },
+  { name: "Italian", value: "italian", code: "it-IT" },
+  { name: "Portuguese", value: "portuguese", code: "pt-PT" },
+  { name: "Russian", value: "russian", code: "ru-RU" },
+  { name: "Japanese", value: "japanese", code: "ja-JP" },
+  { name: "Korean", value: "korean", code: "ko-KR" },
+  { name: "Mandarin Chinese", value: "mandarin", code: "zh-CN" },
+  { name: "Arabic", value: "arabic", code: "ar-SA" },
+  { name: "Hindi", value: "hindi", code: "hi-IN" },
+];

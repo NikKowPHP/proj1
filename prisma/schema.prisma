@@ -1,0 +1,192 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SrsItemType {
+  MISTAKE
+  TRANSLATION
+  PRACTICE_MISTAKE
+}
+
+enum ReadingLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model User {
+  id                    String    @id
+  email                 String    @unique
+  supabaseAuthId        String    @unique
+  nativeLanguage        String?
+  defaultTargetLanguage String?
+  writingStyle          String?
+  writingPurpose        String?
+  selfAssessedLevel     String?
+  goals                 Json?
+  status                String    @default("ACTIVE") // e.g., ACTIVE, DELETION_PENDING
+  lastUsageReset        DateTime? // Timestamp for resetting daily limits
+  onboardingCompleted   Boolean   @default(false)
+
+  // Monetization
+  stripeCustomerId   String? @unique
+  subscriptionTier   String  @default("FREE")
+  subscriptionStatus String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  topics           Topic[]
+  journalEntries   JournalEntry[]
+  srsItems         SrsReviewItem[]
+  languageProfiles LanguageProfile[]
+  suggestedTopics  SuggestedTopic[]
+}
+
+model LanguageProfile {
+  id                    String @id @default(cuid())
+  userId                String
+  user                  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  language              String
+  aiAssessedProficiency Float  @default(2.0)
+  proficiencySubScores  Json?
+
+  @@unique([userId, language])
+}
+
+model Topic {
+  id             String         @id @default(cuid())
+  userId         String
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  targetLanguage String?
+  isMastered     Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  journalEntries JournalEntry[]
+  imageUrl       String?
+  type           String         @default("TEXT")
+
+  @@unique([userId, title, targetLanguage])
+}
+
+model JournalEntry {
+  id             String    @id @default(cuid())
+  authorId       String
+  author         User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  topicId        String
+  topic          Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  content        String    @db.Text
+  aidsUsage      Json?
+  targetLanguage String?
+  mode           String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  analysis       Analysis?
+}
+
+model Analysis {
+  id            String       @id @default(cuid())
+  entryId       String       @unique
+  entry         JournalEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  grammarScore  Int
+  phrasingScore Int
+  vocabScore    Int
+  feedbackJson  String       @db.Text
+  rawAiResponse String       @db.Text
+  createdAt     DateTime     @default(now())
+  mistakes      Mistake[]
+}
+
+model Mistake {
+  id               String            @id @default(cuid())
+  analysisId       String
+  analysis         Analysis          @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  type             String
+  originalText     String            @db.Text
+  correctedText    String            @db.Text
+  explanation      String            @db.Text
+  createdAt        DateTime          @default(now())
+  srsReviewItems   SrsReviewItem[]
+  practiceAttempts PracticeAttempt[]
+}
+
+model SrsReviewItem {
+  id             String      @id @default(cuid())
+  userId         String
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type           SrsItemType
+  frontContent   String
+  backContent    String
+  context        String?
+  mistakeId      String?
+  mistake        Mistake?    @relation(fields: [mistakeId], references: [id], onDelete: Cascade)
+  targetLanguage String?
+  nextReviewAt   DateTime
+  lastReviewedAt DateTime?
+  interval       Int         @default(1)
+  easeFactor     Float       @default(2.5)
+  createdAt      DateTime    @default(now())
+}
+
+model SuggestedTopic {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  targetLanguage String
+  createdAt      DateTime @default(now())
+
+  @@unique([userId, title, targetLanguage])
+}
+
+model ProcessedWebhook {
+  id          String   @id @default(cuid())
+  eventId     String   @unique
+  type        String
+  processedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+}
+
+model SystemSetting {
+  key       String   @id
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PracticeAttempt {
+  id               String   @id @default(cuid())
+  mistakeId        String
+  mistake          Mistake  @relation(fields: [mistakeId], references: [id], onDelete: Cascade)
+  userId           String
+  taskPrompt       String   @db.Text
+  expectedAnswer   String   @db.Text
+  userAnswer       String   @db.Text
+  aiEvaluationJson String   @db.Text
+  isCorrect        Boolean
+  score            Float?
+  createdAt        DateTime @default(now())
+
+  @@index([mistakeId])
+  @@index([userId])
+}
+
+model ReadingMaterial {
+  id             String       @id @default(cuid())
+  title          String       @db.Text
+  content        String       @db.Text
+  targetLanguage String
+  level          ReadingLevel
+  source         String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([targetLanguage, level])
+}

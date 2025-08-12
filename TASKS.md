@@ -1,0 +1,4 @@
+- [x] Fix "Maximum update depth exceeded" React error in Select component.
+- [x] Fix "Maximum update depth exceeded" React error by correctly forwarding refs in UI components.
+- [x] Fix "Maximum update depth exceeded" error by systematically adding `React.forwardRef` to all custom UI components wrapping Radix primitives.
+- [x] Fix "Maximum update depth exceeded" error by systematically adding `React.forwardRef` to all custom UI components, especially the Dialog component, to resolve infinite render loop on dashboard.

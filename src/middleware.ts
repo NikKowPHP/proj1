@@ -15,14 +15,19 @@ export async function middleware(request: NextRequest) {
     },
   });
 
+  const sentryDsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+  const sentryHost = sentryDsn ? new URL(sentryDsn).host : "";
+
   // Construct and set the final CSP header
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline' https://vercel.live;
     style-src 'self' 'unsafe-inline';
     img-src 'self' data: https:;
     media-src 'self' data:;
-    connect-src 'self';
+    connect-src 'self' ${
+      sentryHost ? `https://${sentryHost}` : ""
+    } https://vercel.live https://vitals.vercel-insights.com;
     font-src 'self';
     worker-src 'self' blob:;
     object-src 'none';

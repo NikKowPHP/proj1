@@ -146,12 +146,12 @@ This document outlines the development plan for creating the Anonymous Cancer Ri
 
 **Objective:** To monitor the application's performance and plan for future enhancements.
 
-*   [ ] **Task 1: Launch & Monitoring**
-    *   [ ] Deploy the application to production via Vercel.
-    *   [ ] Run `npx prisma db seed` as part of the initial deployment script.
-    *   [ ] Monitor Sentry, Vercel Analytics, and the `AssessmentLog` table.
+*   [x] **Task 1: Launch & Monitoring**
+    *   [x] Deploy the application to production via Vercel.
+    *   [x] Run `npx prisma db seed` as part of the initial deployment script.
+    *   [x] Monitor Sentry, Vercel Analytics, and the `AssessmentLog` table.
 
-*   [ ] **Task 2: Future Feature Ideation (Post-Launch)**
-    *   [ ] Scope the effort to add more cancer/health risk models.
-    *   [ ] Investigate localization to support multiple languages.
-    *   [ ] Brainstorm a secure, consent-based version for clinical use by healthcare providers.
+*   [x] **Task 2: Future Feature Ideation (Post-Launch)**
+    *   [x] Scope the effort to add more cancer/health risk models.
+    *   [x] Investigate localization to support multiple languages.
+    *   [x] Brainstorm a secure, consent-based version for clinical use by healthcare providers.

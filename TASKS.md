@@ -76,11 +76,11 @@ This plan details the necessary steps to upgrade the Health Risk Assessor's ques
 ### **Phase D: Quality Assurance**
 *Goal: Verify the correctness, robustness, and usability of the entire new flow.*
 
-- **[ ] Task D.1: Update Unit Tests**
+- **[x] Task D.1: Update Unit Tests**
   - **File:** `src/lib/services/risk-calculator.service.test.ts`
   - **Action:** Add new `it` blocks to test the `calculateRisk` function with imperial units and with data that should trigger the new risk factors (`BODY_COMPOSITION`, `GENETIC_PREDISPOSITION`).
 
-- **[ ] Task D.2: Update End-to-End Tests**
+- **[x] Task D.2: Update End-to-End Tests**
   - **File:** `e2e/assessment.spec.ts`
   - **Action:** Modify the Playwright test script to cover the complete v2 flow:
     1.  Interact with the new unit selection `Tabs`.
@@ -89,7 +89,7 @@ This plan details the necessary steps to upgrade the Health Risk Assessor's ques
     4.  Complete the final "Medical History" step and submit.
     5.  Assert that the results page loads successfully.
 
-- **[ ] Task D.3: Perform Manual User Acceptance Testing (UAT)**
+- **[x] Task D.3: Perform Manual User Acceptance Testing (UAT)**
   - **Action:** Conduct a thorough manual test of the entire application.
     -  Test with valid, invalid, and edge-case data in the new inputs.
     -  Switch between units midway through a step to ensure behavior is correct.

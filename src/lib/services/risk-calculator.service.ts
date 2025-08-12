@@ -52,8 +52,8 @@ export function calculateRisk(answers: Answers): CalculationResult {
   const units = processedAnswers.units;
 
   if (heightStr && weightStr && units) {
-    let height = parseFloat(heightStr);
-    let weight = parseFloat(weightStr);
+    const height = parseFloat(heightStr);
+    const weight = parseFloat(weightStr);
 
     let heightInMeters: number;
     let weightInKg: number;

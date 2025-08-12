@@ -3,6 +3,7 @@ import { GroqService } from "./groq-service";
 import { GeminiService } from "./gemini-service";
 import { executeWithFallbacks, ProviderConfig } from "./composite-executor";
 
+import { getCancerRiskAssessmentPrompt } from "./prompts/cancerRiskAssessment.prompt";
 import type { AudioEvaluationContext } from "@/lib/types";
 import { AIModel, TextAIProvider, UnifiedEvaluationResult } from "./types";
 import { TutorChatMessage } from "../types";
@@ -47,5 +48,15 @@ export class CompositeAIService {
       { provider: this.providers.groq, model: modelConfig.GROQ as AIModel },
       { provider: this.providers.gemini, model: modelConfig.GEMINI as AIModel },
     ];
+  }
+
+  async getRiskAssessment(answers: Record<string, string>, userId?: string) {
+    const prompt = getCancerRiskAssessmentPrompt(answers);
+    const providerChain = this.getProviderChain("large");
+    return executeWithFallbacks(
+      providerChain,
+      (provider, model) => provider.generateJson(prompt, model),
+      userId,
+    );
   }
 }

@@ -60,35 +60,35 @@ This document outlines the development plan for creating the Anonymous Cancer Ri
 
 **Objective:** To implement the core anonymous user journey from the welcome screen to the results dashboard.
 
-*   [ ] **Task 0: Content & Medical Review (CRITICAL PATH)**
-    *   [ ] **Task 0a: Finalize Content.** Draft and receive final approval from the medical advisor for all questionnaire questions, logic, and disclaimers.
-    *   [ ] **Task 0b: Structure Content.** A developer must convert the approved content into a structured JSON file (e.g., `src/lib/assessment-questions.json`).
-    *   [ ] **Task 0c: Implement Seeding Script.** Update `prisma/seed.cts` to read the JSON file and populate the `Questionnaire` table with version 1. **(This is a blocker for API and UI development).**
+*   [x] **Task 0: Content & Medical Review (CRITICAL PATH)**
+    *   [x] **Task 0a: Finalize Content.** Draft and receive final approval from the medical advisor for all questionnaire questions, logic, and disclaimers.
+    *   [x] **Task 0b: Structure Content.** A developer must convert the approved content into a structured JSON file (e.g., `src/lib/assessment-questions.json`).
+    *   [x] **Task 0c: Implement Seeding Script.** Update `prisma/seed.cts` to read the JSON file and populate the `Questionnaire` table with version 1. **(This is a blocker for API and UI development).**
 
-*   [ ] **Task 1: Create Welcome Page**
-    *   [ ] Update `src/app/page.tsx` to become the welcome screen, including the approved disclaimer text.
-    *   [ ] Add the `[ Start My Anonymous Assessment ]` button, linking to `/assessment`.
+*   [x] **Task 1: Create Welcome Page**
+    *   [x] Update `src/app/page.tsx` to become the welcome screen, including the approved disclaimer text.
+    *   [x] Add the `[ Start My Anonymous Assessment ]` button, linking to `/assessment`.
 
-*   [ ] **Task 2: Build the Questionnaire**
-    *   [ ] Create the new route: `src/app/assessment/page.tsx`.
-    *   [ ] The page will fetch the active questionnaire content from a new API endpoint (`/api/questionnaire`).
-    *   [ ] Create a new Zustand store `src/lib/stores/assessment.store.ts` to hold answers, using `sessionStorage` for persistence.
-    *   [ ] Implement the multi-step wizard UI that dynamically renders based on the fetched questionnaire JSON.
-    *   [ ] Implement "Next" and "Back" navigation and a small notice about session-based progress saving.
+*   [x] **Task 2: Build the Questionnaire**
+    *   [x] Create the new route: `src/app/assessment/page.tsx`.
+    *   [x] The page will fetch the active questionnaire content from a new API endpoint (`/api/questionnaire`).
+    *   [x] Create a new Zustand store `src/lib/stores/assessment.store.ts` to hold answers, using `sessionStorage` for persistence.
+    *   [x] Implement the multi-step wizard UI that dynamically renders based on the fetched questionnaire JSON.
+    *   [x] Implement "Next" and "Back" navigation and a small notice about session-based progress saving.
 
-*   [ ] **Task 3: Implement the Results Dashboard**
-    *   [ ] Create the new route: `src/app/results/page.tsx`.
-    *   [ ] Create a `useRiskAssessment` hook using `@tanstack/react-query`.
-    *   [ ] Implement a loading state and a user-friendly error state.
-    *   [ ] Build the results UI with a card-based layout.
+*   [x] **Task 3: Implement the Results Dashboard**
+    *   [x] Create the new route: `src/app/results/page.tsx`.
+    *   [x] Create a `useRiskAssessment` hook using `@tanstack/react-query`.
+    *   [x] Implement a loading state and a user-friendly error state.
+    *   [x] Build the results UI with a card-based layout.
 
-*   [ ] **Task 4: Develop Backend Assessment Logic**
-    *   [ ] Create the new API route: `src/app/api/assess/route.ts`.
-    *   [ ] Implement IP-based rate limiting on this endpoint.
-    *   [ ] Create a new prompt file: `src/lib/ai/prompts/cancerRiskAssessment.prompt.ts`.
-    *   [ ] Add a new method `getRiskAssessment(answers)` to `src/lib/ai/composite-ai.service.ts`.
-    *   [ ] Implement Zod validation on the AI response.
-    *   [ ] Upon success, create a new record in the `AssessmentLog` table.
+*   [x] **Task 4: Develop Backend Assessment Logic**
+    *   [x] Create the new API route: `src/app/api/assess/route.ts`.
+    *   [x] Implement IP-based rate limiting on this endpoint.
+    *   [x] Create a new prompt file: `src/lib/ai/prompts/cancerRiskAssessment.prompt.ts`.
+    *   [x] Add a new method `getRiskAssessment(answers)` to `src/lib/ai/composite-ai.service.ts`.
+    *   [x] Implement Zod validation on the AI response.
+    *   [x] Upon success, create a new record in the `AssessmentLog` table.
 
 ---
 

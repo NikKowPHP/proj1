@@ -1,0 +1,55 @@
+{
+  "steps": [
+    {
+      "title": "About You",
+      "questions": [
+        {
+          "id": "age",
+          "text": "What is your age range?",
+          "type": "select",
+          "options": ["18-29", "30-39", "40-49", "50-59", "60+"]
+        },
+        {
+          "id": "sex",
+          "text": "What was your sex assigned at birth?",
+          "type": "select",
+          "options": ["Male", "Female"]
+        }
+      ]
+    },
+    {
+      "title": "Lifestyle Habits",
+      "questions": [
+        {
+          "id": "smoking",
+          "text": "Have you smoked at least 100 cigarettes in your entire life?",
+          "type": "select",
+          "options": ["Yes", "No"]
+        },
+        {
+          "id": "alcohol",
+          "text": "On average, how many alcoholic drinks do you have per week?",
+          "type": "select",
+          "options": ["None", "1-2", "3-7", "8-14", "15+"]
+        }
+      ]
+    },
+    {
+      "title": "Diet & Exercise",
+      "questions": [
+        {
+          "id": "activity",
+          "text": "How many days per week do you get at least 30 minutes of moderate physical activity?",
+          "type": "select",
+          "options": ["0 days", "1-2 days", "3-4 days", "5+ days"]
+        },
+        {
+          "id": "diet",
+          "text": "How many servings of fruits and vegetables do you eat per day?",
+          "type": "select",
+          "options": ["0-1", "2-3", "4-5", "6+"]
+        }
+      ]
+    }
+  ]
+}

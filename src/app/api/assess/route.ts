@@ -1,0 +1,87 @@
+import { NextRequest, NextResponse } from "next/server";
+import { ipRateLimiter } from "@/lib/rateLimiter";
+import { logger } from "@/lib/logger";
+import { getAIService } from "@/lib/ai/composite-ai.service";
+import { prisma } from "@/lib/db";
+import { z } from "zod";
+
+const answersSchema = z.record(z.string());
+
+// Zod schema for the AI response to ensure type safety
+const riskFactorSchema = z.object({
+  factor: z.string(),
+  riskLevel: z.enum(["Low", "Moderate", "High"]),
+  explanation: z.string(),
+});
+
+const positiveFactorSchema = z.object({
+  factor: z.string(),
+  explanation: z.string(),
+});
+
+const aiResponseSchema = z.object({
+  riskFactors: z.array(riskFactorSchema),
+  positiveFactors: z.array(positiveFactorSchema),
+  recommendations: z.array(z.string()),
+});
+
+export async function POST(request: NextRequest) {
+  const forwarded = request.headers.get("x-forwarded-for");
+  const ip = forwarded ? forwarded.split(/, /)[0] : "127.0.0.1";
+
+  const limit = ipRateLimiter(ip);
+  if (!limit.allowed) {
+    logger.warn(`[API:assess] IP rate limit exceeded for: ${ip}`);
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429 },
+    );
+  }
+
+  try {
+    const body = await request.json();
+    const parsedAnswers = answersSchema.safeParse(body.answers);
+
+    if (!parsedAnswers.success) {
+      return NextResponse.json(
+        { error: "Invalid answers format" },
+        { status: 400 },
+      );
+    }
+
+    const aiService = getAIService();
+    const { result, serviceUsed } = await aiService.getRiskAssessment(
+      parsedAnswers.data,
+    );
+
+    const validatedResult = aiResponseSchema.safeParse(result);
+    if (!validatedResult.success) {
+      logger.error("AI response validation failed", {
+        error: validatedResult.error,
+        serviceUsed,
+      });
+      await prisma.assessmentLog.create({
+        data: { status: "AI_VALIDATION_ERROR" },
+      });
+      return NextResponse.json(
+        { error: "Failed to process assessment due to invalid AI response" },
+        { status: 502 },
+      );
+    }
+
+    await prisma.assessmentLog.create({
+      data: { status: "SUCCESS" },
+    });
+
+    return NextResponse.json(validatedResult.data);
+  } catch (error) {
+    logger.error("Error in /api/assess", error);
+    await prisma.assessmentLog.create({
+      data: { status: "SERVER_ERROR" },
+    });
+    return NextResponse.json(
+      { error: "Failed to process assessment" },
+      { status: 500 },
+    );
+  }
+}

@@ -1,19 +1,41 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAssessmentStore } from "@/lib/stores/assessment.store.ts";
 import { useRiskAssessment } from "@/lib/hooks/data/useRiskAssessment";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import Spinner from "@/components/ui/Spinner";
-import { AlertTriangle, Lightbulb, CheckCircle } from "lucide-react";
+import {
+  AlertTriangle,
+  Lightbulb,
+  CheckCircle,
+  HeartPulse,
+  Mail,
+  Download,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { generateAssessmentPdf } from "@/lib/utils/pdf-generator";
+import type { AssessmentResult } from "@/lib/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useEmailExport } from "@/lib/hooks/data/useEmailExport";
 
 export default function ResultsPage() {
   const { answers, reset } = useAssessmentStore();
@@ -25,15 +47,31 @@ export default function ResultsPage() {
     error,
   } = useRiskAssessment();
 
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const emailExportMutation = useEmailExport();
+
   useEffect(() => {
-    // Only run the assessment if answers are present
-    // This prevents re-running on component re-renders if data is already fetched
-    if (Object.keys(answers).length > 0) {
+    if (Object.keys(answers).length > 0 && !assessment) {
       assess(answers);
     }
-  }, [answers, assess]);
+  }, [answers, assess, assessment]);
 
-  if (Object.keys(answers).length === 0) {
+  const handleEmailExport = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email && assessment) {
+      emailExportMutation.mutate(
+        { recipientEmail: email, assessmentData: assessment },
+        {
+          onSuccess: () => {
+            setIsEmailDialogOpen(false);
+          },
+        },
+      );
+    }
+  };
+
+  if (Object.keys(answers).length === 0 && !isPending && !assessment) {
     return (
       <div className="container mx-auto p-4 max-w-2xl text-center space-y-4">
         <h1 className="text-2xl font-bold">No Assessment Data</h1>
@@ -99,7 +137,7 @@ export default function ResultsPage() {
           </p>
         </div>
 
-        {assessment?.riskFactors.map((factor: any, index: number) => (
+        {assessment?.riskFactors.map((factor, index) => (
           <Card key={index}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -117,7 +155,7 @@ export default function ResultsPage() {
           </Card>
         ))}
 
-        {assessment?.positiveFactors.map((factor: any, index: number) => (
+        {assessment?.positiveFactors.map((factor, index) => (
           <Card key={index}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -140,12 +178,85 @@ export default function ResultsPage() {
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-5 space-y-2 text-sm">
-              {assessment?.recommendations.map((rec: string, index: number) => (
+              {assessment?.recommendations.map((rec, index) => (
                 <li key={index}>{rec}</li>
               ))}
             </ul>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              Conversation Starters for Your Doctor
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-disc pl-5 space-y-2 text-sm">
+              <li>"Based on my lifestyle, what are the most important screenings for me at this age?"</li>
+              <li>"I'd like to discuss my diet and activity levels. What's one change you'd recommend I focus on first?"</li>
+              <li>"Are there any specific symptoms I should be aware of, given my risk factors?"</li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+               Helpful Resources
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+             <ul className="list-disc pl-5 space-y-2 text-sm">
+               <li><a href="https://www.cancer.gov" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">National Cancer Institute (NCI)</a></li>
+               <li><a href="https://www.cancer.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">American Cancer Society (ACS)</a></li>
+             </ul>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Export Your Results</CardTitle>
+            <CardDescription>
+              Save these results to discuss with a healthcare professional. We do not store this data.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col sm:flex-row gap-4">
+            <Button className="flex-1" onClick={() => generateAssessmentPdf(assessment as AssessmentResult)}>
+              <Download className="mr-2 h-4 w-4" />
+              Download as PDF
+            </Button>
+            <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="flex-1">
+                  <Mail className="mr-2 h-4 w-4" />
+                  Email My Results
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <form onSubmit={handleEmailExport}>
+                  <DialogHeader>
+                    <DialogTitle>Email Your Results</DialogTitle>
+                    <DialogDescription>
+                      Enter your email address to receive a copy of your results. We will not store or use your email for any other purpose.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="py-4">
+                    <Label htmlFor="email" className="sr-only">Email</Label>
+                    <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit" disabled={emailExportMutation.isPending}>
+                      {emailExportMutation.isPending && <Spinner size="sm" className="mr-2" />}
+                      Send Email
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
+
         <div className="text-center">
           <Button
             onClick={() => {

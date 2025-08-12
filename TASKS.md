@@ -96,19 +96,19 @@ This document outlines the development plan for creating the Anonymous Cancer Ri
 
 **Objective:** To add the optional PDF and email export features while strictly maintaining user anonymity.
 
-*   [ ] **Task 1: Implement PDF Export**
-    *   [ ] Install `jspdf` and `jspdf-autotable`.
-    *   [ ] Create a new utility module: `src/lib/utils/pdf-generator.ts`.
-    *   [ ] Add a `[ 📥 Download as PDF ]` button to the results page.
+*   [x] **Task 1: Implement PDF Export**
+    *   [x] Install `jspdf` and `jspdf-autotable`.
+    *   [x] Create a new utility module: `src/lib/utils/pdf-generator.ts`.
+    *   [x] Add a `[ 📥 Download as PDF ]` button to the results page.
 
-*   [ ] **Task 2: Implement "Send-and-Forget" Email Export**
-    *   [ ] Add an `[ 📧 Email My Results ]` button to the results page that opens a `Dialog`.
-    *   [ ] Create a new API route: `src/app/api/export/email/route.ts`.
-    *   [ ] Design and build an HTML email template for the results report.
-    *   [ ] Implement the "Send-and-Forget" logic.
+*   [x] **Task 2: Implement "Send-and-Forget" Email Export**
+    *   [x] Add an `[ 📧 Email My Results ]` button to the results page that opens a `Dialog`.
+    *   [x] Create a new API route: `src/app/api/export/email/route.ts`.
+    *   [x] Design and build an HTML email template for the results report.
+    *   [x] Implement the "Send-and-Forget" logic.
 
-*   [ ] **Task 3: Add In-App Resources**
-    *   [ ] On the results page, add sections for "conversation starters" and links to health organizations.
+*   [x] **Task 3: Add In-App Resources**
+    *   [x] On the results page, add sections for "conversation starters" and links to health organizations.
 
 ---
 

@@ -20,3 +20,17 @@ export interface TextAIProvider {
     model: AIModel,
   ): Promise<string>;
 }
+
+// Assessment Result Type
+export interface AssessmentResult {
+  riskFactors: {
+    factor: string;
+    riskLevel: "Low" | "Moderate" | "High";
+    explanation: string;
+  }[];
+  positiveFactors: {
+    factor: string;
+    explanation: string;
+  }[];
+  recommendations: string[];
+}

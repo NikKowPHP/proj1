@@ -1,6 +1,18 @@
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+
 export default function PrivacyPage() {
   return (
     <div className="container mx-auto p-4 md:p-8 prose dark:prose-invert max-w-4xl">
+      <div className="mb-8">
+        <Button asChild variant="ghost" className="pl-0">
+          <Link href="/">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </Link>
+        </Button>
+      </div>
       <h1>Privacy Policy</h1>
       <p>Last updated: August 05, 2025</p>
 

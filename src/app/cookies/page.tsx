@@ -1,6 +1,18 @@
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+
 export default function CookiesPage() {
   return (
     <div className="container mx-auto p-4 md:p-8 prose dark:prose-invert max-w-4xl">
+      <div className="mb-8">
+        <Button asChild variant="ghost" className="pl-0">
+          <Link href="/">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </Link>
+        </Button>
+      </div>
       <h1 className="text-2xl font-bold mb-4">Cookie Policy</h1>
       <p>Last updated: July 16, 2024</p>
 

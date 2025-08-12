@@ -27,13 +27,22 @@ export interface TextAIProvider {
   
 }
 
+// A single risk factor from a model's assessment
+interface RiskFactor {
+  factor: string;
+  riskLevel: "Low" | "Moderate" | "High";
+  explanation: string;
+}
+
+// The assessment results for a single model (e.g., General Cancer)
+interface ModelAssessment {
+  modelName: string;
+  riskFactors: RiskFactor[];
+}
+
 // Assessment Result Type (final output from AI to client)
 export interface AssessmentResult {
-  riskFactors: {
-    factor: string;
-    riskLevel: "Low" | "Moderate" | "High";
-    explanation: string;
-  }[];
+  modelAssessments: ModelAssessment[];
   positiveFactors: {
     factor: string;
     explanation: string;

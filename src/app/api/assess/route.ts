@@ -25,13 +25,18 @@ const riskFactorSchema = z.object({
   explanation: z.string(),
 });
 
+const modelAssessmentSchema = z.object({
+  modelName: z.string(),
+  riskFactors: z.array(riskFactorSchema),
+});
+
 const positiveFactorSchema = z.object({
   factor: z.string(),
   explanation: z.string(),
 });
 
 const aiResponseSchema = z.object({
-  riskFactors: z.array(riskFactorSchema),
+  modelAssessments: z.array(modelAssessmentSchema),
   positiveFactors: z.array(positiveFactorSchema),
   recommendations: z.array(z.string()),
 });

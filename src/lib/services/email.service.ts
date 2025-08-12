@@ -13,15 +13,22 @@ const resend = process.env.RESEND_API_KEY
   : null;
 
 function generateAssessmentHtml(assessmentData: AssessmentResult): string {
-  const { riskFactors, positiveFactors, recommendations } = assessmentData;
+  const { modelAssessments, positiveFactors, recommendations } = assessmentData;
 
-  const riskFactorsHtml = riskFactors
+  const modelAssessmentsHtml = modelAssessments
     .map(
-      (factor) => `
-    <div style="margin-bottom: 16px; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
-      <h3 style="margin: 0 0 8px; font-size: 16px;">${factor.factor} (Risk: ${factor.riskLevel})</h3>
-      <p style="margin: 0; font-size: 14px;">${factor.explanation}</p>
-    </div>
+      (model) => `
+    <h2 style="font-size: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-top: 24px;">${model.modelName}</h2>
+    ${model.riskFactors
+      .map(
+        (factor) => `
+        <div style="margin-bottom: 16px; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+          <h3 style="margin: 0 0 8px; font-size: 16px;">${factor.factor} (Risk: ${factor.riskLevel})</h3>
+          <p style="margin: 0; font-size: 14px;">${factor.explanation}</p>
+        </div>
+      `,
+      )
+      .join("")}
   `,
     )
     .join("");
@@ -52,11 +59,13 @@ function generateAssessmentHtml(assessmentData: AssessmentResult): string {
         <h1 style="font-size: 24px;">Your Anonymous Health Assessment Results</h1>
         <p>Thank you for using our tool. Here is a copy of your results. Please consider discussing them with a healthcare provider.</p>
         
-        <h2 style="font-size: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-top: 24px;">Potential Risk Factors</h2>
-        ${riskFactorsHtml}
+        ${modelAssessmentsHtml}
         
-        <h2 style="font-size: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-top: 24px;">Positive Lifestyle Factors</h2>
-        ${positiveFactorsHtml}
+        ${
+          positiveFactors.length > 0
+            ? `<h2 style="font-size: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-top: 24px;">Positive Lifestyle Factors</h2>${positiveFactorsHtml}`
+            : ""
+        }
 
         <h2 style="font-size: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-top: 24px;">Recommendations</h2>
         <ul>${recommendationsHtml}</ul>

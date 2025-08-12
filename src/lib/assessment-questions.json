@@ -37,6 +37,16 @@
           "options": ["Never smoked", "Former smoker", "Current smoker"]
         },
         {
+          "id": "smoking_duration",
+          "text": "For how many years have you been smoking?",
+          "type": "select",
+          "options": ["Less than 5 years", "5-10 years", "11-20 years", "More than 20 years"],
+          "dependsOn": {
+            "questionId": "smoking_status",
+            "value": "Current smoker"
+          }
+        },
+        {
           "id": "smoking_years_quit",
           "text": "How many years has it been since you quit smoking?",
           "type": "select",
@@ -78,7 +88,19 @@
       ]
     },
     {
-        "title": "Medical History",
+      "title": "Environmental & Occupational History",
+      "description": "This information helps assess risks related to your environment and work.",
+      "questions": [
+        {
+          "id": "asbestos_exposure",
+          "text": "Have you ever had significant, prolonged exposure to asbestos?",
+          "type": "select",
+          "options": ["Yes", "No", "I don't know"]
+        }
+      ]
+    },
+    {
+        "title": "Family History",
         "description": "This information helps provide a more accurate assessment. It will not be stored and remains completely anonymous.",
         "questions": [
             {

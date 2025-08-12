@@ -27,25 +27,28 @@ export const generateAssessmentPdf = (assessmentData: AssessmentResult) => {
 
   let startY = 40;
 
-  // --- Risk Factors ---
-  if (assessmentData.riskFactors.length > 0) {
-    doc.setFontSize(14);
-    doc.text("Potential Risk Factors", 14, startY);
-    startY += 8;
+  // --- Risk Factors per Model ---
+  assessmentData.modelAssessments.forEach((model) => {
+    if (model.riskFactors.length > 0) {
+      doc.setFontSize(16);
+      doc.text(model.modelName, 14, startY);
+      startY += 10;
 
-    doc.autoTable({
-      startY,
-      head: [["Factor", "Risk Level", "Explanation"]],
-      body: assessmentData.riskFactors.map((f) => [
-        f.factor,
-        f.riskLevel,
-        f.explanation,
-      ]),
-      theme: "striped",
-      headStyles: { fillColor: [255, 193, 7] }, // Amber color for risks
-    });
-    startY = doc.autoTable.previous!.finalY + 10;
-  }
+      doc.autoTable({
+        startY,
+        head: [["Factor", "Risk Level", "Explanation"]],
+        body: model.riskFactors.map((f) => [
+          f.factor,
+          f.riskLevel,
+          f.explanation,
+        ]),
+        theme: "striped",
+        headStyles: { fillColor: [255, 193, 7] }, // Amber color for risks
+      });
+      startY = doc.autoTable.previous!.finalY + 15;
+    }
+  });
+
 
   // --- Positive Factors ---
   if (assessmentData.positiveFactors.length > 0) {

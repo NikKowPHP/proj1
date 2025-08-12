@@ -16,7 +16,6 @@ import {
   AlertTriangle,
   Lightbulb,
   CheckCircle,
-  HeartPulse,
   Mail,
   Download,
 } from "lucide-react";
@@ -38,6 +37,12 @@ import { Label } from "@/components/ui/label";
 import { useEmailExport } from "@/lib/hooks/data/useEmailExport";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -140,43 +145,61 @@ export default function ResultsPage() {
           </p>
         </div>
 
-        {assessment?.riskFactors.map((factor, index) => {
-          const isSensitive = factor.factor.toLowerCase().includes('genetic') || factor.factor.toLowerCase().includes('history');
-          return (
-            <Card 
-              key={index} 
-              className={cn(isSensitive && "border-2 border-amber-500")}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-amber-500" />
-                  {factor.factor}
-                </CardTitle>
-                <CardDescription>
-                  Risk Level:{" "}
-                  <span className="font-semibold">{factor.riskLevel}</span>
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm">{factor.explanation}</p>
-              </CardContent>
-            </Card>
-          );
-        })}
+        <Tabs defaultValue={assessment?.modelAssessments?.[0]?.modelName} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            {assessment?.modelAssessments.map((model) => (
+              <TabsTrigger key={model.modelName} value={model.modelName}>
+                {model.modelName}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {assessment?.modelAssessments.map((model) => (
+            <TabsContent key={model.modelName} value={model.modelName} className="space-y-4 mt-4">
+              {model.riskFactors.map((factor, index) => {
+                const isSensitive = factor.factor.toLowerCase().includes('genetic') || factor.factor.toLowerCase().includes('history') || factor.factor.toLowerCase().includes('asbestos');
+                return (
+                  <Card 
+                    key={index} 
+                    className={cn(isSensitive && "border-2 border-amber-500")}
+                  >
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-amber-500" />
+                        {factor.factor}
+                      </CardTitle>
+                      <CardDescription>
+                        Risk Level:{" "}
+                        <span className="font-semibold">{factor.riskLevel}</span>
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm">{factor.explanation}</p>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </TabsContent>
+          ))}
+        </Tabs>
 
-        {assessment?.positiveFactors.map((factor, index) => (
-          <Card key={index}>
+        {assessment?.positiveFactors && assessment.positiveFactors.length > 0 && (
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-500" />
-                {factor.factor}
+                Positive Lifestyle Factors
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm">{factor.explanation}</p>
+            <CardContent className="space-y-4">
+              {assessment.positiveFactors.map((factor, index) => (
+                 <div key={index}>
+                    <p className="font-semibold">{factor.factor}</p>
+                    <p className="text-sm text-muted-foreground">{factor.explanation}</p>
+                 </div>
+              ))}
             </CardContent>
           </Card>
-        ))}
+        )}
 
         <Card>
           <CardHeader>
@@ -204,6 +227,7 @@ export default function ResultsPage() {
             <ul className="list-disc pl-5 space-y-2 text-sm">
               <li>"Based on my lifestyle, what are the most important screenings for me at this age?"</li>
               <li>"I'd like to discuss my diet and activity levels. What's one change you'd recommend I focus on first?"</li>
+              <li>"Given my smoking history and potential exposures, what should I be aware of regarding my lung health?"</li>
               <li>"Are there any specific symptoms I should be aware of, given my risk factors?"</li>
             </ul>
           </CardContent>

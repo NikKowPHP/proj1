@@ -1,7 +1,3 @@
-Of course. Here is the final, comprehensive implementation plan, incorporating all discussed improvements and best practices. This plan is atomic, references the specific files in your codebase, and is ready for a developer to execute from start to finish.
-
----
-
 ## **Final Implementation Plan: Questionnaire Enhancements (v2)**
 
 This plan details the necessary steps to upgrade the Health Risk Assessor's questionnaire to version 2, introducing more detailed questions, robust validation, and an improved user experience.
@@ -9,11 +5,11 @@ This plan details the necessary steps to upgrade the Health Risk Assessor's ques
 ### **Phase A: Foundation - Data & Schema**
 *Goal: Establish the new questionnaire structure and data model as the source of truth.*
 
-- **[ ] Task A.1: Update Questionnaire Data File**
+- **[x] Task A.1: Update Questionnaire Data File**
   - **File:** `src/lib/assessment-questions.json`
   - **Action:** Replace the entire content with the finalized v2 JSON structure. This structure must include the new "Medical History" step, height/weight questions, and granular lifestyle questions. Ensure question IDs are unique and descriptive (e.g., `diet_fruits_veg`, `smoking_status`).
 
-- **[ ] Task A.2: Update and Execute Database Seeder**
+- **[x] Task A.2: Update and Execute Database Seeder**
   - **File:** `prisma/seed.cts`
   - **Action:**
     1.  Modify the script to upsert the new content as `version: 2`.

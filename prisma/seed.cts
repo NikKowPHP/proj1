@@ -5,7 +5,7 @@ import path from "path";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Seeding database...");
+  console.log("Seeding database for questionnaire v2...");
 
   try {
     const filePath = path.join(
@@ -15,29 +15,29 @@ async function main() {
     const fileContent = fs.readFileSync(filePath, "utf-8");
     const questionnaireContent = JSON.parse(fileContent);
 
-    // Deactivate all other versions first
+    // Deactivate all other versions first to ensure only v2 is active
     await prisma.questionnaire.updateMany({
       where: { isActive: true },
       data: { isActive: false },
     });
 
-    // Upsert version 1
+    // Upsert version 2
     await prisma.questionnaire.upsert({
-      where: { version: 1 },
+      where: { version: 2 },
       update: {
         content: questionnaireContent,
         isActive: true,
       },
       create: {
-        version: 1,
+        version: 2,
         content: questionnaireContent,
         isActive: true,
       },
     });
 
-    console.log("Successfully seeded and activated questionnaire version 1.");
+    console.log("Successfully seeded and activated questionnaire version 2.");
   } catch (error) {
-    console.error("Failed to seed questionnaire:", error);
+    console.error("Failed to seed questionnaire v2:", error);
   }
 
   console.log("Seeding complete.");

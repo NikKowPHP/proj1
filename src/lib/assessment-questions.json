@@ -14,6 +14,16 @@
           "text": "What was your sex assigned at birth?",
           "type": "select",
           "options": ["Male", "Female"]
+        },
+        {
+          "id": "height",
+          "text": "Height",
+          "type": "number_input"
+        },
+        {
+          "id": "weight",
+          "text": "Weight",
+          "type": "number_input"
         }
       ]
     },
@@ -21,10 +31,20 @@
       "title": "Lifestyle Habits",
       "questions": [
         {
-          "id": "smoking",
-          "text": "Have you smoked at least 100 cigarettes in your entire life?",
+          "id": "smoking_status",
+          "text": "What is your smoking status?",
           "type": "select",
-          "options": ["Yes", "No"]
+          "options": ["Never smoked", "Former smoker", "Current smoker"]
+        },
+        {
+          "id": "smoking_years_quit",
+          "text": "How many years has it been since you quit smoking?",
+          "type": "select",
+          "options": ["Less than 1 year", "1-5 years", "6-10 years", "More than 10 years"],
+          "dependsOn": {
+            "questionId": "smoking_status",
+            "value": "Former smoker"
+          }
         },
         {
           "id": "alcohol",
@@ -44,12 +64,30 @@
           "options": ["0 days", "1-2 days", "3-4 days", "5+ days"]
         },
         {
-          "id": "diet",
+          "id": "diet_fruits_veg",
           "text": "How many servings of fruits and vegetables do you eat per day?",
           "type": "select",
           "options": ["0-1", "2-3", "4-5", "6+"]
+        },
+        {
+            "id": "diet_red_meat",
+            "text": "How often do you eat red or processed meat per week?",
+            "type": "select",
+            "options": ["Never or rarely", "1-2 times", "3-4 times", "5+ times"]
         }
       ]
+    },
+    {
+        "title": "Medical History",
+        "description": "This information helps provide a more accurate assessment. It will not be stored and remains completely anonymous.",
+        "questions": [
+            {
+                "id": "family_history_cancer",
+                "text": "Have any of your first-degree relatives (parent, sibling, child) been diagnosed with cancer?",
+                "type": "select",
+                "options": ["Yes", "No", "I don't know"]
+            }
+        ]
     }
   ]
 }

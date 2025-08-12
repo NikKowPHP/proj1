@@ -41,12 +41,13 @@ test.describe("Core Assessment Flow", () => {
     await page.route("**/api/assess", async (route) => {
       const json = {
         riskFactors: [
-          { factor: "Smoking Habits", riskLevel: "High", explanation: "Mock explanation about smoking." },
+          { factor: "Smoking-Related Risk", riskLevel: "High", explanation: "Mock explanation about smoking from the new hybrid system." },
+          { factor: "Lifestyle Choices Risk", riskLevel: "Moderate", explanation: "Mock explanation about lifestyle from the new hybrid system." },
         ],
         positiveFactors: [
-          { factor: "Healthy Diet", explanation: "Mock explanation about diet." },
+          { factor: "Healthy Diet", explanation: "Mock explanation about diet from the new hybrid system." },
         ],
-        recommendations: ["Consult a healthcare professional."],
+        recommendations: ["Consult a healthcare professional about these results."],
       };
       await route.fulfill({ json });
     });
@@ -59,8 +60,8 @@ test.describe("Core Assessment Flow", () => {
     await expect(page.getByRole("heading", { name: "Your Assessment Results" })).toBeVisible();
 
     // Check for mocked content
-    await expect(page.getByText("Smoking Habits")).toBeVisible();
+    await expect(page.getByText("Smoking-Related Risk")).toBeVisible();
     await expect(page.getByText("Healthy Diet")).toBeVisible();
-    await expect(page.getByText("Consult a healthcare professional.")).toBeVisible();
+    await expect(page.getByText("Consult a healthcare professional about these results.")).toBeVisible();
   });
 });

@@ -40,13 +40,15 @@ export function calculateRisk(answers: Answers): CalculationResult {
 
   // 1. Calculate scores for each risk factor category
   for (const factorId in riskConfig.factors) {
-    const factorInfo = riskConfig.factors[factorId as keyof typeof riskConfig.factors];
+    const factorInfo =
+      riskConfig.factors[factorId as keyof typeof riskConfig.factors];
     let score = 0;
 
     for (const questionId of factorInfo.questionIds) {
       const answer = answers[questionId];
       if (answer) {
-        const questionWeights = riskConfig.weights[questionId as keyof typeof riskConfig.weights];
+        const questionWeights =
+          riskConfig.weights[questionId as keyof typeof riskConfig.weights];
         score += questionWeights[answer as keyof typeof questionWeights] ?? 0;
       }
     }
@@ -61,10 +63,16 @@ export function calculateRisk(answers: Answers): CalculationResult {
 
   // 2. Identify positive lifestyle factors
   for (const factorId in riskConfig.positiveFactors) {
-    const positiveFactorInfo = riskConfig.positiveFactors[factorId as keyof typeof riskConfig.positiveFactors];
+    const positiveFactorInfo =
+      riskConfig.positiveFactors[
+        factorId as keyof typeof riskConfig.positiveFactors
+      ];
     const triggerAnswer = answers[positiveFactorInfo.trigger.questionId];
-    
-    if (triggerAnswer && positiveFactorInfo.trigger.answers.includes(triggerAnswer)) {
+
+    if (
+      triggerAnswer &&
+      positiveFactorInfo.trigger.answers.includes(triggerAnswer)
+    ) {
       positiveFactors.push({
         id: factorId,
         name: positiveFactorInfo.name,

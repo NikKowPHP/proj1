@@ -1,73 +1,109 @@
-### **Phase 0: Pre-Development (Prerequisites)**
+# Atomic Plan: Final Production Polish
 
-*   [x] **[ADDITION] Task 0: Finalize Medical Logic and Parameters**
-    *   **Action:** Work with the medical advisor to get the **exact, finalized calculation logic** for each risk factor. This must include:
-        *   The specific questions that influence a risk score.
-        *   The numerical points or weighting for each answer.
-        *   The formulas for combining scores.
-        *   The score thresholds for classifying risk as `Low`, `Average`, or `Higher than Average`.
-    *   **Output:** A definitive document or spreadsheet that a developer can implement without ambiguity. **(This is a hard blocker for Phase 1).**
+**Objective:** To address the final remaining issues related to medical logic externalization, user experience, and codebase cleanup to prepare the application for a production launch.
 
 ---
 
-### **Phase 1: Backend Refactoring**
+### **Epic 1: Externalize Medical Logic (The "Source of Truth")**
 
-This phase focuses on creating the new calculation engine and rewiring the API and AI services to use it.
+**Objective:** To move the hard-coded risk calculation parameters from the TypeScript service file into an external, non-code JSON file for improved safety and maintainability.
 
-*   [x] **Task 1: Define Data Contracts in `types.ts`**
-    *   **File:** `src/lib/types/index.ts`
-    *   **Action:** Define the `CalculationResult` interface that the new engine will produce. This object will be the "source of truth" passed to the AI.
+*   [x] **Task 1.1: Create the Configuration File**
+    *   **Action:** In the `src/lib/` directory, create a new file named `risk-model-config.json`.
 
-*   [x] **[ADDITION] Task 2: Create Risk Model Configuration**
-    *   **File:** Create a new file `src/lib/risk-model-config.json` (or similar).
-    *   **Action:** Translate the finalized medical logic from the Pre-Development phase into a structured JSON configuration. This file will contain all the numerical weights, thresholds, and mappings. The code will read from this file.
+*   [x] **Task 1.2: Define and Populate the JSON Structure**
+    *   **Action:** Define a clear JSON structure within the new file that holds all numerical weights, thresholds, factor names, and descriptions.
+    *   **Code Snippet (Example Structure):**
+        ```json
+        {
+          "factors": {
+            "SMOKING_RELATED": {
+              "name": "Smoking-Related Risk",
+              "questionIds": ["smoking"],
+              "thresholds": { "average": 5, "high": 9 }
+            }
+          },
+          "weights": {
+            "smoking": {
+              "Yes": 10,
+              "No": 0
+            }
+          },
+          "positiveFactors": {
+            "NON_SMOKER": {
+              "name": "Non-Smoker",
+              "description": "Not smoking is the single most effective way to reduce your risk.",
+              "trigger": { "questionId": "smoking", "answers": ["No"] }
+            }
+          }
+        }
+        ```
+    *   **Action:** Transfer all hard-coded logic values from `risk-calculator.service.ts` into this new `risk-model-config.json` file.
 
-*   [x] **Task 3: Create the Deterministic Calculation Engine**
-    *   **File:** Create a new file `src/lib/services/risk-calculator.service.ts`.
-    *   **Action:** Implement the risk calculation logic. This service will **load its parameters from `risk-model-config.json`** and apply them to the user's answers.
+*   [x] **Task 1.3: Refactor the Risk Calculator Service**
+    *   **File:** `src/lib/services/risk-calculator.service.ts`
+    *   **Action:** Modify the service to `import` the `risk-model-config.json` file.
+    *   **Action:** Refactor the `calculateRisk` function to read its parameters (weights, thresholds) from the imported JSON object instead of using hard-coded values.
 
-*   [x] **Task 4: Create Unit Tests for the Calculation Engine**
-    *   **File:** Create a new test file `src/lib/services/risk-calculator.service.test.ts`.
-    *   **Action:** Write comprehensive unit tests for the `calculateRisk` function to ensure its accuracy.
-    *   **Test Cases:** Test with "low-risk", "high-risk", and edge-case answer sets to verify the output matches the medical advisor's specification.
-
-*   [x] **Task 5: Refactor the AI Prompt**
-    *   **File:** `src/lib/ai/prompts/cancerRiskAssessment.prompt.ts`
-    *   **Action:** Rewrite the prompt. The new prompt will **receive** the `CalculationResult` and be asked to **explain** it, not calculate it.
-
-*   [x] **Task 6: Refactor the Composite AI Service**
-    *   **File:** `src/lib/ai/composite-ai.service.ts`
-    *   **Action:** Rename `getRiskAssessment(answers)` to `getRiskAssessmentExplanation(calculationResult: CalculationResult)` and update it to use the new prompt.
-
-*   [x] **Task 7: Orchestrate the Hybrid Flow in the API Route**
-    *   **File:** `src/app/api/assess/route.ts`
-    *   **Action:** Rewire the handler to use the new hybrid flow:
-        1.  Receive `answers` from the client.
-        2.  Call `calculateRisk(answers)` to get a `CalculationResult`.
-        3.  Pass this `CalculationResult` object to `aiService.getRiskAssessmentExplanation()`.
-        4.  Return the final, user-friendly JSON from the AI to the client after Zod validation.
+*   [x] **Task 1.4: Verify Implementation with Existing Tests**
+    *   **Action:** Run the existing unit tests for the risk calculator.
+    *   **File:** `src/lib/services/risk-calculator.service.test.ts`
+    *   **Expected Result:** All tests should continue to pass, proving that the logic was successfully externalized without changing the calculation outcome.
 
 ---
 
-### **Phase 2: Testing & Verification**
+### **Epic 2: Enhance Questionnaire Persistence**
 
-This phase ensures that the refactored system works correctly from end to end.
+**Objective:** To improve the user experience by persisting questionnaire progress even if the browser tab is accidentally closed.
 
-*   [ ] **Task 1: Update API Integration Tests**
-    *   **File:** The Jest test file for `/api/assess/route.ts`.
-    *   **Action:**
-        *   Mock the `risk-calculator.service`.
-        *   Assert that `calculateRisk` is called correctly.
-        *   Assert that `getRiskAssessmentExplanation` is called with the mock output from the calculator.
+*   [ ] **Task 2.1: Update Zustand Store to Use `localStorage`**
+    *   **File:** `src/lib/stores/assessment.store.ts`
+    *   **Action:** In the `persist` middleware options, change the storage target from `sessionStorage` to `localStorage`.
+    *   **Code Change:**
+        ```typescript
+        // Change this line:
+        storage: createJSONStorage(() => sessionStorage),
+        // To this:
+        storage: createJSONStorage(() => localStorage),
+        ```
 
-*   [ ] **Task 2: Update End-to-End Tests**
+*   [ ] **Task 2.2: Implement "Resume Session" Logic**
+    *   **File:** `src/app/assessment/page.tsx`
+    *   **Action:** Add a `useEffect` hook that runs on initial page load.
+    *   **Logic:**
+        1.  Check if `answers` in the Zustand store are not empty.
+        2.  If data exists, use a `Dialog` (like shadcn's `AlertDialog`) to prompt the user: "It looks like you have a session in progress. Would you like to resume or start a new assessment?"
+        3.  If "Resume" is clicked, the dialog closes.
+        4.  If "Start New" is clicked, call the `reset()` function from the Zustand store.
+
+*   [ ] **Task 2.3: Implement Session Cleanup**
+    *   **File:** `src/app/results/page.tsx`
+    *   **Action:** In the `onClick` handler for the "Start New Assessment" button, ensure the `reset()` function from the Zustand store is called before navigating the user back to the homepage.
+
+*   [ ] **Task 2.4: Update E2E Test**
     *   **File:** `e2e/assessment.spec.ts`
-    *   **Action:** Update the `page.route()` mock for the `/api/assess` endpoint to return the final JSON structure that the new hybrid approach produces.
+    *   **Action:** Add a step in the middle of the questionnaire that reloads the page (`page.reload()`).
+    *   **Expected Result:** The test should verify that the user's previous answers are still present in the form fields after the reload.
 
-*   [ ] **[ADDITION] Task 3: Staging Environment Verification**
-    *   **Action:** Deploy the completed changes to a private staging environment.
-    *   **Action:** Have the client and, most importantly, the **medical advisor**, perform a User Acceptance Test (UAT) on the staging environment. They must verify that the results for a variety of inputs are accurate and communicated correctly.
+---
 
-*   [ ] **Task 4: Final Review and Deployment**
-    *   **Action:** Manually test the full flow one last time.
-    *   **Action:** Merge the changes into the main branch for production deployment.
+### **Epic 3: Finalize Branding & Cleanup**
+
+**Objective:** To remove the last remnants of the old application and ensure all user-facing assets reflect the new brand.
+
+*   [ ] **Task 3.1: Delete Unused Script**
+    *   **Action:** Delete the legacy database encryption script.
+    *   **Command:** `rm scripts/encrypt-existing-data.cts`
+
+*   [ ] **Task 3.2: Update PWA Manifest Files**
+    *   **File 1:** `public/manifest.json`
+    *   **File 2:** `public/site.webmanifest`
+    *   **Action:** In both files, change the `name` and `short_name` fields from "Lexity" to "Health Risk Assessor" (or the final product name).
+
+*   [ ] **Task 3.3: Update Project Name**
+    *   **File:** `package.json`
+    *   **Action:** Change the `"name"` field from `"lexity"` to `"health-risk-assessor"`.
+
+*   [ ] **Task 3.4: Final Verification**
+    *   **Action:** Run `npm install` to update the `package-lock.json` file.
+    *   **Action:** Build and run the application locally to ensure all changes are applied and no new errors have been introduced.

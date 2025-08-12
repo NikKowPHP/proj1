@@ -4,7 +4,7 @@ import { GeminiService } from "./gemini-service";
 import { executeWithFallbacks, ProviderConfig } from "./composite-executor";
 
 import { getCancerRiskAssessmentPrompt } from "./prompts/cancerRiskAssessment.prompt";
-import type { AudioEvaluationContext } from "@/lib/types";
+import type { AudioEvaluationContext, CalculationResult } from "@/lib/types";
 import { AIModel, TextAIProvider, UnifiedEvaluationResult } from "./types";
 import { TutorChatMessage } from "../types";
 
@@ -50,8 +50,11 @@ export class CompositeAIService {
     ];
   }
 
-  async getRiskAssessment(answers: Record<string, string>, userId?: string) {
-    const prompt = getCancerRiskAssessmentPrompt(answers);
+  async getRiskAssessmentExplanation(
+    calculationResult: CalculationResult,
+    userId?: string,
+  ) {
+    const prompt = getCancerRiskAssessmentPrompt(calculationResult);
     const providerChain = this.getProviderChain("large");
     return executeWithFallbacks(
       providerChain,

@@ -22,24 +22,24 @@ This phase focuses on creating the new calculation engine and rewiring the API a
     *   **File:** Create a new file `src/lib/risk-model-config.json` (or similar).
     *   **Action:** Translate the finalized medical logic from the Pre-Development phase into a structured JSON configuration. This file will contain all the numerical weights, thresholds, and mappings. The code will read from this file.
 
-*   [ ] **Task 3: Create the Deterministic Calculation Engine**
+*   [x] **Task 3: Create the Deterministic Calculation Engine**
     *   **File:** Create a new file `src/lib/services/risk-calculator.service.ts`.
     *   **Action:** Implement the risk calculation logic. This service will **load its parameters from `risk-model-config.json`** and apply them to the user's answers.
 
-*   [ ] **Task 4: Create Unit Tests for the Calculation Engine**
+*   [x] **Task 4: Create Unit Tests for the Calculation Engine**
     *   **File:** Create a new test file `src/lib/services/risk-calculator.service.test.ts`.
     *   **Action:** Write comprehensive unit tests for the `calculateRisk` function to ensure its accuracy.
     *   **Test Cases:** Test with "low-risk", "high-risk", and edge-case answer sets to verify the output matches the medical advisor's specification.
 
-*   [ ] **Task 5: Refactor the AI Prompt**
+*   [x] **Task 5: Refactor the AI Prompt**
     *   **File:** `src/lib/ai/prompts/cancerRiskAssessment.prompt.ts`
     *   **Action:** Rewrite the prompt. The new prompt will **receive** the `CalculationResult` and be asked to **explain** it, not calculate it.
 
-*   [ ] **Task 6: Refactor the Composite AI Service**
+*   [x] **Task 6: Refactor the Composite AI Service**
     *   **File:** `src/lib/ai/composite-ai.service.ts`
     *   **Action:** Rename `getRiskAssessment(answers)` to `getRiskAssessmentExplanation(calculationResult: CalculationResult)` and update it to use the new prompt.
 
-*   [ ] **Task 7: Orchestrate the Hybrid Flow in the API Route**
+*   [x] **Task 7: Orchestrate the Hybrid Flow in the API Route**
     *   **File:** `src/app/api/assess/route.ts`
     *   **Action:** Rewire the handler to use the new hybrid flow:
         1.  Receive `answers` from the client.

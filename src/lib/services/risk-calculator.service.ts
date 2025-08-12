@@ -5,8 +5,42 @@ import type {
   IdentifiedPositiveFactor,
   CalculatedRiskLevel,
 } from "@/lib/types";
-import riskConfig from "@/lib/risk-model-config.json";
+import riskConfigJson from "@/lib/risk-model-config.json";
 import { logger } from "../logger";
+
+// Define the type for the config file to ensure type safety
+interface RiskModelConfig {
+  models: {
+    [modelId: string]: {
+      name: string;
+      factors: {
+        [factorId: string]: {
+          name: string;
+          questionIds: string[];
+          thresholds: { average: number; high: number };
+        };
+      };
+      weights: {
+        [questionId: string]: {
+          [answer: string]: number;
+        };
+      };
+    };
+  };
+  positiveFactors: {
+    [factorId: string]: {
+      name: string;
+      description: string;
+      trigger: {
+        questionId: string;
+        answers: string[];
+      };
+    };
+  };
+}
+
+// Cast the imported JSON to our defined type to override stale inference.
+const riskConfig = riskConfigJson as unknown as RiskModelConfig;
 
 type Answers = Record<string, string>;
 type ModelConfig = (typeof riskConfig.models)[keyof typeof riskConfig.models];

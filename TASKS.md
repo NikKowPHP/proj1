@@ -1,4 +1,159 @@
-- [x] Fix "Maximum update depth exceeded" React error in Select component.
-- [x] Fix "Maximum update depth exceeded" React error by correctly forwarding refs in UI components.
-- [x] Fix "Maximum update depth exceeded" error by systematically adding `React.forwardRef` to all custom UI components wrapping Radix primitives.
-- [x] Fix "Maximum update depth exceeded" error by systematically adding `React.forwardRef` to all custom UI components, especially the Dialog component, to resolve infinite render loop on dashboard.
+
+# Master Plan: Anonymous Cancer Risk Assessment Tool
+
+This document outlines the development plan for creating the Anonymous Cancer Risk Assessment Tool by adapting the existing Lexity codebase. The plan is divided into sequential phases, starting with the removal of legacy features and progressing to the implementation and refinement of the new application.
+
+## Phase 0: Foundation & Cleanup (Stripping Down Lexity)
+
+**Objective:** To remove all functionality related to user accounts, persistent data, monetization, and language learning, creating a clean, anonymous-first foundation.
+
+*   [ ] **Task 1: Remove Authentication System**
+    *   [ ] Delete directories: `src/app/login/`, `src/app/signup/`, `src/app/forgot-password/`, `src/app/reset-password/`.
+    *   [ ] Delete API route directory: `src/app/api/auth/`.
+    *   [ ] Delete components: `src/components/SignInForm.tsx`, `SignUpForm.tsx`, `AuthLinks.tsx`, etc.
+    *   [ ] Delete `src/lib/stores/auth.store.ts`.
+    *   [ ] Delete utility files: `src/lib/auth.ts`, `src/lib/user.ts`.
+    *   [ ] Delete E2E tests: `e2e/auth.setup.ts`, `e2e/auth.spec.ts`.
+    *   [ ] Refactor `middleware.ts` to remove all user authentication logic. Retain the Content Security Policy header logic.
+
+*   [ ] **Task 2: Reconfigure Database for Operational Use (No PII)**
+    *   [ ] **Step 1: Gut the Schema.** In `prisma/schema.prisma`, delete all existing user-related models.
+    *   [ ] **Step 2: Define New, Non-PII Models.** Add simple models for operational purposes. For example:
+        ```prisma
+        // prisma/schema.prisma
+
+        model AssessmentLog {
+          id        String   @id @default(cuid())
+          createdAt DateTime @default(now())
+          status    String   // e.g., "SUCCESS", "AI_ERROR"
+        }
+
+        model Questionnaire {
+          id        String   @id @default(cuid())
+          version   Int      @unique
+          isActive  Boolean  @default(false)
+          content   Json
+          createdAt DateTime @default(now())
+        }
+        ```
+    *   [ ] **Step 3: Create New Migration.** Generate a new migration to apply this clean schema: `npx prisma migrate dev --name reconfigure-for-operational-db`.
+    *   [ ] **Step 4: Prepare Seed Script.** Clear out the old `prisma/seed.cts` and prepare it for the new `Questionnaire` model.
+
+*   [ ] **Task 3: Remove Monetization & Admin Features**
+    *   [ ] Delete directories: `src/app/pricing/`, `src/app/admin/`.
+    *   [ ] Delete API route directories: `src/app/api/billing/`, `src/app/api/admin/`.
+    *   [ ] Delete `src/lib/config/pricing.ts` and `src/lib/services/stripe.service.ts`.
+    *   [ ] Delete components: `src/components/PricingTable.tsx`, `src/components/AdminDashboard.tsx`, `src/components/AdminSettings.tsx`.
+
+*   [ ] **Task 4: Purge Unused UI, APIs, and State**
+    *   [ ] Delete all language-learning pages and their corresponding API routes.
+    *   [ ] Delete all non-reusable UI components from `src/components/`.
+    *   [ ] Delete unused state stores: `src/lib/stores/onboarding.store.ts`, `src/lib/stores/language.store.ts`.
+
+*   [ ] **Task 5: Finalize Cleanup**
+    *   [ ] Update `.env.example` to remove Supabase, Stripe, and other unused variables.
+    *   [ ] Run `npm prune` or manually audit `package.json` to remove orphaned dependencies.
+    *   [ ] Verify that the stripped-down application builds and runs without errors.
+
+---
+
+## Phase 1: MVP Implementation - Core Assessment Flow
+
+**Objective:** To implement the core anonymous user journey from the welcome screen to the results dashboard.
+
+*   [ ] **Task 0: Content & Medical Review (CRITICAL PATH)**
+    *   [ ] **Task 0a: Finalize Content.** Draft and receive final approval from the medical advisor for all questionnaire questions, logic, and disclaimers.
+    *   [ ] **Task 0b: Structure Content.** A developer must convert the approved content into a structured JSON file (e.g., `src/lib/assessment-questions.json`).
+    *   [ ] **Task 0c: Implement Seeding Script.** Update `prisma/seed.cts` to read the JSON file and populate the `Questionnaire` table with version 1. **(This is a blocker for API and UI development).**
+
+*   [ ] **Task 1: Create Welcome Page**
+    *   [ ] Update `src/app/page.tsx` to become the welcome screen, including the approved disclaimer text.
+    *   [ ] Add the `[ Start My Anonymous Assessment ]` button, linking to `/assessment`.
+
+*   [ ] **Task 2: Build the Questionnaire**
+    *   [ ] Create the new route: `src/app/assessment/page.tsx`.
+    *   [ ] The page will fetch the active questionnaire content from a new API endpoint (`/api/questionnaire`).
+    *   [ ] Create a new Zustand store `src/lib/stores/assessment.store.ts` to hold answers, using `sessionStorage` for persistence.
+    *   [ ] Implement the multi-step wizard UI that dynamically renders based on the fetched questionnaire JSON.
+    *   [ ] Implement "Next" and "Back" navigation and a small notice about session-based progress saving.
+
+*   [ ] **Task 3: Implement the Results Dashboard**
+    *   [ ] Create the new route: `src/app/results/page.tsx`.
+    *   [ ] Create a `useRiskAssessment` hook using `@tanstack/react-query`.
+    *   [ ] Implement a loading state and a user-friendly error state.
+    *   [ ] Build the results UI with a card-based layout.
+
+*   [ ] **Task 4: Develop Backend Assessment Logic**
+    *   [ ] Create the new API route: `src/app/api/assess/route.ts`.
+    *   [ ] Implement IP-based rate limiting on this endpoint.
+    *   [ ] Create a new prompt file: `src/lib/ai/prompts/cancerRiskAssessment.prompt.ts`.
+    *   [ ] Add a new method `getRiskAssessment(answers)` to `src/lib/ai/composite-ai.service.ts`.
+    *   [ ] Implement Zod validation on the AI response.
+    *   [ ] Upon success, create a new record in the `AssessmentLog` table.
+
+---
+
+## Phase 2: Post-MVP Feature - Export & Actionability
+
+**Objective:** To add the optional PDF and email export features while strictly maintaining user anonymity.
+
+*   [ ] **Task 1: Implement PDF Export**
+    *   [ ] Install `jspdf` and `jspdf-autotable`.
+    *   [ ] Create a new utility module: `src/lib/utils/pdf-generator.ts`.
+    *   [ ] Add a `[ 📥 Download as PDF ]` button to the results page.
+
+*   [ ] **Task 2: Implement "Send-and-Forget" Email Export**
+    *   [ ] Add an `[ 📧 Email My Results ]` button to the results page that opens a `Dialog`.
+    *   [ ] Create a new API route: `src/app/api/export/email/route.ts`.
+    *   [ ] Design and build an HTML email template for the results report.
+    *   [ ] Implement the "Send-and-Forget" logic.
+
+*   [ ] **Task 3: Add In-App Resources**
+    *   [ ] On the results page, add sections for "conversation starters" and links to health organizations.
+
+---
+
+## Phase 3: Pre-Launch - Refinement & Testing
+
+**Objective:** To polish the application, ensure all ethical guidelines are met, and create a new, relevant testing suite.
+
+*   [ ] **Task 1: UI/UX & Theming**
+    *   [ ] Update `src/app/globals.css` and `tailwind.config.ts` to implement the "calm, reassuring" color palette.
+    *   [ ] Implement consistent loading and disabled states for all interactive elements.
+
+*   [ ] **Task 2: Legal & Compliance**
+    *   [ ] Create static pages: `/privacy` and `/terms`.
+    *   [ ] Populate pages with approved legal text.
+    *   [ ] Add links to these pages in the application footer.
+
+*   [ ] **Task 3: Overhaul E2E Test Suite**
+    *   [ ] Delete all existing files in the `e2e/` directory.
+    *   [ ] Create `e2e/assessment.spec.ts` and `e2e/export.spec.ts`.
+
+*   [ ] **Task 4: Unit & Integration Testing**
+    *   [ ] Write Jest tests for `pdf-generator.ts` and API endpoints.
+    *   [ ] Perform an accessibility audit.
+
+*   [ ] **Task 5: Pre-Launch Checklist**
+    *   [ ] Finalize and document all required production environment variables.
+    *   [ ] Configure production environment variables on Vercel.
+    *   [ ] Configure DNS and domain settings.
+    *   [ ] Final review of all disclaimer text with the medical advisor/client.
+    *   [ ] Final sign-off on the production build.
+
+---
+
+## Phase 4: Post-Launch & Future Scope
+
+**Objective:** To monitor the application's performance and plan for future enhancements.
+
+*   [ ] **Task 1: Launch & Monitoring**
+    *   [ ] Deploy the application to production via Vercel.
+    *   [ ] Run `npx prisma db seed` as part of the initial deployment script.
+    *   [ ] Monitor Sentry, Vercel Analytics, and the `AssessmentLog` table.
+
+*   [ ] **Task 2: Future Feature Ideation (Post-Launch)**
+    *   [ ] Scope the effort to add more cancer/health risk models.
+    *   [ ] Investigate localization to support multiple languages.
+    *   [ ] Brainstorm a secure, consent-based version for clinical use by healthcare providers.
+```

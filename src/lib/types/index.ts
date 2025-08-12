@@ -24,6 +24,7 @@ export interface TextAIProvider {
     messages: TutorChatMessage[],
     model: AIModel,
   ): Promise<string>;
+  
 }
 
 // Assessment Result Type (final output from AI to client)

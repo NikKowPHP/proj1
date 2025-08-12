@@ -5,6 +5,10 @@ const sentryWebpackPluginOptions = {
   silent: true,
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
+  // Disable sourcemap uploads for now to prevent build failures without a token.
+  sourcemaps: {
+    disable: true,
+  },
 };
 
 const nextConfig: NextConfig = {

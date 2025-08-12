@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { useAuthStore } from './auth.store';
 
 // BeforeInstallPromptEvent is not a standard type in TypeScript DOM libs yet.
 interface BeforeInstallPromptEvent extends Event {
@@ -20,7 +19,7 @@ interface PWAState {
   dismissInstallPrompt: () => void;
 }
 
-const PWA_DISMISSED_KEY = 'lexity_pwa_install_dismissed_v1';
+const PWA_DISMISSED_KEY = 'anonymous_assessment_pwa_dismissed_v1';
 
 export const usePWAStore = create<PWAState>((set, get) => ({
   installPromptEvent: null,
@@ -37,21 +36,11 @@ export const usePWAStore = create<PWAState>((set, get) => ({
       return;
     }
 
-    // Only show for logged-in users
-    const user = useAuthStore.getState().user;
-    if (!user) {
-      set({ installPromptEvent: null, isInstallable: false, showInstallBanner: false });
-      return;
-    }
-
     set({ installPromptEvent: event, isInstallable: !!event });
     // Automatically show the banner after a delay if the event is set.
     if (event) {
       setTimeout(() => {
-        // Re-check conditions before showing, in case user logged out
-        if (useAuthStore.getState().user) {
-          set({ showInstallBanner: true });
-        }
+        set({ showInstallBanner: true });
       }, 5000); // Show after 5 seconds of engagement
     }
   },

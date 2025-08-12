@@ -1,5 +1,10 @@
 // This file will be populated with types for the new application in later phases.
 
+export interface TutorChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 // AI Model Types
 export type CerebrasModel =
   | "gpt-oss-120b"
@@ -16,7 +21,7 @@ export interface TextAIProvider {
   generateText(prompt: string, model: AIModel): Promise<string>;
   generateChatCompletion(
     systemPrompt: string,
-    messages: any[], // Simplified for now
+    messages: TutorChatMessage[],
     model: AIModel,
   ): Promise<string>;
 }

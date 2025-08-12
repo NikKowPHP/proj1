@@ -5,6 +5,7 @@ import { createRequest } from "node-mocks-http";
 import * as riskCalculator from "@/lib/services/risk-calculator.service";
 import * as ai from "@/lib/ai";
 import { prisma } from "@/lib/db";
+import { MultiCalculationResult } from "@/lib/types";
 
 // Mock dependencies
 jest.mock("@/lib/services/risk-calculator.service");
@@ -17,23 +18,37 @@ jest.mock("@/lib/db", () => ({
   },
 }));
 
-const mockedCalculateRisk = riskCalculator.calculateRisk as jest.Mock;
+const mockedCalculateAllRisks = riskCalculator.calculateAllRisks as jest.Mock;
 const mockedGetAIService = ai.getAIService as jest.Mock;
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
 describe("POST /api/assess", () => {
   const mockAIExplanation = {
-    riskFactors: [{ factor: "Test Risk", riskLevel: "High", explanation: "AI explanation" }],
+    riskFactors: [
+      {
+        factor: "Test Risk",
+        riskLevel: "High",
+        explanation: "AI explanation",
+      },
+    ],
     positiveFactors: [{ factor: "Test Positive", explanation: "Good job" }],
     recommendations: ["See a doctor"],
   };
 
-  const mockCalculationResult = {
-    riskFactors: [{ id: "TEST", name: "Test Risk", score: 10, level: "High" }],
+  const mockCalculationResult: MultiCalculationResult = {
+    modelResults: [
+      {
+        modelId: "GENERAL_CANCER_V1",
+        modelName: "General Cancer Risk",
+        riskFactors: [
+          { id: "TEST", name: "Test Risk", score: 10, level: "High" },
+        ],
+      },
+    ],
     positiveFactors: [],
     userAnswers: { age: "60+" },
   };
-  
+
   const mockAIService = {
     getRiskAssessmentExplanation: jest.fn().mockResolvedValue({
       result: mockAIExplanation,
@@ -44,7 +59,7 @@ describe("POST /api/assess", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockedGetAIService.mockReturnValue(mockAIService);
-    mockedCalculateRisk.mockReturnValue(mockCalculationResult);
+    mockedCalculateAllRisks.mockReturnValue(mockCalculationResult);
   });
 
   it("should orchestrate the hybrid flow correctly", async () => {
@@ -59,12 +74,14 @@ describe("POST /api/assess", () => {
     const responseJson = await response.json();
 
     // 1. Assert risk calculator was called with user answers
-    expect(mockedCalculateRisk).toHaveBeenCalledTimes(1);
-    expect(mockedCalculateRisk).toHaveBeenCalledWith(userAnswers);
+    expect(mockedCalculateAllRisks).toHaveBeenCalledTimes(1);
+    expect(mockedCalculateAllRisks).toHaveBeenCalledWith(userAnswers);
 
     // 2. Assert AI service was called with the result of the calculation
     expect(mockAIService.getRiskAssessmentExplanation).toHaveBeenCalledTimes(1);
-    expect(mockAIService.getRiskAssessmentExplanation).toHaveBeenCalledWith(mockCalculationResult);
+    expect(mockAIService.getRiskAssessmentExplanation).toHaveBeenCalledWith(
+      mockCalculationResult,
+    );
 
     // 3. Assert the final response is the AI explanation
     expect(response.status).toBe(200);
@@ -86,8 +103,8 @@ describe("POST /api/assess", () => {
     const responseJson = await response.json();
 
     expect(response.status).toBe(400);
-    expect(responseJson).toEqual({ error: "Invalid answers format" });
-    expect(mockedCalculateRisk).not.toHaveBeenCalled();
+    expect(responseJson.error).toBe("Invalid answers format");
+    expect(mockedCalculateAllRisks).not.toHaveBeenCalled();
     expect(mockAIService.getRiskAssessmentExplanation).not.toHaveBeenCalled();
   });
 
@@ -109,8 +126,10 @@ describe("POST /api/assess", () => {
     const responseJson = await response.json();
 
     expect(response.status).toBe(502);
-    expect(responseJson).toEqual({ error: "Failed to process assessment due to invalid AI response" });
-    
+    expect(responseJson).toEqual({
+      error: "Failed to process assessment due to invalid AI response",
+    });
+
     // Assert a validation error log was created
     expect(mockPrisma.assessmentLog.create).toHaveBeenCalledWith({
       data: { status: "AI_VALIDATION_ERROR" },

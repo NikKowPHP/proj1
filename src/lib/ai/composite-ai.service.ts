@@ -3,8 +3,8 @@ import { GroqService } from "./groq-service";
 import { GeminiService } from "./gemini-service";
 import { executeWithFallbacks, ProviderConfig } from "./composite-executor";
 
-import { getCancerRiskAssessmentPrompt } from "./prompts/cancerRiskAssessment.prompt";
-import type { CalculationResult } from "@/lib/types";
+import { getMultiRiskAssessmentPrompt } from "./prompts/multiRiskAssessment.prompt";
+import type { MultiCalculationResult } from "@/lib/types";
 import { AIModel, TextAIProvider } from "./types";
 import { TutorChatMessage } from "../types";
 
@@ -51,10 +51,10 @@ export class CompositeAIService {
   }
 
   async getRiskAssessmentExplanation(
-    calculationResult: CalculationResult,
+    calculationResult: MultiCalculationResult,
     userId?: string,
   ) {
-    const prompt = getCancerRiskAssessmentPrompt(calculationResult);
+    const prompt = getMultiRiskAssessmentPrompt(calculationResult);
     const providerChain = this.getProviderChain("large");
     return executeWithFallbacks(
       providerChain,

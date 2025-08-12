@@ -68,12 +68,23 @@ export interface IdentifiedPositiveFactor {
   description: string;
 }
 
+// --- New types for the multi-model architecture (v2) ---
+
 /**
- * The data contract for the output of the deterministic risk calculation engine.
+ * Represents the results for a single risk model (e.g., General Cancer, Lung Cancer).
+ */
+export interface ModelResult {
+  modelId: string;
+  modelName: string;
+  riskFactors: CalculatedRiskFactor[];
+}
+
+/**
+ * The data contract for the output of the multi-model deterministic risk calculation engine.
  * This object is the "source of truth" that will be passed to the AI for explanation.
  */
-export interface CalculationResult {
-  riskFactors: CalculatedRiskFactor[];
+export interface MultiCalculationResult {
+  modelResults: ModelResult[];
   positiveFactors: IdentifiedPositiveFactor[];
   userAnswers: Record<string, string>;
 }

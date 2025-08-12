@@ -4,7 +4,7 @@ import { logger } from "@/lib/logger";
 import { getAIService } from "@/lib/ai";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-import { calculateRisk } from "@/lib/services/risk-calculator.service";
+import { calculateAllRisks } from "@/lib/services/risk-calculator.service";
 
 const answersSchema = z
   .object({
@@ -60,8 +60,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 1. Run deterministic calculation
-    const calculationResult = calculateRisk(parsedAnswers.data as Record<string, string>);
+    // 1. Run deterministic calculation across all models
+    const calculationResult = calculateAllRisks(parsedAnswers.data as Record<string, string>);
 
     // 2. Get AI-powered explanation for the calculation
     const aiService = getAIService();

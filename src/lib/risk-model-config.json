@@ -1,83 +1,88 @@
 {
-  "factors": {
-    "SMOKING_RELATED": {
-      "name": "Smoking-Related Risk",
-      "questionIds": ["smoking_status"],
-      "thresholds": { "average": 3, "high": 9 }
-    },
-    "LIFESTYLE_CHOICES": {
-      "name": "Lifestyle Choices Risk",
-      "questionIds": ["alcohol", "activity", "diet_fruits_veg", "diet_red_meat"],
-      "thresholds": { "average": 7, "high": 12 }
-    },
-    "DEMOGRAPHIC": {
-      "name": "Demographic Risk",
-      "questionIds": ["age", "sex"],
-      "thresholds": { "average": 5, "high": 9 }
-    },
-    "BODY_COMPOSITION": {
-      "name": "Body Composition Risk (BMI)",
-      "questionIds": ["bmi_category"],
-      "thresholds": { "average": 4, "high": 7 }
-    },
-    "GENETIC_PREDISPOSITION": {
-      "name": "Genetic Predisposition",
-      "questionIds": ["family_history_cancer"],
-      "thresholds": { "average": 2, "high": 9 }
-    }
-  },
-  "weights": {
-    "smoking_status": {
-      "Never smoked": 0,
-      "Former smoker": 3,
-      "Current smoker": 10
-    },
-    "alcohol": {
-      "None": 0,
-      "1-2": 1,
-      "3-7": 3,
-      "8-14": 5,
-      "15+": 7
-    },
-    "activity": {
-      "0 days": 5,
-      "1-2 days": 3,
-      "3-4 days": 0,
-      "5+ days": -2
-    },
-    "diet_fruits_veg": {
-      "0-1": 5,
-      "2-3": 2,
-      "4-5": 0,
-      "6+": -2
-    },
-    "diet_red_meat": {
-      "Never or rarely": 0,
-      "1-2 times": 2,
-      "3-4 times": 4,
-      "5+ times": 6
-    },
-    "age": {
-      "18-29": 0,
-      "30-39": 2,
-      "40-49": 4,
-      "50-59": 6,
-      "60+": 8
-    },
-    "sex": {
-      "Male": 1,
-      "Female": 0
-    },
-    "family_history_cancer": {
-      "No": 0,
-      "I don't know": 2,
-      "Yes": 10
-    },
-    "bmi_category": {
-      "Underweight": 3,
-      "Normal": 0,
-      "Overweight": 4,
-      "Obese": 8
+  "models": {
+    "GENERAL_CANCER_V1": {
+      "name": "General Cancer Risk",
+      "factors": {
+        "SMOKING_RELATED": {
+          "name": "Smoking-Related Risk",
+          "questionIds": ["smoking_status"],
+          "thresholds": { "average": 3, "high": 9 }
+        },
+        "LIFESTYLE_CHOICES": {
+          "name": "Lifestyle Choices Risk",
+          "questionIds": ["alcohol", "activity", "diet_fruits_veg", "diet_red_meat"],
+          "thresholds": { "average": 7, "high": 12 }
+        },
+        "DEMOGRAPHIC": {
+          "name": "Demographic Risk",
+          "questionIds": ["age", "sex"],
+          "thresholds": { "average": 5, "high": 9 }
+        },
+        "BODY_COMPOSITION": {
+          "name": "Body Composition Risk (BMI)",
+          "questionIds": ["bmi_category"],
+          "thresholds": { "average": 4, "high": 7 }
+        },
+        "GENETIC_PREDISPOSITION": {
+          "name": "Genetic Predisposition",
+          "questionIds": ["family_history_cancer"],
+          "thresholds": { "average": 2, "high": 9 }
+        }
+      },
+      "weights": {
+        "smoking_status": {
+          "Never smoked": 0,
+          "Former smoker": 3,
+          "Current smoker": 10
+        },
+        "alcohol": {
+          "None": 0,
+          "1-2": 1,
+          "3-7": 3,
+          "8-14": 5,
+          "15+": 7
+        },
+        "activity": {
+          "0 days": 5,
+          "1-2 days": 3,
+          "3-4 days": 0,
+          "5+ days": -2
+        },
+        "diet_fruits_veg": {
+          "0-1": 5,
+          "2-3": 2,
+          "4-5": 0,
+          "6+": -2
+        },
+        "diet_red_meat": {
+          "Never or rarely": 0,
+          "1-2 times": 2,
+          "3-4 times": 4,
+          "5+ times": 6
+        },
+        "age": {
+          "18-29": 0,
+          "30-39": 2,
+          "40-49": 4,
+          "50-59": 6,
+          "60+": 8
+        },
+        "sex": {
+          "Male": 1,
+          "Female": 0
+        },
+        "family_history_cancer": {
+          "No": 0,
+          "I don't know": 2,
+          "Yes": 10
+        },
+        "bmi_category": {
+          "Underweight": 3,
+          "Normal": 0,
+          "Overweight": 4,
+          "Obese": 8
+        }
+      }
     }
   },
   "positiveFactors": {

@@ -2,3 +2,5 @@
 - [x] Fix TypeScript compilation errors related to TutorChatMessage type
 - [x] Fix broken import for `auth.store.ts` in `pwa.store.ts`
 - [x] Fix Sentry build errors and modernize configuration
+- [x] Disable Sentry build-time processing to prevent token errors
+- [x] Fix TypeScript error in PDF generator for jspdf-autotable

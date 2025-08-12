@@ -2,9 +2,13 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import type { AssessmentResult } from "../types";
 
-// Extend jsPDF with autoTable
+// Extend jsPDF with autoTable, including its static `previous` property
+// which is used to get the y-position of the last drawn table.
 interface jsPDFWithAutoTable extends jsPDF {
-  autoTable: (options: any) => jsPDF;
+  autoTable: {
+    (options: any): jsPDF;
+    previous?: { finalY: number };
+  };
 }
 
 export const generateAssessmentPdf = (assessmentData: AssessmentResult) => {
@@ -40,7 +44,7 @@ export const generateAssessmentPdf = (assessmentData: AssessmentResult) => {
       theme: "striped",
       headStyles: { fillColor: [255, 193, 7] }, // Amber color for risks
     });
-    startY = doc.autoTable.previous.finalY + 10;
+    startY = doc.autoTable.previous!.finalY + 10;
   }
 
   // --- Positive Factors ---
@@ -56,7 +60,7 @@ export const generateAssessmentPdf = (assessmentData: AssessmentResult) => {
       theme: "striped",
       headStyles: { fillColor: [76, 175, 80] }, // Green color for positives
     });
-    startY = doc.autoTable.previous.finalY + 10;
+    startY = doc.autoTable.previous!.finalY + 10;
   }
 
   // --- Recommendations ---

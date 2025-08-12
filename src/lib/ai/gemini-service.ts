@@ -1,9 +1,7 @@
 import type {
   AIModel,
-  AudioAIProvider,
   GeminiModel,
   MultimodalAIProvider,
-  UnifiedEvaluationResult,
 } from "./types";
 import { withRetry } from "../utils/withRetry";
 import { getAllKeys } from "./gemini-key-provider";
@@ -13,8 +11,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import crypto from "crypto";
-import type { AudioEvaluationContext, TutorChatMessage } from "@/lib/types";
-import { getAudioAnswerEvaluationPrompt } from "./prompts";
+import type { TutorChatMessage } from "@/lib/types";
 
 // Local types to replace SDK enums
 type HarmCategory =
@@ -37,7 +34,7 @@ const safetySettings: { category: HarmCategory; threshold: HarmBlockThreshold }[
     { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
   ];
 
-export class GeminiService implements MultimodalAIProvider, AudioAIProvider {
+export class GeminiService implements MultimodalAIProvider {
   readonly providerName = "Gemini";
 
   private cleanJsonString(text: string): string {
@@ -266,63 +263,6 @@ export class GeminiService implements MultimodalAIProvider, AudioAIProvider {
       const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("Empty chat response from Gemini API");
       return text.trim();
-    });
-  }
-
-  async evaluateAudioAnswer(
-    context: AudioEvaluationContext,
-  ): Promise<UnifiedEvaluationResult> {
-    const { audioBuffer, mimeType, ...promptContext } = context;
-    const prompt = getAudioAnswerEvaluationPrompt(promptContext);
-
-    return this.executeRequest(async (apiKey) => {
-      let uploadedFile;
-      try {
-        uploadedFile = await this._uploadFile(apiKey, {
-          buffer: audioBuffer,
-          mimeType,
-        });
-
-        const model =
-          (process.env.GEMINI_LARGE_MODEL as GeminiModel) ??
-          "gemini-1.5-pro-latest";
-
-        const payload = {
-          contents: [
-            {
-              role: "user",
-              parts: [
-                { text: prompt },
-                {
-                  file_data: {
-                    mime_type: uploadedFile.mimeType,
-                    file_uri: uploadedFile.uri,
-                  },
-                },
-              ],
-            },
-          ],
-          generationConfig: { response_mime_type: "application/json" },
-          safetySettings,
-        };
-
-        const response = await axios.post(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-          payload,
-          { headers: { "x-goog-api-key": apiKey } },
-        );
-
-        const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!text)
-          throw new Error("Empty audio evaluation response from Gemini API");
-        return JSON.parse(
-          this.cleanJsonString(text),
-        ) as UnifiedEvaluationResult;
-      } finally {
-        if (uploadedFile) {
-          await this._deleteFile(apiKey, uploadedFile.name);
-        }
-      }
     });
   }
 }

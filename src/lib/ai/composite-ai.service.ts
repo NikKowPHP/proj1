@@ -4,8 +4,8 @@ import { GeminiService } from "./gemini-service";
 import { executeWithFallbacks, ProviderConfig } from "./composite-executor";
 
 import { getCancerRiskAssessmentPrompt } from "./prompts/cancerRiskAssessment.prompt";
-import type { AudioEvaluationContext, CalculationResult } from "@/lib/types";
-import { AIModel, TextAIProvider, UnifiedEvaluationResult } from "./types";
+import type { CalculationResult } from "@/lib/types";
+import { AIModel, TextAIProvider } from "./types";
 import { TutorChatMessage } from "../types";
 
 // Define model configuration from environment variables

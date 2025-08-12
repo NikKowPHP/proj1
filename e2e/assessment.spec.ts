@@ -20,6 +20,19 @@ test.describe("Core Assessment Flow", () => {
     await page.getByRole("option", { name: "40-49" }).click();
     await page.getByText("Select an option").first().click();
     await page.getByRole("option", { name: "Male" }).click();
+    
+    // --- NEW: Reload and resume ---
+    await page.reload();
+    
+    // Expect the resume dialog to be visible
+    await expect(page.getByRole('heading', { name: 'Resume Session?' })).toBeVisible();
+    await page.getByRole('button', { name: 'Resume' }).click();
+    
+    // Verify answers are still there
+    await expect(page.getByText('40-49')).toBeVisible();
+    await expect(page.getByText('Male')).toBeVisible();
+    // --- End of new steps ---
+    
     await page.getByRole("button", { name: "Next" }).click();
 
     // Step 2: Lifestyle Habits

@@ -4,7 +4,6 @@ import { CerebrasService } from "./cerebras-service";
 import { GroqService } from "./groq-service";
 import { GeminiService } from "./gemini-service";
 import * as compositeExecutor from "./composite-executor";
-import type { AudioEvaluationContext } from "@/lib/types";
 
 // Mock the individual services and the executor
 jest.mock("./cerebras-service");
@@ -46,35 +45,8 @@ describe("CompositeAIService", () => {
     service = new CompositeAIService();
   });
 
-  describe("analyzeJournalEntry", () => {
-    const commonArgs: [
-      string,
-      string,
-      number,
-      string,
-      null,
-      string,
-      string,
-    ] = ["content", "lang", 50, "native", null, "mode", "user1"];
-
-    it("should call Gemini directly when an imageUrl is provided", async () => {
-      const imageUrl = "http://image.com/test.jpg";
-      mockGeminiInstance.generateJsonWithImage.mockResolvedValue({
-        /* mock response */
-      } as any);
-
-      await service.analyzeJournalEntry(...commonArgs, imageUrl);
-
-      expect(mockGeminiInstance.generateJsonWithImage).toHaveBeenCalledTimes(1);
-      expect(mockGeminiInstance.generateJsonWithImage).toHaveBeenCalledWith(
-        expect.any(String), // The generated prompt
-        expect.any(String), // The model
-        imageUrl,
-      );
-      expect(mockedExecutor.executeWithFallbacks).not.toHaveBeenCalled();
-    });
-
-    it("should use the fallback executor when no imageUrl is provided", async () => {
+  describe("getRiskAssessmentExplanation", () => {
+    it("should use the fallback executor", async () => {
       mockedExecutor.executeWithFallbacks.mockResolvedValue({
         result: {
           /* mock response */
@@ -82,32 +54,9 @@ describe("CompositeAIService", () => {
         serviceUsed: "mock",
       } as any);
 
-      await service.analyzeJournalEntry(...commonArgs, undefined);
+      await service.getRiskAssessmentExplanation({} as any);
 
-      expect(mockGeminiInstance.generateJsonWithImage).not.toHaveBeenCalled();
       expect(mockedExecutor.executeWithFallbacks).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe("evaluateAudioAnswer", () => {
-    it("should call Gemini directly for audio evaluation", async () => {
-      const mockContext: AudioEvaluationContext = {
-        audioBuffer: Buffer.from(""),
-        mimeType: "audio/mp3",
-        question: "q",
-        idealAnswerSummary: "a",
-      };
-      mockGeminiInstance.evaluateAudioAnswer.mockResolvedValue({
-        /* mock response */
-      } as any);
-
-      await service.evaluateAudioAnswer(mockContext);
-
-      expect(mockGeminiInstance.evaluateAudioAnswer).toHaveBeenCalledTimes(1);
-      expect(mockGeminiInstance.evaluateAudioAnswer).toHaveBeenCalledWith(
-        mockContext,
-      );
-      expect(mockedExecutor.executeWithFallbacks).not.toHaveBeenCalled();
     });
   });
 });

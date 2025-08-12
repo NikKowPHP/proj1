@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function AppFooter() {
   return (

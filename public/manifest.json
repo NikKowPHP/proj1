@@ -1,8 +1,7 @@
-
 {
-  "name": "Lexity",
-  "short_name": "Lexity",
-  "description": "AI-powered language learning through writing",
+  "name": "Health Risk Assessor",
+  "short_name": "Health Risk Assessor",
+  "description": "An anonymous, AI-powered health risk assessment tool.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",

@@ -1,7 +1,6 @@
-
 {
-  "name": "Lexity",
-  "short_name": "Lexity",
+  "name": "Health Risk Assessor",
+  "short_name": "Health Risk Assessor",
   "icons": [
     {
       "src": "favicon/android-chrome-192x192.png",

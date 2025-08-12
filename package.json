@@ -1,5 +1,5 @@
 {
-  "name": "lexity",
+  "name": "health-risk-assessor",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -11,7 +11,6 @@
     "beforetest": "dotenv -e .env.test -- docker-compose up -d db && dotenv -e .env.test -- prisma migrate dev",
     "test:coverage": "jest --coverage",
     "prisma:seed": "ts-node prisma/seed.cts",
-    "db:encrypt": "ts-node -r dotenv/config scripts/encrypt-existing-data.cts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

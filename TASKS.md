@@ -56,7 +56,7 @@
 
 **Objective:** To improve the user experience by persisting questionnaire progress even if the browser tab is accidentally closed.
 
-*   [ ] **Task 2.1: Update Zustand Store to Use `localStorage`**
+*   [x] **Task 2.1: Update Zustand Store to Use `localStorage`**
     *   **File:** `src/lib/stores/assessment.store.ts`
     *   **Action:** In the `persist` middleware options, change the storage target from `sessionStorage` to `localStorage`.
     *   **Code Change:**
@@ -67,7 +67,7 @@
         storage: createJSONStorage(() => localStorage),
         ```
 
-*   [ ] **Task 2.2: Implement "Resume Session" Logic**
+*   [x] **Task 2.2: Implement "Resume Session" Logic**
     *   **File:** `src/app/assessment/page.tsx`
     *   **Action:** Add a `useEffect` hook that runs on initial page load.
     *   **Logic:**
@@ -76,11 +76,11 @@
         3.  If "Resume" is clicked, the dialog closes.
         4.  If "Start New" is clicked, call the `reset()` function from the Zustand store.
 
-*   [ ] **Task 2.3: Implement Session Cleanup**
+*   [x] **Task 2.3: Implement Session Cleanup**
     *   **File:** `src/app/results/page.tsx`
     *   **Action:** In the `onClick` handler for the "Start New Assessment" button, ensure the `reset()` function from the Zustand store is called before navigating the user back to the homepage.
 
-*   [ ] **Task 2.4: Update E2E Test**
+*   [x] **Task 2.4: Update E2E Test**
     *   **File:** `e2e/assessment.spec.ts`
     *   **Action:** Add a step in the middle of the questionnaire that reloads the page (`page.reload()`).
     *   **Expected Result:** The test should verify that the user's previous answers are still present in the form fields after the reload.
@@ -91,19 +91,23 @@
 
 **Objective:** To remove the last remnants of the old application and ensure all user-facing assets reflect the new brand.
 
-*   [ ] **Task 3.1: Delete Unused Script**
+*   [x] **Task 3.1: Delete Unused Script**
     *   **Action:** Delete the legacy database encryption script.
     *   **Command:** `rm scripts/encrypt-existing-data.cts`
 
-*   [ ] **Task 3.2: Update PWA Manifest Files**
+*   [x] **Task 3.2: Update PWA Manifest Files**
     *   **File 1:** `public/manifest.json`
     *   **File 2:** `public/site.webmanifest`
     *   **Action:** In both files, change the `name` and `short_name` fields from "Lexity" to "Health Risk Assessor" (or the final product name).
 
-*   [ ] **Task 3.3: Update Project Name**
+*   [x] **Task 3.3: Update Project Name**
     *   **File:** `package.json`
     *   **Action:** Change the `"name"` field from `"lexity"` to `"health-risk-assessor"`.
 
-*   [ ] **Task 3.4: Final Verification**
+*   [x] **Task 3.4: Final Verification**
     *   **Action:** Run `npm install` to update the `package-lock.json` file.
     *   **Action:** Build and run the application locally to ensure all changes are applied and no new errors have been introduced.
+
+- [x] Fix build error by correcting ThemeToggle import path.
+- [x] Fix Prisma seed script path error.
+- [x] Fix build error by removing unused audio evaluation logic.

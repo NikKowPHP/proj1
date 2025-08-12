@@ -1,4 +1,4 @@
-import type { AudioEvaluationContext, EvaluationResult, TutorChatMessage } from "@/lib/types";
+import type { TutorChatMessage } from "@/lib/types";
 
 // AI Model Types
 export type CerebrasModel =
@@ -28,16 +28,4 @@ export interface MultimodalAIProvider extends TextAIProvider {
     model: AIModel,
     imageUrl: string,
   ): Promise<T>;
-}
-
-// A specific, typed result for audio evaluation that extends the base EvaluationResult
-export interface UnifiedEvaluationResult extends EvaluationResult {
-  transcription: string;
-}
-
-// Interface for providers supporting audio input
-export interface AudioAIProvider extends TextAIProvider {
-  evaluateAudioAnswer(
-    context: AudioEvaluationContext,
-  ): Promise<UnifiedEvaluationResult>;
 }

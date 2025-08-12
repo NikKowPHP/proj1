@@ -10,7 +10,7 @@ async function main() {
   try {
     const filePath = path.join(
       __dirname,
-      "../../src/lib/assessment-questions.json",
+      "../src/lib/assessment-questions.json",
     );
     const fileContent = fs.readFileSync(filePath, "utf-8");
     const questionnaireContent = JSON.parse(fileContent);

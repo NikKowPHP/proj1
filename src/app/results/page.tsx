@@ -36,8 +36,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEmailExport } from "@/lib/hooks/data/useEmailExport";
+import { useRouter } from "next/navigation";
 
 export default function ResultsPage() {
+  const router = useRouter();
   const { answers, reset } = useAssessmentStore();
   const {
     mutate: assess,

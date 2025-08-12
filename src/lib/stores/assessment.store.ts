@@ -33,7 +33,7 @@ export const useAssessmentStore = create<AssessmentState>()(
     }),
     {
       name: "assessment-storage",
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => localStorage),
     },
   ),
 );

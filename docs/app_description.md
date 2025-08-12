@@ -79,9 +79,9 @@ graph TD
 
 The integrity of our assessment relies on established, peer-reviewed medical research. The questionnaire logic and risk factor weighting will not be invented by our team but will be based on:
 
-*   **Established Risk Models:** We will implement logic derived from publicly available and validated risk assessment models (e.g., the [Gail Model](https://www.cancer.gov/bcrisktool/) for breast cancer, or similar established models for other cancer types).
+*   **Established Risk Models:** We will implement logic derived from publicly available and validated risk assessment models (e.g., the [Gail Model](https://www.cancer.gov/bcrisktool/) for breast cancer, or similar established models for other cancer types). The model now incorporates factors like **Body Mass Index (BMI)**—calculated from user-provided height and weight—and **family history** to provide a more comprehensive, yet still educational, overview.
 *   **Medical Advisor Review:** All questions, risk factors, and the final "Doctor's Visit Companion" report format will be reviewed and approved by a qualified medical advisor to ensure the information is presented responsibly and accurately.
-*   **AI's Role:** The AI's function is not to create new medical science, but to process the user's inputs according to the pre-defined, vetted logic of these models and present the results in a clear, understandable format. The core prompt will be engineered to strictly follow this logic.
+*   **AI's Role:** The AI's function is not to create new medical science, but to process the user's inputs according to the pre-defined, vetted logic of these models and present the results in a clear, understandable format. The core prompt is engineered to strictly follow this logic and to handle sensitive topics like genetic predisposition with extra care.
 
 ## 5. Monetization Strategy: Public Good / Non-commercial
 
@@ -130,9 +130,9 @@ model Questionnaire {
 
 ### **Epic 1: Core Anonymous Experience**
 - **[RISK-001]:** As a user, I can visit the welcome page and understand the tool's purpose and its commitment to anonymity.
-- **[RISK-002]:** As a user, I can answer a series of health-related questions in a multi-step wizard.
+- **[RISK-002]:** As a user, I can answer a series of health-related questions in a multi-step wizard, including selecting my preferred units (metric/imperial), entering my height and weight, and answering conditional questions that appear based on my previous answers.
 - **[RISK-003]:** As a user, after completing the questionnaire, I can view a personalized risk dashboard with simple, clear results.
-- **[RISK-004]:** As a user, if I close my browser and return later, I can resume my questionnaire from where I left off.
+- **[RISK-004]:** As a user, if I close my browser and return later, I am prompted to resume my questionnaire from where I left off.
 
 ### **Epic 2: Results Export & Actionability**
 - **[RISK-010]:** As a user, I can download my results as a professionally formatted PDF ("Doctor's Visit Companion").
@@ -142,7 +142,7 @@ model Questionnaire {
 ### **Epic 3: Trust, Compliance & UI**
 - **[RISK-020]:** As a user, I see clear disclaimers stating the tool is not for diagnosis before, during, and after the assessment.
 - **[RISK-021]:** As a developer, the "send-and-forget" email endpoint is implemented to ensure no email addresses are ever stored.
-- **[RISK-022]:** As a user, I experience a calm, reassuring, and accessible interface on both mobile and desktop.
+- **[RISK-022]:** As a user, I experience a calm, reassuring, and accessible interface on both mobile and desktop, with clear UI elements like tabs for unit selection.
 
 ## 8. Development & Compliance Practices
 
@@ -179,7 +179,7 @@ Our immediate goal is to launch an MVP that validates the core user proposition:
 
 | Risk Category | Risk Description | Mitigation Strategy |
 | :--- | :--- | :--- |
-| **Technical / Ethical** | The AI provides inaccurate, alarming, or clinically incorrect risk assessments. | Rigorous prompt engineering with clear guardrails and few-shot examples to ensure consistent JSON output. Prominently display disclaimers that the tool is not medical advice. Frame results as "risk factors" and "statistical profiles," not diagnoses. The AI's output will be validated against a Zod schema before being shown to the user; if validation fails, a generic 'could not process' message is shown instead of a malformed result. |
+| **Technical / Ethical** | The AI provides inaccurate, alarming, or clinically incorrect risk assessments, especially for sensitive factors like **Genetic Predisposition**. | Rigorous prompt engineering with clear guardrails to ensure consistent JSON output and cautious language. For sensitive topics, the AI is explicitly instructed to emphasize that correlation is not causation and to strongly recommend professional consultation. Prominently display disclaimers that the tool is not medical advice. The AI's output is validated against a Zod schema before being shown; if validation fails, a generic 'could not process' message is shown. |
 | **Product / Trust** | Users do not trust the "anonymity" promise and abandon the questionnaire. | Be radically transparent in the UI about the stateless nature of the app. Clearly explain the "Send-and-Forget" protocol. Avoid any unnecessary data collection. |
 | **Dependency**| An AI provider experiences an outage, has policy changes, or degrades in quality. | The implemented **`CompositeAIService` provides a resilient, multi-provider fallback system**. If the primary provider (e.g., Gemini) fails, the service automatically and seamlessly retries the request with a secondary provider (e.g., Groq), ensuring high availability and mitigating dependency risk. |
 | **Compliance** | The application is misconstrued as a medical device, creating potential liability. | Work with legal counsel to craft disclaimer language. Emphasize the tool's purpose as a conversation starter for users *and their doctors*. |

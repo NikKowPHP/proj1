@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/providers";
 import { Toaster } from "@/components/ui/toaster";
+import { AppFooter } from "@/components/AppFooter";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Lexity - Language Learning",
-  description: "AI-powered language learning through writing",
+  title: "Anonymous Health Assessment",
+  description: "An AI-powered health risk assessment tool.",
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Lexity",
+    title: "Health Assessment",
   },
 };
 
@@ -65,8 +66,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <main className="flex-1">{children}</main>
-          <Toaster />
+          <div className="flex flex-col min-h-screen">
+            <main className="flex-1">{children}</main>
+            <AppFooter />
+            <Toaster />
+          </div>
         </Providers>
       </body>
     </html>

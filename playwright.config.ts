@@ -25,7 +25,7 @@ export default defineConfig({
     env: {
       DATABASE_URL: process.env.DATABASE_URL!,
       APP_ENCRYPTION_KEY: process.env.APP_ENCRYPTION_KEY!,
-      GEMINI_API_KEY_1: process.env.GEMINI_API_KEY_1,
+      GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     },
   },
 

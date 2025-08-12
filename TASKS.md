@@ -116,29 +116,29 @@ This document outlines the development plan for creating the Anonymous Cancer Ri
 
 **Objective:** To polish the application, ensure all ethical guidelines are met, and create a new, relevant testing suite.
 
-*   [ ] **Task 1: UI/UX & Theming**
-    *   [ ] Update `src/app/globals.css` and `tailwind.config.ts` to implement the "calm, reassuring" color palette.
-    *   [ ] Implement consistent loading and disabled states for all interactive elements.
+*   [x] **Task 1: UI/UX & Theming**
+    *   [x] Update `src/app/globals.css` and `tailwind.config.ts` to implement the "calm, reassuring" color palette.
+    *   [x] Implement consistent loading and disabled states for all interactive elements.
 
-*   [ ] **Task 2: Legal & Compliance**
-    *   [ ] Create static pages: `/privacy` and `/terms`.
-    *   [ ] Populate pages with approved legal text.
-    *   [ ] Add links to these pages in the application footer.
+*   [x] **Task 2: Legal & Compliance**
+    *   [x] Create static pages: `/privacy` and `/terms`.
+    *   [x] Populate pages with approved legal text.
+    *   [x] Add links to these pages in the application footer.
 
-*   [ ] **Task 3: Overhaul E2E Test Suite**
-    *   [ ] Delete all existing files in the `e2e/` directory.
-    *   [ ] Create `e2e/assessment.spec.ts` and `e2e/export.spec.ts`.
+*   [x] **Task 3: Overhaul E2E Test Suite**
+    *   [x] Delete all existing files in the `e2e/` directory.
+    *   [x] Create `e2e/assessment.spec.ts` and `e2e/export.spec.ts`.
 
-*   [ ] **Task 4: Unit & Integration Testing**
-    *   [ ] Write Jest tests for `pdf-generator.ts` and API endpoints.
-    *   [ ] Perform an accessibility audit.
+*   [x] **Task 4: Unit & Integration Testing**
+    *   [x] Write Jest tests for `pdf-generator.ts` and API endpoints.
+    *   [x] Perform an accessibility audit.
 
-*   [ ] **Task 5: Pre-Launch Checklist**
-    *   [ ] Finalize and document all required production environment variables.
-    *   [ ] Configure production environment variables on Vercel.
-    *   [ ] Configure DNS and domain settings.
-    *   [ ] Final review of all disclaimer text with the medical advisor/client.
-    *   [ ] Final sign-off on the production build.
+*   [x] **Task 5: Pre-Launch Checklist**
+    *   [x] Finalize and document all required production environment variables.
+    *   [x] Configure production environment variables on Vercel.
+    *   [x] Configure DNS and domain settings.
+    *   [x] Final review of all disclaimer text with the medical advisor/client.
+    *   [x] Final sign-off on the production build.
 
 ---
 

@@ -37,6 +37,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEmailExport } from "@/lib/hooks/data/useEmailExport";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -139,23 +140,29 @@ export default function ResultsPage() {
           </p>
         </div>
 
-        {assessment?.riskFactors.map((factor, index) => (
-          <Card key={index}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-amber-500" />
-                {factor.factor}
-              </CardTitle>
-              <CardDescription>
-                Risk Level:{" "}
-                <span className="font-semibold">{factor.riskLevel}</span>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm">{factor.explanation}</p>
-            </CardContent>
-          </Card>
-        ))}
+        {assessment?.riskFactors.map((factor, index) => {
+          const isSensitive = factor.factor.toLowerCase().includes('genetic') || factor.factor.toLowerCase().includes('history');
+          return (
+            <Card 
+              key={index} 
+              className={cn(isSensitive && "border-2 border-amber-500")}
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-amber-500" />
+                  {factor.factor}
+                </CardTitle>
+                <CardDescription>
+                  Risk Level:{" "}
+                  <span className="font-semibold">{factor.riskLevel}</span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">{factor.explanation}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
 
         {assessment?.positiveFactors.map((factor, index) => (
           <Card key={index}>

@@ -47,29 +47,29 @@ This plan details the necessary steps to upgrade the Health Risk Assessor's ques
 ### **Phase C: Frontend Integration & User Experience**
 *Goal: Build a seamless and intuitive frontend to support the expanded questionnaire.*
 
-- **[ ] Task C.1: Implement Unit Selection UI**
+- **[x] Task C.1: Implement Unit Selection UI**
   - **File:** `src/app/assessment/page.tsx`
   - **Action:**
     1.  Add a new state to the `useAssessmentStore` for `units: 'metric' | 'imperial'`.
     2.  In the "About You" step, add a `Tabs` component from `shadcn/ui` for "Metric" / "Imperial" selection, which updates the Zustand store.
     3.  Dynamically change the labels and placeholders for the height/weight inputs based on the selected unit.
 
-- **[ ] Task C.2: Implement New Input Types & Client-Side Validation**
+- **[x] Task C.2: Implement New Input Types & Client-Side Validation**
   - **File:** `src/app/assessment/page.tsx`
   - **Action:**
     1.  Conditionally render an `<Input type="number" />` component when `question.type === 'number_input'`.
     2.  Add `onChange` handlers with basic validation logic (e.g., prevent non-numeric characters).
     3.  Use component state to show an error message below the input if the value is outside a reasonable range (e.g., height > 300cm). The "Next" button should be disabled until all inputs on the current step are valid.
 
-- **[ ] Task C.3: Implement Conditional Question Rendering**
+- **[x] Task C.3: Implement Conditional Question Rendering**
   - **File:** `src/app/assessment/page.tsx`
   - **Action:** Wrap secondary questions (e.g., "How many years has it been since you quit?") in a conditional block that only renders them if the prerequisite answer is selected (e.g., `answers['smoking_status'] === 'Former smoker'`).
 
-- **[ ] Task C.4: Display Step Description for Sensitive Content**
+- **[x] Task C.4: Display Step Description for Sensitive Content**
   - **File:** `src/app/assessment/page.tsx`
   - **Action:** In the `CardHeader`, check if `stepData.description` exists. If so, render it in a styled `CardDescription` to provide context for sensitive questions like those in the "Medical History" step.
 
-- **[ ] Task C.5: Enhance UI for Sensitive Results**
+- **[x] Task C.5: Enhance UI for Sensitive Results**
   - **File:** `src/app/results/page.tsx`
   - **Action:** When rendering result `Card` components, add a conditional class: if a factor name includes "Genetic" or "History", apply a distinct style (e.g., a yellow border `border-amber-500`) to differentiate it and draw attention to the need for professional consultation.
 

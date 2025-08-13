@@ -61,7 +61,7 @@ graph TD
 | **ORM** | **Prisma** | Provides a type-safe interface to the operational PostgreSQL database for managing questionnaires and logs. |
 | **Authentication** | **None** | The application is fully anonymous by design. |
 | **Payments** | **None** | The tool is a free public service. |
-| **AI / Core Engine**| **Composite AI Service (Gemini, Groq, Cerebras)** | A resilient, multi-provider service that sends requests to a primary AI model and automatically falls back to secondary providers on failure, ensuring high availability. |
+| **AI / Core Engine**| **Composite AI Service (Gemini, Groq, Cerebras)** | A resilient, multi-provider service that sends requests to a primary AI model and automatically falls back to secondary providers on failure, ensuring high availability. We utilize flagship models from each provider (e.g., **Gemini 1.5 Pro, Llama3 70B, Qwen 235B**) for high-quality analysis. |
 | **Notifications** | **Resend API** | Used exclusively for the optional, one-time, "send-and-forget" email export feature, chosen for its simplicity and reliability. |
 | **Styling** | **Tailwind CSS & shadcn/ui** | A utility-first framework and accessible component library allow for the rapid creation of a clean, calm, and responsive user interface. |
 | **Deployment** | **Vercel** | Offers seamless integration with Next.js, serverless functions for our stateless API, and a global CDN for fast performance. |
@@ -79,7 +79,11 @@ graph TD
 
 The integrity of our assessment relies on established, peer-reviewed medical research. The questionnaire logic and risk factor weighting will not be invented by our team but will be based on:
 
-*   **Established Risk Models:** We will implement logic derived from publicly available and validated risk assessment models (e.g., the [Gail Model](https://www.cancer.gov/bcrisktool/) for breast cancer, or similar established models for other cancer types). The model now incorporates factors like **Body Mass Index (BMI)**—calculated from user-provided height and weight—and **family history** to provide a more comprehensive, yet still educational, overview.
+*   **Implemented Risk Models:** The application currently assesses risks across several distinct, deterministic models based on established medical literature. The specific models implemented are:
+    *   **General Cancer Risk:** A broad assessment based on demographic, lifestyle, BMI, and genetic predisposition factors.
+    *   **Lung Cancer Risk:** A focused model evaluating the impact of smoking history and environmental exposures.
+    *   **Cardiovascular Risk:** A model assessing key indicators like blood pressure, diabetes, age, and BMI alongside lifestyle factors.
+*   The models incorporate factors like **Body Mass Index (BMI)**—calculated from user-provided height and weight—and **family history** to provide a more comprehensive, yet still educational, overview.
 *   **Medical Advisor Review:** All questions, risk factors, and the final "Doctor's Visit Companion" report format will be reviewed and approved by a qualified medical advisor to ensure the information is presented responsibly and accurately.
 *   **AI's Role:** The AI's function is not to create new medical science, but to process the user's inputs according to the pre-defined, vetted logic of these models and present the results in a clear, understandable format. The core prompt is engineered to strictly follow this logic and to handle sensitive topics like genetic predisposition with extra care.
 

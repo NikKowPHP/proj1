@@ -1,3 +1,2 @@
-- [x] Add sequential loading states to AI analysis page
-- [x] Fix build error by updating Zod schema in email export API route
-- [x] Add comprehensive logging to the assessment API to diagnose reported stall
+
+- [x] Improve documentation to specify which cancer and AI models are used

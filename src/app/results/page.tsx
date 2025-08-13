@@ -45,6 +45,12 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 
+const loadingMessages = [
+  "Connecting to our secure analysis engine...",
+  "Analyzing your lifestyle factors against our risk models...",
+  "Synthesizing results and generating personalized recommendations...",
+];
+
 export default function ResultsPage() {
   const router = useRouter();
   const { answers, reset } = useAssessmentStore();
@@ -59,12 +65,36 @@ export default function ResultsPage() {
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   const [email, setEmail] = useState("");
   const emailExportMutation = useEmailExport();
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
 
   useEffect(() => {
     if (Object.keys(answers).length > 0 && !assessment) {
       assess(answers);
     }
   }, [answers, assess, assessment]);
+
+  useEffect(() => {
+    if (isPending) {
+      setLoadingMessageIndex(0);
+      const timers: NodeJS.Timeout[] = [];
+
+      timers.push(
+        setTimeout(() => {
+          setLoadingMessageIndex(1);
+        }, 10000),
+      );
+
+      timers.push(
+        setTimeout(() => {
+          setLoadingMessageIndex(2);
+        }, 20000),
+      );
+
+      return () => {
+        timers.forEach(clearTimeout);
+      };
+    }
+  }, [isPending]);
 
   const handleEmailExport = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +134,7 @@ export default function ResultsPage() {
           <CardContent className="flex flex-col items-center gap-4">
             <Spinner size="lg" />
             <p className="text-muted-foreground">
-              Please wait while our AI processes your information.
+              {loadingMessages[loadingMessageIndex]}
             </p>
           </CardContent>
         </Card>

@@ -15,12 +15,19 @@ export async function executeWithFallbacks<T>(
 
   for (const { provider, model } of providers) {
     try {
+      logger.info(
+        `[CompositeExecutor] Attempting request with provider: ${provider.providerName}, model: ${model}`,
+        { userId },
+      );
       const result = await requestFn(provider, model);
+      logger.info(
+        `[CompositeExecutor] Successfully completed request with provider: ${provider.providerName}`,
+      );
       return { result, serviceUsed: provider.providerName };
     } catch (error) {
       lastError = error;
       logger.warn(
-        `AI provider ${provider.providerName} with model ${model} failed. Falling back to next provider.`,
+        `[CompositeExecutor] AI provider ${provider.providerName} with model ${model} failed. Falling back to next provider.`,
         {
           error: error instanceof Error ? error.message : String(error),
           userId,
@@ -29,6 +36,11 @@ export async function executeWithFallbacks<T>(
     }
   }
 
+  logger.error("[CompositeExecutor] All AI providers failed.", {
+    lastError:
+      lastError instanceof Error ? lastError.message : String(lastError),
+    userId,
+  });
   throw new Error(
     `All AI providers failed. Last error from ${
       providers[providers.length - 1].provider.providerName

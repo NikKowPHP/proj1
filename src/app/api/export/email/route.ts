@@ -4,22 +4,28 @@ import { logger } from "@/lib/logger";
 import { sendAssessmentEmail } from "@/lib/services/email.service";
 import type { AssessmentResult } from "@/lib/types";
 
+const riskFactorSchema = z.object({
+  factor: z.string(),
+  riskLevel: z.enum(["Low", "Moderate", "High"]),
+  explanation: z.string(),
+});
+
+const modelAssessmentSchema = z.object({
+  modelName: z.string(),
+  riskFactors: z.array(riskFactorSchema),
+});
+
+const positiveFactorSchema = z.object({
+  factor: z.string(),
+  explanation: z.string(),
+});
+
 const emailExportSchema = z.object({
   recipientEmail: z.string().email(),
   assessmentData: z.object({
-    riskFactors: z.array(
-      z.object({
-        factor: z.string(),
-        riskLevel: z.string(),
-        explanation: z.string(),
-      }),
-    ),
-    positiveFactors: z.array(
-      z.object({
-        factor: z.string(),
-        explanation: z.string(),
-      }),
-    ),
+    overallSummary: z.string(),
+    modelAssessments: z.array(modelAssessmentSchema),
+    positiveFactors: z.array(positiveFactorSchema),
     recommendations: z.array(z.string()),
   }),
 });

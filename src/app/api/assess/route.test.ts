@@ -1,11 +1,11 @@
 /** @jest-environment node */
 
 import { POST } from "./route";
-import { createRequest } from "node-mocks-http";
 import * as riskCalculator from "@/lib/services/risk-calculator.service";
 import * as ai from "@/lib/ai";
 import { prisma } from "@/lib/db";
 import { MultiCalculationResult } from "@/lib/types";
+import { NextRequest } from "next/server";
 
 // Mock dependencies
 jest.mock("@/lib/services/risk-calculator.service");
@@ -25,12 +25,16 @@ const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 describe("POST /api/assess", () => {
   const mockAIExplanation = {
     overallSummary: "Summary",
-    modelAssessments: [],
-    riskFactors: [
+    modelAssessments: [
       {
-        factor: "Test Risk",
-        riskLevel: "High",
-        explanation: "AI explanation",
+        modelName: "General Cancer Risk",
+        riskFactors: [
+          {
+            factor: "Test Risk",
+            riskLevel: "High",
+            explanation: "AI explanation",
+          },
+        ],
       },
     ],
     positiveFactors: [{ factor: "Test Positive", explanation: "Good job" }],
@@ -74,13 +78,14 @@ describe("POST /api/assess", () => {
   });
 
   it("should orchestrate the hybrid flow correctly", async () => {
-    const req = createRequest({
+    const requestBody = { answers: validUserAnswers };
+    const req = new NextRequest("http://localhost/api/assess", {
       method: "POST",
       headers: { "x-forwarded-for": "127.0.0.1" },
-      body: { answers: validUserAnswers },
+      body: JSON.stringify(requestBody),
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req);
     const responseJson = await response.json();
 
     // 1. Assert risk calculator was called with user answers
@@ -106,13 +111,13 @@ describe("POST /api/assess", () => {
   });
 
   it("should return 400 for invalid answers format", async () => {
-    const req = createRequest({
+    const requestBody = { answers: { units: 'metric', height: 'abc', weight: '123' } };
+    const req = new NextRequest("http://localhost/api/assess", {
       method: "POST",
-      // This payload will pass the first validation but fail the stricter answersSchema validation
-      body: { answers: { units: 'metric', height: 'abc', weight: '123' } },
+      body: JSON.stringify(requestBody),
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req);
     const responseJson = await response.json();
 
     expect(response.status).toBe(400);
@@ -128,13 +133,14 @@ describe("POST /api/assess", () => {
       serviceUsed: "mock-ai",
     });
 
-    const req = createRequest({
+    const requestBody = { answers: validUserAnswers };
+    const req = new NextRequest("http://localhost/api/assess", {
       method: "POST",
       headers: { "x-forwarded-for": "127.0.0.1" },
-      body: { answers: validUserAnswers },
+      body: JSON.stringify(requestBody),
     });
 
-    const response = await POST(req as any);
+    const response = await POST(req);
     const responseJson = await response.json();
 
     expect(response.status).toBe(502);
@@ -148,3 +154,4 @@ describe("POST /api/assess", () => {
     });
   });
 });
+      

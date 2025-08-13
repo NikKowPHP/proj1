@@ -31,4 +31,13 @@
 - [x] Fix failing tests for PDF generator
 - [x] Fix failing PDF generator tests by updating mock
 - [x] Fix PDF generator tests by mocking `jspdf-autotable` behavior
+- [x] Fix failing Cerebras integration test due to dummy API key
+- [x] Fix failing Groq integration test due to dummy API key
+- [x] Fix failing risk calculator test by mocking correct config file
+- [x] Remove obsolete audio evaluation test from Gemini service tests
+- [x] Fix failing API route tests by mocking `request.json()`
+- [x] Fix failing API route tests by using `NextRequest` for mocks
+- [x] Fix failing rate limiter tests by aligning with current implementation
+- [x] Fix failing Prisma seed script by pointing to correct file
+- [x] Update Prisma seed script to include Polish questionnaire
       

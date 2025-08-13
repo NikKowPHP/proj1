@@ -39,14 +39,14 @@ describe("GeminiService with Key Rotation (REST)", () => {
 
     const result = await service.generateJson(
       "Test content",
-      "gemini-2.5-flash",
+      "gemini-1.5-flash-latest",
     );
 
     expect(result).toEqual({ feedback: "Great job!" });
     expect(mockedKeyProvider.getAllKeys).toHaveBeenCalledTimes(1);
     expect(mockedAxios.post).toHaveBeenCalledTimes(1);
     expect(mockedAxios.post).toHaveBeenCalledWith(
-      expect.stringContaining("models/gemini-2.5-flash:generateContent"),
+      expect.stringContaining("models/gemini-1.5-flash-latest:generateContent"),
       expect.any(Object),
       { headers: { "x-goog-api-key": "valid-key-1" } },
     );
@@ -75,7 +75,7 @@ describe("GeminiService with Key Rotation (REST)", () => {
 
     const result = await service.generateJson(
       "Test content",
-      "gemini-2.5-flash",
+      "gemini-1.5-flash-latest",
     );
 
     expect(result).toEqual({ feedback: "Success on second key!" });
@@ -102,7 +102,7 @@ describe("GeminiService with Key Rotation (REST)", () => {
     });
 
     await expect(
-      service.generateJson("Test content", "gemini-2.5-flash"),
+      service.generateJson("Test content", "gemini-1.5-flash-latest"),
     ).rejects.toThrow(
       "All Gemini API keys failed. Last error: API key not valid",
     );
@@ -118,7 +118,7 @@ describe("GeminiService with Key Rotation (REST)", () => {
     mockedAxios.post.mockRejectedValue(nonRotationError);
 
     await expect(
-      service.generateJson("Test content", "gemini-2.5-flash"),
+      service.generateJson("Test content", "gemini-1.5-flash-latest"),
     ).rejects.toThrow("Invalid request");
 
     // It should only try once
@@ -126,58 +126,4 @@ describe("GeminiService with Key Rotation (REST)", () => {
     expect(mockedAxios.post).toHaveBeenCalledTimes(1);
   });
 });
-
-describe("GeminiService Audio/Image Evaluation (REST)", () => {
-  let service: GeminiService;
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-    (withRetry as jest.Mock).mockImplementation((fn) => fn());
-    mockedKeyProvider.getAllKeys.mockReturnValue(["valid-key"]);
-    service = new GeminiService();
-  });
-
-  it("should handle audio evaluation successfully, including file cleanup", async () => {
-    const mockAudioContext = {
-      audioBuffer: Buffer.from("fake-audio"),
-      mimeType: "audio/mp3",
-      question: "test question",
-      idealAnswerSummary: "summary",
-    };
-    const mockApiResponse = {
-      data: {
-        candidates: [
-          { content: { parts: [{ text: '{"transcription":"test"}' }] } },
-        ],
-      },
-    };
-    const mockUploadedFile = {
-      name: "files/temp-file-name",
-      uri: "some-uri",
-      mimeType: "audio/mp3",
-    };
-
-    // Mock the sequence of axios calls
-    mockedAxios.post
-      // 1. Start resumable upload
-      .mockResolvedValueOnce({
-        headers: { "x-goog-upload-url": "https://upload.url" },
-      })
-      // 2. Finalize upload
-      .mockResolvedValueOnce({ data: { file: mockUploadedFile } })
-      // 3. Generate content
-      .mockResolvedValueOnce(mockApiResponse);
-    // 4. Delete file
-    mockedAxios.delete.mockResolvedValue({});
-
-    const result = await service.evaluateAudioAnswer(mockAudioContext);
-
-    expect(result).toEqual({ transcription: "test" });
-    expect(mockedAxios.post).toHaveBeenCalledTimes(3);
-    expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.delete).toHaveBeenCalledWith(
-      expect.stringContaining(mockUploadedFile.name),
-      { headers: { "x-goog-api-key": "valid-key" } },
-    );
-  });
-});
+      

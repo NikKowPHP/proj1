@@ -4,7 +4,7 @@ import { calculateAllRisks } from "./risk-calculator.service";
 import type { MultiCalculationResult } from "../types";
 // Mock the config to isolate test
 jest.mock(
-  "@/lib/risk-model-config.json",
+  "@/lib/risk-model-config.en.json",
   () => ({
     models: {
       GENERAL_CANCER_V1: {
@@ -96,3 +96,4 @@ describe("Risk Calculator Service (v2 - Multi-Model)", () => {
     expect(result.modelResults.length).toBeGreaterThan(0); // It should still process what it can
   });
 });
+      

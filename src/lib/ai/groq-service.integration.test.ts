@@ -1,6 +1,5 @@
 /** @jest-environment node */
 import { GroqService } from "./groq-service";
-import { getTextTranslationPrompt } from "./prompts";
 
 // These tests make real API calls to the Groq API and will not run if
 // the GROQ_API_KEY or GROQ_API_KEY_1 environment variable is not set.
@@ -18,7 +17,7 @@ describeIfApiKey("GroqService Integration Tests", () => {
   });
 
   it("should translate text correctly from English to Spanish", async () => {
-    const prompt = getTextTranslationPrompt("Hello", "English", "Spanish");
+    const prompt = "Translate the word 'Hello' into Spanish.";
     const model = process.env.GROQ_SMALL_MODEL || "gemma2-9b-it";
     const translatedText = await service.generateText(prompt, model);
     expect(translatedText.toLowerCase()).toContain("hola");

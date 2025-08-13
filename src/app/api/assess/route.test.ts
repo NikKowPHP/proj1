@@ -24,6 +24,8 @@ const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
 describe("POST /api/assess", () => {
   const mockAIExplanation = {
+    overallSummary: "Summary",
+    modelAssessments: [],
     riskFactors: [
       {
         factor: "Test Risk",
@@ -34,6 +36,15 @@ describe("POST /api/assess", () => {
     positiveFactors: [{ factor: "Test Positive", explanation: "Good job" }],
     recommendations: ["See a doctor"],
   };
+  
+  const validUserAnswers = {
+    age: "60+",
+    sex: "Male",
+    units: "metric",
+    height: "180",
+    weight: "90",
+    smoking_status: "Current smoker",
+  } as const;
 
   const mockCalculationResult: MultiCalculationResult = {
     modelResults: [
@@ -46,7 +57,7 @@ describe("POST /api/assess", () => {
       },
     ],
     positiveFactors: [],
-    userAnswers: { age: "60+" },
+    userAnswers: validUserAnswers,
   };
 
   const mockAIService = {
@@ -63,11 +74,10 @@ describe("POST /api/assess", () => {
   });
 
   it("should orchestrate the hybrid flow correctly", async () => {
-    const userAnswers = { age: "60+", smoking: "Yes" };
     const req = createRequest({
       method: "POST",
       headers: { "x-forwarded-for": "127.0.0.1" },
-      body: { answers: userAnswers },
+      body: { answers: validUserAnswers },
     });
 
     const response = await POST(req as any);
@@ -75,12 +85,14 @@ describe("POST /api/assess", () => {
 
     // 1. Assert risk calculator was called with user answers
     expect(mockedCalculateAllRisks).toHaveBeenCalledTimes(1);
-    expect(mockedCalculateAllRisks).toHaveBeenCalledWith(userAnswers);
+    expect(mockedCalculateAllRisks).toHaveBeenCalledWith(validUserAnswers, "en");
 
     // 2. Assert AI service was called with the result of the calculation
     expect(mockAIService.getRiskAssessmentExplanation).toHaveBeenCalledTimes(1);
     expect(mockAIService.getRiskAssessmentExplanation).toHaveBeenCalledWith(
       mockCalculationResult,
+      undefined,
+      "en",
     );
 
     // 3. Assert the final response is the AI explanation
@@ -96,7 +108,8 @@ describe("POST /api/assess", () => {
   it("should return 400 for invalid answers format", async () => {
     const req = createRequest({
       method: "POST",
-      body: { answers: "not-an-object" },
+      // This payload will pass the first validation but fail the stricter answersSchema validation
+      body: { answers: { units: 'metric', height: 'abc', weight: '123' } },
     });
 
     const response = await POST(req as any);
@@ -115,11 +128,10 @@ describe("POST /api/assess", () => {
       serviceUsed: "mock-ai",
     });
 
-    const userAnswers = { age: "60+" };
     const req = createRequest({
       method: "POST",
       headers: { "x-forwarded-for": "127.0.0.1" },
-      body: { answers: userAnswers },
+      body: { answers: validUserAnswers },
     });
 
     const response = await POST(req as any);

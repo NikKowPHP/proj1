@@ -1,6 +1,5 @@
 /** @jest-environment node */
 import { CerebrasService } from "./cerebras-service";
-import { getTextTranslationPrompt } from "./prompts";
 
 // These tests make real API calls to the Cerebras API and will not run if
 // the CEREBRAS_API_KEY or CEREBRAS_API_KEY_1 environment variable is not set.
@@ -18,7 +17,7 @@ describeIfApiKey("CerebrasService Integration Tests", () => {
   });
 
   it("should translate text correctly from English to Spanish", async () => {
-    const prompt = getTextTranslationPrompt("Hello", "English", "Spanish");
+    const prompt = "Translate the word 'Hello' into Spanish.";
     const model = process.env.CEREBRAS_SMALL_MODEL || "qwen-3-32b";
     const translatedText = await service.generateText(prompt, model);
     expect(translatedText.toLowerCase()).toContain("hola");

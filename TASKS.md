@@ -22,3 +22,13 @@
 - [x] **Task 14: Internationalize Email Content**
 - [x] **Task 15: Update E2E Tests**
 - [x] **Task 16: Review and Refine**
+
+### Maintenance
+
+- [x] Fix build error in PDF generator
+- [x] Fix failing unit and integration tests
+- [x] Fix rate limiter type error in assess API route
+- [x] Fix failing tests for PDF generator
+- [x] Fix failing PDF generator tests by updating mock
+- [x] Fix PDF generator tests by mocking `jspdf-autotable` behavior
+      

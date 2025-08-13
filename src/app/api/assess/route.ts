@@ -49,7 +49,7 @@ const aiResponseSchema = z.object({
 
 export async function POST(request: NextRequest) {
   const forwarded = request.headers.get("x-forwarded-for");
-  const ip = forwarded ? forwarded.split(/, /) : "127.0.0.1";
+  const ip = forwarded ? forwarded.split(/, /)[0] : "127.0.0.1";
   logger.info(`[API:assess] Request received from IP: ${ip}`);
 
   const limit = ipRateLimiter(ip);
@@ -161,3 +161,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+      

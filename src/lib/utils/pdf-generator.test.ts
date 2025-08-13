@@ -7,20 +7,22 @@ import type { AssessmentResult } from '../types';
 
 // Mock the jsPDF library
 jest.mock('jspdf', () => {
-  const mockAutoTable = jest.fn();
-  const mockText = jest.fn();
-  const mockSetFontSize = jest.fn();
-  const mockSetTextColor = jest.fn();
-  const mockSave = jest.fn();
+  // Create a mock implementation object that will be returned by the constructor
+  const implementation = {
+    autoTable: jest.fn(),
+    text: jest.fn(),
+    setFontSize: jest.fn(),
+    setTextColor: jest.fn(),
+    save: jest.fn(),
+    splitTextToSize: jest.fn((text: string) => [text]),
+  };
 
-  // Mock the jsPDF constructor to return an object with our mocked methods
-  return jest.fn().mockImplementation(() => ({
-    autoTable: mockAutoTable,
-    text: mockText,
-    setFontSize: mockSetFontSize,
-    setTextColor: mockSetTextColor,
-    save: mockSave,
-  }));
+  // Attach the 'previous' property to the autoTable mock to simulate
+  // the jspdf-autotable plugin's behavior of tracking the last table's position.
+  (implementation.autoTable as any).previous = { finalY: 100 };
+
+  // The mock constructor returns our implementation object
+  return jest.fn().mockImplementation(() => implementation);
 });
 
 // Access the mocked constructor and methods for assertions
@@ -29,8 +31,14 @@ const mockAutoTable = new MockedJsPDF().autoTable;
 
 describe('generateAssessmentPdf', () => {
   const mockData: AssessmentResult = {
-    riskFactors: [
-      { factor: 'Smoking', riskLevel: 'High', explanation: 'Causes cancer.' }
+    overallSummary: "This is a mock summary.",
+    modelAssessments: [
+      {
+        modelName: "General Risk",
+        riskFactors: [
+          { factor: 'Smoking', riskLevel: 'High', explanation: 'Causes cancer.' }
+        ]
+      }
     ],
     positiveFactors: [
       { factor: 'Exercise', explanation: 'Is good for you.' }
@@ -44,7 +52,7 @@ describe('generateAssessmentPdf', () => {
   });
 
   it('should call autoTable with risk factors data', () => {
-    generateAssessmentPdf(mockData);
+    generateAssessmentPdf(mockData, 'en');
     expect(mockAutoTable).toHaveBeenCalledWith(expect.objectContaining({
       head: [['Factor', 'Risk Level', 'Explanation']],
       body: [['Smoking', 'High', 'Causes cancer.']]
@@ -52,7 +60,7 @@ describe('generateAssessmentPdf', () => {
   });
 
   it('should call autoTable with positive factors data', () => {
-    generateAssessmentPdf(mockData);
+    generateAssessmentPdf(mockData, 'en');
     expect(mockAutoTable).toHaveBeenCalledWith(expect.objectContaining({
       head: [['Factor', 'Details']],
       body: [['Exercise', 'Is good for you.']]
@@ -60,13 +68,14 @@ describe('generateAssessmentPdf', () => {
   });
 
   it('should call autoTable twice (once for each section)', () => {
-    generateAssessmentPdf(mockData);
+    generateAssessmentPdf(mockData, 'en');
     expect(mockAutoTable).toHaveBeenCalledTimes(2);
   });
 
   it('should call doc.save with a correctly formatted filename', () => {
-    generateAssessmentPdf(mockData);
+    generateAssessmentPdf(mockData, 'en');
     const expectedFilename = `Health_Assessment_Results_${new Date().toLocaleDateString()}.pdf`;
     expect(new MockedJsPDF().save).toHaveBeenCalledWith(expectedFilename);
   });
 });
+      

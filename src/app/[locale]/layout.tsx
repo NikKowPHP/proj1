@@ -1,11 +1,14 @@
 import React from "react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { Providers } from "@/providers";
 import { Toaster } from "@/components/ui/toaster";
 import { AppFooter } from "@/components/AppFooter";
 import { Analytics } from "@vercel/analytics/react";
+import { NextIntlClientProvider } from "next-intl";
+import { notFound } from "next/navigation";
+import { routing } from "@/i18n/routing";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,23 +59,37 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }>) {
+  const { locale } = await params;
+
+  // Validate that the incoming `locale` parameter is valid
+  if (!routing.locales.includes(locale as any)) {
+    notFound();
+  }
+
+  // Import messages directly
+  const messages = (await import(`../../../messages/${locale}.json`)).default;
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          <div className="flex flex-col min-h-screen">
-            <main className="flex-1">{children}</main>
-            <AppFooter />
-            <Toaster />
-          </div>
-        </Providers>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <Providers>
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-1">{children}</main>
+              <AppFooter />
+              <Toaster />
+            </div>
+          </Providers>
+        </NextIntlClientProvider>
         <Analytics />
       </body>
     </html>

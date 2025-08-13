@@ -6,6 +6,7 @@ import type { AssessmentResult } from "@/lib/types";
 interface EmailExportPayload {
   recipientEmail: string;
   assessmentData: AssessmentResult;
+  locale: string;
 }
 
 export const useEmailExport = () => {

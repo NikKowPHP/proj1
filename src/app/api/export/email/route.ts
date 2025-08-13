@@ -28,6 +28,7 @@ const emailExportSchema = z.object({
     positiveFactors: z.array(positiveFactorSchema),
     recommendations: z.array(z.string()),
   }),
+  locale: z.string().optional().default("en"),
 });
 
 export async function POST(req: NextRequest) {
@@ -39,11 +40,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: parsed.error }, { status: 400 });
     }
 
-    const { recipientEmail, assessmentData } = parsed.data;
+    const { recipientEmail, assessmentData, locale } = parsed.data;
 
     await sendAssessmentEmail(
       recipientEmail,
       assessmentData as AssessmentResult,
+      locale,
     );
 
     // IMPORTANT: We do not log the recipient's email to maintain anonymity.

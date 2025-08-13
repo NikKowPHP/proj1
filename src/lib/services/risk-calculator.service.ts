@@ -5,7 +5,8 @@ import type {
   IdentifiedPositiveFactor,
   CalculatedRiskLevel,
 } from "@/lib/types";
-import riskConfigJson from "@/lib/risk-model-config.json";
+import riskConfigEn from "@/lib/risk-model-config.en.json";
+import riskConfigPl from "@/lib/risk-model-config.pl.json";
 import { logger } from "../logger";
 
 // Define the type for the config file to ensure type safety
@@ -39,11 +40,13 @@ interface RiskModelConfig {
   };
 }
 
-// Cast the imported JSON to our defined type to override stale inference.
-const riskConfig = riskConfigJson as unknown as RiskModelConfig;
+const configs: { [key: string]: RiskModelConfig } = {
+  en: riskConfigEn as unknown as RiskModelConfig,
+  pl: riskConfigPl as unknown as RiskModelConfig,
+};
 
 type Answers = Record<string, string>;
-type ModelConfig = (typeof riskConfig.models)[keyof typeof riskConfig.models];
+type ModelConfig = (typeof configs.en.models)[keyof typeof configs.en.models];
 
 /**
  * Determines the risk level based on a score and predefined thresholds.
@@ -108,6 +111,7 @@ function calculateRiskForModel(
  */
 function identifyPositiveFactors(
   answers: Answers,
+  riskConfig: RiskModelConfig,
 ): IdentifiedPositiveFactor[] {
   const positiveFactors: IdentifiedPositiveFactor[] = [];
   for (const factorId in riskConfig.positiveFactors) {
@@ -136,9 +140,14 @@ function identifyPositiveFactors(
  * This function uses a deterministic model defined in `risk-model-config.json`.
  *
  * @param answers A record of question IDs and the user's corresponding answers.
+ * @param locale The locale to use for model names and descriptions.
  * @returns A `MultiCalculationResult` object containing results from all models.
  */
-export function calculateAllRisks(answers: Answers): MultiCalculationResult {
+export function calculateAllRisks(
+  answers: Answers,
+  locale: string = "en",
+): MultiCalculationResult {
+  const riskConfig = configs[locale] || configs.en;
   const modelResults: ModelResult[] = [];
   const processedAnswers = { ...answers };
 
@@ -191,7 +200,7 @@ export function calculateAllRisks(answers: Answers): MultiCalculationResult {
   }
 
   // 2. Identify positive lifestyle factors (globally)
-  const positiveFactors = identifyPositiveFactors(processedAnswers);
+  const positiveFactors = identifyPositiveFactors(processedAnswers, riskConfig);
 
   return {
     modelResults,

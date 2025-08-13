@@ -11,33 +11,52 @@ interface jsPDFWithAutoTable extends jsPDF {
   };
 }
 
-export const generateAssessmentPdf = (assessmentData: AssessmentResult) => {
+const translations: Record<string, any> = {
+  en: {
+    title: "Your Anonymous Health Assessment Results",
+    disclaimer: "Disclaimer: This is for educational purposes only. Consult a healthcare provider.",
+    overallSummary: "Overall Summary",
+    riskFactorsHead: ["Factor", "Risk Level", "Explanation"],
+    positiveFactors: "Positive Lifestyle Factors",
+    positiveFactorsHead: ["Factor", "Details"],
+    recommendations: "Recommendations",
+    filename: "Health_Assessment_Results",
+  },
+  pl: {
+    title: "Twoje Wyniki Anonimowej Oceny Zdrowia",
+    disclaimer: "Zastrzeżenie: To jest tylko w celach edukacyjnych. Skonsultuj się z lekarzem.",
+    overallSummary: "Ogólne Podsumowanie",
+    riskFactorsHead: ["Czynnik", "Poziom Ryzyka", "Wyjaśnienie"],
+    positiveFactors: "Pozytywne Czynniki Stylu Życia",
+    positiveFactorsHead: ["Czynnik", "Szczegóły"],
+    recommendations: "Rekomendacje",
+    filename: "Wyniki_Oceny_Zdrowia",
+  }
+}
+
+export const generateAssessmentPdf = (assessmentData: AssessmentResult, locale: string = 'en') => {
+  const t = translations[locale] || translations.en;
   const doc = new jsPDF() as jsPDFWithAutoTable;
 
   // --- Header ---
   doc.setFontSize(18);
-  doc.text("Your Anonymous Health Assessment Results", 14, 22);
+  doc.text(t.title, 14, 22);
   doc.setFontSize(11);
   doc.setTextColor(100);
-  doc.text(
-    "Disclaimer: This is for educational purposes only. Consult a healthcare provider.",
-    14,
-    30,
-  );
+  doc.text(t.disclaimer, 14, 30);
 
   let startY = 40;
 
   // --- Overall Summary ---
   if (assessmentData.overallSummary) {
     doc.setFontSize(14);
-    doc.text("Overall Summary", 14, startY);
+    doc.text(t.overallSummary, 14, startY);
     startY += 8;
     doc.setFontSize(11);
     const summaryLines = doc.splitTextToSize(assessmentData.overallSummary, 180);
     doc.text(summaryLines, 14, startY);
     startY += summaryLines.length * 5 + 10;
   }
-
 
   // --- Risk Factors per Model ---
   assessmentData.modelAssessments.forEach((model) => {
@@ -48,14 +67,14 @@ export const generateAssessmentPdf = (assessmentData: AssessmentResult) => {
 
       doc.autoTable({
         startY,
-        head: [["Factor", "Risk Level", "Explanation"]],
+        head: [t.riskFactorsHead],
         body: model.riskFactors.map((f) => [
           f.factor,
           f.riskLevel,
           f.explanation,
         ]),
         theme: "striped",
-        headStyles: { fillColor: [255, 193, 7] }, // Amber color for risks
+        headStyles: { fillColor: }, // Amber color for risks
       });
       startY = doc.autoTable.previous!.finalY + 15;
     }
@@ -65,15 +84,15 @@ export const generateAssessmentPdf = (assessmentData: AssessmentResult) => {
   // --- Positive Factors ---
   if (assessmentData.positiveFactors.length > 0) {
     doc.setFontSize(14);
-    doc.text("Positive Lifestyle Factors", 14, startY);
+    doc.text(t.positiveFactors, 14, startY);
     startY += 8;
 
     doc.autoTable({
       startY,
-      head: [["Factor", "Details"]],
+      head: [t.positiveFactorsHead],
       body: assessmentData.positiveFactors.map((f) => [f.factor, f.explanation]),
       theme: "striped",
-      headStyles: { fillColor: [76, 175, 80] }, // Green color for positives
+      headStyles: { fillColor: }, // Green color for positives
     });
     startY = doc.autoTable.previous!.finalY + 10;
   }
@@ -81,7 +100,7 @@ export const generateAssessmentPdf = (assessmentData: AssessmentResult) => {
   // --- Recommendations ---
   if (assessmentData.recommendations.length > 0) {
     doc.setFontSize(14);
-    doc.text("Recommendations", 14, startY);
+    doc.text(t.recommendations, 14, startY);
     startY += 8;
 
     const recommendationsText = assessmentData.recommendations
@@ -91,5 +110,5 @@ export const generateAssessmentPdf = (assessmentData: AssessmentResult) => {
     doc.text(recommendationsText, 14, startY, { maxWidth: 180 });
   }
 
-  doc.save(`Health_Assessment_Results_${new Date().toLocaleDateString()}.pdf`);
+  doc.save(`${t.filename}_${new Date().toLocaleDateString()}.pdf`);
 };

@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import withNextIntl from 'next-intl/plugin';
 
 const sentryWebpackPluginOptions = {
   silent: true,
@@ -22,4 +23,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+export default withNextIntl('./src/i18n/request.ts')(withSentryConfig(nextConfig, sentryWebpackPluginOptions));

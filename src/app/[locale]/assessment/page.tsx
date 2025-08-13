@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslations } from "next-intl";
 
 interface Question {
   id: string;
@@ -52,7 +53,11 @@ interface Step {
 }
 
 export default function AssessmentPage() {
+  const t = useTranslations("AssessmentPage");
   const router = useRouter();
+  const params = useParams();
+  const locale = typeof params.locale === 'string' ? params.locale : 'en';
+
   const {
     currentStep,
     answers,
@@ -85,8 +90,8 @@ export default function AssessmentPage() {
     isLoading,
     error,
   } = useQuery<{ steps: Step[] }>({
-    queryKey: ["questionnaire"],
-    queryFn: apiClient.questionnaire.getActive,
+    queryKey: ["questionnaire", locale],
+    queryFn: () => apiClient.questionnaire.getActive(locale),
   });
 
   useEffect(() => {
@@ -110,15 +115,15 @@ export default function AssessmentPage() {
   };
   
   const validateNumberInput = (id: string, value: string): string | null => {
-    if (!value.trim()) return "This field is required.";
+    if (!value.trim()) return t("requiredField");
     const num = Number(value);
-    if (isNaN(num)) return "Please enter a valid number.";
-    if (num <= 0) return "Value must be positive.";
+    if (isNaN(num)) return t("validNumber");
+    if (num <= 0) return t("positiveValue");
   
-    if (id === 'height' && units === 'metric' && (num < 50 || num > 300)) return "Please enter a height between 50 and 300 cm.";
-    if (id === 'height' && units === 'imperial' && (num < 20 || num > 120)) return "Please enter a height between 20 and 120 inches.";
-    if (id === 'weight' && units === 'metric' && (num < 20 || num > 300)) return "Please enter a weight between 20 and 300 kg.";
-    if (id === 'weight' && units === 'imperial' && (num < 40 || num > 660)) return "Please enter a weight between 40 and 660 lbs.";
+    if (id === 'height' && units === 'metric' && (num < 50 || num > 300)) return t("heightMetricRange");
+    if (id === 'height' && units === 'imperial' && (num < 20 || num > 120)) return t("heightImperialRange");
+    if (id === 'weight' && units === 'metric' && (num < 20 || num > 300)) return t("weightMetricRange");
+    if (id === 'weight' && units === 'imperial' && (num < 40 || num > 660)) return t("weightImperialRange");
     
     return null;
   };
@@ -131,7 +136,6 @@ export default function AssessmentPage() {
     
     setLocalErrors(prev => ({ ...prev, [id]: error || '' }));
     
-    // Always set the answer to allow `isStepComplete` to react, but rely on `localErrors` for validation state.
     setAnswer(id, value);
   };
   
@@ -148,7 +152,7 @@ export default function AssessmentPage() {
     return (
       <div className="container mx-auto p-4 max-w-2xl text-center">
         <p className="text-destructive">
-          Error loading assessment: {(error as Error).message}
+          {t("loadingError", { error: (error as Error).message })}
         </p>
       </div>
     );
@@ -159,7 +163,24 @@ export default function AssessmentPage() {
 
   const visibleQuestions = stepData?.questions.filter(q => {
     if (!q.dependsOn) return true;
-    return answers[q.dependsOn.questionId] === q.dependsOn.value;
+    const dependencyAnswer = answers[q.dependsOn.questionId];
+    if (!dependencyAnswer) return false;
+
+    // Handle translated options. This is a simple approach.
+    // A more robust solution might use value keys instead of display text.
+    const options = questionnaire?.steps.find(s => s.questions.some(qs => qs.id === q.dependsOn?.questionId))
+                        ?.questions.find(qs => qs.id === q.dependsOn?.questionId)?.options || [];
+    const englishOptions = ["Current smoker", "Former smoker"]; // Example
+    const polishOptions = ["Obecny palacz", "Były palacz"];
+    
+    let valueToCompare = q.dependsOn.value;
+    if (locale === 'pl' && englishOptions.includes(valueToCompare)) {
+        const idx = englishOptions.indexOf(valueToCompare);
+        if (idx > -1) {
+            valueToCompare = polishOptions[idx];
+        }
+    }
+    return dependencyAnswer === valueToCompare;
   }) || [];
   
   const isStepComplete = () => {
@@ -182,17 +203,14 @@ export default function AssessmentPage() {
           onPointerDownOutside={(e) => e.preventDefault()}
         >
           <DialogHeader>
-            <DialogTitle>Resume Session?</DialogTitle>
-            <DialogDescription>
-              It looks like you have a session in progress. Would you like to
-              resume or start a new assessment?
-            </DialogDescription>
+            <DialogTitle>{t("resumeDialogTitle")}</DialogTitle>
+            <DialogDescription>{t("resumeDialogDescription")}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={handleStartNew}>
-              Start New
+              {t("resumeDialogStartNew")}
             </Button>
-            <Button onClick={() => setShowResumeDialog(false)}>Resume</Button>
+            <Button onClick={() => setShowResumeDialog(false)}>{t("resumeDialogResume")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -202,18 +220,18 @@ export default function AssessmentPage() {
             <Progress value={progressPercentage} className="mb-4" />
             <CardTitle>{stepData?.title}</CardTitle>
             <CardDescription>
-              Step {currentStep + 1} of {totalSteps}
+              {t("step", { currentStep: currentStep + 1, totalSteps: totalSteps })}
               {stepData?.description && <span className="block mt-2">{stepData.description}</span>}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {currentStep === 0 && hasHeightOrWeight && (
               <div className="space-y-2">
-                <Label>Units</Label>
+                <Label>{t("units")}</Label>
                 <Tabs value={units} onValueChange={(value) => setUnits(value as 'metric' | 'imperial')} className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="metric">Metric (cm / kg)</TabsTrigger>
-                    <TabsTrigger value="imperial">Imperial (inches / lbs)</TabsTrigger>
+                    <TabsTrigger value="metric">{t("unitsMetric")}</TabsTrigger>
+                    <TabsTrigger value="imperial">{t("unitsImperial")}</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
@@ -227,7 +245,7 @@ export default function AssessmentPage() {
                     value={answers[question.id] || ""}
                   >
                     <SelectTrigger id={question.id}>
-                      <SelectValue placeholder="Select an option" />
+                      <SelectValue placeholder={t("selectOption")} />
                     </SelectTrigger>
                     <SelectContent>
                       {question.options?.map((option) => (
@@ -246,8 +264,8 @@ export default function AssessmentPage() {
                       inputMode="decimal"
                       placeholder={
                         question.id === 'height'
-                          ? (units === 'metric' ? 'e.g., 175' : 'e.g., 69')
-                          : (units === 'metric' ? 'e.g., 70' : 'e.g., 154')
+                          ? (units === 'metric' ? t("heightPlaceholderMetric") : t("heightPlaceholderImperial"))
+                          : (units === 'metric' ? t("weightPlaceholderMetric") : t("weightPlaceholderImperial"))
                       }
                       value={answers[question.id] || ""}
                       onChange={(e) => handleInputChange(question.id, e.target.value, question.type)}
@@ -266,10 +284,10 @@ export default function AssessmentPage() {
               onClick={prevStep}
               disabled={currentStep === 0}
             >
-              Back
+              {t("back")}
             </Button>
             <Button onClick={handleNext} disabled={!isStepComplete()}>
-              {currentStep === totalSteps - 1 ? "View Results" : "Next"}
+              {currentStep === totalSteps - 1 ? t("viewResults") : t("next")}
             </Button>
           </CardFooter>
         </Card>

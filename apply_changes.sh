@@ -1,20 +1,15 @@
 #!/bin/bash
 
-# A script to process a markdown file, find sections for specific file paths or
-# bash commands, and either write content to files or execute the commands.
-
-# --- Configuration ---
-HEADER_PREFIX="### "
-# Using single quotes is more robust for defining a string containing backticks.
-CODE_FENCE='```'
+# A script to process an XML response from an AI, executing commands and
+# applying file modifications as specified in the standard AI output format.
 
 # --- Main Script Logic ---
 
 # 1. Validate Input
 # -----------------------------------------------------------------------------
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <path_to_markdown_file>"
-    echo "Example: $0 work_breakdown/tasks/a.md"
+    echo "Usage: $0 <path_to_xml_response_file>"
+    echo "Example: $0 ai-response.xml"
     exit 1
 fi
 
@@ -25,81 +20,120 @@ if [ ! -f "$INPUT_FILE" ]; then
     exit 1
 fi
 
-echo "Processing file: $INPUT_FILE"
-echo "-------------------------------------"
+echo "Processing response file: $INPUT_FILE"
+echo "========================================"
 
 # 2. Initialize State
 # -----------------------------------------------------------------------------
-# 'search_header': Looking for a '### ...' line.
-# 'search_code': Found a header, now looking for a code block start.
-# 'in_code': Inside a code block, accumulating content.
-STATE="search_header"
-BLOCK_TYPE="" # Will be 'file' or 'bash'
-CURRENT_SECTION_TITLE=""
+# 'search': Default state, looking for a relevant opening tag.
+# 'in_reasoning': Capturing the content of the <reasoning> tag.
+# 'in_cdata': Capturing content from a CDATA block.
+STATE="search"
+# 'BLOCK_TYPE' determines the action after CDATA is read (either 'command' or 'file').
+BLOCK_TYPE=""
+CURRENT_FILE_PATH=""
 CURRENT_CONTENT=""
 
-# 3. Process the file line by line
+# 3. Process the XML file line by line
 # -----------------------------------------------------------------------------
-while IFS= read -r line || [[ -n "$line" ]]; do
+while IFS= read -r line || [ -n "$line" ]; do
+
+    # Regardless of the state, if we find a CDATA start, we switch to handle it.
+    if [[ "$STATE" != "in_cdata" && "$line" == *"<![CDATA["* ]]; then
+        STATE="in_cdata"
+        # Everything after the CDATA tag on this line is the start of our content.
+        CURRENT_CONTENT=$(echo "$line" | sed 's/.*<!\[CDATA\[//')
+
+        # If CDATA also ends on this line, handle it right away.
+        # The action will be triggered by the "in_cdata" state logic below.
+        if [[ "$line" == *"]]>"* ]]; then
+            CURRENT_CONTENT=$(echo "$CURRENT_CONTENT" | sed 's/\]\]>.*//')
+        else
+            # The CDATA block continues on the next line, so we loop to the next line.
+            continue
+        fi
+    fi
+
     case "$STATE" in
-        "search_header")
-            if [[ "$line" == "$HEADER_PREFIX"* ]]; then
-                # Extract the title (which can be a file path or a description)
-                CURRENT_SECTION_TITLE="${line#$HEADER_PREFIX}"
-                echo "Found section: $CURRENT_SECTION_TITLE"
-                STATE="search_code"
-            fi
-            ;;
-
-        "search_code")
-            # Check for a bash code block
-            if [[ "$line" == "${CODE_FENCE}bash"* ]]; then
-                BLOCK_TYPE="bash"
-                echo "  -> Found bash block. Will execute content."
-                CURRENT_CONTENT="" # Reset content
-                STATE="in_code"
-            # Check for any other type of code block
-            elif [[ "$line" == "$CODE_FENCE"* ]]; then
+        "search")
+            if [[ "$line" == *"<reasoning>"* ]]; then
+                echo "--- Reasoning ---"
+                STATE="in_reasoning"
+                # If </reasoning> is on the same line, handle it and go back to 'search'.
+                if [[ "$line" == *"</reasoning>"* ]]; then
+                    content=$(echo "$line" | sed -e 's/.*<reasoning>//' -e 's/<\/reasoning>.*//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+                    echo "$content"
+                    echo "-----------------"
+                    STATE="search"
+                fi
+            elif [[ "$line" == *"<commands>"* ]]; then
+                BLOCK_TYPE="command"
+                # The state will be switched to 'in_cdata' by the general check above if needed.
+            elif [[ "$line" == *"<file path=\""* ]]; then
                 BLOCK_TYPE="file"
-                echo "  -> Found file block. Will write to: $CURRENT_SECTION_TITLE"
-                CURRENT_CONTENT="" # Reset content
-                STATE="in_code"
+                CURRENT_FILE_PATH=$(echo "$line" | sed -n 's/.*<file path="\([^"]*\)".*/\1/p')
+                # The state will be switched to 'in_cdata' by the general check above if needed.
             fi
             ;;
 
-        "in_code")
-            # Is this the end of the code block?
-            if [[ "$line" == "$CODE_FENCE" ]]; then
-                # --- This is the core action fork ---
-                if [[ "$BLOCK_TYPE" == "bash" ]]; then
-                    # --- EXECUTE BASH COMMANDS ---
-                    echo "  -> Executing captured commands..."
-                    # Execute the content in a subshell for safety.
-                    # The 'bash -e' command ensures the subshell exits immediately if a command fails.
-                    bash -e <<< "$CURRENT_CONTENT"
-                    EXECUTION_STATUS=$?
-                    if [ $EXECUTION_STATUS -eq 0 ]; then
-                        echo "  -> Bash execution successful."
-                    else
-                        echo "  -> ERROR: Bash execution failed with status $EXECUTION_STATUS."
-                    fi
+        "in_reasoning")
+            if [[ "$line" == *"</reasoning>"* ]]; then
+                content_before_tag=$(echo "$line" | sed 's|</reasoning>.*||')
+                echo "$content_before_tag" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+                echo "-----------------"
+                STATE="search"
+            else
+                echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+            fi
+            ;;
 
+        "in_cdata")
+            # This state is entered either by the general check above, or if we were already in it.
+            # If the CDATA block ends on this line, we process it.
+            if [[ "$line" == *"]]>"* ]]; then
+                # Append the part of the line before the closing marker.
+                content_before_marker=$(echo "$line" | sed 's/\]\]>.*//')
+                # Check if CURRENT_CONTENT was initialized on a previous line.
+                if [ -z "$CURRENT_CONTENT" ]; then
+                    CURRENT_CONTENT="$content_before_marker"
+                else
+                    CURRENT_CONTENT="$CURRENT_CONTENT"$'\n'"$content_before_marker"
+                fi
+
+                # --- Perform action based on BLOCK_TYPE ---
+                if [[ "$BLOCK_TYPE" == "command" ]]; then
+                    # Only execute if there's non-whitespace content
+                    if [[ -n "$(echo "$CURRENT_CONTENT" | tr -d '[:space:]')" ]]; then
+                        echo; echo "--- Executing Commands ---"
+                        # Execute in a subshell. Use -e to exit on error within subshell.
+                        bash -e <<< "$CURRENT_CONTENT"
+                        EXECUTION_STATUS=$?
+                        if [ $EXECUTION_STATUS -eq 0 ]; then
+                            echo "-> Commands executed successfully."
+                        else
+                            echo "-> ERROR: Command execution failed with status $EXECUTION_STATUS."
+                        fi
+                        echo "--------------------------"
+                    fi
                 elif [[ "$BLOCK_TYPE" == "file" ]]; then
-                    # --- WRITE TO FILE ---
-                    DIR_NAME=$(dirname "$CURRENT_SECTION_TITLE")
+                    echo; echo "--- Applying File Modification ---"
+                    echo "-> Writing to: $CURRENT_FILE_PATH"
+                    DIR_NAME=$(dirname "$CURRENT_FILE_PATH")
                     mkdir -p "$DIR_NAME"
-                    printf "%s" "$CURRENT_CONTENT" > "$CURRENT_SECTION_TITLE"
-                    echo "  -> Wrote content to $CURRENT_SECTION_TITLE"
+                    # Use printf to preserve content exactly as captured
+                    printf "%s" "$CURRENT_CONTENT" > "$CURRENT_FILE_PATH"
+                    echo "-> Done."
+                    echo "--------------------------------"
                 fi
                 
-                echo # Add a blank line for readability
-                # Reset state to look for the next section
-                STATE="search_header"
+                # Reset state for the next block
+                STATE="search"
                 BLOCK_TYPE=""
-
+                CURRENT_FILE_PATH=""
+                CURRENT_CONTENT=""
             else
-                # Still inside the code block. Append the line to our content.
-                if [ -z "$CURRENT_CONTENT" ]; then
+                # We are in a multi-line CDATA block. Append the whole line.
+                 if [ -z "$CURRENT_CONTENT" ]; then
                     CURRENT_CONTENT="$line"
                 else
                     CURRENT_CONTENT="$CURRENT_CONTENT"$'\n'"$line"
@@ -109,5 +143,5 @@ while IFS= read -r line || [[ -n "$line" ]]; do
     esac
 done < "$INPUT_FILE"
 
-echo "-------------------------------------"
-echo "Processing complete."
+echo "========================================"
+echo "Response processing complete."

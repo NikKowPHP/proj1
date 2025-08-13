@@ -6,8 +6,10 @@ export const useRiskAssessment = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (answers: Record<string, string>) =>
-      apiClient.assessment.assess({ answers }),
+    mutationFn: (payload: {
+      answers: Record<string, string>;
+      locale: string;
+    }) => apiClient.assessment.assess(payload),
     onError: (error: any) => {
       toast({
         variant: "destructive",

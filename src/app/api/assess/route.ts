@@ -18,6 +18,11 @@ const answersSchema = z
   })
   .catchall(z.string().optional());
 
+const assessRequestSchema = z.object({
+  answers: z.record(z.string()),
+  locale: z.string().optional().default("en"),
+});
+
 // Zod schema for the AI response to ensure type safety
 const riskFactorSchema = z.object({
   factor: z.string(),
@@ -44,7 +49,7 @@ const aiResponseSchema = z.object({
 
 export async function POST(request: NextRequest) {
   const forwarded = request.headers.get("x-forwarded-for");
-  const ip = forwarded ? forwarded.split(/, /)[0] : "127.0.0.1";
+  const ip = forwarded ? forwarded.split(/, /) : "127.0.0.1";
   logger.info(`[API:assess] Request received from IP: ${ip}`);
 
   const limit = ipRateLimiter(ip);
@@ -59,36 +64,55 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     logger.info("[API:assess] Request body parsed.");
-    const parsedAnswers = answersSchema.safeParse(body.answers);
+    const parsedRequest = assessRequestSchema.safeParse(body);
 
-    if (!parsedAnswers.success) {
-      logger.warn("[API:assess] Invalid answers format.", {
-        details: parsedAnswers.error.flatten(),
+    if (!parsedRequest.success) {
+      logger.warn("[API:assess] Invalid request format.", {
+        details: parsedRequest.error.flatten(),
       });
       return NextResponse.json(
         {
-          error: "Invalid answers format",
-          details: parsedAnswers.error.flatten(),
+          error: "Invalid request format",
+          details: parsedRequest.error.flatten(),
         },
         { status: 400 },
       );
     }
+    
+    const { answers, locale } = parsedRequest.data;
+    
+    const validatedAnswers = answersSchema.safeParse(answers);
+    if (!validatedAnswers.success) {
+      logger.warn("[API:assess] Invalid answers format.", {
+        details: validatedAnswers.error.flatten(),
+      });
+      return NextResponse.json(
+        {
+          error: "Invalid answers format",
+          details: validatedAnswers.error.flatten(),
+        },
+        { status: 400 },
+      );
+    }
+
+
     logger.info("[API:assess] Answers successfully parsed and validated.");
 
     // 1. Run deterministic calculation across all models
-    logger.info("[API:assess] Starting deterministic risk calculation...");
+    logger.info(`[API:assess] Starting deterministic risk calculation for locale: ${locale}...`);
     const calculationResult = calculateAllRisks(
-      parsedAnswers.data as Record<string, string>,
+      validatedAnswers.data as Record<string, string>,
+      locale,
     );
     logger.info(
       `[API:assess] Deterministic risk calculation completed for models: ${calculationResult.modelResults.map((m) => m.modelId).join(", ")}`,
     );
 
     // 2. Get AI-powered explanation for the calculation
-    logger.info("[API:assess] Requesting AI explanation...");
+    logger.info(`[API:assess] Requesting AI explanation in locale: ${locale}`);
     const aiService = getAIService();
     const { result, serviceUsed } =
-      await aiService.getRiskAssessmentExplanation(calculationResult);
+      await aiService.getRiskAssessmentExplanation(calculationResult, undefined, locale);
     logger.info(
       `[API:assess] AI explanation received from service: ${serviceUsed}.`,
     );

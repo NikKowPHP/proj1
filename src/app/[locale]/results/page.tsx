@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useEffect, useState } from "react";
 import { useAssessmentStore } from "@/lib/stores/assessment.store";
 import { useRiskAssessment } from "@/lib/hooks/data/useRiskAssessment";
@@ -21,7 +22,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Link, useRouter } from "@/i18n/navigation";
 import { generateAssessmentPdf } from "@/lib/utils/pdf-generator";
 import type { AssessmentResult } from "@/lib/types";
 import {
@@ -36,7 +37,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEmailExport } from "@/lib/hooks/data/useEmailExport";
-import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   Tabs,
@@ -44,15 +45,20 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { useTranslations } from "next-intl";
 
-const loadingMessages = [
-  "Connecting to our secure analysis engine...",
-  "Analyzing your lifestyle factors against our risk models...",
-  "Synthesizing results and generating personalized recommendations...",
+const loadingMessagesKeys = [
+  "loadingMessage1",
+  "loadingMessage2",
+  "loadingMessage3",
 ];
 
 export default function ResultsPage() {
+  const t = useTranslations("ResultsPage");
   const router = useRouter();
+  const params = useParams();
+  const locale = typeof params.locale === "string" ? params.locale : "en";
+
   const { answers, reset } = useAssessmentStore();
   const {
     mutate: assess,
@@ -69,9 +75,9 @@ export default function ResultsPage() {
 
   useEffect(() => {
     if (Object.keys(answers).length > 0 && !assessment) {
-      assess(answers);
+      assess({ answers, locale });
     }
-  }, [answers, assess, assessment]);
+  }, [answers, assess, assessment, locale]);
 
   useEffect(() => {
     if (isPending) {
@@ -100,7 +106,7 @@ export default function ResultsPage() {
     e.preventDefault();
     if (email && assessment) {
       emailExportMutation.mutate(
-        { recipientEmail: email, assessmentData: assessment },
+        { recipientEmail: email, assessmentData: assessment, locale },
         {
           onSuccess: () => {
             setIsEmailDialogOpen(false);
@@ -109,16 +115,21 @@ export default function ResultsPage() {
       );
     }
   };
+  
+  const handleDownloadPdf = () => {
+    if (assessment) {
+      generateAssessmentPdf(assessment, locale);
+    }
+  };
+
 
   if (Object.keys(answers).length === 0 && !isPending && !assessment) {
     return (
       <div className="container mx-auto p-4 max-w-2xl text-center space-y-4">
-        <h1 className="text-2xl font-bold">No Assessment Data</h1>
-        <p className="text-muted-foreground">
-          It looks like you haven't completed an assessment yet.
-        </p>
+        <h1 className="text-2xl font-bold">{t("noDataTitle")}</h1>
+        <p className="text-muted-foreground">{t("noDataDescription")}</p>
         <Button asChild>
-          <Link href="/assessment">Start Assessment</Link>
+          <Link href="/assessment">{t("noDataCta")}</Link>
         </Button>
       </div>
     );
@@ -129,12 +140,12 @@ export default function ResultsPage() {
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <Card className="text-center p-8 w-full max-w-md">
           <CardHeader>
-            <CardTitle>Analyzing Your Results...</CardTitle>
+            <CardTitle>{t("loadingTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-4">
             <Spinner size="lg" />
             <p className="text-muted-foreground">
-              {loadingMessages[loadingMessageIndex]}
+              {t(loadingMessagesKeys[loadingMessageIndex])}
             </p>
           </CardContent>
         </Card>
@@ -147,17 +158,15 @@ export default function ResultsPage() {
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <Card className="text-center p-8 w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-destructive">Analysis Failed</CardTitle>
+            <CardTitle className="text-destructive">{t("errorTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-4">
-            <p className="text-muted-foreground">
-              We couldn't process your results at this time.
-            </p>
+            <p className="text-muted-foreground">{t("errorDescription")}</p>
             <p className="text-xs text-muted-foreground">
               Error: {(error as Error).message}
             </p>
             <Button asChild variant="outline">
-              <Link href="/assessment">Try Again</Link>
+              <Link href="/assessment">{t("errorCta")}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -169,11 +178,8 @@ export default function ResultsPage() {
     <div className="min-h-screen bg-secondary/30 py-12 px-4">
       <div className="container mx-auto max-w-3xl space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">Your Assessment Results</h1>
-          <p className="text-muted-foreground mt-2">
-            This is an educational summary. Please consult a healthcare
-            provider.
-          </p>
+          <h1 className="text-3xl font-bold">{t("resultsTitle")}</h1>
+          <p className="text-muted-foreground mt-2">{t("resultsDescription")}</p>
         </div>
         
         {assessment?.overallSummary && (
@@ -181,7 +187,7 @@ export default function ResultsPage() {
              <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-primary">
                   <ShieldCheck className="h-5 w-5" />
-                  Overall Summary
+                  {t("overallSummary")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -213,8 +219,7 @@ export default function ResultsPage() {
                         {factor.factor}
                       </CardTitle>
                       <CardDescription>
-                        Risk Level:{" "}
-                        <span className="font-semibold">{factor.riskLevel}</span>
+                        {t("riskLevel", { level: factor.riskLevel })}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -232,7 +237,7 @@ export default function ResultsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-500" />
-                Positive Lifestyle Factors
+                {t("positiveFactors")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -250,7 +255,7 @@ export default function ResultsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="h-5 w-5 text-primary" />
-              Recommendations
+              {t("recommendations")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -265,15 +270,15 @@ export default function ResultsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              Conversation Starters for Your Doctor
+              {t("doctorStarters")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-5 space-y-2 text-sm">
-              <li>"Based on my lifestyle, what are the most important screenings for me at this age?"</li>
-              <li>"I'd like to discuss my diet and activity levels. What's one change you'd recommend I focus on first?"</li>
-              <li>"Given my smoking history and potential exposures, what should I be aware of regarding my lung health?"</li>
-              <li>"Are there any specific symptoms I should be aware of, given my risk factors?"</li>
+              <li>{t("doctorStarter1")}</li>
+              <li>{t("doctorStarter2")}</li>
+              <li>{t("doctorStarter3")}</li>
+              <li>{t("doctorStarter4")}</li>
             </ul>
           </CardContent>
         </Card>
@@ -281,7 +286,7 @@ export default function ResultsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-               Helpful Resources
+               {t("resources")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -295,30 +300,26 @@ export default function ResultsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Export Your Results</CardTitle>
-            <CardDescription>
-              Save these results to discuss with a healthcare professional. We do not store this data.
-            </CardDescription>
+            <CardTitle>{t("exportTitle")}</CardTitle>
+            <CardDescription>{t("exportDescription")}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="flex-1" onClick={() => generateAssessmentPdf(assessment as AssessmentResult)}>
+            <Button size="lg" className="flex-1" onClick={handleDownloadPdf}>
               <Download className="mr-2 h-4 w-4" />
-              Download as PDF
+              {t("exportPdf")}
             </Button>
             <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="lg" variant="outline" className="flex-1">
                   <Mail className="mr-2 h-4 w-4" />
-                  Email My Results
+                  {t("exportEmail")}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <form onSubmit={handleEmailExport}>
                   <DialogHeader>
-                    <DialogTitle>Email Your Results</DialogTitle>
-                    <DialogDescription>
-                      Enter your email address to receive a copy of your results. We will not store or use your email for any other purpose.
-                    </DialogDescription>
+                    <DialogTitle>{t("emailDialogTitle")}</DialogTitle>
+                    <DialogDescription>{t("emailDialogDescription")}</DialogDescription>
                   </DialogHeader>
                   <div className="py-4">
                     <Label htmlFor="email" className="sr-only">Email</Label>
@@ -327,7 +328,7 @@ export default function ResultsPage() {
                   <DialogFooter>
                     <Button type="submit" disabled={emailExportMutation.isPending}>
                       {emailExportMutation.isPending && <Spinner size="sm" className="mr-2" />}
-                      Send Email
+                      {t("emailDialogCta")}
                     </Button>
                   </DialogFooter>
                 </form>
@@ -344,7 +345,7 @@ export default function ResultsPage() {
               router.push("/");
             }}
           >
-            Start New Assessment
+            {t("newAssessment")}
           </Button>
         </div>
       </div>

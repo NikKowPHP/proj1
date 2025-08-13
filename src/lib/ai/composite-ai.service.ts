@@ -53,8 +53,9 @@ export class CompositeAIService {
   async getRiskAssessmentExplanation(
     calculationResult: MultiCalculationResult,
     userId?: string,
+    locale: string = "en",
   ) {
-    const prompt = getMultiRiskAssessmentPrompt(calculationResult);
+    const prompt = getMultiRiskAssessmentPrompt(calculationResult, locale);
     const providerChain = this.getProviderChain("large");
     return executeWithFallbacks(
       providerChain,

@@ -74,7 +74,7 @@ export const generateAssessmentPdf = (assessmentData: AssessmentResult, locale: 
           f.explanation,
         ]),
         theme: "striped",
-        headStyles: { fillColor: }, // Amber color for risks
+        headStyles: { fillColor: [245, 158, 11] }, // Amber color for risks
       });
       startY = doc.autoTable.previous!.finalY + 15;
     }
@@ -92,7 +92,7 @@ export const generateAssessmentPdf = (assessmentData: AssessmentResult, locale: 
       head: [t.positiveFactorsHead],
       body: assessmentData.positiveFactors.map((f) => [f.factor, f.explanation]),
       theme: "striped",
-      headStyles: { fillColor: }, // Green color for positives
+      headStyles: { fillColor: [34, 197, 94] }, // Green color for positives
     });
     startY = doc.autoTable.previous!.finalY + 10;
   }
@@ -112,3 +112,4 @@ export const generateAssessmentPdf = (assessmentData: AssessmentResult, locale: 
 
   doc.save(`${t.filename}_${new Date().toLocaleDateString()}.pdf`);
 };
+      

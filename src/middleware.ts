@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
   // Construct and set the final CSP header
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://vercel.live;
+    script-src 'self' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com;
     style-src 'self' 'unsafe-inline';
     img-src 'self' data: https:;
     media-src 'self' data:;

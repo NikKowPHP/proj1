@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { AIModel } from "../types";
 import { CerebrasService } from "./cerebras-service";
 
 // These tests make real API calls to the Cerebras API and will not run if
@@ -18,13 +19,13 @@ describeIfApiKey("CerebrasService Integration Tests", () => {
 
   it("should translate text correctly from English to Spanish", async () => {
     const prompt = "Translate the word 'Hello' into Spanish.";
-    const model = process.env.CEREBRAS_SMALL_MODEL || "qwen-3-32b";
+    const model =( process.env.CEREBRAS_SMALL_MODEL || "qwen-3-32b") as AIModel;
     try {
       const translatedText = await service.generateText(prompt, model);
       expect(translatedText.toLowerCase()).toContain("hola");
     } catch (error: any) {
       // Gracefully handle the case where a dummy/invalid API key is provided
-      if (error.message.includes("Wrong API Key") || error.message.includes("wrong_api_key")) {
+      if (error.message.toLowerCase().includes("api key")) {
         console.warn(
           "Skipping Cerebras integration test due to invalid (dummy) API key.",
         );

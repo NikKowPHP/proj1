@@ -40,4 +40,7 @@
 - [x] Fix failing rate limiter tests by aligning with current implementation
 - [x] Fix failing Prisma seed script by pointing to correct file
 - [x] Update Prisma seed script to include Polish questionnaire
-      
+- [x] Fix failing API route test by updating mock data structure
+- [x] Acknowledge attempt to run test on non-existent file
+- [x] Fix failing integration tests by improving error handling
+- [x] Fix failing Gemini integration test due to empty test suite

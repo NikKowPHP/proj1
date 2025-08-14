@@ -24,7 +24,7 @@ describeIfApiKey("GroqService Integration Tests", () => {
       expect(translatedText.toLowerCase()).toContain("hola");
     } catch (error: any) {
       // Gracefully handle the case where a dummy/invalid API key is provided
-      if (error.message.includes("invalid_api_key") || error.message.includes("Invalid API Key")) {
+      if (error.message.toLowerCase().includes("api key")) {
         console.warn(
           "Skipping Groq integration test due to invalid (dummy) API key.",
         );

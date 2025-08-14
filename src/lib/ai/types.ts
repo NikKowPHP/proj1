@@ -5,7 +5,10 @@ export type CerebrasModel =
   | "gpt-oss-120b"
   | "qwen-3-235b-a22b-thinking-2507";
 export type GroqModel = "openai/gpt-oss-120b" | "moonshotai/kimi-k2-instruct";
-export type GeminiModel = "gemini-2.5-flash";
+export type GeminiModel =
+  | "gemini-1.5-pro-latest"
+  | "gemini-2.5-flash-latest"
+  | "gemini-2.5-flash";
 
 export type AIModel = CerebrasModel | GroqModel | GeminiModel;
 

@@ -32,18 +32,22 @@ export class CerebrasService implements TextAIProvider {
       } catch (error: any) {
         lastError = error;
         const status = error.response?.status;
-        if (
-          status === 400 || // Added for invalid API key
-          status === 429 ||
-          status === 401 ||
-          status === 403 ||
-          (status >= 500 && status <= 599)
-        ) {
+        
+        const shouldRotate =
+          !status || // Network error
+          status === 429 || // Rate limit
+          status === 401 || // Auth error
+          status === 403 || // Forbidden
+          status === 400 || // Bad request (often invalid key)
+          (status >= 500 && status <= 599); // Server error
+
+        if (shouldRotate) {
           logger.warn(
-            `Cerebras key #${index + 1} failed (status: ${status}). Rotating.`,
+            `Cerebras key #${index + 1} failed (status: ${status || 'N/A'}). Rotating.`,
           );
           continue;
         }
+
         // Re-throw a clean error to avoid circular dependency issues in Jest workers
         const errorDetails = error.response?.data
           ? JSON.stringify(error.response.data)
@@ -166,3 +170,4 @@ export class CerebrasService implements TextAIProvider {
     return text.trim();
   }
 }
+      

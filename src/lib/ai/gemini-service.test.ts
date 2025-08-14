@@ -39,14 +39,14 @@ describe("GeminiService with Key Rotation (REST)", () => {
 
     const result = await service.generateJson(
       "Test content",
-      "gemini-1.5-flash-latest",
+      "gemini-2.5-flash-latest",
     );
 
     expect(result).toEqual({ feedback: "Great job!" });
     expect(mockedKeyProvider.getAllKeys).toHaveBeenCalledTimes(1);
     expect(mockedAxios.post).toHaveBeenCalledTimes(1);
     expect(mockedAxios.post).toHaveBeenCalledWith(
-      expect.stringContaining("models/gemini-1.5-flash-latest:generateContent"),
+      expect.stringContaining("models/gemini-2.5-flash-latest:generateContent"),
       expect.any(Object),
       { headers: { "x-goog-api-key": "valid-key-1" } },
     );
@@ -75,7 +75,7 @@ describe("GeminiService with Key Rotation (REST)", () => {
 
     const result = await service.generateJson(
       "Test content",
-      "gemini-1.5-flash-latest",
+      "gemini-2.5-flash-latest",
     );
 
     expect(result).toEqual({ feedback: "Success on second key!" });
@@ -102,7 +102,7 @@ describe("GeminiService with Key Rotation (REST)", () => {
     });
 
     await expect(
-      service.generateJson("Test content", "gemini-1.5-flash-latest"),
+      service.generateJson("Test content", "gemini-2.5-flash-latest"),
     ).rejects.toThrow(
       "All Gemini API keys failed. Last error: API key not valid",
     );
@@ -118,7 +118,7 @@ describe("GeminiService with Key Rotation (REST)", () => {
     mockedAxios.post.mockRejectedValue(nonRotationError);
 
     await expect(
-      service.generateJson("Test content", "gemini-1.5-flash-latest"),
+      service.generateJson("Test content", "gemini-2.5-flash-latest"),
     ).rejects.toThrow("Invalid request");
 
     // It should only try once

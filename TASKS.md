@@ -1,46 +1,34 @@
-### Phase 1: Setup and Basic Internationalization
+# Application Testing Plan
 
-- [x] **Task 1: Install `next-intl`**
-- [x] **Task 2: Create `messages` directory and translation files**
-- [x] **Task 3: Configure `next-intl` routing**
-- [x] **Task 4: Configure `next-intl` navigation**
-- [x] **Task 5: Implement middleware for automatic redirection**
-- [x] **Task 6: Configure `next-intl` request handling**
-- [x] **Task 7: Create `[locale]` dynamic route**
-- [x] **Task 8: Update Root Layout**
-- [x] **Task 9: Internationalize Home Page**
+This document outlines the manual testing plan for the core functionalities of the Health Risk Assessment application.
 
-### Phase 2: Internationalize Core App Content
+## Phase 1: Core User Flow
+- [x] Test landing page loads correctly in both English and Polish.
+- [x] Test starting a new assessment.
+- [x] Test completing the entire questionnaire with valid data.
+- [x] Test viewing the results page after assessment.
+- [x] Test the "Start New Assessment" functionality from the results page, ensuring it clears previous state.
 
-- [x] **Task 10: Internationalize Static Pages (Privacy, Terms, Cookies)**
-- [x] **Task 11: Internationalize Assessment Page**
-- [x] **Task 12: Internationalize Results Page**
+## Phase 2: Key Features & Validation
+- [x] Test the "Resume Session" functionality by refreshing the assessment page mid-way.
+- [x] Test input validation for height and weight fields (e.g., non-numeric, negative, out-of-range values).
+- [x] Test conditional logic in the questionnaire (e.g., smoking-related questions only appear for smokers).
+- [x] Test PDF export functionality on the results page.
+- [x] Test Email export functionality on the results page.
 
-### Phase 3: Internationalize Backend and Final Touches
+## Phase 3: Internationalization (i18n)
+- [x] Verify that UI text translates correctly on the homepage.
+- [x] Verify that UI text translates correctly during the assessment.
+- [x] Verify that UI text translates correctly on the results page.
+- [x] Verify that the exported PDF content is correctly translated.
 
-- [x] **Task 13: Internationalize Risk Model Configuration**
-- [x] **Task 14: Internationalize Email Content**
-- [x] **Task 15: Update E2E Tests**
-- [x] **Task 16: Review and Refine**
+## Phase 4: Static Pages & Footer
+- [x] Test navigation to the Privacy Policy page from the footer.
+- [x] Test navigation to the Terms of Service page from the footer.
+- [x] Test theme toggle (light/dark mode) and ensure it persists across pages.
 
-### Maintenance
-
-- [x] Fix build error in PDF generator
-- [x] Fix failing unit and integration tests
-- [x] Fix rate limiter type error in assess API route
-- [x] Fix failing tests for PDF generator
-- [x] Fix failing PDF generator tests by updating mock
-- [x] Fix PDF generator tests by mocking `jspdf-autotable` behavior
-- [x] Fix failing Cerebras integration test due to dummy API key
-- [x] Fix failing Groq integration test due to dummy API key
-- [x] Fix failing risk calculator test by mocking correct config file
-- [x] Remove obsolete audio evaluation test from Gemini service tests
-- [x] Fix failing API route tests by mocking `request.json()`
-- [x] Fix failing API route tests by using `NextRequest` for mocks
-- [x] Fix failing rate limiter tests by aligning with current implementation
-- [x] Fix failing Prisma seed script by pointing to correct file
-- [x] Update Prisma seed script to include Polish questionnaire
-- [x] Fix failing API route test by updating mock data structure
-- [x] Acknowledge attempt to run test on non-existent file
-- [x] Fix failing integration tests by improving error handling
-- [x] Fix failing Gemini integration test due to empty test suite
+## Completed Tasks
+- [x] Create a TODO list plan for testing the main functionality of the app.
+- [x] Add a language switcher to the UI.
+- [x] Fix footer layout for mobile responsiveness.
+      

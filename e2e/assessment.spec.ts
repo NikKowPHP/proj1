@@ -12,7 +12,9 @@ const translations = {
   en: {
     assessmentTitle: "Anonymous Health Risk Assessment",
     startCta: "Start My Anonymous Assessment",
+    resumeDialogTitle: "Resume Session?",
     step1: {
+      title: "About You",
       age: "50-59",
       sex: "Male",
     },
@@ -42,13 +44,16 @@ const translations = {
       tab1: "General Cancer Risk",
       tab2: "Lung Cancer Risk",
       tab3: "Cardiovascular Risk",
+      newAssessment: "Start New Assessment",
     },
     option: (text: string) => page.getByRole("option", { name: text }),
   },
   pl: {
     assessmentTitle: "Anonimowa Ocena Ryzyka Zdrowotnego",
     startCta: "Rozpocznij Moją Anonimową Ocenę",
+    resumeDialogTitle: "Wznowić sesję?",
     step1: {
+      title: "O Tobie",
       age: "50-59",
       sex: "Mężczyzna",
     },
@@ -78,6 +83,7 @@ const translations = {
       tab1: "Ogólne Ryzyko Nowotworowe",
       tab2: "Ryzyko Raka Płuc",
       tab3: "Ryzyko Sercowo-Naczyniowe",
+      newAssessment: "Rozpocznij Nową Ocenę",
     },
     option: (text: string) => page.getByRole("option", { name: text }),
   },
@@ -221,6 +227,30 @@ for (const locale of locales) {
       // Click and check third tab
       await page.getByRole("tab", { name: t.results.tab3 }).click();
       await expect(page.getByText("Key Health Indicators")).toBeVisible();
+
+      // 6. Test starting a new assessment clears state
+      await page.getByRole("button", { name: t.results.newAssessment }).click();
+
+      // Should navigate back to the home page
+      await expect(page).toHaveURL(`/${locale}`);
+      await expect(
+        page.getByRole("heading", { name: t.assessmentTitle }),
+      ).toBeVisible();
+
+      // Start another assessment
+      await page.getByRole("button", { name: t.startCta }).click();
+      await expect(page).toHaveURL(`/${locale}/assessment`);
+
+      // Verify that the "Resume Session" dialog does NOT appear
+      await expect(
+        page.getByRole("heading", { name: t.resumeDialogTitle }),
+      ).not.toBeVisible();
+
+      // Verify we are on step 1 by checking for its title
+      await expect(
+        page.getByRole("heading", { name: t.step1.title }),
+      ).toBeVisible();
     });
   });
 }
+      

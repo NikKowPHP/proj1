@@ -2,6 +2,10 @@ import type { GuidelinePlan } from "@/lib/types";
 import configEn from "@/lib/preventive-plan-config.en.json";
 import configPl from "@/lib/preventive-plan-config.pl.json";
 
+// Type assertion for imported JSON configs
+const configEnTyped = configEn as PlanConfig;
+const configPlTyped = configPl as PlanConfig;
+
 type Answers = Record<string, string>;
 
 interface Condition {
@@ -21,8 +25,8 @@ interface PlanConfig {
 }
 
 const configs: { [key: string]: PlanConfig } = {
-  en: configEn,
-  pl: configPl,
+  en: configEnTyped,
+  pl: configPlTyped,
 };
 
 function checkCondition(condition: Condition, answers: Answers): boolean {

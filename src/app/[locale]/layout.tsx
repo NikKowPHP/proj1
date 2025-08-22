@@ -21,8 +21,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Anonymous Health Assessment",
-  description: "An AI-powered health risk assessment tool.",
+  title: "Proactive Health Planner",
+  description: "An AI-powered tool to build a personalized preventive health plan.",
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Health Assessment",
+    title: "Health Planner",
   },
 };
 
@@ -95,3 +95,4 @@ export default async function RootLayout({
     </html>
   );
 }
+      

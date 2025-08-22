@@ -1,25 +1,24 @@
-
 ### **Project: "Proactive Health Planner" - Implementation Plan** ONKONO
 
 #### **Phase 1: Foundational Reframing & Content Update**
 *(Goal: Update all user-facing text and documentation to reflect the new "preventive plan" mission. This is primarily content changes.)*
 
 *   **Project Naming & Messaging:**
-    *   `[ ]` **[messages/en.json]** Update `HomePage.title` to "Proactive Health Planner" or similar.
-    *   `[ ]` **[messages/en.json]** Update `HomePage.description` to focus on building a "preventive care roadmap."
-    *   `[ ]` **[messages/en.json]** Update `HomePage.ctaButton` to "Build My Preventive Plan."
-    *   `[ ]` **[messages/pl.json]** Apply the same content updates for the Polish translations.
-    *   `[ ]` **[package.json]** Update the `name` and `description` fields.
-    *   `[ ]` **[next.config.ts]** Update any metadata related to the site title/description.
-    *   `[ ]` **[public/manifest.json]** Update `name` and `short_name`.
+    *   `[x]` **[messages/en.json]** Update `HomePage.title` to "Proactive Health Planner" or similar.
+    *   `[x]` **[messages/en.json]** Update `HomePage.description` to focus on building a "preventive care roadmap."
+    *   `[x]` **[messages/en.json]** Update `HomePage.ctaButton` to "Build My Preventive Plan."
+    *   `[x]` **[messages/pl.json]** Apply the same content updates for the Polish translations.
+    *   `[x]` **[package.json]** Update the `name` and `description` fields.
+    *   `[x]` **[next.config.ts]** Update any metadata related to the site title/description.
+    *   `[x]` **[public/manifest.json]** Update `name` and `short_name`.
 
 *   **Questionnaire Framing:**
-    *   `[ ]` **[lib/assessment-questions.en.json]** Revise `title` and `description` for each step to frame it as gathering information for a plan, not assessing risk.
-    *   `[ ]` **[lib/assessment-questions.pl.json]** Apply the same framing revisions for Polish questions.
+    *   `[x]` **[lib/assessment-questions.en.json]** Revise `title` and `description` for each step to frame it as gathering information for a plan, not assessing risk.
+    *   `[x]` **[lib/assessment-questions.pl.json]** Apply the same framing revisions for Polish questions.
 
 *   **Static Pages & Footer:**
-    *   `[ ]` **[messages/en.json]** Review and update `PrivacyPage` and `TermsPage` content to ensure it aligns with the new mission (e.g., explicitly state no risk scores are calculated).
-    *   `[ ]` **[messages/pl.json]** Apply the same review and updates for Polish static pages.
+    *   `[x]` **[messages/en.json]** Review and update `PrivacyPage` and `TermsPage` content to ensure it aligns with the new mission (e.g., explicitly state no risk scores are calculated).
+    *   `[x]` **[messages/pl.json]** Apply the same review and updates for Polish static pages.
 
 #### **Phase 2: Backend Logic Overhaul (The Rules Engine)**
 *(Goal: Replace the risk scoring system with a deterministic engine that generates a list of recommended actions based on established guidelines.)*
@@ -103,3 +102,4 @@
 
 ---
 This atomic plan provides a clear, step-by-step path to fully implement the revised vision, ensuring all parts of the existing codebase are correctly updated, repurposed, or replaced.
+      

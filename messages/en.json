@@ -1,14 +1,14 @@
 {
   "HomePage": {
-    "title": "Anonymous Health Risk Assessment",
-    "description": "Answer a few simple questions to receive an AI-powered assessment of potential health risks based on your lifestyle factors.",
-    "ctaButton": "Start My Anonymous Assessment",
+    "title": "Proactive Health Planner",
+    "description": "Answer a few simple questions to build a personalized preventive care roadmap based on your lifestyle and health profile.",
+    "ctaButton": "Build My Preventive Plan",
     "disclaimerTitle": "Important Disclaimer",
     "disclaimerContent1": "This tool provides information for educational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment. The assessment is based on statistical data and cannot account for individual health conditions.",
     "disclaimerContent2": "<strong>Always consult with a qualified healthcare provider</strong> regarding any medical concerns or before making any decisions related to your health. We do not store any personally identifiable information."
   },
   "AppFooter": {
-    "copyright": "© {year} Anonymous Assessment. All rights reserved.",
+    "copyright": "© {year} Proactive Health Planner. All rights reserved.",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service"
   },
@@ -16,7 +16,7 @@
     "backToHome": "Back to Home",
     "title": "Privacy Policy",
     "lastUpdated": "Last updated: August 05, 2025",
-    "intro": "This application (\"we,\" \"our,\" or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we handle your information when you use our anonymous health risk assessment tool (the \"Service\").",
+    "intro": "This application (\"we,\" \"our,\" or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we handle your information when you use our proactive health planner (the \"Service\").",
     "anonymityTitle": "1. Anonymity by Design",
     "anonymityIntro": "The core principle of this Service is user anonymity. We have designed the system to avoid collecting or storing any Personally Identifiable Information (PII).",
     "anonymityPoint1": "<strong>No User Accounts:</strong> You do not need to create an account to use the Service.",
@@ -24,7 +24,7 @@
     "anonymityPoint3": "<strong>Session-Based Data:</strong> The answers you provide to the questionnaire are stored only in your browser's local storage. This data is automatically deleted if you start a new assessment. It is never sent to our servers until you click \"View Results\".",
     "processingTitle": "2. Information We Process",
     "processingIntro": "To provide you with an assessment, we process the following information:",
-    "processingPoint1": "<strong>Questionnaire Answers:</strong> The answers you provide are sent to our backend service and then to a third-party AI provider to generate your risk assessment. This data is processed in-memory and is not stored or logged in association with any personal identifiers.",
+    "processingPoint1": "<strong>Questionnaire Answers:</strong> The answers you provide are sent to our backend service and then to a third-party AI provider to generate your preventive health plan. This data is processed in-memory and is not stored or logged in association with any personal identifiers.",
     "processingPoint2": "<strong>IP Address:</strong> Your IP address is used temporarily for rate-limiting purposes to prevent abuse of the service. It is not stored or linked to your assessment data.",
     "processingPoint3": "<strong>Operational Logs:</strong> We may keep anonymized logs about assessment events (e.g., \"SUCCESS,\" \"AI_ERROR\") for the purpose of monitoring our system's health and usage statistics. These logs contain no part of your questionnaire data.",
     "emailTitle": "3. \"Send-and-Forget\" Email Feature",
@@ -43,13 +43,13 @@
     "backToHome": "Back to Home",
     "title": "Terms of Service",
     "lastUpdated": "Last updated: August 05, 2025",
-    "intro": "By using this anonymous health risk assessment tool (the \"Service\"), you agree to these Terms of Service.",
+    "intro": "By using this proactive health planner (the \"Service\"), you agree to these Terms of Service.",
     "notMedicalAdviceTitle": "1. Not Medical Advice",
-    "notMedicalAdviceContent": "The Service provides information for educational and informational purposes only. It is not intended as a substitute for professional medical advice, diagnosis, or treatment for any health condition. The information provided by the AI is based on statistical data and general knowledge and cannot replace a consultation with a qualified healthcare provider who can assess your individual health needs.",
+    "notMedicalAdviceContent": "The Service provides information for educational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. This tool does not calculate risk scores; it generates recommendations based on established public health guidelines and your inputs. Always consult with a qualified healthcare provider who can assess your individual needs.",
     "noWarrantyTitle": "2. No Warranty",
     "noWarrantyContent": "The Service is provided \"as is\" without any warranties of any kind, express or implied. We do not warrant the accuracy, completeness, or usefulness of any information presented. You rely on the information provided by this Service at your own risk.",
     "liabilityTitle": "3. Limitation of Liability",
-    "liabilityContent": "In no event shall we or our affiliates be liable for any damages, including but not limited to direct, indirect, incidental, special, or consequential damages, arising out of or in connection with your use of or inability to use the Service.",
+    "liabilityContent": "In no event shall we or our affiliates be liable for any damages, including but not to direct, indirect, incidental, special, or consequential damages, arising out of or in connection with your use of or inability to use the Service.",
     "useOfServiceTitle": "4. Use of Service",
     "useOfServiceContent": "You agree to use the Service responsibly and not to misuse it. Misuse includes, but is not limited to, attempting to overload the system, interfering with its security, or using it for any unlawful purpose. We employ rate-limiting to ensure fair access for all users.",
     "changesToTermsTitle": "5. Changes to Terms",
@@ -106,9 +106,9 @@
     "weightPlaceholderImperial": "e.g., 154"
   },
   "ResultsPage": {
-    "noDataTitle": "No Assessment Data",
-    "noDataDescription": "It looks like you haven't completed an assessment yet.",
-    "noDataCta": "Start Assessment",
+    "noDataTitle": "No Plan Data",
+    "noDataDescription": "It looks like you haven't generated a plan yet.",
+    "noDataCta": "Build My Plan",
     "loadingTitle": "Analyzing Your Results...",
     "loadingMessage1": "Connecting to our secure analysis engine...",
     "loadingMessage2": "Analyzing your lifestyle factors against our risk models...",
@@ -116,8 +116,8 @@
     "errorTitle": "Analysis Failed",
     "errorDescription": "We couldn't process your results at this time.",
     "errorCta": "Try Again",
-    "resultsTitle": "Your Assessment Results",
-    "resultsDescription": "This is an educational summary. Please consult a healthcare provider.",
+    "resultsTitle": "Your Preventive Health Plan",
+    "resultsDescription": "This is a personalized plan based on public health guidelines. Please discuss it with your healthcare provider.",
     "overallSummary": "Overall Summary",
     "riskLevel": "Risk Level: {level}",
     "positiveFactors": "Positive Lifestyle Factors",
@@ -128,13 +128,14 @@
     "doctorStarter3": "\"Given my smoking history and potential exposures, what should I be aware of regarding my lung health?\"",
     "doctorStarter4": "\"Are there any specific symptoms I should be aware of, given my risk factors?\"",
     "resources": "Helpful Resources",
-    "exportTitle": "Export Your Results",
-    "exportDescription": "Save these results to discuss with a healthcare professional. We do not store this data.",
+    "exportTitle": "Export Your Plan",
+    "exportDescription": "Save this plan to discuss with a healthcare professional. We do not store this data.",
     "exportPdf": "Download as PDF",
-    "exportEmail": "Email My Results",
-    "emailDialogTitle": "Email Your Results",
-    "emailDialogDescription": "Enter your email address to receive a copy of your results. We will not store or use your email for any other purpose.",
+    "exportEmail": "Email My Plan",
+    "emailDialogTitle": "Email Your Plan",
+    "emailDialogDescription": "Enter your email address to receive a copy of your plan. We will not store or use your email for any other purpose.",
     "emailDialogCta": "Send Email",
-    "newAssessment": "Start New Assessment"
+    "newAssessment": "Build New Plan"
   }
 }
+      

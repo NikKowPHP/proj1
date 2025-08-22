@@ -1,7 +1,7 @@
 {
   "steps": [
     {
-      "title": "About You",
+      "title": "Building Your Profile",
       "questions": [
         {
           "id": "age",
@@ -105,8 +105,8 @@
       ]
     },
     {
-      "title": "Environmental & Occupational History",
-      "description": "This information helps assess risks related to your environment and work.",
+      "title": "Environmental Factors",
+      "description": "This information helps us understand environmental factors that may influence your plan.",
       "questions": [
         {
           "id": "asbestos_exposure",
@@ -117,8 +117,8 @@
       ]
     },
     {
-        "title": "Family History",
-        "description": "This information helps provide a more accurate assessment. It will not be stored and remains completely anonymous.",
+        "title": "Family Health History",
+        "description": "This information helps tailor your plan based on family health history. It will not be stored and remains completely anonymous.",
         "questions": [
             {
                 "id": "family_history_cancer",
@@ -130,3 +130,4 @@
     }
   ]
 }
+      

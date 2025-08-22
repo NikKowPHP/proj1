@@ -1,7 +1,7 @@
 {
-  "name": "Health Risk Assessor",
-  "short_name": "Health Risk Assessor",
-  "description": "An anonymous, AI-powered health risk assessment tool.",
+  "name": "Proactive Health Planner",
+  "short_name": "Health Planner",
+  "description": "An AI-powered tool to build a personalized preventive health plan.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
@@ -39,3 +39,4 @@
     }
   ]
 }
+      

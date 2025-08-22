@@ -1,14 +1,14 @@
 {
   "HomePage": {
-    "title": "Anonimowa Ocena Ryzyka Zdrowotnego",
-    "description": "Odpowiedz na kilka prostych pytań, aby otrzymać opartą na sztucznej inteligencji ocenę potencjalnych ryzyk zdrowotnych na podstawie czynników związanych ze stylem życia.",
-    "ctaButton": "Rozpocznij Moją Anonimową Ocenę",
+    "title": "Proaktywny Planer Zdrowia",
+    "description": "Odpowiedz na kilka prostych pytań, aby stworzyć spersonalizowany plan opieki profilaktycznej w oparciu o Twój styl życia i profil zdrowotny.",
+    "ctaButton": "Zbuduj Mój Plan Profilaktyczny",
     "disclaimerTitle": "Ważne Zastrzeżenie",
     "disclaimerContent1": "To narzędzie dostarcza informacji wyłącznie w celach edukacyjnych i nie zastępuje profesjonalnej porady medycznej, diagnozy ani leczenia. Ocena opiera się na danych statystycznych i nie może uwzględniać indywidualnych uwarunkowań zdrowotnych.",
     "disclaimerContent2": "<strong>Zawsze konsultuj się z wykwalifikowanym pracownikiem służby zdrowia</strong> w sprawie wszelkich problemów medycznych lub przed podjęciem jakichkolwiek decyzji związanych ze zdrowiem. Nie przechowujemy żadnych danych osobowych."
   },
   "AppFooter": {
-    "copyright": "© {year} Anonimowa Ocena. Wszelkie prawa zastrzeżone.",
+    "copyright": "© {year} Proaktywny Planer Zdrowia. Wszelkie prawa zastrzeżone.",
     "privacyPolicy": "Polityka Prywatności",
     "termsOfService": "Warunki Korzystania z Usługi"
   },
@@ -16,7 +16,7 @@
     "backToHome": "Powrót do strony głównej",
     "title": "Polityka Prywatności",
     "lastUpdated": "Ostatnia aktualizacja: 5 sierpnia 2025",
-    "intro": "Ta aplikacja („my”, „nasz” lub „nas”) zobowiązuje się do ochrony Twojej prywatności. Niniejsza Polityka Prywatności wyjaśnia, w jaki sposób postępujemy z Twoimi informacjami, gdy korzystasz z naszego anonimowego narzędzia do oceny ryzyka zdrowotnego („Usługa”).",
+    "intro": "Ta aplikacja („my”, „nasz” lub „nas”) zobowiązuje się do ochrony Twojej prywatności. Niniejsza Polityka Prywatności wyjaśnia, w jaki sposób postępujemy z Twoimi informacjami, gdy korzystasz z naszego proaktywnego planera zdrowia („Usługa”).",
     "anonymityTitle": "1. Anonimowość z założenia",
     "anonymityIntro": "Podstawową zasadą tej Usługi jest anonimowość użytkownika. Zaprojektowaliśmy system tak, aby unikać gromadzenia lub przechowywania jakichkolwiek danych osobowych (PII).",
     "anonymityPoint1": "<strong>Brak kont użytkowników:</strong> Nie musisz tworzyć konta, aby korzystać z Usługi.",
@@ -24,7 +24,7 @@
     "anonymityPoint3": "<strong>Dane oparte na sesji:</strong> Odpowiedzi udzielone w ankiecie są przechowywane wyłącznie w pamięci lokalnej przeglądarki. Dane te są automatycznie usuwane po rozpoczęciu nowej oceny. Nigdy nie są wysyłane na nasze serwery, dopóki nie klikniesz „Zobacz wyniki”.",
     "processingTitle": "2. Informacje, które przetwarzamy",
     "processingIntro": "Aby dostarczyć Ci ocenę, przetwarzamy następujące informacje:",
-    "processingPoint1": "<strong>Odpowiedzi z ankiety:</strong> Udzielone przez Ciebie odpowiedzi są wysyłane do naszego serwisu backendowego, a następnie do zewnętrznego dostawcy AI w celu wygenerowania oceny ryzyka. Dane te są przetwarzane w pamięci i nie są przechowywane ani rejestrowane w powiązaniu z żadnymi danymi osobowymi.",
+    "processingPoint1": "<strong>Odpowiedzi z ankiety:</strong> Udzielone przez Ciebie odpowiedzi są wysyłane do naszego serwisu backendowego, a następnie do zewnętrznego dostawcy AI w celu wygenerowania Twojego profilaktycznego planu zdrowia. Dane te są przetwarzane w pamięci i nie są przechowywane ani rejestrowane w powiązaniu z żadnymi danymi osobowymi.",
     "processingPoint2": "<strong>Adres IP:</strong> Twój adres IP jest tymczasowo używany do celów ograniczania liczby żądań, aby zapobiec nadużywaniu usługi. Nie jest on przechowywany ani łączony z danymi Twojej oceny.",
     "processingPoint3": "<strong>Logi operacyjne:</strong> Możemy przechowywać anonimowe logi dotyczące zdarzeń oceny (np. „SUKCES”, „BŁĄD_AI”) w celu monitorowania stanu naszego systemu i statystyk użytkowania. Logi te nie zawierają żadnej części danych z Twojej ankiety.",
     "emailTitle": "3. Funkcja e-mail „Wyślij i zapomnij”",
@@ -43,9 +43,9 @@
     "backToHome": "Powrót do strony głównej",
     "title": "Warunki Korzystania z Usługi",
     "lastUpdated": "Ostatnia aktualizacja: 5 sierpnia 2025",
-    "intro": "Korzystając z tego anonimowego narzędzia do oceny ryzyka zdrowotnego („Usługa”), zgadzasz się na niniejsze Warunki Korzystania z Usługi.",
+    "intro": "Korzystając z tego proaktywnego planera zdrowia („Usługa”), zgadzasz się na niniejsze Warunki Korzystania z Usługi.",
     "notMedicalAdviceTitle": "1. To nie jest porada medyczna",
-    "notMedicalAdviceContent": "Usługa dostarcza informacji wyłącznie w celach edukacyjnych i informacyjnych. Nie ma na celu zastąpienia profesjonalnej porady medycznej, diagnozy ani leczenia jakiegokolwiek schorzenia. Informacje dostarczane przez AI opierają się na danych statystycznych i ogólnej wiedzy i nie mogą zastąpić konsultacji z wykwalifikowanym pracownikiem służby zdrowia, który może ocenić Twoje indywidualne potrzeby zdrowotne.",
+    "notMedicalAdviceContent": "Usługa dostarcza informacji wyłącznie w celach edukacyjnych. Nie zastępuje profesjonalnej porady medycznej, diagnozy ani leczenia. To narzędzie nie oblicza wyników ryzyka; generuje rekomendacje na podstawie ustalonych wytycznych zdrowia publicznego i Twoich odpowiedzi. Zawsze konsultuj się z wykwalifikowanym pracownikiem służby zdrowia, który może ocenić Twoje indywidualne potrzeby.",
     "noWarrantyTitle": "2. Brak gwarancji",
     "noWarrantyContent": "Usługa jest świadczona w stanie „tak jak jest”, bez żadnych gwarancji, wyraźnych ani dorozumianych. Nie gwarantujemy dokładności, kompletności ani użyteczności żadnych przedstawionych informacji. Korzystasz z informacji dostarczanych przez tę Usługę na własne ryzyko.",
     "liabilityTitle": "3. Ograniczenie odpowiedzialności",
@@ -106,9 +106,9 @@
     "weightPlaceholderImperial": "np. 154"
   },
   "ResultsPage": {
-    "noDataTitle": "Brak Danych Oceny",
-    "noDataDescription": "Wygląda na to, że jeszcze nie ukończyłeś/aś oceny.",
-    "noDataCta": "Rozpocznij Ocenę",
+    "noDataTitle": "Brak Danych Planu",
+    "noDataDescription": "Wygląda na to, że jeszcze nie wygenerowałeś/aś planu.",
+    "noDataCta": "Zbuduj Mój Plan",
     "loadingTitle": "Analizowanie Twoich Wyników...",
     "loadingMessage1": "Łączenie z naszym bezpiecznym silnikiem analitycznym...",
     "loadingMessage2": "Analizowanie czynników Twojego stylu życia w oparciu o nasze modele ryzyka...",
@@ -116,8 +116,8 @@
     "errorTitle": "Analiza Nieudana",
     "errorDescription": "W tej chwili nie mogliśmy przetworzyć Twoich wyników.",
     "errorCta": "Spróbuj Ponownie",
-    "resultsTitle": "Twoje Wyniki Oceny",
-    "resultsDescription": "To jest podsumowanie edukacyjne. Skonsultuj się z lekarzem.",
+    "resultsTitle": "Twój Profilaktyczny Plan Zdrowia",
+    "resultsDescription": "To jest spersonalizowany plan oparty na publicznych wytycznych zdrowotnych. Prosimy omówić go ze swoim lekarzem.",
     "overallSummary": "Ogólne Podsumowanie",
     "riskLevel": "Poziom Ryzyka: {level}",
     "positiveFactors": "Pozytywne Czynniki Stylu Życia",
@@ -128,13 +128,14 @@
     "doctorStarter3": "\"Biorąc pod uwagę moją historię palenia i potencjalne narażenia, na co powinienem/powinnam zwrócić uwagę w kwestii zdrowia płuc?\"",
     "doctorStarter4": "\"Czy są jakieś konkretne objawy, na które powinienem/powinnam zwrócić uwagę, biorąc pod uwagę moje czynniki ryzyka?\"",
     "resources": "Pomocne Zasoby",
-    "exportTitle": "Eksportuj Swoje Wyniki",
-    "exportDescription": "Zapisz te wyniki, aby omówić je z pracownikiem służby zdrowia. Nie przechowujemy tych danych.",
+    "exportTitle": "Eksportuj Swój Plan",
+    "exportDescription": "Zapisz ten plan, aby omówić go z pracownikiem służby zdrowia. Nie przechowujemy tych danych.",
     "exportPdf": "Pobierz jako PDF",
-    "exportEmail": "Wyślij Wyniki E-mailem",
-    "emailDialogTitle": "Wyślij Wyniki E-mailem",
-    "emailDialogDescription": "Wpisz swój adres e-mail, aby otrzymać kopię wyników. Nie będziemy przechowywać ani używać Twojego e-maila w żadnym innym celu.",
+    "exportEmail": "Wyślij Plan E-mailem",
+    "emailDialogTitle": "Wyślij Plan E-mailem",
+    "emailDialogDescription": "Wpisz swój adres e-mail, aby otrzymać kopię swojego planu. Nie będziemy przechowywać ani używać Twojego e-maila w żadnym innym celu.",
     "emailDialogCta": "Wyślij E-mail",
-    "newAssessment": "Rozpocznij Nową Ocenę"
+    "newAssessment": "Zbuduj Nowy Plan"
   }
 }
+      

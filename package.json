@@ -1,6 +1,7 @@
 {
-  "name": "health-risk-assessor",
+  "name": "proactive-health-planner",
   "version": "1.0.0",
+  "description": "An AI-powered tool to build a personalized preventive health plan.",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -81,3 +82,4 @@
     "typescript-eslint": "^8.34.1"
   }
 }
+      

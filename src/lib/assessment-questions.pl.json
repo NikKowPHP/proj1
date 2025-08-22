@@ -1,7 +1,7 @@
 {
   "steps": [
     {
-      "title": "O Tobie",
+      "title": "Tworzenie Twojego Profilu",
       "questions": [
         {
           "id": "age",
@@ -105,8 +105,8 @@
       ]
     },
     {
-      "title": "Historia Środowiskowa i Zawodowa",
-      "description": "Te informacje pomagają ocenić ryzyka związane z Twoim środowiskiem i pracą.",
+      "title": "Czynniki Środowiskowe",
+      "description": "Te informacje pomagają nam zrozumieć czynniki środowiskowe, które mogą wpłynąć na Twój plan.",
       "questions": [
         {
           "id": "asbestos_exposure",
@@ -117,8 +117,8 @@
       ]
     },
     {
-      "title": "Historia Rodzinna",
-      "description": "Te informacje pomagają zapewnić dokładniejszą ocenę. Nie będą przechowywane i pozostają całkowicie anonimowe.",
+      "title": "Historia Zdrowia Rodziny",
+      "description": "Te informacje pomagają dostosować Twój plan na podstawie historii zdrowia rodziny. Nie będą przechowywane i pozostają całkowicie anonimowe.",
       "questions": [
         {
           "id": "family_history_cancer",
@@ -130,3 +130,4 @@
     }
   ]
 }
+      

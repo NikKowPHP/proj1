@@ -1,14 +1,14 @@
 /** @jest-environment node */
 
 import { POST } from "./route";
-import * as riskCalculator from "@/lib/services/risk-calculator.service";
+import * as guidelineEngine from "@/lib/services/guideline-engine.service";
 import * as ai from "@/lib/ai";
 import { prisma } from "@/lib/db";
-import { MultiCalculationResult } from "@/lib/types";
+import { GuidelinePlan, ActionPlan } from "@/lib/types";
 import { NextRequest } from "next/server";
 
 // Mock dependencies
-jest.mock("@/lib/services/risk-calculator.service");
+jest.mock("@/lib/services/guideline-engine.service");
 jest.mock("@/lib/ai");
 jest.mock("@/lib/db", () => ({
   prisma: {
@@ -18,31 +18,22 @@ jest.mock("@/lib/db", () => ({
   },
 }));
 
-const mockedCalculateAllRisks = riskCalculator.calculateAllRisks as jest.Mock;
+const mockedGeneratePlan = guidelineEngine.generatePlan as jest.Mock;
 const mockedGetAIService = ai.getAIService as jest.Mock;
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
 describe("POST /api/assess", () => {
-  const mockAIExplanation = {
+  const mockAIExplanation: ActionPlan = {
     overallSummary: "Summary",
-    modelAssessments: [
-      {
-        modelName: "General Cancer Risk",
-        riskFactors: [
-          {
-            factor: "Test Risk",
-            riskLevel: "High",
-            explanation: "AI explanation",
-          },
-        ],
-      },
+    recommendedScreenings: [
+      { id: "TEST", title: "Test Screening", description: "...", why: "..." },
     ],
-    positiveFactors: [{ factor: "Test Positive", explanation: "Good job" }],
-    recommendations: ["See a doctor"],
+    lifestyleGuidelines: [],
+    topicsForDoctor: [],
   };
-  
+
   const validUserAnswers = {
-    age: "60+",
+    age: "50-59",
     sex: "Male",
     units: "metric",
     height: "180",
@@ -50,22 +41,15 @@ describe("POST /api/assess", () => {
     smoking_status: "Current smoker",
   } as const;
 
-  const mockCalculationResult: MultiCalculationResult = {
-    modelResults: [
-      {
-        modelId: "GENERAL_CANCER_V1",
-        modelName: "General Cancer Risk",
-        riskFactors: [
-          { id: "TEST", name: "Test Risk", score: 10, level: "High" },
-        ],
-      },
-    ],
-    positiveFactors: [],
+  const mockGuidelineResult: GuidelinePlan = {
+    screenings: ["TEST_SCREENING"],
+    lifestyle: [],
+    topicsForDoctor: [],
     userAnswers: validUserAnswers,
   };
 
   const mockAIService = {
-    getRiskAssessmentExplanation: jest.fn().mockResolvedValue({
+    getPlanExplanation: jest.fn().mockResolvedValue({
       result: mockAIExplanation,
       serviceUsed: "mock-ai",
     }),
@@ -74,10 +58,10 @@ describe("POST /api/assess", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockedGetAIService.mockReturnValue(mockAIService);
-    mockedCalculateAllRisks.mockReturnValue(mockCalculationResult);
+    mockedGeneratePlan.mockReturnValue(mockGuidelineResult);
   });
 
-  it("should orchestrate the hybrid flow correctly", async () => {
+  it("should orchestrate the new guideline flow correctly", async () => {
     const requestBody = { answers: validUserAnswers };
     const req = new NextRequest("http://localhost/api/assess", {
       method: "POST",
@@ -88,19 +72,19 @@ describe("POST /api/assess", () => {
     const response = await POST(req);
     const responseJson = await response.json();
 
-    // 1. Assert risk calculator was called with user answers
-    expect(mockedCalculateAllRisks).toHaveBeenCalledTimes(1);
-    expect(mockedCalculateAllRisks).toHaveBeenCalledWith(validUserAnswers, "en");
+    // 1. Assert guideline engine was called with user answers
+    expect(mockedGeneratePlan).toHaveBeenCalledTimes(1);
+    expect(mockedGeneratePlan).toHaveBeenCalledWith(validUserAnswers, "en");
 
-    // 2. Assert AI service was called with the result of the calculation
-    expect(mockAIService.getRiskAssessmentExplanation).toHaveBeenCalledTimes(1);
-    expect(mockAIService.getRiskAssessmentExplanation).toHaveBeenCalledWith(
-      mockCalculationResult,
+    // 2. Assert AI service was called with the result of the guideline engine
+    expect(mockAIService.getPlanExplanation).toHaveBeenCalledTimes(1);
+    expect(mockAIService.getPlanExplanation).toHaveBeenCalledWith(
+      mockGuidelineResult,
       undefined,
       "en",
     );
 
-    // 3. Assert the final response is the AI explanation
+    // 3. Assert the final response is the AI-generated ActionPlan
     expect(response.status).toBe(200);
     expect(responseJson).toEqual(mockAIExplanation);
 
@@ -122,13 +106,13 @@ describe("POST /api/assess", () => {
 
     expect(response.status).toBe(400);
     expect(responseJson.error).toBe("Invalid answers format");
-    expect(mockedCalculateAllRisks).not.toHaveBeenCalled();
-    expect(mockAIService.getRiskAssessmentExplanation).not.toHaveBeenCalled();
+    expect(mockedGeneratePlan).not.toHaveBeenCalled();
+    expect(mockAIService.getPlanExplanation).not.toHaveBeenCalled();
   });
 
   it("should return 502 if AI response validation fails", async () => {
     // Mock AI to return an invalid response
-    mockAIService.getRiskAssessmentExplanation.mockResolvedValueOnce({
+    mockAIService.getPlanExplanation.mockResolvedValueOnce({
       result: { bad: "data" }, // Invalid structure
       serviceUsed: "mock-ai",
     });
@@ -145,7 +129,7 @@ describe("POST /api/assess", () => {
 
     expect(response.status).toBe(502);
     expect(responseJson).toEqual({
-      error: "Failed to process assessment due to invalid AI response",
+      error: "Failed to process plan due to invalid AI response",
     });
 
     // Assert a validation error log was created

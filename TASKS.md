@@ -83,14 +83,14 @@
 #### **Phase 6: Testing & Validation**
 *(Goal: Update all tests to validate the new functionality and remove obsolete tests.)*
 
-*   `[ ]` **Delete `lib/services/risk-calculator.service.v2.test.ts`**.
-*   `[ ]` **Create `lib/services/guideline-engine.service.test.ts`:** Write new unit tests for the rules engine, ensuring it correctly generates action IDs based on sample user inputs.
-*   `[ ]` **[e2e/assessment.spec.ts]** Heavily refactor the E2E test.
+*   `[x]` **Delete `lib/services/risk-calculator.service.v2.test.ts`**.
+*   `[x]` **Create `lib/services/guideline-engine.service.test.ts`:** Write new unit tests for the rules engine, ensuring it correctly generates action IDs based on sample user inputs.
+*   `[x]` **[e2e/assessment.spec.ts]** Heavily refactor the E2E test.
     *   The test should no longer check for risk tabs or levels.
     *   It should check for the presence of the "Personalized Action Plan" title.
     *   It should check for specific screening recommendations based on the test data provided (e.g., assert that a colonoscopy recommendation appears for a 55-year-old user).
-*   `[ ]` **[e2e/features.spec.ts]** Review and update any tests that interact with the results page, particularly the PDF and Email export tests, to validate the new content.
-*   `[ ]` **[app/api/assess/route.test.ts]** Update the API route test to mock the new `guideline-engine.service` and validate the new orchestration flow.
+*   `[x]` **[e2e/features.spec.ts]** Review and update any tests that interact with the results page, particularly the PDF and Email export tests, to validate the new content.
+*   `[x]` **[app/api/assess/route.test.ts]** Update the API route test to mock the new `guideline-engine.service` and validate the new orchestration flow.
 
 #### **Phase 7: Documentation & Final Cleanup**
 *(Goal: Ensure all project documentation reflects the final state of the application and remove any dead code.)*

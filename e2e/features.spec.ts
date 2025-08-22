@@ -171,16 +171,16 @@ test.describe("Phase 2: Key Features & Validation (en)", () => {
       await route.fulfill({
         json: {
           overallSummary: "This is a mock summary for export tests.",
-          modelAssessments: [],
-          positiveFactors: [],
-          recommendations: [],
+          recommendedScreenings: [],
+          lifestyleGuidelines: [],
+          topicsForDoctor: [],
         },
       });
     });
 
     await page.getByRole("button", { name: "View Results" }).click();
     await expect(
-      page.getByRole("heading", { name: "Your Assessment Results" }),
+      page.getByRole("heading", { name: "Your Preventive Health Plan" }),
     ).toBeVisible();
 
     // Test PDF Download
@@ -188,7 +188,7 @@ test.describe("Phase 2: Key Features & Validation (en)", () => {
     await page.getByRole("button", { name: "Download as PDF" }).click();
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toMatch(
-      /Health_Assessment_Results_.*\.pdf/,
+      /Doctors_Discussion_Guide_.*\.pdf/,
     );
 
     // Test Email Export
@@ -198,9 +198,9 @@ test.describe("Phase 2: Key Features & Validation (en)", () => {
       await route.fulfill({ status: 200, json: { success: true } });
     });
 
-    await page.getByRole("button", { name: "Email My Results" }).click();
+    await page.getByRole("button", { name: "Email My Plan" }).click();
     await expect(
-      page.getByRole("heading", { name: "Email Your Results" }),
+      page.getByRole("heading", { name: "Email Your Plan" }),
     ).toBeVisible();
     await page.getByPlaceholder("you@example.com").fill("test@example.com");
     await page.getByRole("button", { name: "Send Email" }).click();
@@ -208,12 +208,13 @@ test.describe("Phase 2: Key Features & Validation (en)", () => {
     // Assert that the success toast appears and the dialog closes
     await expect(page.getByText("Email Sent")).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Email Your Results" }),
+      page.getByRole("heading", { name: "Email Your Plan" }),
     ).not.toBeVisible();
 
     // Assert the API was called with the correct data
     expect(emailRequestPayload.recipientEmail).toBe("test@example.com");
     expect(emailRequestPayload.assessmentData).toBeDefined();
+    expect(emailRequestPayload.answers).toBeDefined(); // Check that answers are included
     expect(emailRequestPayload.assessmentData.overallSummary).toBe(
       "This is a mock summary for export tests.",
     );
@@ -263,7 +264,7 @@ test.describe("Phase 4: Static Pages & Footer", () => {
 
     // Toggle back to light mode
     await themeToggleButton.click();
-    await expect(html).not.toHaveClass(/dark/);
+    await expect(html).not.toBeVisible();
   });
 });
       

@@ -57,9 +57,9 @@ test.describe("Phase 3: Internationalization (i18n)", () => {
       await route.fulfill({
         json: {
           overallSummary: "To jest testowe podsumowanie.",
-          modelAssessments: [],
-          positiveFactors: [],
-          recommendations: [],
+          recommendedScreenings: [],
+          lifestyleGuidelines: [],
+          topicsForDoctor: [],
         },
       });
     });
@@ -69,7 +69,7 @@ test.describe("Phase 3: Internationalization (i18n)", () => {
 
     // Verify on results page
     await expect(
-      page.getByRole("heading", { name: "Twoje Wyniki Oceny" }),
+      page.getByRole("heading", { name: "Twój Profilaktyczny Plan Zdrowia" }),
     ).toBeVisible();
 
     // Test PDF Download filename
@@ -77,7 +77,7 @@ test.describe("Phase 3: Internationalization (i18n)", () => {
     await page.getByRole("button", { name: "Pobierz jako PDF" }).click();
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toMatch(
-      /Wyniki_Oceny_Zdrowia_.*\.pdf/,
+      /Przewodnik_Do_Dyskusji_Z_Lekarzem_.*\.pdf/,
     );
   });
 

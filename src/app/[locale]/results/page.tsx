@@ -17,7 +17,6 @@ import { Mail, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useRouter } from "@/i18n/navigation";
 import { generateAssessmentPdf } from "@/lib/utils/pdf-generator";
-import type { ActionPlan } from "@/lib/types";
 import {
   Dialog,
   DialogContent,

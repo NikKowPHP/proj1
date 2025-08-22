@@ -41,7 +41,7 @@ const translations: Record<string, any> = {
   },
 };
 
-function generateAssessmentHtml(
+function generatePlanHtml(
   planData: ActionPlan,
   answers: Record<string, string>,
   locale: string,
@@ -123,9 +123,9 @@ function generateAssessmentHtml(
   `;
 }
 
-export async function sendAssessmentEmail(
+export async function sendPlanEmail(
   recipientEmail: string,
-  assessmentData: ActionPlan,
+  planData: ActionPlan,
   answers: Record<string, string>,
   locale: string,
 ) {
@@ -134,7 +134,7 @@ export async function sendAssessmentEmail(
   }
 
   const t = translations[locale] || translations.en;
-  const emailHtml = generateAssessmentHtml(assessmentData, answers, locale);
+  const emailHtml = generatePlanHtml(planData, answers, locale);
 
   try {
     await resend.emails.send({
@@ -144,7 +144,7 @@ export async function sendAssessmentEmail(
       html: emailHtml,
     });
   } catch (error) {
-    logger.error("Failed to send assessment email via Resend", { error });
+    logger.error("Failed to send plan email via Resend", { error });
     throw new Error("Failed to send email.");
   }
 }

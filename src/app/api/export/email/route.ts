@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
-import { sendAssessmentEmail } from "@/lib/services/email.service";
+import { sendPlanEmail } from "@/lib/services/email.service";
 import type { ActionPlan } from "@/lib/types";
 
 const recommendedScreeningSchema = z.object({
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     const { recipientEmail, assessmentData, answers, locale } = parsed.data;
 
-    await sendAssessmentEmail(
+    await sendPlanEmail(
       recipientEmail,
       assessmentData as ActionPlan,
       answers,
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     );
 
     // IMPORTANT: We do not log the recipient's email to maintain anonymity.
-    logger.info("Assessment email sent successfully.");
+    logger.info("Plan email sent successfully.");
 
     return NextResponse.json({ success: true });
   } catch (error) {

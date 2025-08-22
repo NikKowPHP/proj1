@@ -45,7 +45,7 @@ const translations: Record<string, any> = {
 const addSection = (
   doc: jsPDFWithAutoTable,
   title: string,
-  content: () => void,
+  content: (startY: number) => void,
   startY: number,
 ): number => {
   if (startY > 250) {
@@ -55,7 +55,7 @@ const addSection = (
   doc.setFontSize(14);
   doc.text(title, 14, startY);
   startY += 8;
-  content();
+  content(startY);
   return (doc.autoTable.previous?.finalY ?? startY) + 12;
 };
 
@@ -89,9 +89,9 @@ export const generateAssessmentPdf = (
 
   // --- Sections ---
   if (planData.recommendedScreenings.length > 0) {
-    startY = addSection(doc, t.recommendedScreenings, () => {
+    startY = addSection(doc, t.recommendedScreenings, (y) => {
       doc.autoTable({
-        startY,
+        startY: y,
         head: [t.screeningHead],
         body: planData.recommendedScreenings.map((s) => [s.title, s.why]),
         theme: "striped",
@@ -101,9 +101,9 @@ export const generateAssessmentPdf = (
   }
 
   if (planData.lifestyleGuidelines.length > 0) {
-    startY = addSection(doc, t.lifestyleGuidelines, () => {
+    startY = addSection(doc, t.lifestyleGuidelines, (y) => {
       doc.autoTable({
-        startY,
+        startY: y,
         head: [t.lifestyleHead],
         body: planData.lifestyleGuidelines.map((l) => [l.title, l.description]),
         theme: "striped",
@@ -113,9 +113,9 @@ export const generateAssessmentPdf = (
   }
   
   if (planData.topicsForDoctor.length > 0) {
-    startY = addSection(doc, t.topicsForDoctor, () => {
+    startY = addSection(doc, t.topicsForDoctor, (y) => {
       doc.autoTable({
-        startY,
+        startY: y,
         head: [t.topicsHead],
         body: planData.topicsForDoctor.map((topic) => [topic.title, topic.why]),
         theme: "striped",
@@ -125,9 +125,9 @@ export const generateAssessmentPdf = (
   }
 
   if (Object.keys(answers).length > 0) {
-    startY = addSection(doc, t.yourAnswers, () => {
+    startY = addSection(doc, t.yourAnswers, (y) => {
       doc.autoTable({
-        startY,
+        startY: y,
         head: [t.answersHead],
         body: Object.entries(answers).map(([key, value]) => [
           key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), 

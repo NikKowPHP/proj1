@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/lib/services/api-client.service";
 import { useToast } from "@/components/ui/use-toast";
+import { ActionPlan } from "@/lib/types";
 
 export const useRiskAssessment = () => {
   const { toast } = useToast();
@@ -9,7 +10,7 @@ export const useRiskAssessment = () => {
     mutationFn: (payload: {
       answers: Record<string, string>;
       locale: string;
-    }) => apiClient.assessment.assess(payload),
+    }): Promise<ActionPlan> => apiClient.assessment.assess(payload),
     onError: (error: any) => {
       toast({
         variant: "destructive",
@@ -22,3 +23,4 @@ export const useRiskAssessment = () => {
     },
   });
 };
+      

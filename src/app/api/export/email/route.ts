@@ -2,31 +2,35 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
 import { sendAssessmentEmail } from "@/lib/services/email.service";
-import type { AssessmentResult } from "@/lib/types";
+import type { ActionPlan } from "@/lib/types";
 
-const riskFactorSchema = z.object({
-  factor: z.string(),
-  riskLevel: z.enum(["Low", "Moderate", "High"]),
-  explanation: z.string(),
+// Matches the new ActionPlan structure
+const recommendedScreeningSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  why: z.string(),
 });
 
-const modelAssessmentSchema = z.object({
-  modelName: z.string(),
-  riskFactors: z.array(riskFactorSchema),
+const lifestyleGuidelineSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
 });
 
-const positiveFactorSchema = z.object({
-  factor: z.string(),
-  explanation: z.string(),
+const topicForDoctorSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  why: z.string(),
 });
 
 const emailExportSchema = z.object({
   recipientEmail: z.string().email(),
   assessmentData: z.object({
     overallSummary: z.string(),
-    modelAssessments: z.array(modelAssessmentSchema),
-    positiveFactors: z.array(positiveFactorSchema),
-    recommendations: z.array(z.string()),
+    recommendedScreenings: z.array(recommendedScreeningSchema),
+    lifestyleGuidelines: z.array(lifestyleGuidelineSchema),
+    topicsForDoctor: z.array(topicForDoctorSchema),
   }),
   locale: z.string().optional().default("en"),
 });
@@ -44,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     await sendAssessmentEmail(
       recipientEmail,
-      assessmentData as AssessmentResult,
+      assessmentData as ActionPlan,
       locale,
     );
 
@@ -60,3 +64,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+      

@@ -53,7 +53,7 @@ const aiResponseSchema = z.object({
 
 export async function POST(request: NextRequest) {
   const forwarded = request.headers.get("x-forwarded-for");
-  const ip = forwarded ? forwarded.split(/, /)[0] : "1227.0.0.1";
+  const ip = forwarded ? forwarded.split(/, /)[0] : "127.0.0.1";
   logger.info(`[API:assess] Request received from IP: ${ip}`);
 
   const limit = ipRateLimiter(ip);
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     logger.info(`[API:assess] Requesting AI explanation in locale: ${locale}`);
     const aiService = getAIService();
     const { result, serviceUsed } =
-      await aiService.getRiskAssessmentExplanation(guidelinePlan, undefined, locale); // This method will be renamed later
+      await aiService.getPlanExplanation(guidelinePlan, undefined, locale);
     logger.info(
       `[API:assess] AI explanation received from service: ${serviceUsed}.`,
     );

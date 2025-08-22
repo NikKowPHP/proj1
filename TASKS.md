@@ -45,29 +45,29 @@
 #### **Phase 3: AI Prompt & Integration Rework**
 *(Goal: Re-purpose the AI to be a "Compassionate Explainer" for the deterministically generated plan.)*
 
-*   `[ ]` **[lib/ai/prompts/multiRiskAssessment.prompt.ts]** Completely rewrite the prompt.
+*   `[x]` **[lib/ai/prompts/multiRiskAssessment.prompt.ts]** Completely rewrite the prompt.
     *   The new prompt will accept the structured plan from the `guideline-engine` as input.
     *   It will instruct the AI to generate the user-friendly explanatory text (`why it's important`, etc.) for each recommended action.
     *   It will explicitly forbid the AI from calculating risks or creating new recommendations.
     *   Rename the file to `preventivePlanExplainer.prompt.ts`.
-*   `[ ]` **[lib/ai/composite-ai.service.ts]** Update the service method.
+*   `[x]` **[lib/ai/composite-ai.service.ts]** Update the service method.
     *   Rename `getRiskAssessmentExplanation` to `getPlanExplanation`.
     *   Update its input parameter to accept the new plan object.
     *   Update it to call the new `preventivePlanExplainer.prompt.ts`.
-*   `[ ]` **[app/api/assess/route.ts]** Update the call from the old AI method to the new `getPlanExplanation` method.
+*   `[x]` **[app/api/assess/route.ts]** Update the call from the old AI method to the new `getPlanExplanation` method.
 
 #### **Phase 4: Frontend Results Page Reconstruction**
 *(Goal: Completely replace the "Risk Dashboard" with the new "Personalized Action Plan" UI.)*
 
-*   `[ ]` **[app/[locale]/results/page.tsx]** Begin major refactoring.
+*   `[x]` **[app/[locale]/results/page.tsx]** Begin major refactoring.
     *   Remove all UI elements related to the old risk dashboard (Tabs, risk level indicators, `ShieldCheck` icons for summary).
     *   Remove the logic for displaying `modelAssessments`.
-*   `[ ]` **Create `components/ActionPlanDisplay.tsx`:** Create a new parent component for the results.
-*   `[ ]` **Create `components/RecommendedScreenings.tsx`:** A component that takes an array of screening recommendations and displays them in clear, individual cards.
-*   `[ ]` **Create `components/LifestyleGuidelines.tsx`:** A component to display lifestyle advice.
-*   `[ ]` **Create `components/TopicsForDoctor.tsx`:** A component to list the suggested discussion points.
-*   `[ ]` **[app/[locale]/results/page.tsx]** Integrate these new components. The page will now fetch the `ActionPlan` and pass the relevant parts to each new component.
-*   `[ ]` **[lib/hooks/data/useRiskAssessment.ts]** Update the generic type for the `useMutation` to expect the new `ActionPlan` type instead of `AssessmentResult`.
+*   `[x]` **Create `components/ActionPlanDisplay.tsx`:** Create a new parent component for the results.
+*   `[x]` **Create `components/RecommendedScreenings.tsx`:** A component that takes an array of screening recommendations and displays them in clear, individual cards.
+*   `[x]` **Create `components/LifestyleGuidelines.tsx`:** A component to display lifestyle advice.
+*   `[x]` **Create `components/TopicsForDoctor.tsx`:** A component to list the suggested discussion points.
+*   `[x]` **[app/[locale]/results/page.tsx]** Integrate these new components. The page will now fetch the `ActionPlan` and pass the relevant parts to each new component.
+*   `[x]` **[lib/hooks/data/useRiskAssessment.ts]** Update the generic type for the `useMutation` to expect the new `ActionPlan` type instead of `AssessmentResult`.
 
 #### **Phase 5: Update Export Functionality**
 *(Goal: Ensure the PDF and Email exports are updated to reflect the new "Doctor's Discussion Guide" format.)*

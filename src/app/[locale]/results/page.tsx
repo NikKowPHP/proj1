@@ -13,18 +13,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Spinner from "@/components/ui/Spinner";
-import {
-  AlertTriangle,
-  Lightbulb,
-  CheckCircle,
-  Mail,
-  Download,
-  ShieldCheck,
-} from "lucide-react";
+import { Mail, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useRouter } from "@/i18n/navigation";
 import { generateAssessmentPdf } from "@/lib/utils/pdf-generator";
-import type { AssessmentResult } from "@/lib/types";
+import type { ActionPlan } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
@@ -38,14 +31,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEmailExport } from "@/lib/hooks/data/useEmailExport";
 import { useParams } from "next/navigation";
-import { cn } from "@/lib/utils";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { useTranslations } from "next-intl";
+import { ActionPlanDisplay } from "@/components/ActionPlanDisplay";
 
 const loadingMessagesKeys = [
   "loadingMessage1",
@@ -118,7 +105,7 @@ export default function ResultsPage() {
   
   const handleDownloadPdf = () => {
     if (assessment) {
-      generateAssessmentPdf(assessment, locale);
+      generateAssessmentPdf(assessment as any, locale); // Cast to any during transition
     }
   };
 
@@ -182,121 +169,7 @@ export default function ResultsPage() {
           <p className="text-muted-foreground mt-2">{t("resultsDescription")}</p>
         </div>
         
-        {assessment?.overallSummary && (
-          <Card className="bg-card">
-             <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-primary">
-                  <ShieldCheck className="h-5 w-5" />
-                  {t("overallSummary")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm">{assessment.overallSummary}</p>
-              </CardContent>
-          </Card>
-        )}
-
-        <Tabs defaultValue={assessment?.modelAssessments?.[0]?.modelName} className="w-full">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
-            {assessment?.modelAssessments.map((model) => (
-              <TabsTrigger key={model.modelName} value={model.modelName}>
-                {model.modelName}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          {assessment?.modelAssessments.map((model) => (
-            <TabsContent key={model.modelName} value={model.modelName} className="space-y-4 mt-4">
-              {model.riskFactors.map((factor, index) => {
-                const isSensitive = factor.factor.toLowerCase().includes('genetic') || factor.factor.toLowerCase().includes('history') || factor.factor.toLowerCase().includes('asbestos');
-                return (
-                  <Card 
-                    key={index} 
-                    className={cn(isSensitive && "border-2 border-amber-500")}
-                  >
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <AlertTriangle className="h-5 w-5 text-amber-500" />
-                        {factor.factor}
-                      </CardTitle>
-                      <CardDescription>
-                        {t("riskLevel", { level: factor.riskLevel })}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm">{factor.explanation}</p>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </TabsContent>
-          ))}
-        </Tabs>
-
-        {assessment?.positiveFactors && assessment.positiveFactors.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                {t("positiveFactors")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {assessment.positiveFactors.map((factor, index) => (
-                 <div key={index}>
-                    <p className="font-semibold">{factor.factor}</p>
-                    <p className="text-sm text-muted-foreground">{factor.explanation}</p>
-                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-primary" />
-              {t("recommendations")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-5 space-y-2 text-sm">
-              {assessment?.recommendations.map((rec, index) => (
-                <li key={index}>{rec}</li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {t("doctorStarters")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-5 space-y-2 text-sm">
-              <li>{t("doctorStarter1")}</li>
-              <li>{t("doctorStarter2")}</li>
-              <li>{t("doctorStarter3")}</li>
-              <li>{t("doctorStarter4")}</li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-               {t("resources")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-             <ul className="list-disc pl-5 space-y-2 text-sm">
-               <li><a href="https://www.cancer.gov" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">National Cancer Institute (NCI)</a></li>
-               <li><a href="https://www.cancer.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">American Cancer Society (ACS)</a></li>
-               <li><a href="https://www.heart.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">American Heart Association (AHA)</a></li>
-             </ul>
-          </CardContent>
-        </Card>
+        {assessment && <ActionPlanDisplay plan={assessment} />}
 
         <Card>
           <CardHeader>
@@ -352,3 +225,4 @@ export default function ResultsPage() {
     </div>
   );
 }
+      

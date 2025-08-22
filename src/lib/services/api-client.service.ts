@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { AssessmentResult } from "@/lib/types";
+import type { ActionPlan } from "@/lib/types";
 
 export const apiClient = {
   questionnaire: {
@@ -12,8 +12,8 @@ export const apiClient = {
     assess: async (payload: {
       answers: Record<string, string>;
       locale: string;
-    }): Promise<AssessmentResult> => {
-      const { data } = await axios.post<AssessmentResult>(
+    }): Promise<ActionPlan> => {
+      const { data } = await axios.post<ActionPlan>(
         "/api/assess",
         payload,
       );
@@ -23,10 +23,11 @@ export const apiClient = {
   export: {
     email: async (payload: {
       recipientEmail: string;
-      assessmentData: AssessmentResult;
+      assessmentData: ActionPlan;
     }) => {
       const { data } = await axios.post("/api/export/email", payload);
       return data;
     },
   },
 };
+      

@@ -3,8 +3,8 @@ import { GroqService } from "./groq-service";
 import { GeminiService } from "./gemini-service";
 import { executeWithFallbacks, ProviderConfig } from "./composite-executor";
 
-import { getMultiRiskAssessmentPrompt } from "./prompts/multiRiskAssessment.prompt";
-import type { MultiCalculationResult } from "@/lib/types";
+import { getPreventivePlanExplainerPrompt } from "./prompts/preventivePlanExplainer.prompt";
+import type { GuidelinePlan } from "@/lib/types";
 import { AIModel, TextAIProvider } from "./types";
 import { TutorChatMessage } from "../types";
 
@@ -50,12 +50,12 @@ export class CompositeAIService {
     ];
   }
 
-  async getRiskAssessmentExplanation(
-    calculationResult: MultiCalculationResult,
+  async getPlanExplanation(
+    guidelinePlan: GuidelinePlan,
     userId?: string,
     locale: string = "en",
   ) {
-    const prompt = getMultiRiskAssessmentPrompt(calculationResult, locale);
+    const prompt = getPreventivePlanExplainerPrompt(guidelinePlan, locale);
     const providerChain = this.getProviderChain("large");
     return executeWithFallbacks(
       providerChain,
@@ -64,3 +64,4 @@ export class CompositeAIService {
     );
   }
 }
+      

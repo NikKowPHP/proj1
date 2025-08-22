@@ -4,7 +4,7 @@ import { logger } from "@/lib/logger";
 import { getAIService } from "@/lib/ai";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-import { calculateAllRisks } from "@/lib/services/risk-calculator.service";
+import { generatePlan } from "@/lib/services/guideline-engine.service";
 
 const answersSchema = z
   .object({
@@ -23,33 +23,37 @@ const assessRequestSchema = z.object({
   locale: z.string().optional().default("en"),
 });
 
-// Zod schema for the AI response to ensure type safety
-const riskFactorSchema = z.object({
-  factor: z.string(),
-  riskLevel: z.enum(["Low", "Moderate", "High"]),
-  explanation: z.string(),
+// Zod schema for the AI response to ensure type safety. Matches `ActionPlan`.
+const recommendedScreeningSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  why: z.string(),
 });
 
-const modelAssessmentSchema = z.object({
-  modelName: z.string(),
-  riskFactors: z.array(riskFactorSchema),
+const lifestyleGuidelineSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
 });
 
-const positiveFactorSchema = z.object({
-  factor: z.string(),
-  explanation: z.string(),
+const topicForDoctorSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  why: z.string(),
 });
 
 const aiResponseSchema = z.object({
   overallSummary: z.string(),
-  modelAssessments: z.array(modelAssessmentSchema),
-  positiveFactors: z.array(positiveFactorSchema),
-  recommendations: z.array(z.string()),
+  recommendedScreenings: z.array(recommendedScreeningSchema),
+  lifestyleGuidelines: z.array(lifestyleGuidelineSchema),
+  topicsForDoctor: z.array(topicForDoctorSchema),
 });
+
 
 export async function POST(request: NextRequest) {
   const forwarded = request.headers.get("x-forwarded-for");
-  const ip = forwarded ? forwarded.split(/, /)[0] : "127.0.0.1";
+  const ip = forwarded ? forwarded.split(/, /)[0] : "1227.0.0.1";
   logger.info(`[API:assess] Request received from IP: ${ip}`);
 
   const limit = ipRateLimiter(ip);
@@ -98,21 +102,21 @@ export async function POST(request: NextRequest) {
 
     logger.info("[API:assess] Answers successfully parsed and validated.");
 
-    // 1. Run deterministic calculation across all models
-    logger.info(`[API:assess] Starting deterministic risk calculation for locale: ${locale}...`);
-    const calculationResult = calculateAllRisks(
+    // 1. Run deterministic guideline engine
+    logger.info(`[API:assess] Starting guideline engine for locale: ${locale}...`);
+    const guidelinePlan = generatePlan(
       validatedAnswers.data as Record<string, string>,
       locale,
     );
     logger.info(
-      `[API:assess] Deterministic risk calculation completed for models: ${calculationResult.modelResults.map((m) => m.modelId).join(", ")}`,
+      `[API:assess] Guideline engine completed. Found ${guidelinePlan.screenings.length} screenings, ${guidelinePlan.lifestyle.length} lifestyle tips, ${guidelinePlan.topicsForDoctor.length} topics.`,
     );
 
-    // 2. Get AI-powered explanation for the calculation
+    // 2. Get AI-powered explanation for the generated plan
     logger.info(`[API:assess] Requesting AI explanation in locale: ${locale}`);
     const aiService = getAIService();
     const { result, serviceUsed } =
-      await aiService.getRiskAssessmentExplanation(calculationResult, undefined, locale);
+      await aiService.getRiskAssessmentExplanation(guidelinePlan, undefined, locale); // This method will be renamed later
     logger.info(
       `[API:assess] AI explanation received from service: ${serviceUsed}.`,
     );
@@ -125,13 +129,13 @@ export async function POST(request: NextRequest) {
         error: validatedResult.error.flatten(),
         serviceUsed,
         aiResponse: result,
-        calculationResult, // Also log the deterministic result for debugging
+        guidelinePlan,
       });
       await prisma.assessmentLog.create({
         data: { status: "AI_VALIDATION_ERROR" },
       });
       return NextResponse.json(
-        { error: "Failed to process assessment due to invalid AI response" },
+        { error: "Failed to process plan due to invalid AI response" },
         { status: 502 },
       );
     }
@@ -156,7 +160,7 @@ export async function POST(request: NextRequest) {
       data: { status: "SERVER_ERROR" },
     });
     return NextResponse.json(
-      { error: "Failed to process assessment" },
+      { error: "Failed to process plan" },
       { status: 500 },
     );
   }

@@ -1,0 +1,49 @@
+{
+  "rules": [
+    {
+      "actionId": "COLORECTAL_CANCER_SCREENING",
+      "category": "screenings",
+      "conditions": [
+        { "questionId": "age", "operator": "in", "value": ["40-49", "50-59", "60+"] }
+      ]
+    },
+    {
+      "actionId": "LUNG_CANCER_SCREENING",
+      "category": "screenings",
+      "conditions": [
+        { "questionId": "age", "operator": "in", "value": ["50-59", "60+"] },
+        { "questionId": "smoking_status", "operator": "equals", "value": "Obecny palacz" }
+      ]
+    },
+    {
+      "actionId": "DISCUSS_SMOKING_CESSATION",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "smoking_status", "operator": "equals", "value": "Obecny palacz" }
+      ]
+    },
+    {
+      "actionId": "BLOOD_PRESSURE_CHECK",
+      "category": "screenings",
+      "conditions": [
+        { "questionId": "known_blood_pressure", "operator": "equals", "value": "Tak" },
+        { "questionId": "age", "operator": "in", "value": ["40-49", "50-59", "60+"] }
+      ]
+    },
+    {
+      "actionId": "DIABETES_SCREENING",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "has_diabetes", "operator": "equals", "value": "Tak" }
+      ]
+    },
+    {
+        "actionId": "DISCUSS_DIET_AND_EXERCISE",
+        "category": "lifestyle",
+        "conditions": [
+            { "questionId": "activity", "operator": "in", "value": ["0 dni", "1-2 dni"] }
+        ]
+    }
+  ]
+}
+      

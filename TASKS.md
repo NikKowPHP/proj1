@@ -24,21 +24,21 @@
 *(Goal: Replace the risk scoring system with a deterministic engine that generates a list of recommended actions based on established guidelines.)*
 
 *   **Configuration:**
-    *   `[ ]` **Create `preventive-plan-config.en.json`:** Design a new JSON structure for defining screening/guideline rules. Each rule should have conditions (e.g., `age >= 40`, `smoking_status: "Current smoker"`) and an associated action ID (e.g., `RECOMMEND_MAMMOGRAM`).
-    *   `[ ]` **Create `preventive-plan-config.pl.json`:** Create the Polish equivalent of the new config file.
-    *   `[ ]` **Delete `risk-model-config.en.json`:** Remove the old risk scoring configuration.
-    *   `[ ]` **Delete `risk-model-config.pl.json`:** Remove the old risk scoring configuration.
+    *   `[x]` **Create `preventive-plan-config.en.json`:** Design a new JSON structure for defining screening/guideline rules. Each rule should have conditions (e.g., `age >= 40`, `smoking_status: "Current smoker"`) and an associated action ID (e.g., `RECOMMEND_MAMMOGRAM`).
+    *   `[x]` **Create `preventive-plan-config.pl.json`:** Create the Polish equivalent of the new config file.
+    *   `[x]` **Delete `risk-model-config.en.json`:** Remove the old risk scoring configuration.
+    *   `[x]` **Delete `risk-model-config.pl.json`:** Remove the old risk scoring configuration.
 
 *   **Core Logic:**
-    *   `[ ]` **Create `lib/services/guideline-engine.service.ts`:** Create a new service that reads the `preventive-plan-config.json`, processes user answers against the rules, and outputs a structured list of action IDs (e.g., `{ screenings: ["COLONOSCOPY_AGE_50"], lifestyle: ["DISCUSS_DIET"] }`).
-    *   `[ ]` **Delete `lib/services/risk-calculator.service.ts`:** Remove the old service entirely.
-    *   `[ ]` **Update `api/assess/route.ts`:**
+    *   `[x]` **Create `lib/services/guideline-engine.service.ts`:** Create a new service that reads the `preventive-plan-config.json`, processes user answers against the rules, and outputs a structured list of action IDs (e.g., `{ screenings: ["COLONOSCOPY_AGE_50"], lifestyle: ["DISCUSS_DIET"] }`).
+    *   `[x]` **Delete `lib/services/risk-calculator.service.ts`:** Remove the old service entirely.
+    *   `[x]` **Update `api/assess/route.ts`:**
         *   Remove the call to `calculateAllRisks`.
         *   Add a call to the new `guidelineEngine.generatePlan()`.
         *   Update the Zod schema (`aiResponseSchema`) to validate the new expected AI output (the `ActionPlan`).
 
 *   **Types:**
-    *   `[ ]` **[lib/types/index.ts]** Overhaul the type definitions.
+    *   `[x]` **[lib/types/index.ts]** Overhaul the type definitions.
         *   Remove `AssessmentResult`, `RiskFactor`, `ModelAssessment`, `CalculatedRiskFactor`, etc.
         *   Create new types: `ActionPlan`, `RecommendedScreening`, `LifestyleGuideline`, `TopicForDoctor`, and the output type from the `guideline-engine.service.ts`.
 

@@ -93,7 +93,12 @@ export default function ResultsPage() {
     e.preventDefault();
     if (email && assessment) {
       emailExportMutation.mutate(
-        { recipientEmail: email, assessmentData: assessment, locale },
+        {
+          recipientEmail: email,
+          assessmentData: assessment,
+          answers,
+          locale,
+        },
         {
           onSuccess: () => {
             setIsEmailDialogOpen(false);
@@ -102,10 +107,10 @@ export default function ResultsPage() {
       );
     }
   };
-  
+
   const handleDownloadPdf = () => {
     if (assessment) {
-      generateAssessmentPdf(assessment as any, locale); // Cast to any during transition
+      generateAssessmentPdf(assessment, answers, locale);
     }
   };
 

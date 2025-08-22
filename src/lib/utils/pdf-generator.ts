@@ -1,9 +1,7 @@
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import type { AssessmentResult } from "../types";
+import type { ActionPlan } from "../types";
 
-// Extend jsPDF with autoTable, including its static `previous` property
-// which is used to get the y-position of the last drawn table.
 interface jsPDFWithAutoTable extends jsPDF {
   autoTable: {
     (options: any): jsPDF;
@@ -13,28 +11,59 @@ interface jsPDFWithAutoTable extends jsPDF {
 
 const translations: Record<string, any> = {
   en: {
-    title: "Your Anonymous Health Assessment Results",
-    disclaimer: "Disclaimer: This is for educational purposes only. Consult a healthcare provider.",
+    title: "Doctor's Discussion Guide",
+    disclaimer:
+      "This is a guide for discussion with a healthcare professional and is not medical advice.",
     overallSummary: "Overall Summary",
-    riskFactorsHead: ["Factor", "Risk Level", "Explanation"],
-    positiveFactors: "Positive Lifestyle Factors",
-    positiveFactorsHead: ["Factor", "Details"],
-    recommendations: "Recommendations",
-    filename: "Health_Assessment_Results",
+    recommendedScreenings: "Recommended Screenings",
+    screeningHead: ["Screening", "Reason"],
+    lifestyleGuidelines: "Lifestyle Guidelines",
+    lifestyleHead: ["Guideline", "Description"],
+    topicsForDoctor: "Topics For Your Doctor",
+    topicsHead: ["Topic", "Reason for Discussion"],
+    yourAnswers: "Your Provided Answers",
+    answersHead: ["Question", "Your Answer"],
+    filename: "Doctors_Discussion_Guide",
   },
   pl: {
-    title: "Twoje Wyniki Anonimowej Oceny Zdrowia",
-    disclaimer: "Zastrzeżenie: To jest tylko w celach edukacyjnych. Skonsultuj się z lekarzem.",
+    title: "Przewodnik do Dyskusji z Lekarzem",
+    disclaimer:
+      "To jest przewodnik do dyskusji z pracownikiem służby zdrowia i nie stanowi porady medycznej.",
     overallSummary: "Ogólne Podsumowanie",
-    riskFactorsHead: ["Czynnik", "Poziom Ryzyka", "Wyjaśnienie"],
-    positiveFactors: "Pozytywne Czynniki Stylu Życia",
-    positiveFactorsHead: ["Czynnik", "Szczegóły"],
-    recommendations: "Rekomendacje",
-    filename: "Wyniki_Oceny_Zdrowia",
-  }
-}
+    recommendedScreenings: "Zalecane Badania Przesiewowe",
+    screeningHead: ["Badanie", "Powód"],
+    lifestyleGuidelines: "Wskazówki Dotyczące Stylu Życia",
+    lifestyleHead: ["Wskazówka", "Opis"],
+    topicsForDoctor: "Tematy do Omówienia z Lekarzem",
+    topicsHead: ["Temat", "Powód do dyskusji"],
+    yourAnswers: "Twoje Udzielone Odpowiedzi",
+    answersHead: ["Pytanie", "Twoja Odpowiedź"],
+    filename: "Przewodnik_Do_Dyskusji_Z_Lekarzem",
+  },
+};
 
-export const generateAssessmentPdf = (assessmentData: AssessmentResult, locale: string = 'en') => {
+const addSection = (
+  doc: jsPDFWithAutoTable,
+  title: string,
+  content: () => void,
+  startY: number,
+): number => {
+  if (startY > 250) {
+    doc.addPage();
+    startY = 20;
+  }
+  doc.setFontSize(14);
+  doc.text(title, 14, startY);
+  startY += 8;
+  content();
+  return (doc.autoTable.previous?.finalY ?? startY) + 12;
+};
+
+export const generateAssessmentPdf = (
+  planData: ActionPlan,
+  answers: Record<string, string>,
+  locale: string = "en",
+) => {
   const t = translations[locale] || translations.en;
   const doc = new jsPDF() as jsPDFWithAutoTable;
 
@@ -45,71 +74,71 @@ export const generateAssessmentPdf = (assessmentData: AssessmentResult, locale: 
   doc.setTextColor(100);
   doc.text(t.disclaimer, 14, 30);
 
-  let startY = 40;
+  let startY = 45;
 
   // --- Overall Summary ---
-  if (assessmentData.overallSummary) {
-    doc.setFontSize(14);
+  if (planData.overallSummary) {
+    doc.setFontSize(12);
     doc.text(t.overallSummary, 14, startY);
-    startY += 8;
-    doc.setFontSize(11);
-    const summaryLines = doc.splitTextToSize(assessmentData.overallSummary, 180);
+    startY += 7;
+    doc.setFontSize(10);
+    const summaryLines = doc.splitTextToSize(planData.overallSummary, 180);
     doc.text(summaryLines, 14, startY);
     startY += summaryLines.length * 5 + 10;
   }
 
-  // --- Risk Factors per Model ---
-  assessmentData.modelAssessments.forEach((model) => {
-    if (model.riskFactors.length > 0) {
-      doc.setFontSize(16);
-      doc.text(model.modelName, 14, startY);
-      startY += 10;
-
+  // --- Sections ---
+  if (planData.recommendedScreenings.length > 0) {
+    startY = addSection(doc, t.recommendedScreenings, () => {
       doc.autoTable({
         startY,
-        head: [t.riskFactorsHead],
-        body: model.riskFactors.map((f) => [
-          f.factor,
-          f.riskLevel,
-          f.explanation,
-        ]),
+        head: [t.screeningHead],
+        body: planData.recommendedScreenings.map((s) => [s.title, s.why]),
         theme: "striped",
-        headStyles: { fillColor: [245, 158, 11] }, // Amber color for risks
+        headStyles: { fillColor: [22, 163, 74] },
       });
-      startY = doc.autoTable.previous!.finalY + 15;
-    }
-  });
-
-
-  // --- Positive Factors ---
-  if (assessmentData.positiveFactors.length > 0) {
-    doc.setFontSize(14);
-    doc.text(t.positiveFactors, 14, startY);
-    startY += 8;
-
-    doc.autoTable({
-      startY,
-      head: [t.positiveFactorsHead],
-      body: assessmentData.positiveFactors.map((f) => [f.factor, f.explanation]),
-      theme: "striped",
-      headStyles: { fillColor: [34, 197, 94] }, // Green color for positives
-    });
-    startY = doc.autoTable.previous!.finalY + 10;
+    }, startY);
   }
 
-  // --- Recommendations ---
-  if (assessmentData.recommendations.length > 0) {
-    doc.setFontSize(14);
-    doc.text(t.recommendations, 14, startY);
-    startY += 8;
-
-    const recommendationsText = assessmentData.recommendations
-      .map((rec) => `- ${rec}`)
-      .join("\n");
-    doc.setFontSize(11);
-    doc.text(recommendationsText, 14, startY, { maxWidth: 180 });
+  if (planData.lifestyleGuidelines.length > 0) {
+    startY = addSection(doc, t.lifestyleGuidelines, () => {
+      doc.autoTable({
+        startY,
+        head: [t.lifestyleHead],
+        body: planData.lifestyleGuidelines.map((l) => [l.title, l.description]),
+        theme: "striped",
+        headStyles: { fillColor: [37, 99, 235] },
+      });
+    }, startY);
+  }
+  
+  if (planData.topicsForDoctor.length > 0) {
+    startY = addSection(doc, t.topicsForDoctor, () => {
+      doc.autoTable({
+        startY,
+        head: [t.topicsHead],
+        body: planData.topicsForDoctor.map((topic) => [topic.title, topic.why]),
+        theme: "striped",
+        headStyles: { fillColor: [245, 158, 11] },
+      });
+    }, startY);
   }
 
-  doc.save(`${t.filename}_${new Date().toLocaleDateString()}.pdf`);
+  if (Object.keys(answers).length > 0) {
+    startY = addSection(doc, t.yourAnswers, () => {
+      doc.autoTable({
+        startY,
+        head: [t.answersHead],
+        body: Object.entries(answers).map(([key, value]) => [
+          key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), 
+          value
+        ]),
+        theme: "grid",
+        headStyles: { fillColor: [100, 116, 139] },
+      });
+    }, startY);
+  }
+
+  doc.save(`${t.filename}_${new Date().toLocaleDateString().replace(/\//g, "-")}.pdf`);
 };
       

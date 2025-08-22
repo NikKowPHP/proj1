@@ -4,7 +4,6 @@ import { logger } from "@/lib/logger";
 import { sendAssessmentEmail } from "@/lib/services/email.service";
 import type { ActionPlan } from "@/lib/types";
 
-// Matches the new ActionPlan structure
 const recommendedScreeningSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -32,6 +31,7 @@ const emailExportSchema = z.object({
     lifestyleGuidelines: z.array(lifestyleGuidelineSchema),
     topicsForDoctor: z.array(topicForDoctorSchema),
   }),
+  answers: z.record(z.string()),
   locale: z.string().optional().default("en"),
 });
 
@@ -44,11 +44,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: parsed.error }, { status: 400 });
     }
 
-    const { recipientEmail, assessmentData, locale } = parsed.data;
+    const { recipientEmail, assessmentData, answers, locale } = parsed.data;
 
     await sendAssessmentEmail(
       recipientEmail,
       assessmentData as ActionPlan,
+      answers,
       locale,
     );
 

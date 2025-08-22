@@ -24,6 +24,7 @@ export const apiClient = {
     email: async (payload: {
       recipientEmail: string;
       assessmentData: ActionPlan;
+      answers: Record<string, string>;
     }) => {
       const { data } = await axios.post("/api/export/email", payload);
       return data;

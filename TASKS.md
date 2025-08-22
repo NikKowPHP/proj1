@@ -72,13 +72,13 @@
 #### **Phase 5: Update Export Functionality**
 *(Goal: Ensure the PDF and Email exports are updated to reflect the new "Doctor's Discussion Guide" format.)*
 
-*   `[ ]` **[lib/utils/pdf-generator.ts]** Rewrite the PDF generation logic.
+*   `[x]` **[lib/utils/pdf-generator.ts]** Rewrite the PDF generation logic.
     *   Change the title to "Doctor's Discussion Guide."
     *   Instead of `autoTable` for risk factors, create sections for "Recommended Screenings," "Lifestyle Guidelines," and "Topics for My Doctor."
     *   Include a section that lists the user's provided answers for context.
-*   `[ ]` **[lib/services/email.service.ts]** Rewrite the `generateAssessmentHtml` function.
+*   `[x]` **[lib/services/email.service.ts]** Rewrite the `generateAssessmentHtml` function.
     *   Update the email template to match the new "Doctor's Discussion Guide" format.
-*   `[ ]` **[app/api/export/email/route.ts]** Update the Zod validation schema to expect the new `ActionPlan` data structure in the request body.
+*   `[x]` **[app/api/export/email/route.ts]** Update the Zod validation schema to expect the new `ActionPlan` data structure in the request body.
 
 #### **Phase 6: Testing & Validation**
 *(Goal: Update all tests to validate the new functionality and remove obsolete tests.)*

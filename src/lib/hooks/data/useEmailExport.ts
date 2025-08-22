@@ -6,6 +6,7 @@ import type { ActionPlan } from "@/lib/types";
 interface EmailExportPayload {
   recipientEmail: string;
   assessmentData: ActionPlan;
+  answers: Record<string, string>;
   locale: string;
 }
 
@@ -13,7 +14,7 @@ export const useEmailExport = () => {
   const { toast } = useToast();
   return useMutation({
     mutationFn: (payload: EmailExportPayload) =>
-      apiClient.export.email(payload as any), // Cast to any to handle type transition
+      apiClient.export.email(payload),
     onSuccess: () => {
       toast({
         title: "Email Sent",

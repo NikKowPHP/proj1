@@ -98,4 +98,15 @@ body {
     scroll-padding-top: 80px;
   }
 }
+
+/* Custom overrides for ONKONO design */
+
+/* Force sharp corners on the assessment progress bar */
+[data-slot="assessment-progress"] {
+  border-radius: 0 !important;
+}
+
+[data-slot="assessment-progress"] > div {
+  border-radius: 0 !important;
+}
       

@@ -1,7 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTranslations } from "next-intl";
-import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function AppFooter() {
   const t = useTranslations("AppFooter");
@@ -17,7 +16,6 @@ export function AppFooter() {
           <Link href="/terms" className="hover:text-foreground transition-colors">
             {t("termsOfService")}
           </Link>
-          <LanguageSwitcher />
           <ThemeToggle />
         </div>
       </div>

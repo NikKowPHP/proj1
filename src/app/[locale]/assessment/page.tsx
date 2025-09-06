@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAssessmentStore } from "@/lib/stores/assessment.store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { AlertTriangle, ChevronUp, ChevronDown } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -24,8 +25,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface Question {
   id: string;
@@ -65,6 +66,7 @@ export default function AssessmentPage() {
 
   const [isClient, setIsClient] = useState(false);
   const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -201,35 +203,61 @@ export default function AssessmentPage() {
   );
 
   return (
-    <div className="grid md:grid-cols-2 min-h-screen bg-background text-foreground">
-      {/* Left Column: Branding and Disclaimer */}
-      <div className="hidden md:flex flex-col bg-secondary p-12 text-foreground">
-        <div className="my-auto">
-          <h1 className="text-3xl font-bold text-primary mb-4">ONKONO</h1>
-          <p className="text-xl text-muted-foreground mb-12">
-            Your personalized guide to proactive cancer screening.
+    <div className="grid md:grid-cols-2 min-h-screen bg-white">
+      {/* Left Column */}
+      <div className="hidden md:flex flex-col justify-between p-12 text-black relative">
+        <div>
+          <h1 className="text-3xl font-bold text-red-600 mb-4">ONKONO</h1>
+          <p className="text-lg text-gray-700 mb-12">
+            Easy questions to answer about your health.
           </p>
-          <div className="border-l-4 border-primary pl-6 space-y-4">
-            <h2 className="text-lg font-semibold">Important Disclaimer</h2>
-            <p className="text-sm text-muted-foreground">
-              This tool provides information for educational purposes only and is
-              not a substitute for professional medical advice, diagnosis, or
-              treatment.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              <strong>Always consult with a qualified healthcare provider</strong>{" "}
-              regarding any medical concerns or before making any decisions
-              related to your health.
-            </p>
-          </div>
         </div>
-        <div className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} ONKONO. All rights reserved.
+
+        <div className="absolute bottom-12 left-12 right-12">
+          <div className="space-y-4">
+            <div
+              className="flex items-start gap-4 cursor-pointer"
+              onClick={() => setIsDisclaimerOpen(!isDisclaimerOpen)}
+            >
+              {isDisclaimerOpen ? (
+                <ChevronDown className="h-5 w-5 text-red-600 flex-shrink-0" />
+              ) : (
+                <ChevronUp className="h-5 w-5 text-red-600 flex-shrink-0" />
+              )}
+              <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0" />
+              <div>
+                <h2 className="text-lg font-semibold">Important Disclaimer</h2>
+                <p className="text-sm text-gray-600 mt-2">
+                  This tool provides information for educational purposes only
+                  and is not a substitute for professional medical advice,
+                  diagnosis, or treatment.
+                </p>
+                <p className="text-sm text-gray-600 mt-2">
+                  <strong className="text-red-600">
+                    Always consult with a qualified healthcare provider
+                  </strong>{" "}
+                  regarding any medical concerns or before making any decisions
+                  related to your health.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {isDisclaimerOpen && (
+            <div className="mt-6 text-sm text-gray-500 flex flex-col items-start gap-2 pl-12">
+              <a href="/terms" className="hover:underline">
+                Terms and conditions
+              </a>
+              <a href="/about" className="hover:underline">
+                About Onkono
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Right Column: Assessment Form */}
-      <main className="w-full flex flex-col items-center justify-center p-4 md:p-8">
+      <main className="w-full flex flex-col items-center justify-center p-4 md:p-8 bg-black text-white relative">
         <Dialog open={showResumeDialog} onOpenChange={setShowResumeDialog}>
           <DialogContent
             showCloseButton={false}
@@ -254,38 +282,53 @@ export default function AssessmentPage() {
         </Dialog>
 
         <div className="w-full max-w-md space-y-8">
-          <header>
-            <Progress value={progressPercentage} className="mb-4" />
-            <h1 className="text-3xl font-bold">{stepData?.title}</h1>
-            <p className="text-muted-foreground mt-2">
+          {/* Header section with Language Switcher */}
+          <div className="flex justify-center w-full">
+            <LanguageSwitcher />
+          </div>
+          <div>
+            <Progress
+              value={progressPercentage}
+              className="mb-4 h-3 bg-gray-700"
+              indicatorClassName="bg-[#FF3B30]"
+            />
+            <h1 className="text-2xl font-bold">{stepData?.title}</h1>
+            <p className="text-gray-400 mt-2">
               {t("step", {
                 currentStep: currentStep + 1,
                 totalSteps: totalSteps,
               })}
-              {stepData?.description && (
-                <span className="block mt-2">{stepData.description}</span>
-              )}
             </p>
-          </header>
+          </div>
 
           <section className="space-y-6">
+            {" "}
+            {/* Enforces consistent vertical rhythm */}
             {currentStep === 0 && hasHeightOrWeight && (
               <div className="space-y-2">
                 <Label>{t("units")}</Label>
-                <Tabs
-                  value={units}
-                  onValueChange={(value) =>
-                    setUnits(value as "metric" | "imperial")
-                  }
-                  className="w-full"
-                >
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="metric">{t("unitsMetric")}</TabsTrigger>
-                    <TabsTrigger value="imperial">
-                      {t("unitsImperial")}
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                <div className="flex w-full border border-gray-700 rounded-none p-1">
+                  <button
+                    onClick={() => setUnits("metric")}
+                    className={`flex-1 p-2 text-sm rounded-none transition-colors ${
+                      units === "metric"
+                        ? "bg-white text-black"
+                        : "bg-transparent text-white"
+                    }`}
+                  >
+                    {t("unitsMetric")}
+                  </button>
+                  <button
+                    onClick={() => setUnits("imperial")}
+                    className={`flex-1 p-2 text-sm rounded-none transition-colors ${
+                      units === "imperial"
+                        ? "bg-white text-black"
+                        : "bg-transparent text-white"
+                    }`}
+                  >
+                    {t("unitsImperial")}
+                  </button>
+                </div>
               </div>
             )}
             {visibleQuestions.map((question) => (
@@ -296,8 +339,14 @@ export default function AssessmentPage() {
                     onValueChange={(value) => setAnswer(question.id, value)}
                     value={answers[question.id] || ""}
                   >
-                    <SelectTrigger id={question.id}>
-                      <SelectValue placeholder={t("selectOption")} />
+                    <SelectTrigger
+                      id={question.id}
+                      className="rounded-none bg-[#3A3A3C] border-gray-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-red-600"
+                    >
+                      <SelectValue
+                        placeholder={t("selectOption")}
+                        className="placeholder:text-gray-500"
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {question.options?.map((option) => (
@@ -325,12 +374,16 @@ export default function AssessmentPage() {
                       }
                       value={answers[question.id] || ""}
                       onChange={(e) =>
-                        handleInputChange(question.id, e.target.value, question.type)
+                        handleInputChange(
+                          question.id,
+                          e.target.value,
+                          question.type,
+                        )
                       }
                       aria-invalid={!!localErrors[question.id]}
-                      className={
+                      className={`rounded-none bg-[#3A3A3C] border-gray-700 placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-red-600 ${
                         localErrors[question.id] ? "border-destructive" : ""
-                      }
+                      }`}
                     />
                     {localErrors[question.id] && (
                       <p className="text-sm text-destructive">
@@ -342,19 +395,21 @@ export default function AssessmentPage() {
               </div>
             ))}
           </section>
-          
           <footer className="flex justify-between">
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={prevStep}
               disabled={currentStep === 0}
+              className="rounded-none border border-gray-600 hover:bg-gray-800"
             >
               {t("back")}
             </Button>
-            <Button onClick={handleNext} disabled={!isStepComplete()}>
-              {currentStep === totalSteps - 1
-                ? t("viewResults")
-                : t("next")}
+            <Button
+              onClick={handleNext}
+              disabled={!isStepComplete()}
+              className="rounded-none bg-[#FF3B30] hover:bg-red-700 disabled:bg-gray-700 disabled:opacity-100 disabled:text-gray-500"
+            >
+              {currentStep === totalSteps - 1 ? t("viewResults") : t("next")}
             </Button>
           </footer>
         </div>

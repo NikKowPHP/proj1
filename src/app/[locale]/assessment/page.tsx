@@ -216,7 +216,7 @@ export default function AssessmentPage() {
       <div className="hidden md:flex flex-col justify-between p-12 text-black relative">
         <div>
           <h1 className="text-3xl font-bold text-red-600 mb-4">ONKONO</h1>
-          <p className="text-lg text-gray-700 mb-12">
+          <p className=" text-red-600 mb-12">
             Easy questions to answer about your health.
           </p>
         </div>
@@ -227,7 +227,7 @@ export default function AssessmentPage() {
               className="flex items-start gap-4 cursor-pointer transition-all duration-200 "
               onClick={() => setIsDisclaimerOpen(!isDisclaimerOpen)}
             >
-              <ChevronUp className={`h-5 w-5 text-red-600 flex-shrink-0 transition-transform duration-300 ${isDisclaimerOpen ? 'rotate-180' : 'rotate-0'}`} />
+              <ChevronUp className={`h-14 w-13 text-red-600 flex-shrink-0 transition-transform duration-300 ${isDisclaimerOpen ? 'rotate-180' : 'rotate-0'}`} />
               <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0 transition-transform duration-300" />
               <div className="transition-all duration-300">
                 <h2 className="text-lg font-semibold transition-colors duration-200 hover:text-red-700">Important Disclaimer</h2>
@@ -415,7 +415,7 @@ export default function AssessmentPage() {
             <Button
               onClick={handleNext}
               disabled={!isStepComplete()}
-              className="rounded-none bg-[#FF3B30] hover:bg-red-700 disabled:bg-gray-700 disabled:opacity-100 disabled:text-gray-500"
+              className="rounded-none bg-[#FF3B30] hover:bg-red-700 disabled:bg-[#f75a51] disabled:opacity-100 disabled:text-gray-200"
             >
               {currentStep === totalSteps - 1 ? t("viewResults") : t("next")}
             </Button>

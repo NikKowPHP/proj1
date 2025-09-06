@@ -23,10 +23,10 @@ const buttonVariants = cva(
           "border border-white/20 bg-black/10 text-foreground backdrop-blur-lg hover:bg-black/20 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20",
       },
       size: {
-        default: "h-11 px-4 rounded-full md:h-9 md:rounded-lg",
-        sm: "h-9 rounded-full px-3 md:h-8 md:rounded-md gap-1.5",
-        lg: "h-12 rounded-full px-6 md:h-10 md:rounded-md",
-        icon: "size-11 rounded-full md:size-9 md:rounded-lg",
+        default: "h-11 px-4  md:h-9 ",
+        sm: "h-9  px-3 md:h-8  gap-1.5",
+        lg: "h-12  px-6 md:h-10 ",
+        icon: "size-11  md:size-9 ",
       },
     },
     defaultVariants: {

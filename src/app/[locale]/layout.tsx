@@ -85,7 +85,7 @@ export default async function RootLayout({
           <Providers>
             <div className="flex flex-col min-h-screen">
               <main className="flex-1">{children}</main>
-              <AppFooter />
+              {/* <AppFooter /> */}
               <Toaster />
             </div>
           </Providers>

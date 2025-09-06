@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
@@ -68,10 +69,17 @@ export default function AssessmentPage() {
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handleDisclaimerToggle = () => {
+    setIsAnimating(true);
+    setIsDisclaimerOpen(!isDisclaimerOpen);
+    setTimeout(() => setIsAnimating(false), 300);
+  };
 
   useEffect(() => {
     if (isClient && Object.keys(useAssessmentStore.getState().answers).length > 0) {
@@ -216,23 +224,19 @@ export default function AssessmentPage() {
         <div className="absolute bottom-12 left-12 right-12">
           <div className="space-y-4">
             <div
-              className="flex items-start gap-4 cursor-pointer"
+              className="flex items-start gap-4 cursor-pointer transition-all duration-200 "
               onClick={() => setIsDisclaimerOpen(!isDisclaimerOpen)}
             >
-              {isDisclaimerOpen ? (
-                <ChevronDown className="h-5 w-5 text-red-600 flex-shrink-0" />
-              ) : (
-                <ChevronUp className="h-5 w-5 text-red-600 flex-shrink-0" />
-              )}
-              <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0" />
-              <div>
-                <h2 className="text-lg font-semibold">Important Disclaimer</h2>
-                <p className="text-xs text-gray-600 mt-2">
+              <ChevronUp className={`h-5 w-5 text-red-600 flex-shrink-0 transition-transform duration-300 ${isDisclaimerOpen ? 'rotate-180' : 'rotate-0'}`} />
+              <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0 transition-transform duration-300" />
+              <div className="transition-all duration-300">
+                <h2 className="text-lg font-semibold transition-colors duration-200 hover:text-red-700">Important Disclaimer</h2>
+                <p className="text-xs text-gray-600 mt-2 transition-all duration-300">
                   This tool provides information for educational purposes only
                   and is not a substitute for professional medical advice,
                   diagnosis, or treatment.
                 </p>
-                <p className="text-xs text-gray-600 mt-2">
+                <p className="text-xs text-gray-600 mt-2 transition-all duration-300">
                   <strong className="text-red-600">
                     Always consult with a qualified healthcare provider
                   </strong>{" "}
@@ -244,13 +248,17 @@ export default function AssessmentPage() {
           </div>
 
           {isDisclaimerOpen && (
-            <div className="mt-6 text-xs text-gray-500 flex items-center justify-around  flex-wrap  gap-2 pl-12">
-              <a href="/terms" className="hover:underline">
+            <div
+              className={`mt-6 text-xs text-gray-500 flex items-center justify-around  flex-wrap  gap-2 pl-12 transition-all duration-300 ease-in-out ${
+                isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
+              }`}
+            >
+              <Link href="/terms" className="hover:underline transition-colors duration-200 hover:text-red-600">
                 Terms and conditions
-              </a>
-              <a href="/about" className="hover:underline">
+              </Link>
+              <Link href="/about" className="hover:underline transition-colors duration-200 hover:text-red-600">
                 About Onkono
-              </a>
+              </Link>
             </div>
           )}
         </div>

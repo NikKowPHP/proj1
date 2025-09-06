@@ -227,12 +227,12 @@ export default function AssessmentPage() {
               <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0" />
               <div>
                 <h2 className="text-lg font-semibold">Important Disclaimer</h2>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-xs text-gray-600 mt-2">
                   This tool provides information for educational purposes only
                   and is not a substitute for professional medical advice,
                   diagnosis, or treatment.
                 </p>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-xs text-gray-600 mt-2">
                   <strong className="text-red-600">
                     Always consult with a qualified healthcare provider
                   </strong>{" "}
@@ -244,7 +244,7 @@ export default function AssessmentPage() {
           </div>
 
           {isDisclaimerOpen && (
-            <div className="mt-6 text-sm text-gray-500 flex flex-col items-start gap-2 pl-12">
+            <div className="mt-6 text-xs text-gray-500 flex items-center justify-around  flex-wrap  gap-2 pl-12">
               <a href="/terms" className="hover:underline">
                 Terms and conditions
               </a>

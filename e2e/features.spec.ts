@@ -36,7 +36,7 @@ test.describe("Phase 2: Key Features & Validation (en)", () => {
 
     // Go back and check if data from step 1 is preserved
     await page.getByRole("button", { name: "Back" }).click();
-    await expect(page.getByRole("button", { name: "Female" })).toBeVisible();
+    await expect(page.getByRole("combobox", { name: "Female" })).toBeVisible();
     await expect(page.getByLabel("Height")).toHaveValue("165");
   });
 
@@ -222,7 +222,7 @@ test.describe("Phase 2: Key Features & Validation (en)", () => {
 });
 
 test.describe("Phase 4: Static Pages & Footer", () => {
-  test("should handle footer navigation and theme toggling", async ({
+  test("should handle footer navigation, language switching, and theme toggling", async ({
     page,
   }) => {
     await page.goto("/en");
@@ -242,7 +242,16 @@ test.describe("Phase 4: Static Pages & Footer", () => {
     await expect(
       page.getByRole("heading", { name: "Terms of Service" }),
     ).toBeVisible();
+    
+    // Test Language Switcher
+    await page.getByRole("link", { name: "PL" }).click();
+    await expect(page).toHaveURL("/pl/terms");
+    await expect(page.getByRole("heading", { name: "Warunki Korzystania z Usługi"})).toBeVisible();
+    await page.getByRole("link", { name: "EN" }).click();
+    await expect(page).toHaveURL("/en/terms");
+    
     await page.goBack();
+
 
     // Test Theme Toggle
     const html = page.locator("html");
@@ -250,7 +259,7 @@ test.describe("Phase 4: Static Pages & Footer", () => {
       name: "Toggle theme",
     });
 
-    // Check initial state (assuming light mode)
+    // Check initial state (assuming light mode in test runner)
     await expect(html).not.toHaveClass(/dark/);
 
     // Toggle to dark mode
@@ -264,7 +273,7 @@ test.describe("Phase 4: Static Pages & Footer", () => {
 
     // Toggle back to light mode
     await themeToggleButton.click();
-    await expect(html).not.toBeVisible();
+    await expect(html).not.toHaveClass(/dark/);
   });
 });
       

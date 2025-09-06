@@ -1,104 +1,77 @@
-### **Project: "Proactive Health Planner" - Implementation Plan** ONKONO
+### Implementation Plan: Comprehensive UI/UX Redesign for ONKONO
 
-#### **Phase 1: Foundational Reframing & Content Update**
-*(Goal: Update all user-facing text and documentation to reflect the new "preventive plan" mission. This is primarily content changes.)*
+This plan outlines the steps to redesign the existing "Proactive Health Planner" application, refactoring the UI/UX to precisely match the provided screenshot, including a new two-column layout, dark theme with red accents, and updated branding across the entire application.
 
-*   **Project Naming & Messaging:**
-    *   `[x]` **[messages/en.json]** Update `HomePage.title` to "Proactive Health Planner" or similar.
-    *   `[x]` **[messages/en.json]** Update `HomePage.description` to focus on building a "preventive care roadmap."
-    *   `[x]` **[messages/en.json]** Update `HomePage.ctaButton` to "Build My Preventive Plan."
-    *   `[x]` **[messages/pl.json]** Apply the same content updates for the Polish translations.
-    *   `[x]` **[package.json]** Update the `name` and `description` fields.
-    *   `[x]` **[next.config.ts]** Update any metadata related to the site title/description.
-    *   `[x]` **[public/manifest.json]** Update `name` and `short_name`.
+#### Phase 1: Global Theming, Branding, and Layout
+*(Goal: Establish the new visual identity and apply it consistently across the application.)*
 
-*   **Questionnaire Framing:**
-    *   `[x]` **[lib/assessment-questions.en.json]** Revise `title` and `description` for each step to frame it as gathering information for a plan, not assessing risk.
-    *   `[x]` **[lib/assessment-questions.pl.json]** Apply the same framing revisions for Polish questions.
+-   [x] **1.1. Update Global Theme**
+    -   [x] Open `src/app/globals.css`.
+    -   [x] In the `:root` and `.dark` selectors, replace the existing color palette.
+        -   [x] Set `--background` to a near-black color (e.g., `hsl(0 0% 8%)`).
+        -   [x] Set `--foreground` to a light gray/white (e.g., `hsl(0 0% 98%)`).
+        -   [x] Set `--card` and `--popover` to a slightly lighter dark shade (e.g., `hsl(0 0% 12%)`).
+        -   [x] Set `--primary` and `--ring` to a vibrant red to match the screenshot's accent (e.g., `hsl(0 84% 60%)`).
+        -   [x] Set `--destructive` to the same red, as it serves the same purpose in this design.
+        -   [x] Adjust `--input`, `--border`, `--secondary`, and `--muted` to use subtle dark grays that work with the new theme (e.g., `hsl(0 0% 15%)`).
 
-*   **Static Pages & Footer:**
-    *   `[x]` **[messages/en.json]** Review and update `PrivacyPage` and `TermsPage` content to ensure it aligns with the new mission (e.g., explicitly state no risk scores are calculated).
-    *   `[x]` **[messages/pl.json]** Apply the same review and updates for Polish static pages.
+-   [x] **1.2. Update Branding Assets and Metadata**
+    -   [x] **ASSUMPTION:** A new logo file `onkono.svg` and a new set of favicons will be provided.
+    -   [x] Replace the contents of the `public/favicon/` directory with the new ONKONO icons.
+    -   [x] Replace `public/next.svg` and `public/vercel.svg` with the `onkono.svg` file or delete if unused.
+    -   [x] Open `src/app/[locale]/layout.tsx` and update the `metadata` object's `title` and `description` to "ONKONO" and its new tagline.
+    -   [x] Update `public/manifest.json` and `public/site.webmanifest` with the new branding.
 
-#### **Phase 2: Backend Logic Overhaul (The Rules Engine)**
-*(Goal: Replace the risk scoring system with a deterministic engine that generates a list of recommended actions based on established guidelines.)*
+-   [x] **1.3. Restructure Core Layouts**
+    -   [x] Open `src/app/[locale]/page.tsx` (Home Page) and update the layout and branding to match the new "ONKONO" identity, removing the old "Proactive Health Planner" hero section.
+    -   [x] Open `src/app/[locale]/assessment/page.tsx`.
+        -   [x] Implement the two-column CSS Grid layout: `<div className="grid md:grid-cols-2 min-h-screen">`.
+        -   [x] Create the left column with the ONKONO logo, tagline, and the important disclaimer section (styling it with the new red accent color).
+        -   [x] Move the assessment form into the right column.
+    -   [x] Open `src/components/AppFooter.tsx` and replace the copyright text with "ONKONO".
+    -   [x] Open `src/components/LanguageSwitcher.tsx` and refactor it from a `Select` dropdown to a simple `PL | EN` text-based switcher using `Link` components to match the screenshot.
 
-*   **Configuration:**
-    *   `[x]` **Create `preventive-plan-config.en.json`:** Design a new JSON structure for defining screening/guideline rules. Each rule should have conditions (e.g., `age >= 40`, `smoking_status: "Current smoker"`) and an associated action ID (e.g., `RECOMMEND_MAMMOGRAM`).
-    *   `[x]` **Create `preventive-plan-config.pl.json`:** Create the Polish equivalent of the new config file.
-    *   `[x]` **Delete `risk-model-config.en.json`:** Remove the old risk scoring configuration.
-    *   `[x]` **Delete `risk-model-config.pl.json`:** Remove the old risk scoring configuration.
+#### Phase 2: Refactor UI Components for the New Design System
+*(Goal: Update shared components to reflect the new aesthetic, ensuring consistency and reusability.)*
 
-*   **Core Logic:**
-    *   `[x]` **Create `lib/services/guideline-engine.service.ts`:** Create a new service that reads the `preventive-plan-config.json`, processes user answers against the rules, and outputs a structured list of action IDs (e.g., `{ screenings: ["COLONOSCOPY_AGE_50"], lifestyle: ["DISCUSS_DIET"] }`).
-    *   `[x]` **Delete `lib/services/risk-calculator.service.ts`:** Remove the old service entirely.
-    *   `[x]` **Update `api/assess/route.ts`:**
-        *   Remove the call to `calculateAllRisks`.
-        *   Add a call to the new `guidelineEngine.generatePlan()`.
-        *   Update the Zod schema (`aiResponseSchema`) to validate the new expected AI output (the `ActionPlan`).
+-   [x] **2.1. Update `shadcn/ui` Component Styles**
+    -   [x] **Button:** Open `src/components/ui/button.tsx`. Modify the `default` variant to use the new red primary color.
+    -   [x] **Input:** Open `src/components/ui/input.tsx`. Modify the base styles to match the screenshot's dark, borderless look.
+    -   [x] **Select:** Open `src/components/ui/select.tsx`. Update `SelectTrigger` styles to match the borderless, dark aesthetic.
+    -   [x] **Tabs:** Open `src/components/ui/tabs.tsx`. Update `TabsList` and `TabsTrigger` to create the full-width, segmented control style seen in the screenshot for the "Units" selection.
+    -   [x] **Card:** Open `src/components/ui/card.tsx`. Ensure the default card styles align with the new dark theme for use on other pages like the results page.
 
-*   **Types:**
-    *   `[x]` **[lib/types/index.ts]** Overhaul the type definitions.
-        *   Remove `AssessmentResult`, `RiskFactor`, `ModelAssessment`, `CalculatedRiskFactor`, etc.
-        *   Create new types: `ActionPlan`, `RecommendedScreening`, `LifestyleGuideline`, `TopicForDoctor`, and the output type from the `guideline-engine.service.ts`.
+-   [x] **2.2. Rebuild the Assessment Form**
+    -   [x] Open `src/app/[locale]/assessment/page.tsx`.
+    -   [x] Remove the main `Card` wrapper from the form.
+    -   [x] Replace `CardHeader`, `CardContent`, and `CardFooter` with semantic `div`s.
+    -   [x] The form components (`Input`, `Select`, `Button`, `Tabs`) should now inherit the new styles from the updated UI components, requiring minimal override classes.
 
-#### **Phase 3: AI Prompt & Integration Rework**
-*(Goal: Re-purpose the AI to be a "Compassionate Explainer" for the deterministically generated plan.)*
+#### Phase 3: Update and Harmonize All Pages
+*(Goal: Ensure every page in the application is visually consistent with the new brand identity.)*
 
-*   `[x]` **[lib/ai/prompts/multiRiskAssessment.prompt.ts]** Completely rewrite the prompt.
-    *   The new prompt will accept the structured plan from the `guideline-engine` as input.
-    *   It will instruct the AI to generate the user-friendly explanatory text (`why it's important`, etc.) for each recommended action.
-    *   It will explicitly forbid the AI from calculating risks or creating new recommendations.
-    *   Rename the file to `preventivePlanExplainer.prompt.ts`.
-*   `[x]` **[lib/ai/composite-ai.service.ts]** Update the service method.
-    *   Rename `getRiskAssessmentExplanation` to `getPlanExplanation`.
-    *   Update its input parameter to accept the new plan object.
-    *   Update it to call the new `preventivePlanExplainer.prompt.ts`.
-*   `[x]` **[app/api/assess/route.ts]** Update the call from the old AI method to the new `getPlanExplanation` method.
+-   [x] **3.1. Redesign Results Page**
+    -   [x] Open `src/app/[locale]/results/page.tsx`.
+    -   [x] Refactor the page to use the new themed components (`Card`, `Button`, etc.) so its appearance matches the new dark, red-accented theme.
+    -   [x] Ensure the `ActionPlanDisplay.tsx` and its child components (`RecommendedScreenings.tsx`, etc.) render correctly with the new styles.
 
-#### **Phase 4: Frontend Results Page Reconstruction**
-*(Goal: Completely replace the "Risk Dashboard" with the new "Personalized Action Plan" UI.)*
+-   [x] **3.2. Redesign Static Pages**
+    -   [x] Open `src/app/[locale]/privacy/page.tsx` and `src/app/[locale]/terms/page.tsx`.
+    -   [x] Ensure the prose styles and the "Back to Home" button are updated automatically by the global theme changes. Manually adjust any styles that are not inheriting correctly.
 
-*   `[x]` **[app/[locale]/results/page.tsx]** Begin major refactoring.
-    *   Remove all UI elements related to the old risk dashboard (Tabs, risk level indicators, `ShieldCheck` icons for summary).
-    *   Remove the logic for displaying `modelAssessments`.
-*   `[x]` **Create `components/ActionPlanDisplay.tsx`:** Create a new parent component for the results.
-*   `[x]` **Create `components/RecommendedScreenings.tsx`:** A component that takes an array of screening recommendations and displays them in clear, individual cards.
-*   `[x]` **Create `components/LifestyleGuidelines.tsx`:** A component to display lifestyle advice.
-*   `[x]` **Create `components/TopicsForDoctor.tsx`:** A component to list the suggested discussion points.
-*   `[x]` **[app/[locale]/results/page.tsx]** Integrate these new components. The page will now fetch the `ActionPlan` and pass the relevant parts to each new component.
-*   `[x]` **[lib/hooks/data/useRiskAssessment.ts]** Update the generic type for the `useMutation` to expect the new `ActionPlan` type instead of `AssessmentResult`.
+#### Phase 4: Testing and Validation
+*(Goal: Verify that the redesigned application is fully functional and visually correct.)*
 
-#### **Phase 5: Update Export Functionality**
-*(Goal: Ensure the PDF and Email exports are updated to reflect the new "Doctor's Discussion Guide" format.)*
+-   [x] **4.1. Update End-to-End Tests**
+    -   [x] Open `e2e/assessment.spec.ts`.
+        -   [x] Update selectors to account for the removal of the `Card` component structure.
+        -   [x] Add an assertion to verify the "ONKONO" logo is visible on the assessment page.
+    -   [x] Open `e2e/features.spec.ts`.
+        -   [x] Review the footer navigation test. Update the language switcher part of the test to click on text links instead of a select dropdown.
+        -   [x] Ensure the theme toggle test still passes.
 
-*   `[x]` **[lib/utils/pdf-generator.ts]** Rewrite the PDF generation logic.
-    *   Change the title to "Doctor's Discussion Guide."
-    *   Instead of `autoTable` for risk factors, create sections for "Recommended Screenings," "Lifestyle Guidelines," and "Topics for My Doctor."
-    *   Include a section that lists the user's provided answers for context.
-*   `[x]` **[lib/services/email.service.ts]** Rewrite the `generateAssessmentHtml` function.
-    *   Update the email template to match the new "Doctor's Discussion Guide" format.
-*   `[x]` **[app/api/export/email/route.ts]** Update the Zod validation schema to expect the new `ActionPlan` data structure in the request body.
-
-#### **Phase 6: Testing & Validation**
-*(Goal: Update all tests to validate the new functionality and remove obsolete tests.)*
-
-*   `[x]` **Delete `lib/services/risk-calculator.service.v2.test.ts`**.
-*   `[x]` **Create `lib/services/guideline-engine.service.test.ts`:** Write new unit tests for the rules engine, ensuring it correctly generates action IDs based on sample user inputs.
-*   `[x]` **[e2e/assessment.spec.ts]** Heavily refactor the E2E test.
-    *   The test should no longer check for risk tabs or levels.
-    *   It should check for the presence of the "Personalized Action Plan" title.
-*   `[x]` **[e2e/features.spec.ts]** Review and update any tests that interact with the results page, particularly the PDF and Email export tests, to validate the new content.
-*   `[x]` **[app/api/assess/route.test.ts]** Update the API route test to mock the new `guideline-engine.service` and validate the new orchestration flow.
-
-#### **Phase 7: Documentation & Final Cleanup**
-*(Goal: Ensure all project documentation reflects the final state of the application and remove any dead code.)*
-
-*   `[x]` **[docs/app_description.md]** Rewrite the technical description to match the new architecture (rules engine + AI explainer).
-*   `[x]` **[docs/description.md]** Rewrite the product vision document.
-*   `[x]` **[.env.example]** Review and remove any environment variables that are no longer needed.
-*   `[x]` **Code Pruning:** Manually search the codebase for any remaining types, components, or utility functions related to "risk," "score," or "assessment" that are no longer used and delete them.
-
----
-This atomic plan provides a clear, step-by-step path to fully implement the revised vision, ensuring all parts of the existing codebase are correctly updated, repurposed, or replaced.
+-   [x] **4.2. Manual Cross-Browser and Responsive Testing**
+    -   [x] Perform a full walkthrough of the user journey (Home -> Assessment -> Results) on Chrome, Firefox, and Safari.
+    -   [x] Test on both desktop and mobile viewports, paying close attention to the two-column layout collapsing correctly on mobile.
+    -   [x] Verify that all interactive elements (buttons, inputs, language switcher) are styled correctly and are fully functional.
       

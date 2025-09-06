@@ -3,15 +3,13 @@ import { test, expect } from "@playwright/test";
 test("should redirect from / to /en/", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL("/en");
-  await expect(
-    page.getByRole("heading", { name: "Proactive Health Planner" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "ONKONO" })).toBeVisible();
 });
 
 const translations = {
   en: {
-    homeTitle: "Proactive Health Planner",
-    startCta: "Build My Preventive Plan",
+    homeTitle: "ONKONO",
+    startCta: "Start My Assessment",
     resumeDialogTitle: "Resume Session?",
     step1: {
       title: "Building Your Profile",
@@ -19,6 +17,7 @@ const translations = {
       sex: "Male",
     },
     step2: {
+      title: "Lifestyle Habits",
       smoking: "Current smoker",
       duration: "More than 20 years",
       alcohol: "8-14",
@@ -35,8 +34,8 @@ const translations = {
     },
   },
   pl: {
-    homeTitle: "Proaktywny Planer Zdrowia",
-    startCta: "Zbuduj Mój Plan Profilaktyczny",
+    homeTitle: "ONKONO",
+    startCta: "Rozpocznij Moją Ocenę",
     resumeDialogTitle: "Wznowić sesję?",
     step1: {
       title: "Tworzenie Twojego Profilu",
@@ -44,6 +43,7 @@ const translations = {
       sex: "Mężczyzna",
     },
     step2: {
+      title: "Nawyki Stylu Życia",
       smoking: "Obecny palacz",
       duration: "Ponad 20 lat",
       alcohol: "8-14",
@@ -79,23 +79,26 @@ for (const locale of locales) {
       // 2. Start the assessment
       await page.getByRole("button", { name: t.startCta }).click();
       await expect(page).toHaveURL(`/${locale}/assessment`);
+      await expect(page.getByRole("heading", { name: "ONKONO" })).toBeVisible();
 
       // 3. Complete the multi-step questionnaire
       // Step 1
-      await page.getByText("Select an option").first().click();
+      await expect(page.getByRole("heading", { name: t.step1.title })).toBeVisible();
+      await page.getByRole("combobox").nth(0).click();
       await page.getByRole("option", { name: t.step1.age }).click();
-      await page.getByText("Select an option").first().click();
+      await page.getByRole("combobox").nth(1).click();
       await page.getByRole("option", { name: t.step1.sex }).click();
       await page.getByLabel("Height").fill("178");
       await page.getByLabel("Weight").fill("95");
       await page.getByRole("button", { name: "Next" }).click();
 
       // Step 2
-      await page.getByText("Select an option").first().click();
+      await expect(page.getByRole("heading", { name: t.step2.title })).toBeVisible();
+      await page.getByRole("combobox").nth(0).click();
       await page.getByRole("option", { name: t.step2.smoking }).click();
-      await page.getByText("Select an option").first().click();
+      await page.getByRole("combobox").nth(1).click(); // Conditional question
       await page.getByRole("option", { name: t.step2.duration }).click();
-      await page.getByText("Select an option").first().click();
+      await page.getByRole("combobox").nth(2).click();
       await page.getByRole("option", { name: t.step2.alcohol }).click();
       await page.getByRole("button", { name: "Next" }).click();
 
@@ -108,14 +111,10 @@ for (const locale of locales) {
       await page.getByRole("button", { name: "Next" }).click();
       
       // Step 4
-      await page.getByText("Select an option").first().click();
+      await page.getByRole("combobox").nth(0).click();
       await page.getByRole("option", { name: t.step4.pressure }).click();
-      const selectsStep4 = await page.getByRole("combobox").all();
-      for (const select of selectsStep4) {
-        if(await select.isDisabled()) continue;
-        await select.click();
-        await page.getByRole("option").first().click();
-      }
+      await page.getByRole("combobox").nth(1).click();
+      await page.getByRole("option").first().click();
       await page.getByRole("button", { name: "Next" }).click();
 
       // Step 5 & 6
@@ -182,4 +181,3 @@ for (const locale of locales) {
     });
   });
 }
-      

@@ -1,14 +1,14 @@
 {
   "HomePage": {
-    "title": "Proaktywny Planer Zdrowia",
-    "description": "Odpowiedz na kilka prostych pytań, aby stworzyć spersonalizowany plan opieki profilaktycznej w oparciu o Twój styl życia i profil zdrowotny.",
-    "ctaButton": "Zbuduj Mój Plan Profilaktyczny",
+    "title": "ONKONO",
+    "description": "Twój spersonalizowany przewodnik po proaktywnych badaniach przesiewowych w kierunku raka. Odpowiedz na kilka pytań, aby stworzyć poufny, praktyczny plan.",
+    "ctaButton": "Rozpocznij Moją Ocenę",
     "disclaimerTitle": "Ważne Zastrzeżenie",
     "disclaimerContent1": "To narzędzie dostarcza informacji wyłącznie w celach edukacyjnych i nie zastępuje profesjonalnej porady medycznej, diagnozy ani leczenia. Ocena opiera się na danych statystycznych i nie może uwzględniać indywidualnych uwarunkowań zdrowotnych.",
     "disclaimerContent2": "<strong>Zawsze konsultuj się z wykwalifikowanym pracownikiem służby zdrowia</strong> w sprawie wszelkich problemów medycznych lub przed podjęciem jakichkolwiek decyzji związanych ze zdrowiem. Nie przechowujemy żadnych danych osobowych."
   },
   "AppFooter": {
-    "copyright": "© {year} Proaktywny Planer Zdrowia. Wszelkie prawa zastrzeżone.",
+    "copyright": "© {year} ONKONO. Wszelkie prawa zastrzeżone.",
     "privacyPolicy": "Polityka Prywatności",
     "termsOfService": "Warunki Korzystania z Usługi"
   },

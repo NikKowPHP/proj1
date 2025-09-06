@@ -1,7 +1,7 @@
 {
-  "name": "Proactive Health Planner",
-  "short_name": "Health Planner",
-  "description": "An AI-powered tool to build a personalized preventive health plan.",
+  "name": "ONKONO",
+  "short_name": "ONKONO",
+  "description": "Your personalized guide to proactive cancer screening.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",

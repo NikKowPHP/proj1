@@ -21,8 +21,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Proactive Health Planner",
-  description: "An AI-powered tool to build a personalized preventive health plan.",
+  title: "ONKONO",
+  description: "Your personalized guide to proactive cancer screening.",
   manifest: "/manifest.json",
   icons: {
     icon: [

@@ -1,4 +1,3 @@
-
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -8,11 +7,7 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card"
       className={cn(
-        // Mobile-first: simple list item style
-        "bg-card text-card-foreground flex flex-col rounded-lg",
-        // Desktop: adds border and shadow, with glassmorphism
-        "md:rounded-xl md:border md:shadow-sm md:bg-card/80 md:backdrop-blur-lg",
-        "dark:md:bg-card/70",
+        "bg-card text-card-foreground flex flex-col rounded-xl border",
         className,
       )}
       {...props}
@@ -98,3 +93,4 @@ export {
   CardDescription,
   CardContent,
 };
+      

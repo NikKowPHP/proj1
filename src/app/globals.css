@@ -4,68 +4,53 @@
 @custom-variant dark (&:is(.dark *));
 
 /* 
-  Calm & Reassuring Design System
-  - Colors are based on soft teals, blues, and grays.
-  - Radius is larger for a softer feel.
+  ONKONO Design System
+  - Dark theme with red accents
 */
 
 :root {
-  /* Base */
-  --radius: 0.875rem; /* 14px */
-  --background: 210 20% 98%;      /* Light Cool Gray */
-  --foreground: 215 25% 25%;      /* Dark Slate Blue */
-
-  /* Components */
-  --card: 0 0% 100%;
-  --card-foreground: 215 25% 25%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 215 25% 25%;
-
-  /* Actions & Accents */
-  --primary: 173.5 60.1% 39.4%;  /* Soft Teal */
-  --primary-foreground: 0 0% 100%;
-  --secondary: 210 20% 94%;      /* Lighter Slate */
-  --secondary-foreground: 215 25% 25%;
-  --muted: 210 20% 94%;
-  --muted-foreground: 215 15% 55%;
-  --accent: 210 20% 94%;
-  --accent-foreground: 215 25% 25%;
-  --destructive: 0 72.2% 50.6%; /* Muted Red */
-
-  /* Borders & Rings */
-  --border: 215 25% 25% / 0.1;
-  --input: 215 25% 25% / 0.08;
-  --ring: 173.5 60.1% 39.4%;
-  --interactive-underline: 215 25% 25% / 0.1;
+  --radius: 0.875rem;
+  --background: 0 0% 8%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 12%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 12%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 84% 60%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 60%;
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 84% 60%;
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --ring: 0 84% 60%;
+  --interactive-underline: 0 0% 15%;
 }
 
 .dark {
-  /* Base */
-  --background: 220 18% 11%;     /* Dark Slate */
-  --foreground: 210 20% 96%;      /* Light Cool Gray */
-
-  /* Components */
-  --card: 220 18% 15%;
-  --card-foreground: 210 20% 96%;
-  --popover: 220 18% 15%;
-  --popover-foreground: 210 20% 96%;
-
-  /* Actions & Accents */
-  --primary: 173.5 50.1% 49.4%;  /* Brighter Teal for Dark Mode */
-  --primary-foreground: 215 25% 15%;
-  --secondary: 220 18% 20%;      
-  --secondary-foreground: 210 20% 96%;
-  --muted: 220 18% 20%;
-  --muted-foreground: 215 10% 65%;
-  --accent: 220 18% 20%;
-  --accent-foreground: 210 20% 96%;
-  --destructive: 0 62.8% 50.6%;  /* Softer Red for Dark Mode */
-
-  /* Borders & Rings */
-  --border: 210 20% 96% / 0.15;
-  --input: 210 20% 96% / 0.1;
-  --ring: 173.5 50.1% 49.4%;
-  --interactive-underline: 210 20% 96% / 0.15;
+  --background: 0 0% 8%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 12%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 12%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 84% 60%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 60%;
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 84% 60%;
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --ring: 0 84% 60%;
+  --interactive-underline: 0 0% 15%;
 }
 
 @theme inline {
@@ -113,3 +98,4 @@ body {
     scroll-padding-top: 80px;
   }
 }
+      

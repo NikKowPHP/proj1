@@ -166,7 +166,7 @@ export default function ResultsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-secondary/30 py-12 px-4">
+    <div className="min-h-screen bg-background py-12 px-4">
       <div className="container mx-auto max-w-3xl space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold">{t("resultsTitle")}</h1>

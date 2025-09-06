@@ -1,14 +1,14 @@
 {
   "HomePage": {
-    "title": "Proactive Health Planner",
-    "description": "Answer a few simple questions to build a personalized preventive care roadmap based on your lifestyle and health profile.",
-    "ctaButton": "Build My Preventive Plan",
+    "title": "ONKONO",
+    "description": "Your personalized guide to proactive cancer screening. Answer a few questions to build a confidential, actionable plan.",
+    "ctaButton": "Start My Assessment",
     "disclaimerTitle": "Important Disclaimer",
     "disclaimerContent1": "This tool provides information for educational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment. The assessment is based on statistical data and cannot account for individual health conditions.",
     "disclaimerContent2": "<strong>Always consult with a qualified healthcare provider</strong> regarding any medical concerns or before making any decisions related to your health. We do not store any personally identifiable information."
   },
   "AppFooter": {
-    "copyright": "© {year} Proactive Health Planner. All rights reserved.",
+    "copyright": "© {year} ONKONO. All rights reserved.",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service"
   },

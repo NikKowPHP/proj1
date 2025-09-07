@@ -50,6 +50,25 @@ const aiResponseSchema = z.object({
   topicsForDoctor: z.array(topicForDoctorSchema),
 });
 
+/**
+ * A helper function to safely log assessment status to the database.
+ * It catches errors during the DB operation and logs them to the console
+ * without crashing the main API route.
+ * @param status - The status to log (e.g., "SUCCESS", "SERVER_ERROR").
+ */
+async function logAssessmentStatus(status: string) {
+  try {
+    await prisma.assessmentLog.create({ data: { status } });
+  } catch (error) {
+    logger.error(`[API:assess] Failed to log status '${status}' to database.`, {
+      error:
+        error instanceof Error
+          ? { message: error.message, stack: error.stack }
+          : String(error),
+    });
+    // We don't rethrow, as a logging failure should not fail the main request.
+  }
+}
 
 export async function POST(request: NextRequest) {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -131,9 +150,7 @@ export async function POST(request: NextRequest) {
         aiResponse: result,
         guidelinePlan,
       });
-      await prisma.assessmentLog.create({
-        data: { status: "AI_VALIDATION_ERROR" },
-      });
+      await logAssessmentStatus("AI_VALIDATION_ERROR");
       return NextResponse.json(
         { error: "Failed to process plan due to invalid AI response" },
         { status: 502 },
@@ -142,9 +159,7 @@ export async function POST(request: NextRequest) {
     logger.info("[API:assess] AI response validated successfully.");
 
     logger.info("[API:assess] Creating success log in database...");
-    await prisma.assessmentLog.create({
-      data: { status: "SUCCESS" },
-    });
+    await logAssessmentStatus("SUCCESS");
     logger.info("[API:assess] Success log created.");
 
     logger.info("[API:assess] Sending successful response to client.");
@@ -156,9 +171,7 @@ export async function POST(request: NextRequest) {
           ? { message: error.message, stack: error.stack }
           : String(error),
     });
-    await prisma.assessmentLog.create({
-      data: { status: "SERVER_ERROR" },
-    });
+    await logAssessmentStatus("SERVER_ERROR");
     return NextResponse.json(
       { error: "Failed to process plan" },
       { status: 500 },

@@ -28,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import Image from "next/image";
 
 interface Question {
   id: string;
@@ -214,8 +215,8 @@ export default function AssessmentPage() {
     <div className="grid md:grid-cols-2 min-h-screen bg-white">
       {/* Left Column */}
       <div className="hidden md:flex flex-col justify-between p-12 text-black relative">
-        <div>
-          <h1 className="text-3xl font-bold text-red-600 mb-4">ONKONO</h1>
+        <div className="flex flex-col  gap-2.5">
+          <Image src="/onkono-logo.png" alt="" width={200} height={100}  />
           <p className=" text-red-600 mb-12">
             Easy questions to answer about your health.
           </p>

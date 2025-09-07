@@ -1,6 +1,12 @@
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import type { ActionPlan } from "../types";
+import { onkonoLogoBase64 } from "../assets/onkono-logo-base64";
+
+// --- Task 2: Prepare and Embed Logo Asset ---
+// NOTE: Replace this placeholder with the actual Base64 encoded logo from /onkono-logo.png
+const LOGO_BASE64 = onkonoLogoBase64;
+
 
 interface jsPDFWithAutoTable extends jsPDF {
   autoTable: {
@@ -9,6 +15,13 @@ interface jsPDFWithAutoTable extends jsPDF {
   };
 }
 
+// --- Task 1: Define Brand Color Constants ---
+const THEME = {
+  BRAND_COLOR: "#FF3B30",
+  TEXT_COLOR: "#333333",
+  HEADER_TEXT_COLOR: "#FFFFFF",
+};
+
 const translations: Record<string, any> = {
   en: {
     title: "Doctor's Discussion Guide",
@@ -16,13 +29,9 @@ const translations: Record<string, any> = {
       "This is a guide for discussion with a healthcare professional and is not medical advice.",
     overallSummary: "Overall Summary",
     recommendedScreenings: "Recommended Screenings",
-    screeningHead: ["Screening", "Reason"],
     lifestyleGuidelines: "Lifestyle Guidelines",
-    lifestyleHead: ["Guideline", "Description"],
     topicsForDoctor: "Topics For Your Doctor",
-    topicsHead: ["Topic", "Reason for Discussion"],
     yourAnswers: "Your Provided Answers",
-    answersHead: ["Question", "Your Answer"],
     filename: "Doctors_Discussion_Guide",
   },
   pl: {
@@ -31,33 +40,30 @@ const translations: Record<string, any> = {
       "To jest przewodnik do dyskusji z pracownikiem służby zdrowia i nie stanowi porady medycznej.",
     overallSummary: "Ogólne Podsumowanie",
     recommendedScreenings: "Zalecane Badania Przesiewowe",
-    screeningHead: ["Badanie", "Powód"],
     lifestyleGuidelines: "Wskazówki Dotyczące Stylu Życia",
-    lifestyleHead: ["Wskazówka", "Opis"],
     topicsForDoctor: "Tematy do Omówienia z Lekarzem",
-    topicsHead: ["Temat", "Powód do dyskusji"],
     yourAnswers: "Twoje Udzielone Odpowiedzi",
-    answersHead: ["Pytanie", "Twoja Odpowiedź"],
     filename: "Przewodnik_Do_Dyskusji_Z_Lekarzem",
   },
 };
 
-const addSection = (
-  doc: jsPDFWithAutoTable,
-  title: string,
-  content: (startY: number) => void,
-  startY: number,
-): number => {
-  if (startY > 250) {
-    doc.addPage();
-    startY = 20;
-  }
-  doc.setFontSize(14);
-  doc.text(title, 14, startY);
-  startY += 8;
-  content(startY);
-  return (doc.autoTable.previous?.finalY ?? startY) + 12;
+// --- Task 5: Create a Custom `drawSectionHeader` Function ---
+const drawSectionHeader = (doc: jsPDFWithAutoTable, title: string, startY: number): number => {
+  const headerHeight = 10;
+  const padding = 14;
+
+  doc.setFillColor(THEME.BRAND_COLOR);
+  doc.rect(padding, startY, doc.internal.pageSize.getWidth() - (padding * 2), headerHeight, "F");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(THEME.HEADER_TEXT_COLOR);
+  doc.text(title, padding + 3, startY + headerHeight / 2 + 2);
+
+  // Return the Y position for the content below the header
+  return startY + headerHeight + 4;
 };
+
 
 export const generateAssessmentPdf = (
   planData: ActionPlan,
@@ -66,79 +72,136 @@ export const generateAssessmentPdf = (
 ) => {
   const t = translations[locale] || translations.en;
   const doc = new jsPDF() as jsPDFWithAutoTable;
+  const pageMargin = 14;
+
+  // --- Task 4: Standardize Document Font ---
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(THEME.TEXT_COLOR);
+
+  // --- Task 3: Implement Logo Rendering ---
+  doc.addImage(LOGO_BASE64, "PNG", pageMargin, 15, 60, 10);
 
   // --- Header ---
   doc.setFontSize(18);
-  doc.text(t.title, 14, 22);
-  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text(t.title, pageMargin, 40);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
   doc.setTextColor(100);
-  doc.text(t.disclaimer, 14, 30);
+  doc.text(t.disclaimer, pageMargin, 48);
 
-  let startY = 45;
+  let startY = 60;
 
   // --- Overall Summary ---
   if (planData.overallSummary) {
-    doc.setFontSize(12);
-    doc.text(t.overallSummary, 14, startY);
-    startY += 7;
-    doc.setFontSize(10);
-    const summaryLines = doc.splitTextToSize(planData.overallSummary, 180);
-    doc.text(summaryLines, 14, startY);
+    doc.setFontSize(11);
+    const summaryLines = doc.splitTextToSize(planData.overallSummary, doc.internal.pageSize.getWidth() - (pageMargin * 2));
+    doc.text(summaryLines, pageMargin, startY);
     startY += summaryLines.length * 5 + 10;
   }
-
-  // --- Sections ---
-  if (planData.recommendedScreenings.length > 0) {
-    startY = addSection(doc, t.recommendedScreenings, (y) => {
-      doc.autoTable({
-        startY: y,
-        head: [t.screeningHead],
-        body: planData.recommendedScreenings.map((s) => [s.title, s.why]),
-        theme: "striped",
-        headStyles: { fillColor: [22, 163, 74] },
-      });
-    }, startY);
-  }
-
-  if (planData.lifestyleGuidelines.length > 0) {
-    startY = addSection(doc, t.lifestyleGuidelines, (y) => {
-      doc.autoTable({
-        startY: y,
-        head: [t.lifestyleHead],
-        body: planData.lifestyleGuidelines.map((l) => [l.title, l.description]),
-        theme: "striped",
-        headStyles: { fillColor: [37, 99, 235] },
-      });
-    }, startY);
-  }
   
+  const checkPageBreak = (currentY: number) => {
+    if (currentY > 260) { // Check if space is running out
+      doc.addPage();
+      return 20; // Start Y on new page
+    }
+    return currentY;
+  };
+
+  // --- Recommended Screenings ---
+  if (planData.recommendedScreenings.length > 0) {
+    startY = checkPageBreak(startY);
+    startY = drawSectionHeader(doc, t.recommendedScreenings, startY);
+    doc.autoTable({
+      startY,
+      body: planData.recommendedScreenings.map((s) => [s.title, s.why]),
+      // --- Task 7: Remove Default Headers ---
+      showHead: false,
+      // --- Task 8: Unify and Simplify Table Styles ---
+      theme: "plain",
+      styles: {
+        cellPadding: { top: 3, right: 3, bottom: 3, left: 1 },
+        font: "helvetica",
+        fontSize: 10,
+      },
+      columnStyles: {
+        0: { fontStyle: 'bold' }
+      },
+      margin: { left: pageMargin },
+    });
+    startY = (doc.autoTable.previous?.finalY ?? startY) + 10;
+  }
+
+  // --- Lifestyle Guidelines ---
+  if (planData.lifestyleGuidelines.length > 0) {
+    startY = checkPageBreak(startY);
+    startY = drawSectionHeader(doc, t.lifestyleGuidelines, startY);
+    doc.autoTable({
+      startY,
+      body: planData.lifestyleGuidelines.map((l) => [l.title, l.description]),
+      showHead: false,
+      theme: "plain",
+      styles: {
+        cellPadding: { top: 3, right: 3, bottom: 3, left: 1 },
+        font: "helvetica",
+        fontSize: 10,
+      },
+      columnStyles: {
+        0: { fontStyle: 'bold' }
+      },
+      margin: { left: pageMargin },
+    });
+    startY = (doc.autoTable.previous?.finalY ?? startY) + 10;
+  }
+
+  // --- Topics For Your Doctor ---
   if (planData.topicsForDoctor.length > 0) {
-    startY = addSection(doc, t.topicsForDoctor, (y) => {
-      doc.autoTable({
-        startY: y,
-        head: [t.topicsHead],
-        body: planData.topicsForDoctor.map((topic) => [topic.title, topic.why]),
-        theme: "striped",
-        headStyles: { fillColor: [245, 158, 11] },
-      });
-    }, startY);
+    startY = checkPageBreak(startY);
+    startY = drawSectionHeader(doc, t.topicsForDoctor, startY);
+    doc.autoTable({
+      startY,
+      body: planData.topicsForDoctor.map((topic) => [topic.title, topic.why]),
+      showHead: false,
+      theme: "plain",
+      styles: {
+        cellPadding: { top: 3, right: 3, bottom: 3, left: 1 },
+        font: "helvetica",
+        fontSize: 10,
+      },
+      columnStyles: {
+        0: { fontStyle: 'bold' }
+      },
+      margin: { left: pageMargin },
+    });
+    startY = (doc.autoTable.previous?.finalY ?? startY) + 10;
   }
 
+  // --- Your Provided Answers ---
   if (Object.keys(answers).length > 0) {
-    startY = addSection(doc, t.yourAnswers, (y) => {
-      doc.autoTable({
-        startY: y,
-        head: [t.answersHead],
-        body: Object.entries(answers).map(([key, value]) => [
-          key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), 
-          value
-        ]),
-        theme: "grid",
-        headStyles: { fillColor: [100, 116, 139] },
-      });
-    }, startY);
+    startY = checkPageBreak(startY);
+    startY = drawSectionHeader(doc, t.yourAnswers, startY);
+    doc.autoTable({
+      startY,
+      body: Object.entries(answers).map(([key, value]) => [
+        key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        value,
+      ]),
+      showHead: false,
+      theme: "plain",
+      styles: {
+        cellPadding: { top: 3, right: 3, bottom: 3, left: 1 },
+        font: "helvetica",
+        fontSize: 10,
+      },
+      columnStyles: {
+        0: { fontStyle: 'bold' }
+      },
+      margin: { left: pageMargin },
+    });
   }
 
-  doc.save(`${t.filename}_${new Date().toLocaleDateString().replace(/\//g, "-")}.pdf`);
+  doc.save(
+    `${t.filename}_${new Date().toLocaleDateString().replace(/\//g, "-")}.pdf`,
+  );
 };
       

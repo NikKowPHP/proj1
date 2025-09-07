@@ -2,30 +2,86 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
+import { AlertTriangle, ChevronUp } from "lucide-react";
+import Image from "next/image";
 
 export default function Home() {
   const t = useTranslations("HomePage");
+  const tFooter = useTranslations("AppFooter");
+  const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const handleDisclaimerToggle = () => {
+    setIsAnimating(true);
+    setIsDisclaimerOpen(!isDisclaimerOpen);
+    setTimeout(() => setIsAnimating(false), 300);
+  };
 
   return (
-    <div className="bg-background text-foreground min-h-screen flex flex-col">
-      <header className="container mx-auto px-4 py-6">
-  
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="55.000000pt" height="54.000000pt" viewBox="0 0 55.000000 54.000000"
- preserveAspectRatio="xMidYMid meet">
+    <div className="grid md:grid-cols-2 min-h-screen bg-white">
+      {/* Left Column */}
+      <div className="hidden md:flex flex-col justify-between p-12 text-black relative">
+         <div className="flex flex-col  gap-2.5">
+                 <Image src="/onkono-logo.png" alt="" width={200} height={100}  />
+                 <p className=" text-red-600 mb-12">
+                   Easy questions to answer about your health.
+                 </p>
+               </div>
 
-<g transform="translate(0.000000,54.000000) scale(0.100000,-0.100000)"
-fill="#000000" stroke="none">
-<path d="M211 519 c-136 -40 -212 -186 -166 -320 21 -59 41 -81 107 -118 98
--56 180 -52 282 12 36 23 55 44 72 81 90 194 -90 404 -295 345z m149 -159
-l-75 -69 25 -28 c13 -15 47 -52 74 -80 l50 -53 -152 0 -152 0 0 150 0 150 153
-0 152 -1 -75 -69z"/>
-</g>
-</svg>
+        <div className="absolute bottom-12 left-12 right-12">
+          <div className="space-y-4">
+            <div
+              className="flex items-start gap-4 cursor-pointer transition-all duration-200 "
+              onClick={handleDisclaimerToggle}
+            >
+              <ChevronUp
+                className={`h-14 w-13 text-red-600 flex-shrink-0 transition-transform duration-300 ${
+                  isDisclaimerOpen ? "rotate-180" : "rotate-0"
+                }`}
+              />
+              <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0 transition-transform duration-300" />
+              <div className="transition-all duration-300">
+                <h2 className="text-lg font-semibold transition-colors duration-200 hover:text-red-700">
+                  {t("disclaimerTitle")}
+                </h2>
+                <p className="text-xs text-gray-600 mt-2 transition-all duration-300">
+                  {t("disclaimerContent1")}
+                </p>
+                <p
+                  className="text-xs text-gray-600 mt-2 transition-all duration-300"
+                  dangerouslySetInnerHTML={{
+                    __html: t.raw("disclaimerContent2"),
+                  }}
+                ></p>
+              </div>
+            </div>
+          </div>
 
-        <h1 className="text-2xl font-bold text-primary">ONKONO</h1>
-      </header>
-      <main className="flex-1 flex items-center justify-center">
+          {isDisclaimerOpen && (
+            <div
+              className={`mt-6 text-xs text-gray-500 flex items-center justify-start flex-wrap gap-4 pl-12 transition-all duration-300 ease-in-out ${
+                isAnimating
+                  ? "opacity-0 translate-y-2"
+                  : "opacity-100 translate-y-0"
+              }`}
+            >
+              <Link
+                href="/terms"
+                className="hover:underline transition-colors duration-200 hover:text-red-600"
+              >
+                {tFooter("termsOfService")}
+              </Link>
+               <Link href="/about" className="hover:underline transition-colors duration-200 hover:text-red-600">
+                About Onkono
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Right Column */}
+      <main className="w-full flex flex-col items-center justify-center p-4 md:p-8 bg-black text-white relative">
         <section className="text-center px-4">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight">
@@ -35,7 +91,11 @@ l-75 -69 25 -28 c13 -15 47 -52 74 -80 l50 -53 -152 0 -152 0 0 150 0 150 153
               {t("description")}
             </p>
             <div className="mt-10 flex justify-center">
-              <Button asChild size="lg">
+              <Button
+                asChild
+                size="lg"
+                className="rounded-none bg-[#FF3B30] hover:bg-red-700"
+              >
                 <Link href="/assessment">{t("ctaButton")}</Link>
               </Button>
             </div>
@@ -45,4 +105,3 @@ l-75 -69 25 -28 c13 -15 47 -52 74 -80 l50 -53 -152 0 -152 0 0 150 0 150 153
     </div>
   );
 }
-      

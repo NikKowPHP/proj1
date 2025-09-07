@@ -1,0 +1,6 @@
+{
+
+   "ignore": {
+    "customPatterns": ["*base64.ts"]
+  }
+}

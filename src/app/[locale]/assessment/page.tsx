@@ -254,7 +254,7 @@ export default function AssessmentPage() {
             <div>
               <Progress
                 value={progressPercentage}
-                className="mb-4 h-3 bg-gray-700"
+                className="mb-4 h-3 bg-[#3a3a3c]"
                 indicatorClassName="bg-[#FF3B30]"
               />
               <h1 className="text-2xl font-bold">{stepData?.title}</h1>

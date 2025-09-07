@@ -2,8 +2,8 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import type { ActionPlan } from "../types";
 import { onkonoLogoBase64 } from "../assets/onkono-logo-base64";
-import { openSansBold } from "../assets/open-sans-bold";
-import { openSansRegular } from "../assets/open-sans-regular";
+import { openSansBold } from "../assets/open-sans-bold-base64";
+import { openSansRegular } from "../assets/open-sans-regular-base64";
 
 interface jsPDFWithAutoTable extends jsPDF {
   autoTable: {

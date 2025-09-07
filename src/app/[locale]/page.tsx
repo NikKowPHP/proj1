@@ -29,9 +29,7 @@ export default function Home() {
         <main className="bg-black text-white w-full flex flex-col items-center justify-center p-4">
           <section className="text-center px-4">
             <div className="max-w-3xl mx-auto">
-              <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight">
-                {t("title")}
-              </h1>
+              
               <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
                 {t("description")}
               </p>

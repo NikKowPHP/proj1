@@ -18,6 +18,18 @@ const THEME = {
   HEADER_TEXT_COLOR: "#FFFFFF",
 };
 
+// Define styling constants for easier tweaking
+const STYLING = {
+  FONT_SIZES: {
+    TITLE: 22,
+    SUMMARY: 10,
+    BODY: 10,
+    HEADER_BAR: 10,
+  },
+  LINE_HEIGHT: 1.4,
+  CHAR_SPACE: 0.05,
+};
+
 const translations: Record<string, any> = {
   en: {
     title: "Doctor's Discussion Guide",
@@ -63,7 +75,7 @@ const translations: Record<string, any> = {
       height: "Wzrost",
       weight: "Waga",
       smoking_status: "Status palenia",
-      smoking_duration: "Smoking Duration", // NOTE: This key may need translation in your app
+      smoking_duration: "Długość palenia",
       alcohol: "Alkohol",
       activity: "Aktywność",
       diet_fruits_veg: "Dieta Owoce/Warzywa",
@@ -85,11 +97,11 @@ const drawSectionHeader = (doc: jsPDFWithAutoTable, title: string, startY: numbe
   doc.rect(padding, startY, doc.internal.pageSize.getWidth() - (padding * 2), headerHeight, "F");
 
   doc.setFont("OpenSans", "bold");
-  doc.setFontSize(12);
+  doc.setFontSize(STYLING.FONT_SIZES.HEADER_BAR);
   doc.setTextColor(THEME.HEADER_TEXT_COLOR);
-  doc.text(title, padding + 3, startY + headerHeight / 2 + 2);
+  doc.text(title, padding + 4, startY + headerHeight / 2 + 2.5);
 
-  return startY + headerHeight + 4;
+  return startY + headerHeight + 5;
 };
 
 export const generateAssessmentPdf = (
@@ -108,24 +120,27 @@ export const generateAssessmentPdf = (
 
   doc.setFont("OpenSans", "normal");
   doc.setTextColor(THEME.TEXT_COLOR);
+  doc.setCharSpace(STYLING.CHAR_SPACE);
 
-  doc.addImage(onkonoLogoBase64, "PNG", pageMargin, 15, 60, 10);
+  // FIX: Resized logo and adjusted margins
+  doc.addImage(onkonoLogoBase64, "PNG", pageMargin, 20, 45, 10.5);
 
-  doc.setFontSize(18);
+  doc.setFontSize(STYLING.FONT_SIZES.TITLE);
   doc.setFont("OpenSans", "bold");
-  doc.text(t.title, pageMargin, 40);
+  doc.text(t.title, pageMargin, 45); // FIX: Adjusted Y position
+  
   doc.setFont("OpenSans", "normal");
-  doc.setFontSize(10);
+  doc.setFontSize(STYLING.FONT_SIZES.BODY);
   doc.setTextColor(100);
-  doc.text(t.disclaimer, pageMargin, 48);
+  doc.text(t.disclaimer, pageMargin, 53, { lineHeightFactor: STYLING.LINE_HEIGHT }); // FIX: Added line height
 
-  let startY = 60;
+  let startY = 65; // FIX: Increased margin
 
   if (planData.overallSummary) {
-    doc.setFontSize(11);
+    doc.setFontSize(STYLING.FONT_SIZES.SUMMARY);
     const summaryLines = doc.splitTextToSize(planData.overallSummary, doc.internal.pageSize.getWidth() - (pageMargin * 2));
-    doc.text(summaryLines, pageMargin, startY);
-    startY += summaryLines.length * 5 + 10;
+    doc.text(summaryLines, pageMargin, startY, { lineHeightFactor: STYLING.LINE_HEIGHT }); // FIX: Added line height
+    startY += summaryLines.length * STYLING.FONT_SIZES.SUMMARY * 0.35 * STYLING.LINE_HEIGHT + 12; // FIX: Increased margin
   }
   
   const checkPageBreak = (currentY: number) => {
@@ -136,23 +151,30 @@ export const generateAssessmentPdf = (
     return currentY;
   };
 
+  // Define common styles for all tables to keep them consistent
+  const commonTableStyles = {
+    showHead: false,
+    theme: "plain",
+    styles: {
+      cellPadding: { top: 1.5, right: 3, bottom: 1.5, left: 1 },
+      font: "OpenSans",
+      fontSize: STYLING.FONT_SIZES.BODY,
+      valign: 'top', // FIX: Ensures top alignment for all cells
+      lineHeight: STYLING.LINE_HEIGHT, // FIX: Adds line height to table text
+    },
+    columnStyles: { 0: { fontStyle: 'bold' } },
+    margin: { left: pageMargin },
+  };
+
   if (planData.recommendedScreenings.length > 0) {
     startY = checkPageBreak(startY);
     startY = drawSectionHeader(doc, t.recommendedScreenings, startY);
     doc.autoTable({
       startY,
       body: planData.recommendedScreenings.map((s) => [s.title, s.why]),
-      showHead: false,
-      theme: "plain",
-      styles: {
-        cellPadding: { top: 1.5, right: 3, bottom: 1.5, left: 1 }, // CHANGE: Reduced vertical padding
-        font: "OpenSans",
-        fontSize: 10,
-      },
-      columnStyles: { 0: { fontStyle: 'bold' } },
-      margin: { left: pageMargin },
+      ...commonTableStyles,
     });
-    startY = (doc.autoTable.previous?.finalY ?? startY) + 10;
+    startY = (doc.autoTable.previous?.finalY ?? startY) + 12; // FIX: Increased margin
   }
 
   if (planData.lifestyleGuidelines.length > 0) {
@@ -161,17 +183,9 @@ export const generateAssessmentPdf = (
     doc.autoTable({
       startY,
       body: planData.lifestyleGuidelines.map((l) => [l.title, l.description]),
-      showHead: false,
-      theme: "plain",
-      styles: {
-        cellPadding: { top: 1.5, right: 3, bottom: 1.5, left: 1 }, // CHANGE: Reduced vertical padding
-        font: "OpenSans",
-        fontSize: 10,
-      },
-      columnStyles: { 0: { fontStyle: 'bold' } },
-      margin: { left: pageMargin },
+      ...commonTableStyles,
     });
-    startY = (doc.autoTable.previous?.finalY ?? startY) + 10;
+    startY = (doc.autoTable.previous?.finalY ?? startY) + 12;
   }
 
   if (planData.topicsForDoctor.length > 0) {
@@ -180,17 +194,9 @@ export const generateAssessmentPdf = (
     doc.autoTable({
       startY,
       body: planData.topicsForDoctor.map((topic) => [topic.title, topic.why]),
-      showHead: false,
-      theme: "plain",
-      styles: {
-        cellPadding: { top: 1.5, right: 3, bottom: 1.5, left: 1 }, // CHANGE: Reduced vertical padding
-        font: "OpenSans",
-        fontSize: 10,
-      },
-      columnStyles: { 0: { fontStyle: 'bold' } },
-      margin: { left: pageMargin },
+      ...commonTableStyles,
     });
-    startY = (doc.autoTable.previous?.finalY ?? startY) + 10;
+    startY = (doc.autoTable.previous?.finalY ?? startY) + 12;
   }
 
   if (Object.keys(answers).length > 0) {
@@ -202,15 +208,7 @@ export const generateAssessmentPdf = (
         t.answersMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
         value,
       ]),
-      showHead: false,
-      theme: "plain",
-      styles: {
-        cellPadding: { top: 1.5, right: 3, bottom: 1.5, left: 1 }, // CHANGE: Reduced vertical padding
-        font: "OpenSans",
-        fontSize: 10,
-      },
-      columnStyles: { 0: { fontStyle: 'bold' } },
-      margin: { left: pageMargin },
+      ...commonTableStyles,
     });
   }
 

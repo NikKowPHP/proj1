@@ -2,11 +2,8 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import type { ActionPlan } from "../types";
 import { onkonoLogoBase64 } from "../assets/onkono-logo-base64";
-
-// --- Task 2: Prepare and Embed Logo Asset ---
-// NOTE: Replace this placeholder with the actual Base64 encoded logo from /onkono-logo.png
-const LOGO_BASE64 = onkonoLogoBase64;
-
+import { openSansBold } from "../assets/open-sans-bold";
+import { openSansRegular } from "../assets/open-sans-regular";
 
 interface jsPDFWithAutoTable extends jsPDF {
   autoTable: {
@@ -15,7 +12,6 @@ interface jsPDFWithAutoTable extends jsPDF {
   };
 }
 
-// --- Task 1: Define Brand Color Constants ---
 const THEME = {
   BRAND_COLOR: "#FF3B30",
   TEXT_COLOR: "#333333",
@@ -33,6 +29,23 @@ const translations: Record<string, any> = {
     topicsForDoctor: "Topics For Your Doctor",
     yourAnswers: "Your Provided Answers",
     filename: "Doctors_Discussion_Guide",
+    answersMap: {
+      age: "Age",
+      sex: "Sex",
+      height: "Height",
+      weight: "Weight",
+      smoking_status: "Smoking Status",
+      smoking_duration: "Smoking Duration",
+      alcohol: "Alcohol",
+      activity: "Activity",
+      diet_fruits_veg: "Diet Fruits/Veg",
+      diet_red_meat: "Diet Red Meat",
+      known_blood_pressure: "Known Blood Pressure",
+      has_diabetes: "Has Diabetes",
+      asbestos_exposure: "Asbestos Exposure",
+      family_history_cancer: "Family History Cancer",
+      units: "Units",
+    },
   },
   pl: {
     title: "Przewodnik do Dyskusji z Lekarzem",
@@ -44,10 +57,26 @@ const translations: Record<string, any> = {
     topicsForDoctor: "Tematy do Omówienia z Lekarzem",
     yourAnswers: "Twoje Udzielone Odpowiedzi",
     filename: "Przewodnik_Do_Dyskusji_Z_Lekarzem",
+    answersMap: {
+      age: "Wiek",
+      sex: "Płeć",
+      height: "Wzrost",
+      weight: "Waga",
+      smoking_status: "Status palenia",
+      smoking_duration: "Smoking Duration", // NOTE: This key may need translation in your app
+      alcohol: "Alkohol",
+      activity: "Aktywność",
+      diet_fruits_veg: "Dieta Owoce/Warzywa",
+      diet_red_meat: "Dieta Czerwone Mięso",
+      known_blood_pressure: "Znane ciśnienie krwi",
+      has_diabetes: "Cukrzyca",
+      asbestos_exposure: "Narażenie na azbest",
+      family_history_cancer: "Historia raka w rodzinie",
+      units: "Jednostki",
+    },
   },
 };
 
-// --- Task 5: Create a Custom `drawSectionHeader` Function ---
 const drawSectionHeader = (doc: jsPDFWithAutoTable, title: string, startY: number): number => {
   const headerHeight = 10;
   const padding = 14;
@@ -55,15 +84,13 @@ const drawSectionHeader = (doc: jsPDFWithAutoTable, title: string, startY: numbe
   doc.setFillColor(THEME.BRAND_COLOR);
   doc.rect(padding, startY, doc.internal.pageSize.getWidth() - (padding * 2), headerHeight, "F");
 
-  doc.setFont("helvetica", "bold");
+  doc.setFont("OpenSans", "bold");
   doc.setFontSize(12);
   doc.setTextColor(THEME.HEADER_TEXT_COLOR);
   doc.text(title, padding + 3, startY + headerHeight / 2 + 2);
 
-  // Return the Y position for the content below the header
   return startY + headerHeight + 4;
 };
-
 
 export const generateAssessmentPdf = (
   planData: ActionPlan,
@@ -74,25 +101,26 @@ export const generateAssessmentPdf = (
   const doc = new jsPDF() as jsPDFWithAutoTable;
   const pageMargin = 14;
 
-  // --- Task 4: Standardize Document Font ---
-  doc.setFont("helvetica", "normal");
+  doc.addFileToVFS("OpenSans-Regular.ttf", openSansRegular);
+  doc.addFileToVFS("OpenSans-Bold.ttf", openSansBold);
+  doc.addFont("OpenSans-Regular.ttf", "OpenSans", "normal");
+  doc.addFont("OpenSans-Bold.ttf", "OpenSans", "bold");
+
+  doc.setFont("OpenSans", "normal");
   doc.setTextColor(THEME.TEXT_COLOR);
 
-  // --- Task 3: Implement Logo Rendering ---
-  doc.addImage(LOGO_BASE64, "PNG", pageMargin, 15, 60, 10);
+  doc.addImage(onkonoLogoBase64, "PNG", pageMargin, 15, 60, 10);
 
-  // --- Header ---
   doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
+  doc.setFont("OpenSans", "bold");
   doc.text(t.title, pageMargin, 40);
-  doc.setFont("helvetica", "normal");
+  doc.setFont("OpenSans", "normal");
   doc.setFontSize(10);
   doc.setTextColor(100);
   doc.text(t.disclaimer, pageMargin, 48);
 
   let startY = 60;
 
-  // --- Overall Summary ---
   if (planData.overallSummary) {
     doc.setFontSize(11);
     const summaryLines = doc.splitTextToSize(planData.overallSummary, doc.internal.pageSize.getWidth() - (pageMargin * 2));
@@ -101,38 +129,32 @@ export const generateAssessmentPdf = (
   }
   
   const checkPageBreak = (currentY: number) => {
-    if (currentY > 260) { // Check if space is running out
+    if (currentY > 260) {
       doc.addPage();
-      return 20; // Start Y on new page
+      return 20;
     }
     return currentY;
   };
 
-  // --- Recommended Screenings ---
   if (planData.recommendedScreenings.length > 0) {
     startY = checkPageBreak(startY);
     startY = drawSectionHeader(doc, t.recommendedScreenings, startY);
     doc.autoTable({
       startY,
       body: planData.recommendedScreenings.map((s) => [s.title, s.why]),
-      // --- Task 7: Remove Default Headers ---
       showHead: false,
-      // --- Task 8: Unify and Simplify Table Styles ---
       theme: "plain",
       styles: {
-        cellPadding: { top: 3, right: 3, bottom: 3, left: 1 },
-        font: "helvetica",
+        cellPadding: { top: 1.5, right: 3, bottom: 1.5, left: 1 }, // CHANGE: Reduced vertical padding
+        font: "OpenSans",
         fontSize: 10,
       },
-      columnStyles: {
-        0: { fontStyle: 'bold' }
-      },
+      columnStyles: { 0: { fontStyle: 'bold' } },
       margin: { left: pageMargin },
     });
     startY = (doc.autoTable.previous?.finalY ?? startY) + 10;
   }
 
-  // --- Lifestyle Guidelines ---
   if (planData.lifestyleGuidelines.length > 0) {
     startY = checkPageBreak(startY);
     startY = drawSectionHeader(doc, t.lifestyleGuidelines, startY);
@@ -142,19 +164,16 @@ export const generateAssessmentPdf = (
       showHead: false,
       theme: "plain",
       styles: {
-        cellPadding: { top: 3, right: 3, bottom: 3, left: 1 },
-        font: "helvetica",
+        cellPadding: { top: 1.5, right: 3, bottom: 1.5, left: 1 }, // CHANGE: Reduced vertical padding
+        font: "OpenSans",
         fontSize: 10,
       },
-      columnStyles: {
-        0: { fontStyle: 'bold' }
-      },
+      columnStyles: { 0: { fontStyle: 'bold' } },
       margin: { left: pageMargin },
     });
     startY = (doc.autoTable.previous?.finalY ?? startY) + 10;
   }
 
-  // --- Topics For Your Doctor ---
   if (planData.topicsForDoctor.length > 0) {
     startY = checkPageBreak(startY);
     startY = drawSectionHeader(doc, t.topicsForDoctor, startY);
@@ -164,38 +183,33 @@ export const generateAssessmentPdf = (
       showHead: false,
       theme: "plain",
       styles: {
-        cellPadding: { top: 3, right: 3, bottom: 3, left: 1 },
-        font: "helvetica",
+        cellPadding: { top: 1.5, right: 3, bottom: 1.5, left: 1 }, // CHANGE: Reduced vertical padding
+        font: "OpenSans",
         fontSize: 10,
       },
-      columnStyles: {
-        0: { fontStyle: 'bold' }
-      },
+      columnStyles: { 0: { fontStyle: 'bold' } },
       margin: { left: pageMargin },
     });
     startY = (doc.autoTable.previous?.finalY ?? startY) + 10;
   }
 
-  // --- Your Provided Answers ---
   if (Object.keys(answers).length > 0) {
     startY = checkPageBreak(startY);
     startY = drawSectionHeader(doc, t.yourAnswers, startY);
     doc.autoTable({
       startY,
       body: Object.entries(answers).map(([key, value]) => [
-        key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        t.answersMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
         value,
       ]),
       showHead: false,
       theme: "plain",
       styles: {
-        cellPadding: { top: 3, right: 3, bottom: 3, left: 1 },
-        font: "helvetica",
+        cellPadding: { top: 1.5, right: 3, bottom: 1.5, left: 1 }, // CHANGE: Reduced vertical padding
+        font: "OpenSans",
         fontSize: 10,
       },
-      columnStyles: {
-        0: { fontStyle: 'bold' }
-      },
+      columnStyles: { 0: { fontStyle: 'bold' } },
       margin: { left: pageMargin },
     });
   }
@@ -204,4 +218,3 @@ export const generateAssessmentPdf = (
     `${t.filename}_${new Date().toLocaleDateString().replace(/\//g, "-")}.pdf`,
   );
 };
-      

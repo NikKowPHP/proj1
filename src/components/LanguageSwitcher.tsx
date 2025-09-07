@@ -15,19 +15,23 @@ export function LanguageSwitcher() {
         href={pathname}
         locale="pl"
         className={cn(
-          "transition-colors hover:text-white",
-          locale === "pl" ? "text-white" : "text-gray-500",
+          "transition-colors hover:text-white sm:hover:text-white",
+          locale === "pl"
+            ? "text-black sm:text-white"
+            : "text-gray-500 sm:text-gray-500",
         )}
       >
         PL
       </Link>
-      <span className="text-gray-500">|</span>
+      <span className="text-gray-500 sm:text-gray-400">|</span>
       <Link
         href={pathname}
         locale="en"
         className={cn(
-          "transition-colors hover:text-white",
-          locale === "en" ? "text-white" : "text-gray-500",
+          "transition-colors hover:text-white sm:hover:text-white",
+          locale === "en"
+            ? "text-white sm:text-black"
+            : "text-gray-500 sm:text-gray-400",
         )}
       >
         EN

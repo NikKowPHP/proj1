@@ -8,7 +8,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -175,19 +174,27 @@ export default function ResultsPage() {
         
         {assessment && <ActionPlanDisplay plan={assessment} />}
 
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader>
             <CardTitle>{t("exportTitle")}</CardTitle>
             <CardDescription>{t("exportDescription")}</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="flex-1" onClick={handleDownloadPdf}>
+          <CardContent className="flex flex-col sm:flex-row p-0 gap-4 sm:gap-0">
+            <Button
+              onClick={handleDownloadPdf}
+              // FIX: Removed size prop, added explicit padding for more height.
+              className="rounded-none py-4 px-6 text-base"
+            >
               <Download className="mr-2 h-4 w-4" />
               {t("exportPdf")}
             </Button>
             <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="lg" variant="outline" className="flex-1">
+                <Button
+                  variant="ghost"
+                  // FIX: Removed size prop, added explicit padding for more height.
+                  className="rounded-none border-t border-white/10 py-10 sm:py-4 px-6 mx-4 text-base hover:bg-white/5 sm:border-t-0 sm:border-l"
+                >
                   <Mail className="mr-2 h-4 w-4" />
                   {t("exportEmail")}
                 </Button>
@@ -229,4 +236,3 @@ export default function ResultsPage() {
     </div>
   );
 }
-      

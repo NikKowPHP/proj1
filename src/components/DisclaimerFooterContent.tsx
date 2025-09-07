@@ -17,6 +17,11 @@ export function DisclaimerFooterContent() {
         className="flex items-start gap-4 cursor-pointer"
         onClick={() => setIsDisclaimerOpen(!isDisclaimerOpen)}
       >
+   <ChevronUp
+              className={`h-10 w-10 text-red-600 flex-shrink-0 transition-transform duration-300 ${
+                isDisclaimerOpen ? "rotate-180" : "rotate-0"
+              }`}
+            />
         <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0 mt-1" />
         <div className="flex-grow">
           <div className="flex justify-between items-center">
@@ -24,11 +29,7 @@ export function DisclaimerFooterContent() {
             <h2 className="text-lg font-semibold">
               {tHome("disclaimerTitle")}
             </h2>
-            <ChevronUp
-              className={`h-6 w-6 text-red-600 flex-shrink-0 transition-transform duration-300 ${
-                isDisclaimerOpen ? "rotate-180" : "rotate-0"
-              }`}
-            />
+         
           </div>
             <div className="mt-2 space-y-2 text-xs text-gray-500 animate-in fade-in duration-300">
            <p>{tHome("disclaimerContent1")}</p>

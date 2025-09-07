@@ -280,11 +280,11 @@ export default function AssessmentPage() {
                     }
                     className="w-full"
                   >
-                    <TabsList className="grid w-full grid-cols-2 rounded-none p-1">
-                      <TabsTrigger value="metric" className="rounded-none">
+                    <TabsList className="grid w-full grid-cols-2 p-1">
+                      <TabsTrigger value="metric">
                         {t("unitsMetric")}
                       </TabsTrigger>
-                      <TabsTrigger value="imperial" className="rounded-none">
+                      <TabsTrigger value="imperial">
                         {t("unitsImperial")}
                       </TabsTrigger>
                     </TabsList>

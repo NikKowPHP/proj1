@@ -12,7 +12,7 @@
   --radius: 0.875rem;
   --background: 0 0% 8%;
   --foreground: 0 0% 98%;
-  --card: 270 2% 23%; /* #3a3a3c - Lighter grey for active elements */
+  --card: 0 0% 8%; /* #3a3a3c - Lighter grey for active elements */
   --card-foreground: 0 0% 98%;
   --popover: 0 0% 12%;
   --popover-foreground: 0 0% 98%;

@@ -17,7 +17,7 @@ export function LanguageSwitcher() {
         className={cn(
           "transition-colors hover:text-white sm:hover:text-white",
           locale === "pl"
-            ? "text-black sm:text-white"
+            ? "text-black sm:text-gray-500"
             : "text-gray-500 sm:text-gray-500",
         )}
       >
@@ -30,7 +30,7 @@ export function LanguageSwitcher() {
         className={cn(
           "transition-colors hover:text-white sm:hover:text-white",
           locale === "en"
-            ? "text-white sm:text-black"
+            ? "text-black sm:text-white"
             : "text-gray-500 sm:text-gray-400",
         )}
       >

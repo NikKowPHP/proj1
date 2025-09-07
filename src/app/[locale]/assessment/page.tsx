@@ -29,6 +29,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { AppHeaderContent } from "@/components/AppHeaderContent";
 import { DisclaimerFooterContent } from "@/components/DisclaimerFooterContent";
 import { DisclaimerFooterContentMobile } from "@/components/DisclaimerFooterContentMobile";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Question {
   id: string;
@@ -254,8 +255,8 @@ export default function AssessmentPage() {
             <div>
               <Progress
                 value={progressPercentage}
-                className="mb-4 h-3 bg-[#3a3a3c]"
-                indicatorClassName="bg-[#FF3B30]"
+                className="mb-4 h-3"
+                indicatorClassName="bg-primary"
               />
               <h1 className="text-2xl font-bold">{stepData?.title}</h1>
               <p className="text-gray-400 mt-2">
@@ -272,28 +273,22 @@ export default function AssessmentPage() {
               {currentStep === 0 && hasHeightOrWeight && (
                 <div className="space-y-2">
                   <Label>{t("units")}</Label>
-                  <div className="flex w-full border border-gray-700 rounded-none p-1">
-                    <button
-                      onClick={() => setUnits("metric")}
-                      className={`flex-1 p-2 text-sm rounded-none transition-colors ${
-                        units === "metric"
-                          ? "bg-white text-black"
-                          : "bg-transparent text-white"
-                      }`}
-                    >
-                      {t("unitsMetric")}
-                    </button>
-                    <button
-                      onClick={() => setUnits("imperial")}
-                      className={`flex-1 p-2 text-sm rounded-none transition-colors ${
-                        units === "imperial"
-                          ? "bg-white text-black"
-                          : "bg-transparent text-white"
-                      }`}
-                    >
-                      {t("unitsImperial")}
-                    </button>
-                  </div>
+                  <Tabs
+                    value={units}
+                    onValueChange={(value) =>
+                      setUnits(value as "metric" | "imperial")
+                    }
+                    className="w-full"
+                  >
+                    <TabsList className="grid w-full grid-cols-2 rounded-none p-1">
+                      <TabsTrigger value="metric" className="rounded-none">
+                        {t("unitsMetric")}
+                      </TabsTrigger>
+                      <TabsTrigger value="imperial" className="rounded-none">
+                        {t("unitsImperial")}
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                 </div>
               )}
               {visibleQuestions.map((question) => (
@@ -306,7 +301,7 @@ export default function AssessmentPage() {
                     >
                       <SelectTrigger
                         id={question.id}
-                        className="rounded-none bg-[#3A3A3C] border-gray-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-red-600"
+                        className="focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-primary"
                       >
                         <SelectValue
                           placeholder={t("selectOption")}
@@ -346,7 +341,7 @@ export default function AssessmentPage() {
                           )
                         }
                         aria-invalid={!!localErrors[question.id]}
-                        className={`rounded-none bg-[#3A3A3C] border-gray-700 placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-red-600 ${
+                        className={`placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-primary ${
                           localErrors[question.id] ? "border-destructive" : ""
                         }`}
                       />
@@ -362,17 +357,18 @@ export default function AssessmentPage() {
             </section>
             <footer className="flex justify-between">
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={prevStep}
                 disabled={currentStep === 0}
-                className="rounded-none border border-gray-600 hover:bg-gray-800"
+                className="rounded-none"
               >
                 {t("back")}
               </Button>
               <Button
+                variant="default"
                 onClick={handleNext}
                 disabled={!isStepComplete()}
-                className="rounded-none bg-[#FF3B30] hover:bg-red-700 disabled:bg-[#f75a51] disabled:opacity-100 disabled:text-gray-200"
+                className="rounded-none disabled:opacity-50"
               >
                 {currentStep === totalSteps - 1
                   ? t("viewResults")

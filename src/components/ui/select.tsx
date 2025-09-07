@@ -36,8 +36,8 @@ const SelectTrigger = React.forwardRef<
     data-slot="select-trigger"
     data-size={size}
     className={cn(
-      "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-full items-center justify-between gap-2  bg-secondary px-3 text-sm whitespace-nowrap transition-[color,box-shadow] outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50",
-      "dark:bg-secondary/50",
+      "flex h-11 w-full items-center justify-between  border-input bg-input px-3 py-2 text-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      "aria-invalid:ring-2 aria-invalid:ring-destructive",
       "data-[size=default]:h-11 data-[size=sm]:h-8",
       "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
       className,

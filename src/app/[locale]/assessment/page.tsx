@@ -28,6 +28,7 @@ import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { AppHeaderContent } from "@/components/AppHeaderContent";
 import { DisclaimerFooterContent } from "@/components/DisclaimerFooterContent";
+import { DisclaimerFooterContentMobile } from "@/components/DisclaimerFooterContentMobile";
 
 interface Question {
   id: string;
@@ -384,7 +385,7 @@ export default function AssessmentPage() {
 
       {/* Mobile-Only Footer (White Background) */}
       <footer className="p-4 bg-white text-black md:hidden">
-        <DisclaimerFooterContent />
+        <DisclaimerFooterContentMobile />
       </footer>
     </div>
   );

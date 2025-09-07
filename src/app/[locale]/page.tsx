@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { AppHeaderContent } from "@/components/AppHeaderContent";
 import { DisclaimerFooterContent } from "@/components/DisclaimerFooterContent";
+import { DisclaimerFooterContentMobile } from "@/components/DisclaimerFooterContentMobile";
 
 export default function Home() {
   const t = useTranslations("HomePage");
@@ -50,7 +51,7 @@ export default function Home() {
 
       {/* Mobile-Only Footer (White Background) */}
       <footer className="p-4 bg-white text-black md:hidden">
-        <DisclaimerFooterContent />
+        <DisclaimerFooterContentMobile />
       </footer>
     </div>
   );

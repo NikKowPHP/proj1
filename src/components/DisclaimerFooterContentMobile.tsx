@@ -6,7 +6,7 @@ import { AlertTriangle, ChevronUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 // This component is color-agnostic.
-export function DisclaimerFooterContent() {
+export function DisclaimerFooterContentMobile() {
   const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
   const tHome = useTranslations("HomePage");
   const tFooter = useTranslations("AppFooter");
@@ -30,16 +30,14 @@ export function DisclaimerFooterContent() {
               }`}
             />
           </div>
+          {isDisclaimerOpen && (
             <div className="mt-2 space-y-2 text-xs text-gray-500 animate-in fade-in duration-300">
-           <p>{tHome("disclaimerContent1")}</p>
+              <p>{tHome("disclaimerContent1")}</p>
               <p
                 dangerouslySetInnerHTML={{
                   __html: tHome.raw("disclaimerContent2"),
                 }}
               />
-          {isDisclaimerOpen && (
-          
-             
               <div className="flex items-center gap-4 pt-2">
                 <Link href="/terms" className="hover:underline">
                   {tFooter("termsOfService")}
@@ -48,9 +46,8 @@ export function DisclaimerFooterContent() {
                   {tFooter("privacyPolicy")}
                 </Link>
               </div>
-          
-            )}
-              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

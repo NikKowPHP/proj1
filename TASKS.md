@@ -9,3 +9,4 @@
 - [x] Add "go back" buttons to static and results pages.
 - [x] Make assessment steps mobile layout consistent with homepage (centered, full viewport).
 - [x] Make results page loading state consistent with homepage layout (centered, full viewport).
+- [x] Make static pages have a 50/50 split on desktop.

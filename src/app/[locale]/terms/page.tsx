@@ -16,7 +16,7 @@ export default function TermsPage() {
         <AppHeaderContent />
       </header>
 
-      <div className="flex-grow md:grid md:grid-cols-[minmax(300px,_1fr)_2fr]">
+      <div className="flex-grow md:grid md:grid-cols-2">
         {/* Left Column (Desktop-Only, White Background) */}
         <div className="hidden md:flex flex-col justify-start p-12 bg-white text-black">
           <AppHeaderContent />

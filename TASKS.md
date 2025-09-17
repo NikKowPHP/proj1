@@ -7,3 +7,5 @@
 - [x] Remove footer from static pages to match user request.
 - [x] Match static page left panel/mobile header background to homepage.
 - [x] Add "go back" buttons to static and results pages.
+- [x] Make assessment steps mobile layout consistent with homepage (centered, full viewport).
+- [x] Make results page loading state consistent with homepage layout (centered, full viewport).

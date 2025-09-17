@@ -238,7 +238,7 @@ export default function AssessmentPage() {
       </Dialog>
 
       {/* Main Container */}
-      <div className="flex-grow md:grid md:grid-cols-2">
+      <div className="flex flex-grow md:grid md:grid-cols-2">
         {/* Left Column (Desktop-Only, White Background) */}
         <div className="hidden md:flex flex-col justify-between p-12 bg-white text-black">
           <AppHeaderContent />
@@ -246,7 +246,7 @@ export default function AssessmentPage() {
         </div>
 
         {/* Right Column / Main Form Content (Black Background) */}
-        <main className="bg-black text-white w-full flex flex-col items-center justify-center p-4">
+        <main className="bg-black text-white w-full flex flex-col flex-grow sm:items-center sm:justify-center p-4 pb-24 md:pb-4">
           <div className="w-full max-w-md space-y-8">
             {/* Header section with Language Switcher */}
             <div className=" justify-center w-full hidden sm:flex">
@@ -380,10 +380,9 @@ export default function AssessmentPage() {
       </div>
 
       {/* Mobile-Only Footer (White Background) */}
-      <footer className="p-4 bg-white text-black md:hidden">
+      <footer className="fixed bottom-0 left-0 right-0 z-10 p-4 bg-white text-black md:hidden border-t">
         <DisclaimerFooterContentMobile />
       </footer>
     </div>
   );
 }
-      

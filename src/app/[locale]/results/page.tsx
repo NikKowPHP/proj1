@@ -164,7 +164,7 @@ export default function ResultsPage() {
     );
   } else {
     content = (
-      <div className="container mx-auto max-w-3xl space-y-8  px-4">
+      <div className="container mx-auto max-w-3xl space-y-8 px-4">
         <Button
           variant="ghost"
           className="pl-0"
@@ -247,8 +247,8 @@ export default function ResultsPage() {
         <AppHeaderContent />
       </header>
 
-      {/* Main Container: Becomes a grid on desktop, is a flex-grow item on mobile */}
-      <div className="flex-grow md:grid md:grid-cols-2">
+      {/* Main Container: Becomes a grid on desktop, is a flex container on mobile */}
+      <div className="flex-grow flex md:grid md:grid-cols-2">
         {/* Left Column (Desktop-Only, White Background) */}
         <div className="hidden md:flex flex-col justify-between p-12 bg-white text-black">
           <AppHeaderContent />
@@ -256,7 +256,7 @@ export default function ResultsPage() {
         </div>
 
         {/* Right Column / Main Content (Black Background) */}
-        <main className="bg-black text-white w-full flex flex-col items-center justify-center p-4 pb-24 md:p-4">
+        <main className="bg-black text-white w-full flex flex-col flex-grow items-center justify-center p-4 pb-24 md:p-4">
           {content}
         </main>
       </div>

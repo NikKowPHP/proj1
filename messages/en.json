@@ -135,7 +135,7 @@
     "emailDialogTitle": "Email Your Plan",
     "emailDialogDescription": "Enter your email address to receive a copy of your plan. We will not store or use your email for any other purpose.",
     "emailDialogCta": "Send Email",
-    "newAssessment": "Build New Plan"
+    "newAssessment": "Build New Plan",
+    "backToHome": "Back to Home"
   }
 }
-      

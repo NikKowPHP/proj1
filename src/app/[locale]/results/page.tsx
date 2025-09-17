@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Spinner from "@/components/ui/Spinner";
-import { Mail, Download } from "lucide-react";
+import { Mail, Download, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useRouter } from "@/i18n/navigation";
 import { generateAssessmentPdf } from "@/lib/utils/pdf-generator";
@@ -164,7 +164,15 @@ export default function ResultsPage() {
     );
   } else {
     content = (
-      <div className="container mx-auto max-w-3xl space-y-8 py-12 px-4">
+      <div className="container mx-auto max-w-3xl space-y-8  px-4">
+        <Button
+          variant="ghost"
+          className="pl-0"
+          onClick={() => router.back()}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          {t("backToHome")}
+        </Button>
         <div className="text-center">
           <h1 className="text-3xl font-bold">{t("resultsTitle")}</h1>
           <p className="text-muted-foreground mt-2">{t("resultsDescription")}</p>

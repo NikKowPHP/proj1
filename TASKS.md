@@ -6,3 +6,4 @@
 - [x] Make homepage content area full viewport on mobile.
 - [x] Remove footer from static pages to match user request.
 - [x] Match static page left panel/mobile header background to homepage.
+- [x] Add "go back" buttons to static and results pages.

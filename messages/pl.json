@@ -135,7 +135,7 @@
     "emailDialogTitle": "Wyślij Plan E-mailem",
     "emailDialogDescription": "Wpisz swój adres e-mail, aby otrzymać kopię swojego planu. Nie będziemy przechowywać ani używać Twojego e-maila w żadnym innym celu.",
     "emailDialogCta": "Wyślij E-mail",
-    "newAssessment": "Zbuduj Nowy Plan"
+    "newAssessment": "Zbuduj Nowy Plan",
+    "backToHome": "Powrót do strony głównej"
   }
 }
-      

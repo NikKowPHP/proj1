@@ -1,9 +1,14 @@
 "use client";
 import { useTranslations } from "next-intl";
 import { AppHeaderContent } from "@/components/AppHeaderContent";
+import { useRouter } from "@/i18n/navigation";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export default function TermsPage() {
   const t = useTranslations("TermsPage");
+  const router = useRouter();
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       {/* Mobile Header */}
@@ -20,6 +25,14 @@ export default function TermsPage() {
         {/* Right Column / Main Content */}
         <main className="w-full p-6 md:p-12 overflow-y-auto">
           <div className="prose dark:prose-invert max-w-4xl w-full mx-auto">
+            <Button
+              variant="ghost"
+              className="pl-0 mb-8"
+              onClick={() => router.back()}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t("backToHome")}
+            </Button>
             <h1>{t("title")}</h1>
             <p>{t("lastUpdated")}</p>
             <p>{t("intro")}</p>

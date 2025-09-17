@@ -4,3 +4,5 @@
 - [x] Fix mobile UI issues on homepage (centering, sticky footer, upward-expanding disclaimer).
 - [x] Make the footer fixed on mobile for the results page.
 - [x] Make homepage content area full viewport on mobile.
+- [x] Remove footer from static pages to match user request.
+- [x] Match static page left panel/mobile header background to homepage.

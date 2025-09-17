@@ -1,7 +1,6 @@
 "use client";
 import { useTranslations } from "next-intl";
 import { AppHeaderContent } from "@/components/AppHeaderContent";
-import { AppFooter } from "@/components/AppFooter";
 
 export default function PrivacyPage() {
   const t = useTranslations("PrivacyPage");
@@ -9,13 +8,13 @@ export default function PrivacyPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       {/* Mobile Header */}
-      <header className="p-4 bg-background text-foreground md:hidden border-b">
+      <header className="p-4 bg-white text-black md:hidden border-b">
         <AppHeaderContent />
       </header>
 
       <div className="flex-grow md:grid md:grid-cols-[minmax(300px,_1fr)_2fr]">
-        {/* Left Column (Desktop-Only, Gray Background) */}
-        <div className="hidden md:flex flex-col justify-start p-12 bg-secondary text-secondary-foreground">
+        {/* Left Column (Desktop-Only, White Background) */}
+        <div className="hidden md:flex flex-col justify-start p-12 bg-white text-black">
           <AppHeaderContent />
         </div>
 
@@ -79,7 +78,6 @@ export default function PrivacyPage() {
           </div>
         </main>
       </div>
-      <AppFooter />
     </div>
   );
 }

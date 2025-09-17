@@ -248,13 +248,13 @@ export default function ResultsPage() {
         </div>
 
         {/* Right Column / Main Content (Black Background) */}
-        <main className="bg-black text-white w-full flex flex-col items-center justify-center p-4">
+        <main className="bg-black text-white w-full flex flex-col items-center justify-center p-4 pb-24 md:p-4">
           {content}
         </main>
       </div>
 
       {/* Mobile-Only Footer (White Background) */}
-      <footer className="p-4 bg-white text-black md:hidden">
+      <footer className="fixed bottom-0 left-0 right-0 z-10 p-4 bg-white text-black md:hidden border-t">
         <DisclaimerFooterContentMobile />
       </footer>
     </div>

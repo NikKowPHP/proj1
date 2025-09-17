@@ -1,3 +1,6 @@
 - [x] Make font size of subtitle similar to description text on the homepage.
 - [x] Redesign results page to match homepage layout.
 - [x] Redesign static pages (Terms, Privacy, Cookies) to match homepage layout.
+- [x] Fix mobile UI issues on homepage (centering, sticky footer, upward-expanding disclaimer).
+- [x] Make the footer fixed on mobile for the results page.
+- [x] Make homepage content area full viewport on mobile.

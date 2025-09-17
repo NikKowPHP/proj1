@@ -1,2 +1,3 @@
 - [x] Make font size of subtitle similar to description text on the homepage.
 - [x] Redesign results page to match homepage layout.
+- [x] Redesign static pages (Terms, Privacy, Cookies) to match homepage layout.

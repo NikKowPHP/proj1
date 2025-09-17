@@ -15,7 +15,7 @@ export function AppHeaderContent() {
           height={75}
           className="w-32 md:w-40"
         />
-        <p className="text-red-600 text-sm mt-1">
+        <p className="text-red-600 text-base mt-1">
           Easy questions to answer about your health.
         </p>
       </div>
@@ -26,4 +26,3 @@ export function AppHeaderContent() {
     </div>
   );
 }
-      

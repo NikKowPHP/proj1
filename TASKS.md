@@ -1,1 +1,2 @@
 - [x] Make font size of subtitle similar to description text on the homepage.
+- [x] Redesign results page to match homepage layout.

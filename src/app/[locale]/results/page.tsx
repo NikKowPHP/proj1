@@ -31,6 +31,9 @@ import { useEmailExport } from "@/lib/hooks/data/useEmailExport";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ActionPlanDisplay } from "@/components/ActionPlanDisplay";
+import { AppHeaderContent } from "@/components/AppHeaderContent";
+import { DisclaimerFooterContent } from "@/components/DisclaimerFooterContent";
+import { DisclaimerFooterContentMobile } from "@/components/DisclaimerFooterContentMobile";
 
 const loadingMessagesKeys = [
   "loadingMessage1",
@@ -112,9 +115,10 @@ export default function ResultsPage() {
     }
   };
 
+  let content: React.ReactNode;
 
   if (Object.keys(answers).length === 0 && !isPending && !assessment) {
-    return (
+    content = (
       <div className="container mx-auto p-4 max-w-2xl text-center space-y-4">
         <h1 className="text-2xl font-bold">{t("noDataTitle")}</h1>
         <p className="text-muted-foreground">{t("noDataDescription")}</p>
@@ -123,11 +127,9 @@ export default function ResultsPage() {
         </Button>
       </div>
     );
-  }
-
-  if (isPending) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+  } else if (isPending) {
+    content = (
+      <div className="flex flex-col items-center justify-center p-4 h-full">
         <Card className="text-center p-8 w-full max-w-md">
           <CardHeader>
             <CardTitle>{t("loadingTitle")}</CardTitle>
@@ -141,11 +143,9 @@ export default function ResultsPage() {
         </Card>
       </div>
     );
-  }
-
-  if (isError) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+  } else if (isError) {
+    content = (
+      <div className="flex flex-col items-center justify-center p-4 h-full">
         <Card className="text-center p-8 w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-destructive">{t("errorTitle")}</CardTitle>
@@ -162,16 +162,14 @@ export default function ResultsPage() {
         </Card>
       </div>
     );
-  }
-
-  return (
-    <div className="min-h-screen bg-background py-12 px-4">
-      <div className="container mx-auto max-w-3xl space-y-8">
+  } else {
+    content = (
+      <div className="container mx-auto max-w-3xl space-y-8 py-12 px-4">
         <div className="text-center">
           <h1 className="text-3xl font-bold">{t("resultsTitle")}</h1>
           <p className="text-muted-foreground mt-2">{t("resultsDescription")}</p>
         </div>
-        
+
         {assessment && <ActionPlanDisplay plan={assessment} />}
 
         <Card className="overflow-hidden">
@@ -182,7 +180,6 @@ export default function ResultsPage() {
           <CardContent className="flex flex-col sm:flex-row p-0 gap-4 sm:gap-0">
             <Button
               onClick={handleDownloadPdf}
-              // FIX: Removed size prop, added explicit padding for more height.
               className="rounded-none py-4 px-6 text-base"
             >
               <Download className="mr-2 h-4 w-4" />
@@ -192,7 +189,6 @@ export default function ResultsPage() {
               <DialogTrigger asChild>
                 <Button
                   variant="ghost"
-                  // FIX: Removed size prop, added explicit padding for more height.
                   className="rounded-none border-t border-white/10 py-10 sm:py-4 px-6 mx-4 text-base hover:bg-white/5 sm:border-t-0 sm:border-l"
                 >
                   <Mail className="mr-2 h-4 w-4" />
@@ -233,6 +229,34 @@ export default function ResultsPage() {
           </Button>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Mobile-Only Header (White Background) */}
+      <header className="p-4 bg-white text-black md:hidden">
+        <AppHeaderContent />
+      </header>
+
+      {/* Main Container: Becomes a grid on desktop, is a flex-grow item on mobile */}
+      <div className="flex-grow md:grid md:grid-cols-2">
+        {/* Left Column (Desktop-Only, White Background) */}
+        <div className="hidden md:flex flex-col justify-between p-12 bg-white text-black">
+          <AppHeaderContent />
+          <DisclaimerFooterContent />
+        </div>
+
+        {/* Right Column / Main Content (Black Background) */}
+        <main className="bg-black text-white w-full flex flex-col items-center justify-center p-4">
+          {content}
+        </main>
+      </div>
+
+      {/* Mobile-Only Footer (White Background) */}
+      <footer className="p-4 bg-white text-black md:hidden">
+        <DisclaimerFooterContentMobile />
+      </footer>
     </div>
   );
 }

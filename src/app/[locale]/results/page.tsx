@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAssessmentStore } from "@/lib/stores/assessment.store";
 import { useRiskAssessment } from "@/lib/hooks/data/useRiskAssessment";
 import {
@@ -60,6 +60,18 @@ export default function ResultsPage() {
   const [email, setEmail] = useState("");
   const emailExportMutation = useEmailExport();
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEmailDialogOpen) {
+      // Radix dialog animation is ~300ms. User wants 1s delay after.
+      const focusTimeout = setTimeout(() => {
+        emailInputRef.current?.focus();
+      }, 500); // 300ms animation + 1000ms delay
+
+      return () => clearTimeout(focusTimeout);
+    }
+  }, [isEmailDialogOpen]);
 
   useEffect(() => {
     if (Object.keys(answers).length > 0 && !assessment) {
@@ -164,7 +176,7 @@ export default function ResultsPage() {
     );
   } else {
     content = (
-      <div className="container mx-auto max-w-3xl space-y-8 px-4">
+      <div className="container mx-auto max-w-3xl space-y-8 py-12 px-4">
         <Button
           variant="ghost"
           className="pl-0"
@@ -203,7 +215,7 @@ export default function ResultsPage() {
                   {t("exportEmail")}
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                 <form onSubmit={handleEmailExport}>
                   <DialogHeader>
                     <DialogTitle>{t("emailDialogTitle")}</DialogTitle>
@@ -211,7 +223,7 @@ export default function ResultsPage() {
                   </DialogHeader>
                   <div className="py-4">
                     <Label htmlFor="email" className="sr-only">Email</Label>
-                    <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
+                    <Input ref={emailInputRef} id="email" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
                   </div>
                   <DialogFooter>
                     <Button type="submit" disabled={emailExportMutation.isPending}>

@@ -55,7 +55,7 @@ const DialogContent = React.forwardRef<
         "px-6 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]", // Safe area padding
         // Mobile: bottom sheet
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-        "bottom-0 left-0 right-0 rounded-t-lg border-t h-[40dvh] sm:h-auto",
+        "bottom-0 left-0 right-0 rounded-t-lg border-t h-[80dvh] sm:h-auto",
         // Desktop: centered modal
         "sm:max-w-lg  sm:border sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]",
         "sm:max-h-[40vh] sm:p-6", // Reset padding and adjust max-height for desktop

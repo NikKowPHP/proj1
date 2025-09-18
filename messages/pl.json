@@ -104,7 +104,8 @@
     "heightPlaceholderImperial": "np. 69",
     "weightPlaceholderMetric": "np. 70",
     "weightPlaceholderImperial": "np. 154",
-    "consentHealth": "Wyrażam zgodę na przetwarzanie moich danych o stanie zdrowia w celu wygenerowania tego jednorazowego planu profilaktycznego. Rozumiem, że te dane nie są przechowywane i zapoznałem/am się z <privacyLink>Polityką Prywatności</privacyLink>."
+    "consentHealth": "Wyrażam zgodę na przetwarzanie moich danych o stanie zdrowia w celu wygenerowania tego jednorazowego planu profilaktycznego. Rozumiem, że te dane nie są przechowywane i zapoznałem/am się z <privacyLink>Polityką Prywatności</privacyLink>.",
+    "consentGenetics": "Wyrażam szczególną zgodę na przetwarzanie moich danych genetycznych w celu tej oceny. Rozumiem, że te informacje są wrażliwe i objęte <privacyLink>Polityką Prywatności</privacyLink>."
   },
   "ResultsPage": {
     "noDataTitle": "Brak Danych Planu",

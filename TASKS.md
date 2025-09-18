@@ -57,23 +57,23 @@ This document outlines the necessary tasks to evolve the ONKONO application from
 
 *(Objective: Build the optional, collapsible "Advanced" sections as distinct modules.)*
 
--   [ ] **Implement "Progressive Disclosure" UX**
-    -   [ ] Create a main "Advanced" section container that is initially collapsed.
-    -   [ ] Structure each of the following modules as a collapsible card within this section.
+-   [x] **Implement "Progressive Disclosure" UX**
+    -   [x] Create a main "Advanced" section container that is initially collapsed.
+    -   [x] Structure each of the following modules as a collapsible card within this section.
 
--   [ ] **B1. Symptom Details Module**
-    -   [ ] Conditionally display this module only if a symptom was selected in the Core form.
-    -   [ ] Implement fields for each selected symptom: `onset`, `severity` (slider), `frequency`, `notes`.
+-   [x] **B1. Symptom Details Module**
+    -   [x] Conditionally display this module only if a symptom was selected in the Core form.
+    -   [x] Implement fields for each selected symptom: `onset`, `severity` (slider), `frequency`, `notes`.
 
--   [ ] **B2. Family Cancer History Module**
-    -   [ ] Conditionally display if `family_cancer_any=Yes`.
-    -   [ ] Use the `RepeatingGroup` pattern to allow adding multiple relatives.
-    -   [ ] For each relative, implement fields: `relation`, `cancer_type` (searchable), `age_dx`.
+-   [x] **B2. Family Cancer History Module**
+    -   [x] Conditionally display if `family_cancer_any=Yes`.
+    -   [x] Use the `RepeatingGroup` pattern to allow adding multiple relatives.
+    -   [x] For each relative, implement fields: `relation`, `cancer_type` (searchable), `age_dx`.
 
--   [ ] **B3. Genetics Module (Sensitive)**
-    -   [ ] Implement all fields as specified in the table (`genetic_testing_done`, `genetic_test_type`, etc.).
-    -   [ ] **Critical:** Implement the `genetic_processing_consent` checkbox. Submission of this specific module must be gated by this consent.
-    -   [ ] Add specified tooltips and microcopy to reassure the user.
+-   [x] **B3. Genetics Module (Sensitive)**
+    -   [x] Implement all fields as specified in the table (`genetic_testing_done`, `genetic_test_type`, etc.).
+    -   [x] **Critical:** Implement the `genetic_processing_consent` checkbox. Submission of this specific module must be gated by this consent.
+    -   [x] Add specified tooltips and microcopy to reassure the user.
 
 -   [ ] **Implement Female-Specific Health Module (`women_section`)**
     -   [ ] Conditionally show this entire module only if `sex_at_birth=Female`.

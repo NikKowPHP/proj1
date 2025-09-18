@@ -104,7 +104,8 @@
     "heightPlaceholderImperial": "e.g., 69",
     "weightPlaceholderMetric": "e.g., 70",
     "weightPlaceholderImperial": "e.g., 154",
-    "consentHealth": "I consent to the processing of my health data for the purpose of generating this one-time preventive plan. I understand this data is not stored and I have read the <privacyLink>Privacy Policy</privacyLink>."
+    "consentHealth": "I consent to the processing of my health data for the purpose of generating this one-time preventive plan. I understand this data is not stored and I have read the <privacyLink>Privacy Policy</privacyLink>.",
+    "consentGenetics": "I give specific consent to process my genetic data for this assessment. I understand this information is sensitive and is covered by the <privacyLink>Privacy Policy</privacyLink>."
   },
   "ResultsPage": {
     "noDataTitle": "No Plan Data",

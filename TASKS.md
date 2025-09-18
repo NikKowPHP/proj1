@@ -75,40 +75,40 @@ This document outlines the necessary tasks to evolve the ONKONO application from
     -   [x] **Critical:** Implement the `genetic_processing_consent` checkbox. Submission of this specific module must be gated by this consent.
     -   [x] Add specified tooltips and microcopy to reassure the user.
 
--   [ ] **Implement Female-Specific Health Module (`women_section`)**
-    -   [ ] Conditionally show this entire module only if `sex_at_birth=Female`.
-    -   [ ] Add `menopause_status` question.
-    -   [ ] Add `menopause_age`, conditionally shown if post-menopausal.
-    -   [ ] Add `had_children` question.
-    -   [ ] Add `first_child_age`, conditionally shown if user has children.
-    -   [ ] Add `hrt_use` question.
+-   [x] **Implement Female-Specific Health Module (`women_section`)**
+    -   [x] Conditionally show this entire module only if `sex_at_birth=Female`.
+    -   [x] Add `menopause_status` question.
+    -   [x] Add `menopause_age`, conditionally shown if post-menopausal.
+    -   [x] Add `had_children` question.
+    -   [x] Add `first_child_age`, conditionally shown if user has children.
+    -   [x] Add `hrt_use` question.
 
--   [ ] **B4. Personal Medical History Module**
-    -   [ ] Implement `illness_any` and the conditional `illness_list` multiselect.
-    -   [ ] Add sub-fields for `year`, `status`, etc., for each selected illness.
+-   [x] **B4. Personal Medical History Module**
+    -   [x] Implement `illness_any` and the conditional `illness_list` multiselect.
+    -   [x] Add sub-fields for `year`, `status`, etc., for each selected illness.
 
--   [ ] **B5. Personal Cancer History Module**
-    -   [ ] Implement `cancer_any` and the conditional repeating group for cancer diagnoses.
-    -   [ ] Add fields for `type`, `year_dx`, and `treatments`.
+-   [x] **B5. Personal Cancer History Module**
+    -   [x] Implement `cancer_any` and the conditional repeating group for cancer diagnoses.
+    -   [x] Add fields for `type`, `year_dx`, and `treatments`.
 
--   [ ] **B6. Screening & Immunization Module**
-    -   [ ] Implement all screening history fields (`colonoscopy`, `mammo`, etc.).
-    -   [ ] Implement age/sex-aware conditional logic for showing these questions.
+-   [x] **B6. Screening & Immunization Module**
+    -   [x] Implement all screening history fields (`colonoscopy`, `mammo`, etc.).
+    -   [x] Implement age/sex-aware conditional logic for showing these questions.
 
--   [ ] **B8. Sexual Health Module (Sensitive)**
-    -   [ ] Implement all fields for History and Practices.
-    -   [ ] Ensure the entire module is clearly marked as optional and is collapsed by default.
-    -   [ ] Ensure every sensitive question includes a "Prefer not to answer" option.
+-   [x] **B8. Sexual Health Module (Sensitive)**
+    -   [x] Implement all fields for History and Practices.
+    -   [x] Ensure the entire module is clearly marked as optional and is collapsed by default.
+    -   [x] Ensure every sensitive question includes a "Prefer not to answer" option.
 
--   [ ] **B9. Occupational Hazards Module**
-    -   [ ] Implement the `job_entries` repeating group.
-    -   [ ] Use the `SearchableSelect` for `job_title` (ISCO-08).
-    -   [ ] Use `Chip` components for `occ_exposures`.
+-   [x] **B9. Occupational Hazards Module**
+    -   [x] Implement the `job_entries` repeating group.
+    -   [x] Use the `SearchableSelect` for `job_title` (ISCO-08).
+    -   [x] Use `Chip` components for `occ_exposures`.
 
--   [ ] **B10. Environmental Exposures Module**
-    -   [ ] Implement all fields (`radon_tested`, `major_road` distance, etc.).
-    -   [ ] Add privacy-focused microcopy for the `home.postal_coarse` field.
-    -   [ ] Implement logic to handle radon units (Bq/m³ or pCi/L).
+-   [x] **B10. Environmental Exposures Module**
+    -   [x] Implement all fields (`radon_tested`, `major_road` distance, etc.).
+    -   [x] Add privacy-focused microcopy for the `home.postal_coarse` field.
+    -   [x] Implement logic to handle radon units (Bq/m³ or pCi/L).
 
 ---
 

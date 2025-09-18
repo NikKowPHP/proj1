@@ -105,7 +105,9 @@
     "weightPlaceholderMetric": "np. 70",
     "weightPlaceholderImperial": "np. 154",
     "consentHealth": "Wyrażam zgodę na przetwarzanie moich danych o stanie zdrowia w celu wygenerowania tego jednorazowego planu profilaktycznego. Rozumiem, że te dane nie są przechowywane i zapoznałem/am się z <privacyLink>Polityką Prywatności</privacyLink>.",
-    "consentGenetics": "Wyrażam szczególną zgodę na przetwarzanie moich danych genetycznych w celu tej oceny. Rozumiem, że te informacje są wrażliwe i objęte <privacyLink>Polityką Prywatności</privacyLink>."
+    "consentGenetics": "Wyrażam szczególną zgodę na przetwarzanie moich danych genetycznych w celu tej oceny. Rozumiem, że te informacje są wrażliwe i objęte <privacyLink>Polityką Prywatności</privacyLink>.",
+    "safetyBannerTitle": "Ważna uwaga",
+    "safetyBannerContent": "Wybrany objaw może mieć wiele przyczyn, ale ważne jest, aby niezwłocznie omówić go z lekarzem. To narzędzie nie służy do diagnozy."
   },
   "ResultsPage": {
     "noDataTitle": "Brak Danych Planu",

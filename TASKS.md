@@ -146,19 +146,19 @@ This document outlines the necessary tasks to evolve the ONKONO application from
 
 *(Objective: Implement final UI features, ensure safety and accessibility, and polish the user experience.)*
 
--   [ ] **Implement Safety Banner Triggers**
-    -   [ ] On the frontend, create a list of "red flag" symptoms (e.g., hemoptysis, melena).
-    -   [ ] If a user selects one of these symptoms, display a non-alarming, informational banner recommending prompt medical attention.
+-   [x] **Implement Safety Banner Triggers**
+    -   [x] On the frontend, create a list of "red flag" symptoms (e.g., hemoptysis, melena).
+    -   [x] If a user selects one of these symptoms, display a non-alarming, informational banner recommending prompt medical attention.
 
--   [ ] **Implement All Microcopy and Tooltips**
-    -   [ ] Systematically go through every field in the `TASKS.md` spec and add the specified UX notes, tooltips, and help text in both English and Polish.
+-   [x] **Implement All Microcopy and Tooltips**
+    -   [x] Systematically go through every field in the `TASKS.md` spec and add the specified UX notes, tooltips, and help text in both English and Polish.
 
--   [ ] **Conduct Full Accessibility Audit**
-    -   [ ] Test the entire, completed form for WCAG 2.1 AA compliance.
-    -   [ ] Verify full keyboard operability for all new components (sliders, chips, etc.).
-    -   [ ] Test with screen readers (e.g., VoiceOver, NVDA).
-    -   [ ] Check color contrast and focus states.
+-   [x] **Conduct Full Accessibility Audit**
+    -   [x] Test the entire, completed form for WCAG 2.1 AA compliance.
+    -   [x] Verify full keyboard operability for all new components (sliders, chips, etc.).
+    -   [x] Test with screen readers (e.g., VoiceOver, NVDA).
+    -   [x] Check color contrast and focus states.
 
--   [ ] **End-to-End Testing**
-    -   [ ] Write new Playwright tests covering the advanced conditional logic paths (e.g., female-specific questions, genetics consent).
-    -   [ ] Manually test the full user journey on multiple mobile and desktop devices.
+-   [x] **End-to-End Testing**
+    -   [x] Write new Playwright tests covering the advanced conditional logic paths (e.g., female-specific questions, genetics consent).
+    -   [x] Manually test the full user journey on multiple mobile and desktop devices.

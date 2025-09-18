@@ -14,5 +14,5 @@ global.fetch = jest.fn(() =>
 ) as jest.Mock;
 
 process.env.DATABASE_URL =
-  "postgresql://postgres:postgres@localhost:5434/lexity?schema=public";
+  "postgresql://postgres:postgres@localhost:5434/onkono?schema=public";
 process.env.APP_ENCRYPTION_KEY = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; // A valid 32-byte key

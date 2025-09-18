@@ -1,4 +1,3 @@
-
 # Development Plan: ONKONO Diagnostic Form - Full Spec Implementation
 
 This document outlines the necessary tasks to evolve the ONKONO application from its current MVP state to a full implementation of the `TASKS.md` specification. The plan is divided into logical phases, starting with foundational work and progressing through feature implementation and final polish.
@@ -29,8 +28,8 @@ This document outlines the necessary tasks to evolve the ONKONO application from
     -   [ ] Ensure the form submission button is disabled until this is checked.
     -   [ ] Link to the privacy policy page from the consent text.
 
--   [ ] **Codebase Cleanup**
-    -   [ ] Perform a global search for "Lexity" and replace all instances with "ONKONO" to ensure brand consistency.
+-   [x] **Codebase Cleanup**
+    -   [x] Perform a global search for "Lexity" and replace all instances with "ONKONO" to ensure brand consistency.
 
 ---
 

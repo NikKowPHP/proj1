@@ -11,6 +11,68 @@
           "type": "consent_checkbox"
         },
         {
+          "id": "intent",
+          "text": {
+            "en": "What is your goal today?",
+            "pl": "Jaki jest Twój cel na dziś?"
+          },
+          "type": "select",
+          "options": [
+            {
+              "label": {
+                "en": "General health check-up",
+                "pl": "Ogólne badanie stanu zdrowia"
+              }
+            },
+            {
+              "label": {
+                "en": "Concerned about a specific symptom",
+                "pl": "Zaniepokojony/a konkretnym objawem"
+              }
+            },
+            {
+              "label": {
+                "en": "Family history of cancer",
+                "pl": "Historia raka w rodzinie"
+              }
+            }
+          ]
+        },
+        {
+          "id": "source",
+          "text": {
+            "en": "Who is filling out this form?",
+            "pl": "Kto wypełnia ten formularz?"
+          },
+          "type": "select",
+          "options": [
+            {
+              "label": {
+                "en": "For myself",
+                "pl": "Dla siebie"
+              }
+            },
+            {
+              "label": {
+                "en": "For someone else",
+                "pl": "Dla kogoś innego"
+              }
+            }
+          ]
+        },
+        {
+          "id": "language",
+          "text": {
+            "en": "Preferred language for the report",
+            "pl": "Preferowany język raportu"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "English", "pl": "Angielski" } },
+            { "label": { "en": "Polish", "pl": "Polski" } }
+          ]
+        },
+        {
           "id": "age",
           "text": {
             "en": "What is your age range?",
@@ -26,7 +88,7 @@
           ]
         },
         {
-          "id": "sex",
+          "id": "sex_at_birth",
           "text": {
             "en": "What was your sex assigned at birth?",
             "pl": "Jaka była Twoja płeć przypisana przy urodzeniu?"
@@ -34,8 +96,29 @@
           "type": "select",
           "options": [
             { "label": { "en": "Male", "pl": "Mężczyzna" } },
-            { "label": { "en": "Female", "pl": "Kobieta" } }
+            { "label": { "en": "Female", "pl": "Kobieta" } },
+            { "label": { "en": "Intersex", "pl": "Interseksualny/a" } },
+            { "label": { "en": "Prefer not to say", "pl": "Wolę nie odpowiadać" } }
           ]
+        },
+        {
+          "id": "gender_identity",
+          "text": {
+            "en": "What is your gender identity? (Optional)",
+            "pl": "Jaka jest Twoja tożsamość płciowa? (Opcjonalnie)"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Man", "pl": "Mężczyzna" } },
+            { "label": { "en": "Woman", "pl": "Kobieta" } },
+            { "label": { "en": "Non-binary", "pl": "Niebinarny/a" } },
+            { "label": { "en": "Prefer to self-describe", "pl": "Wolę opisać samodzielnie" } },
+            { "label": { "en": "Prefer not to say", "pl": "Wolę nie odpowiadać" } }
+          ],
+          "dependsOn": {
+            "questionId": "sex_at_birth",
+            "value": { "en": "Prefer not to say", "pl": "Wolę nie odpowiadać" }
+          }
         },
         {
           "id": "height",
@@ -138,6 +221,20 @@
           ]
         },
         {
+          "id": "activity_level",
+          "text": {
+            "en": "How would you describe your weekly activity level?",
+            "pl": "Jak opisał(a)byś swój tygodniowy poziom aktywności?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Sedentary (little or no exercise)", "pl": "Siedzący (mało lub brak ćwiczeń)" } },
+            { "label": { "en": "Lightly active (light exercise/sports 1-3 days/week)", "pl": "Lekko aktywny (lekkie ćwiczenia/sport 1-3 dni/tydzień)" } },
+            { "label": { "en": "Moderately active (moderate exercise/sports 3-5 days/week)", "pl": "Umiarkowanie aktywny (umiarkowane ćwiczenia/sport 3-5 dni/tydzień)" } },
+            { "label": { "en": "Very active (hard exercise/sports 6-7 days a week)", "pl": "Bardzo aktywny (ciężkie ćwiczenia/sport 6-7 dni w tygodniu)" } }
+          ]
+        },
+        {
           "id": "diet_fruits_veg",
           "text": {
             "en": "How many servings of fruits and vegetables do you eat per day?",
@@ -163,6 +260,21 @@
             { "label": { "en": "1-2 times", "pl": "1-2 razy" } },
             { "label": { "en": "3-4 times", "pl": "3-4 razy" } },
             { "label": { "en": "5+ times", "pl": "5+ razy" } }
+          ]
+        },
+        {
+          "id": "diet_pattern",
+          "text": {
+            "en": "Which best describes your typical diet?",
+            "pl": "Które z poniższych najlepiej opisuje Twoją typową dietę?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Standard Western", "pl": "Standardowa zachodnia" } },
+            { "label": { "en": "Vegetarian", "pl": "Wegetariańska" } },
+            { "label": { "en": "Vegan", "pl": "Wegańska" } },
+            { "label": { "en": "Mediterranean", "pl": "Śródziemnomorska" } },
+            { "label": { "en": "Other", "pl": "Inna" } }
           ]
         }
       ]

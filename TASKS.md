@@ -37,13 +37,13 @@ This document outlines the necessary tasks to evolve the ONKONO application from
 
 *(Objective: Bring the existing "Core" form up to 100% compliance with the spec.)*
 
--   [ ] **Implement Missing Core Fields**
-    -   [ ] Add `intent` radio button question ("What’s your goal today?").
-    -   [ ] Add `source` select question ("Who is filling this form?").
-    -   [ ] Add `language` select question (though this is also handled by the URL).
-    -   [ ] Refactor `sex` field to `sex_at_birth` and add all specified options ("Female / Male / Intersex / Prefer not").
-    -   [ ] Add optional `gender_identity` field.
-    -   [ ] Add `diet_pattern` and `activity_level` fields.
+-   [x] **Implement Missing Core Fields**
+    -   [x] Add `intent` radio button question ("What’s your goal today?").
+    -   [x] Add `source` select question ("Who is filling this form?").
+    -   [x] Add `language` select question (though this is also handled by the URL).
+    -   [x] Refactor `sex` field to `sex_at_birth` and add all specified options ("Female / Male / Intersex / Prefer not").
+    -   [x] Add optional `gender_identity` field.
+    -   [x] Add `diet_pattern` and `activity_level` fields.
 
 -   [ ] **Implement Symptom Selection (`symptoms`)**
     -   [ ] Use the new `CheckboxGroup` component to display the "Red flag list" of symptoms.

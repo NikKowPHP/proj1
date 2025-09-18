@@ -15,13 +15,13 @@ This document outlines the necessary tasks to evolve the ONKONO application from
     -   [x] Update the frontend data fetching logic (`/api/questionnaire`) to serve this new, richer format.
     -   [x] Modify the `AssessmentPage` component to dynamically render questions and options from the new structure.
 
--   [ ] **Component Library Expansion**
-    -   [ ] Create or integrate a `CheckboxGroup` component for multi-select answers (e.g., for symptoms).
-    -   [ ] Create or integrate a `Slider` component (for 0-10 severity scores).
-    -   [ ] Create or integrate a `Chip` component for selectable tokens (e.g., for symptoms, exposures).
-    -   [ ] Create or integrate a `SearchableSelect` component for long lists (e.g., cancer types, job titles).
-    -   [ ] Create or integrate a `YearInput` component to simplify date entry where only the year is needed.
-    -   [ ] Create a `RepeatingGroup` component pattern for adding multiple entries (e.g., family members, jobs).
+-   [x] **Component Library Expansion**
+    -   [x] Create or integrate a `CheckboxGroup` component for multi-select answers (e.g., for symptoms).
+    -   [x] Create or integrate a `Slider` component (for 0-10 severity scores).
+    -   [x] Create or integrate a `Chip` component for selectable tokens (e.g., for symptoms, exposures).
+    -   [x] Create or integrate a `SearchableSelect` component for long lists (e.g., cancer types, job titles).
+    -   [x] Create or integrate a `YearInput` component to simplify date entry where only the year is needed.
+    -   [x] Create a `RepeatingGroup` component pattern for adding multiple entries (e.g., family members, jobs).
 
 -   [ ] **Implement Core Form Consent**
     -   [ ] Add the `consent.health` checkbox to the start of the form.

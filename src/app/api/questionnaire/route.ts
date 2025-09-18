@@ -30,7 +30,13 @@ const project = (node: any, locale: Locale): any => {
             typeof opt.label === "object" && opt.label !== null
               ? opt.label[locale]
               : opt.label;
-          // The value for the select is the localized label, which matches backend expectations
+
+          if (typeof opt.id === "string") {
+            // For checkbox groups, preserve the object structure
+            return { ...opt, label };
+          }
+
+          // For selects, return simple strings
           return label;
         });
       } else {
@@ -51,6 +57,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const localizedQuestionnaire = project(questionnaireData, finalLocale);
+    logger.info(`[API:questionnaire] Processed questionnaire for locale: ${finalLocale}`, { data: localizedQuestionnaire });
     return NextResponse.json(localizedQuestionnaire);
   } catch (error) {
     logger.error(`Error processing questionnaire for locale: ${finalLocale}`, error);

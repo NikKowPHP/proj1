@@ -162,3 +162,7 @@ This document outlines the necessary tasks to evolve the ONKONO application from
 -   [x] **End-to-End Testing**
     -   [x] Write new Playwright tests covering the advanced conditional logic paths (e.g., female-specific questions, genetics consent).
     -   [x] Manually test the full user journey on multiple mobile and desktop devices.
+
+### Debugging
+- [x] **Add Logging**
+    - [x] Add logging to trace symptom data flow from backend to frontend.

@@ -13,7 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Link, useRouter, useParams } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
+import { useParams } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
@@ -32,17 +33,33 @@ import { DisclaimerFooterContentMobile } from "@/components/DisclaimerFooterCont
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckboxGroup, CheckboxOption } from "@/components/ui/CheckboxGroup";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { SymptomDetails } from "@/components/assessment/SymptomDetails";
+import { FamilyCancerHistory } from "@/components/assessment/FamilyCancerHistory";
+import { Genetics } from "@/components/assessment/Genetics";
+import { FemaleHealth } from "@/components/assessment/FemaleHealth";
+import { PersonalMedicalHistory } from "@/components/assessment/PersonalMedicalHistory";
+import { PersonalCancerHistory } from "@/components/assessment/PersonalCancerHistory";
+import { ScreeningHistory } from "@/components/assessment/ScreeningHistory";
+import { SexualHealth } from "@/components/assessment/SexualHealth";
+import { OccupationalHazards } from "@/components/assessment/OccupationalHazards";
+import { EnvironmentalExposures } from "@/components/assessment/EnvironmentalExposures";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
+import { SafetyBanner } from "@/components/assessment/SafetyBanner";
 
 interface Question {
   id: string;
   text: string;
-  type: "select" | "number_input" | "consent_checkbox" | "checkbox_group";
+  type: "select" | "number_input" | "consent_checkbox" | "checkbox_group" | "advanced_modules" | "year_input";
   options?: any[]; // Can be string[] or CheckboxOption[]
   dependsOn?: {
     questionId: string;
-    value: string;
+    value: string | boolean;
   };
   exclusiveOptionId?: string;
+  modules?: any[];
+  tooltip?: string;
 }
 
 interface Step {
@@ -73,6 +90,7 @@ export default function AssessmentPage() {
   const [isClient, setIsClient] = useState(false);
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+  const [showSafetyBanner, setShowSafetyBanner] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -98,9 +116,34 @@ export default function AssessmentPage() {
 
   useEffect(() => {
     if (questionnaire) {
+      console.log("[DEBUG] Questionnaire data received on client:", questionnaire);
       setTotalSteps(questionnaire.steps.length);
     }
   }, [questionnaire, setTotalSteps]);
+
+  // Safety Banner Logic
+  useEffect(() => {
+    if (!questionnaire) return;
+    const symptomsAnswer = answers.symptoms;
+    if (symptomsAnswer) {
+      try {
+        const selectedIds = JSON.parse(symptomsAnswer);
+        const symptomOptions = questionnaire.steps
+          .flatMap(s => s.questions)
+          .find(q => q.id === 'symptoms')?.options || [];
+        
+        const hasRedFlag = selectedIds.some((id: string) => {
+          const option = symptomOptions.find(opt => opt.id === id);
+          return option?.red_flag;
+        });
+        setShowSafetyBanner(hasRedFlag);
+      } catch (e) {
+        setShowSafetyBanner(false);
+      }
+    } else {
+       setShowSafetyBanner(false);
+    }
+  }, [answers.symptoms, questionnaire]);
 
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
@@ -171,13 +214,22 @@ export default function AssessmentPage() {
   const stepData = questionnaire?.steps[currentStep];
   const progressPercentage = ((currentStep + 1) / totalSteps) * 100;
 
-  const visibleQuestions =
-    stepData?.questions.filter((q) => {
-      if (!q.dependsOn) return true;
-      const dependencyAnswer = answers[q.dependsOn.questionId];
-      if (!dependencyAnswer) return false;
-      return dependencyAnswer === q.dependsOn.value;
-    }) || [];
+  const isQuestionVisible = (question: Question) => {
+    if (!question.dependsOn) return true;
+    const dependencyAnswer = answers[question.dependsOn.questionId];
+    if(typeof question.dependsOn.value === 'boolean') {
+        if(question.dependsOn.value) {
+            // "depends on being answered" logic
+            return !!dependencyAnswer && dependencyAnswer !== '[]' && dependencyAnswer !== 'false' && dependencyAnswer !== '["none"]';
+        } else {
+            return !dependencyAnswer || dependencyAnswer === '[]' || dependencyAnswer === 'false' || dependencyAnswer === '["none"]';
+        }
+    }
+    if (!dependencyAnswer) return false;
+    return dependencyAnswer === question.dependsOn.value;
+  };
+
+  const visibleQuestions = stepData?.questions.filter(isQuestionVisible) || [];
 
   const isStepComplete = () => {
     if (!questionnaire) return false;
@@ -195,6 +247,9 @@ export default function AssessmentPage() {
         } catch {
           return false;
         }
+      }
+       if (q.type === "advanced_modules") {
+        return true; // The container itself requires no validation
       }
       return answers[q.id] && answers[q.id].trim() !== "";
     });
@@ -264,7 +319,7 @@ export default function AssessmentPage() {
                 })}
               </p>
             </div>
-
+            {showSafetyBanner && <SafetyBanner />}
             <section className="space-y-6">
               {" "}
               {/* Enforces consistent vertical rhythm */}
@@ -291,8 +346,18 @@ export default function AssessmentPage() {
               )}
               {visibleQuestions.map((question) => (
                 <div key={question.id} className="space-y-2">
-                  {question.type !== "consent_checkbox" && (
-                    <Label htmlFor={question.id}>{question.text}</Label>
+                  {question.type !== "consent_checkbox" && question.type !== 'advanced_modules' && (
+                    <div className="flex items-center gap-2">
+                       <Label htmlFor={question.id}>{question.text}</Label>
+                       {question.tooltip && (
+                         <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild><Info className="h-4 w-4 text-muted-foreground cursor-help" /></TooltipTrigger>
+                              <TooltipContent><p>{question.tooltip}</p></TooltipContent>
+                            </Tooltip>
+                         </TooltipProvider>
+                       )}
+                    </div>
                   )}
                   {question.type === "select" && (
                     <Select
@@ -395,6 +460,113 @@ export default function AssessmentPage() {
                       }
                       exclusiveOption={question.exclusiveOptionId}
                     />
+                  )}
+                  {question.type === 'advanced_modules' && (
+                    <Accordion type="multiple" className="w-full">
+                       {question.modules?.filter(isQuestionVisible).map(module => {
+                        if (module.id === 'symptom_details') {
+                          const selectedSymptoms = answers.symptoms ?
+                                    questionnaire?.steps.flatMap(s => s.questions).find(q => q.id === 'symptoms')?.options?.filter(opt => JSON.parse(answers.symptoms).includes(opt.id)) || []
+                                    : [];
+                          console.log("[DEBUG] `answers.symptoms`:", answers.symptoms);
+                          console.log("[DEBUG] Calculated `selectedSymptoms` prop:", selectedSymptoms);
+
+                          return (
+                            <AccordionItem value={module.id} key={module.id}>
+                              <AccordionTrigger>{module.title}</AccordionTrigger>
+                              <AccordionContent>
+                                <SymptomDetails 
+                                  selectedSymptoms={selectedSymptoms}
+                                  value={
+                                    Object.keys(answers).reduce((acc, key) => {
+                                      if (key.startsWith('symptom_details_')) {
+                                        const symptomId = key.replace('symptom_details_', '');
+                                        acc[symptomId] = JSON.parse(answers[key]);
+                                      }
+                                      return acc;
+                                    }, {} as Record<string, any>)
+                                  }
+                                  onChange={(symptomId, details) => {
+                                    setAnswer(`symptom_details_${symptomId}`, JSON.stringify(details))
+                                  }}
+                                />
+                              </AccordionContent>
+                            </AccordionItem>
+                          );
+                        }
+                        
+                        return (
+                          <AccordionItem value={module.id} key={module.id}>
+                            <AccordionTrigger>{module.title}</AccordionTrigger>
+                            <AccordionContent>
+                                {module.id === 'family_cancer_history' && (
+                                  <FamilyCancerHistory 
+                                    value={answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : []}
+                                    onChange={(value) => setAnswer('family_cancer_history', JSON.stringify(value))}
+                                    options={module.options}
+                                  />
+                                )}
+                                {module.id === 'genetics' && (
+                                  <Genetics
+                                    answers={answers}
+                                    onAnswer={setAnswer}
+                                    questions={module.questions}
+                                  />
+                                )}
+                                {module.id === 'female_health' && (
+                                  <FemaleHealth
+                                    answers={answers}
+                                    onAnswer={setAnswer}
+                                    questions={module.questions}
+                                  />
+                                )}
+                                {module.id === 'personal_medical_history' && (
+                                  <PersonalMedicalHistory
+                                    answers={answers}
+                                    onAnswer={setAnswer}
+                                    options={module.options}
+                                  />
+                                )}
+                                 {module.id === 'personal_cancer_history' && (
+                                  <PersonalCancerHistory
+                                    value={answers.personal_cancer_history ? JSON.parse(answers.personal_cancer_history) : []}
+                                    onChange={(value) => setAnswer('personal_cancer_history', JSON.stringify(value))}
+                                    options={module.options}
+                                  />
+                                )}
+                                {module.id === 'screening_immunization' && (
+                                  <ScreeningHistory
+                                    answers={answers}
+                                    onAnswer={setAnswer}
+                                    questions={module.questions}
+                                  />
+                                )}
+                                {module.id === 'sexual_health' && (
+                                  <SexualHealth
+                                    answers={answers}
+                                    onAnswer={setAnswer}
+                                    questions={module.questions}
+                                  />
+                                )}
+                                {module.id === 'occupational_hazards' && (
+                                  <OccupationalHazards
+                                    value={answers.occupational_hazards ? JSON.parse(answers.occupational_hazards) : []}
+                                    onChange={(value) => setAnswer('occupational_hazards', JSON.stringify(value))}
+                                    options={module.options}
+                                  />
+                                )}
+                                 {module.id === 'environmental_exposures' && (
+                                  <EnvironmentalExposures
+                                    answers={answers}
+                                    onAnswer={setAnswer}
+                                    questions={module.questions}
+                                  />
+                                )}
+                            </AccordionContent>
+                          </AccordionItem>
+                        );
+                       })}
+                    </Accordion>
                   )}
                 </div>
               ))}

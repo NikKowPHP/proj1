@@ -103,7 +103,8 @@
     "heightPlaceholderMetric": "np. 175",
     "heightPlaceholderImperial": "np. 69",
     "weightPlaceholderMetric": "np. 70",
-    "weightPlaceholderImperial": "np. 154"
+    "weightPlaceholderImperial": "np. 154",
+    "consentHealth": "Wyrażam zgodę na przetwarzanie moich danych o stanie zdrowia w celu wygenerowania tego jednorazowego planu profilaktycznego. Rozumiem, że te dane nie są przechowywane i zapoznałem/am się z <privacyLink>Polityką Prywatności</privacyLink>."
   },
   "ResultsPage": {
     "noDataTitle": "Brak Danych Planu",

@@ -23,10 +23,10 @@ This document outlines the necessary tasks to evolve the ONKONO application from
     -   [x] Create or integrate a `YearInput` component to simplify date entry where only the year is needed.
     -   [x] Create a `RepeatingGroup` component pattern for adding multiple entries (e.g., family members, jobs).
 
--   [ ] **Implement Core Form Consent**
-    -   [ ] Add the `consent.health` checkbox to the start of the form.
-    -   [ ] Ensure the form submission button is disabled until this is checked.
-    -   [ ] Link to the privacy policy page from the consent text.
+-   [x] **Implement Core Form Consent**
+    -   [x] Add the `consent.health` checkbox to the start of the form.
+    -   [x] Ensure the form submission button is disabled until this is checked.
+    -   [x] Link to the privacy policy page from the consent text.
 
 -   [x] **Codebase Cleanup**
     -   [x] Perform a global search for "Lexity" and replace all instances with "ONKONO" to ensure brand consistency.

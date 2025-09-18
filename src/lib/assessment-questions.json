@@ -7,6 +7,10 @@
       },
       "questions": [
         {
+          "id": "consent_health",
+          "type": "consent_checkbox"
+        },
+        {
           "id": "age",
           "text": {
             "en": "What is your age range?",

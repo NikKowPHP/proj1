@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRouter, useParams } from "next/navigation";
+import { Link, useRouter, useParams } from "@/i18n/navigation";
 import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
@@ -30,11 +30,12 @@ import { AppHeaderContent } from "@/components/AppHeaderContent";
 import { DisclaimerFooterContent } from "@/components/DisclaimerFooterContent";
 import { DisclaimerFooterContentMobile } from "@/components/DisclaimerFooterContentMobile";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Question {
   id: string;
   text: string;
-  type: "select" | "number_input";
+  type: "select" | "number_input" | "consent_checkbox";
   options?: string[];
   dependsOn?: {
     questionId: string;
@@ -179,9 +180,12 @@ export default function AssessmentPage() {
   const isStepComplete = () => {
     if (!questionnaire) return false;
 
-    const allAnswered = visibleQuestions.every(
-      (q) => answers[q.id] && answers[q.id].trim() !== "",
-    );
+    const allAnswered = visibleQuestions.every((q) => {
+      if (q.type === "consent_checkbox") {
+        return answers[q.id] === 'true';
+      }
+      return answers[q.id] && answers[q.id].trim() !== "";
+    });
     const noErrors = visibleQuestions.every((q) => !localErrors[q.id]);
 
     return allAnswered && noErrors;
@@ -275,7 +279,7 @@ export default function AssessmentPage() {
               )}
               {visibleQuestions.map((question) => (
                 <div key={question.id} className="space-y-2">
-                  <Label htmlFor={question.id}>{question.text}</Label>
+                   {question.type !== 'consent_checkbox' && <Label htmlFor={question.id}>{question.text}</Label>}
                   {question.type === "select" && (
                     <Select
                       onValueChange={(value) => setAnswer(question.id, value)}
@@ -333,6 +337,39 @@ export default function AssessmentPage() {
                         </p>
                       )}
                     </>
+                  )}
+                  {question.type === "consent_checkbox" && (
+                     <div className="flex items-start space-x-3 rounded-md border p-4">
+                      <Checkbox
+                        id={question.id}
+                        checked={answers[question.id] === "true"}
+                        onCheckedChange={(checked) =>
+                          setAnswer(
+                            question.id,
+                            checked ? "true" : "false",
+                          )
+                        }
+                      />
+                       <div className="grid gap-1.5 leading-none">
+                        <label
+                          htmlFor={question.id}
+                          className="text-sm leading-snug text-muted-foreground"
+                        >
+                          {t.rich("consentHealth", {
+                            privacyLink: (chunks) => (
+                              <Link
+                                href="/privacy"
+                                className="font-semibold text-primary hover:underline"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {chunks}
+                              </Link>
+                            ),
+                          })}
+                        </label>
+                      </div>
+                    </div>
                   )}
                 </div>
               ))}

@@ -116,29 +116,29 @@ This document outlines the necessary tasks to evolve the ONKONO application from
 
 *(Objective: Process the new rich data correctly and enhance the AI's ability to generate a truly personalized plan.)*
 
--   [ ] **Implement Data Standardization Engine (Backend)**
-    -   [ ] Create a mapping service to convert form values to standardized codes.
-    -   [ ] Map conditions and cancers to **SNOMED CT / ICD-O**.
-    -   [ ] Map measurements (height, weight) to **LOINC**.
-    -   [ ] Map job titles to **ISCO08**.
-    -   [ ] Ensure all units are stored in **UCUM** format.
-    -   [ ] Ensure all genetic findings are mapped to **HGNC/HGVS**.
+-   [x] **Implement Data Standardization Engine (Backend)**
+    -   [x] Create a mapping service to convert form values to standardized codes.
+    -   [x] Map conditions and cancers to **SNOMED CT / ICD-O**.
+    -   [x] Map measurements (height, weight) to **LOINC**.
+    -   [x] Map job titles to **ISCO08**.
+    -   [x] Ensure all units are stored in **UCUM** format.
+    -   [x] Ensure all genetic findings are mapped to **HGNC/HGVS**.
 
--   [ ] **Implement Server-Side Derived Variables**
-    -   [ ] Add logic to the `/api/assess` route to calculate `age_years` (from DOB), `bmi`, and `pack_years`.
-    -   [ ] Create an `organ_inventory` flag system (e.g., `has_cervix`) based on user inputs to gate screening recommendations.
+-   [x] **Implement Server-Side Derived Variables**
+    -   [x] Add logic to the `/api/assess` route to calculate `age_years` (from DOB), `bmi`, and `pack_years`.
+    -   [x] Create an `organ_inventory` flag system (e.g., `has_cervix`) based on user inputs to gate screening recommendations.
 
--   [ ] **Implement JEM Backend Logic**
-    -   [ ] Create a backend service that takes a job title (or ISCO08 code) and returns a list of suggested `occ_exposures`.
-    -   [ ] Create a new API endpoint for the frontend to call when a job title is selected.
+-   [x] **Implement JEM Backend Logic**
+    -   [x] Create a backend service that takes a job title (or ISCO08 code) and returns a list of suggested `occ_exposures`.
+    -   [x] Create a new API endpoint for the frontend to call when a job title is selected.
 
--   [ ] **Update AI Prompts and Payloads**
-    -   [ ] Heavily revise `preventivePlanExplainer.prompt.ts` to accept the new, complex, and coded data payload.
-    -   [ ] Add logic to the prompt to instruct the AI on how to interpret and explain findings from genetics, occupational hazards, family history, etc.
+-   [x] **Update AI Prompts and Payloads**
+    -   [x] Heavily revise `preventivePlanExplainer.prompt.ts` to accept the new, complex, and coded data payload.
+    -   [x] Add logic to the prompt to instruct the AI on how to interpret and explain findings from genetics, occupational hazards, family history, etc.
 
--   [ ] **Construct Final Submission Payload**
-    -   [ ] Modify the `/api/assess` route to structure the final data sent to the AI according to the full envelope specified in spec section 'F'.
-    -   [ ] Ensure explicit `unknown` and `prefer_not` values are preserved and not collapsed to `null`.
+-   [x] **Construct Final Submission Payload**
+    -   [x] Modify the `/api/assess` route to structure the final data sent to the AI according to the full envelope specified in spec section 'F'.
+    -   [x] Ensure explicit `unknown` and `prefer_not` values are preserved and not collapsed to `null`.
 
 ---
 

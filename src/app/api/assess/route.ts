@@ -5,6 +5,8 @@ import { getAIService } from "@/lib/ai";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { generatePlan } from "@/lib/services/guideline-engine.service";
+import { StandardizationService } from "@/lib/services/standardization.service";
+import { DerivedVariablesService } from "@/lib/services/derived-variables.service";
 
 const answersSchema = z
   .object({
@@ -72,7 +74,7 @@ async function logAssessmentStatus(status: string) {
 
 export async function POST(request: NextRequest) {
   const forwarded = request.headers.get("x-forwarded-for");
-  const ip = forwarded ? forwarded.split(/, /)[0] : "127.0.0.1";
+  const ip = forwarded ? forwarded.split(/, /) : "127.0.0.1";
   logger.info(`[API:assess] Request received from IP: ${ip}`);
 
   const limit = ipRateLimiter(ip);
@@ -121,7 +123,23 @@ export async function POST(request: NextRequest) {
 
     logger.info("[API:assess] Answers successfully parsed and validated.");
 
-    // 1. Run deterministic guideline engine
+    // 1. Standardize the raw answers into a structured payload
+    logger.info("[API:assess] Standardizing user answers...");
+    const standardizedPayload = StandardizationService.standardize(validatedAnswers.data);
+    logger.info("[API:assess] Standardization complete.");
+
+    // 2. Calculate derived variables (e.g., BMI)
+    logger.info("[API:assess] Calculating derived variables...");
+    const derivedVariables = DerivedVariablesService.calculateAll(standardizedPayload);
+    logger.info("[API:assess] Derived variables calculation complete.", { derivedVariables });
+    
+    // 3. Construct the final envelope for the AI
+    const finalPayload = {
+      standardized_data: standardizedPayload,
+      derived_variables: derivedVariables,
+    };
+    
+    // 4. Run deterministic guideline engine
     logger.info(`[API:assess] Starting guideline engine for locale: ${locale}...`);
     const guidelinePlan = generatePlan(
       validatedAnswers.data as Record<string, string>,
@@ -131,16 +149,21 @@ export async function POST(request: NextRequest) {
       `[API:assess] Guideline engine completed. Found ${guidelinePlan.screenings.length} screenings, ${guidelinePlan.lifestyle.length} lifestyle tips, ${guidelinePlan.topicsForDoctor.length} topics.`,
     );
 
-    // 2. Get AI-powered explanation for the generated plan
+    // Attach deterministic plan to the final payload for the AI
+    const payloadForAI = { ...finalPayload, guideline_plan: guidelinePlan };
+
+    // 5. Get AI-powered explanation for the generated plan
     logger.info(`[API:assess] Requesting AI explanation in locale: ${locale}`);
     const aiService = getAIService();
+    // Note: The `getPlanExplanation` now receives the full structured payload.
+    // The prompt inside `getPreventivePlanExplainerPrompt` will need to be updated to handle this new structure.
     const { result, serviceUsed } =
-      await aiService.getPlanExplanation(guidelinePlan, undefined, locale);
+      await aiService.getPlanExplanation(payloadForAI as any, undefined, locale);
     logger.info(
       `[API:assess] AI explanation received from service: ${serviceUsed}.`,
     );
 
-    // 3. Validate the AI's explanation response
+    // 6. Validate the AI's explanation response
     logger.info("[API:assess] Validating AI response structure...");
     const validatedResult = aiResponseSchema.safeParse(result);
     if (!validatedResult.success) {
@@ -178,4 +201,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-      

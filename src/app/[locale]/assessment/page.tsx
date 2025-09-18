@@ -31,16 +31,18 @@ import { DisclaimerFooterContent } from "@/components/DisclaimerFooterContent";
 import { DisclaimerFooterContentMobile } from "@/components/DisclaimerFooterContentMobile";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
+import { CheckboxGroup, CheckboxOption } from "@/components/ui/CheckboxGroup";
 
 interface Question {
   id: string;
   text: string;
-  type: "select" | "number_input" | "consent_checkbox";
-  options?: string[];
+  type: "select" | "number_input" | "consent_checkbox" | "checkbox_group";
+  options?: any[]; // Can be string[] or CheckboxOption[]
   dependsOn?: {
     questionId: string;
     value: string;
   };
+  exclusiveOptionId?: string;
 }
 
 interface Step {
@@ -182,7 +184,17 @@ export default function AssessmentPage() {
 
     const allAnswered = visibleQuestions.every((q) => {
       if (q.type === "consent_checkbox") {
-        return answers[q.id] === 'true';
+        return answers[q.id] === "true";
+      }
+      if (q.type === "checkbox_group") {
+        const value = answers[q.id];
+        if (!value) return false;
+        try {
+          const arr = JSON.parse(value);
+          return Array.isArray(arr) && arr.length > 0;
+        } catch {
+          return false;
+        }
       }
       return answers[q.id] && answers[q.id].trim() !== "";
     });
@@ -279,7 +291,9 @@ export default function AssessmentPage() {
               )}
               {visibleQuestions.map((question) => (
                 <div key={question.id} className="space-y-2">
-                   {question.type !== 'consent_checkbox' && <Label htmlFor={question.id}>{question.text}</Label>}
+                  {question.type !== "consent_checkbox" && (
+                    <Label htmlFor={question.id}>{question.text}</Label>
+                  )}
                   {question.type === "select" && (
                     <Select
                       onValueChange={(value) => setAnswer(question.id, value)}
@@ -295,7 +309,7 @@ export default function AssessmentPage() {
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {question.options?.map((option) => (
+                        {(question.options as string[])?.map((option) => (
                           <SelectItem key={option} value={option}>
                             {option}
                           </SelectItem>
@@ -339,18 +353,15 @@ export default function AssessmentPage() {
                     </>
                   )}
                   {question.type === "consent_checkbox" && (
-                     <div className="flex items-start space-x-3 rounded-md border p-4">
+                    <div className="flex items-start space-x-3 rounded-md border p-4">
                       <Checkbox
                         id={question.id}
                         checked={answers[question.id] === "true"}
                         onCheckedChange={(checked) =>
-                          setAnswer(
-                            question.id,
-                            checked ? "true" : "false",
-                          )
+                          setAnswer(question.id, checked ? "true" : "false")
                         }
                       />
-                       <div className="grid gap-1.5 leading-none">
+                      <div className="grid gap-1.5 leading-none">
                         <label
                           htmlFor={question.id}
                           className="text-sm leading-snug text-muted-foreground"
@@ -370,6 +381,20 @@ export default function AssessmentPage() {
                         </label>
                       </div>
                     </div>
+                  )}
+                  {question.type === "checkbox_group" && (
+                    <CheckboxGroup
+                      options={question.options as CheckboxOption[]}
+                      value={
+                        answers[question.id]
+                          ? JSON.parse(answers[question.id])
+                          : []
+                      }
+                      onChange={(selectedIds) =>
+                        setAnswer(question.id, JSON.stringify(selectedIds))
+                      }
+                      exclusiveOption={question.exclusiveOptionId}
+                    />
                   )}
                 </div>
               ))}

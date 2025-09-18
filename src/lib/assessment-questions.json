@@ -204,6 +204,52 @@
       ]
     },
     {
+      "title": { "en": "Symptoms", "pl": "Objawy" },
+      "questions": [
+        {
+          "id": "symptoms",
+          "text": {
+            "en": "Are you currently experiencing any of the following? (Select all that apply)",
+            "pl": "Czy obecnie doświadczasz któregoś z poniższych objawów? (Zaznacz wszystkie pasujące)"
+          },
+          "type": "checkbox_group",
+          "exclusiveOptionId": "none",
+          "options": [
+            {
+              "id": "fatigue",
+              "label": { "en": "Unusual or extreme tiredness", "pl": "Niezwykłe lub ekstremalne zmęczenie" },
+              "hpo_code": "HP:0012378"
+            },
+            {
+              "id": "unexplained_weight_loss",
+              "label": { "en": "Unexplained weight loss", "pl": "Niewyjaśniona utrata wagi" },
+              "hpo_code": "HP:0004355"
+            },
+            {
+              "id": "fever",
+              "label": { "en": "Fever that is persistent or comes and goes", "pl": "Gorączka, która jest uporczywa lub nawracająca" },
+              "hpo_code": "HP:0001945"
+            },
+            {
+              "id": "pain",
+              "label": { "en": "Persistent pain", "pl": "Uporczywy ból" },
+              "hpo_code": "HP:0100730"
+            },
+            {
+              "id": "skin_changes",
+              "label": { "en": "Skin changes (new mole, sore that doesn't heal)", "pl": "Zmiany skórne (nowy pieprzyk, niegojąca się rana)" },
+              "hpo_code": "HP:0000989"
+            },
+            {
+              "id": "none",
+              "label": { "en": "None of the above", "pl": "Żadne z powyższych" },
+              "hpo_code": "NONE"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": { "en": "Diet & Exercise", "pl": "Dieta i Ćwiczenia" },
       "questions": [
         {

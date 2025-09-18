@@ -45,11 +45,11 @@ This document outlines the necessary tasks to evolve the ONKONO application from
     -   [x] Add optional `gender_identity` field.
     -   [x] Add `diet_pattern` and `activity_level` fields.
 
--   [ ] **Implement Symptom Selection (`symptoms`)**
-    -   [ ] Use the new `CheckboxGroup` component to display the "Red flag list" of symptoms.
-    -   [ ] Implement the exclusive "None" option (if "None" is checked, all other symptoms are unchecked).
-    -   [ ] Ensure the form requires at least one symptom or "None" to be selected to proceed.
-    -   [ ] **Backend:** Map selected symptoms to their corresponding HPO codes for the submission payload.
+-   [x] **Implement Symptom Selection (`symptoms`)**
+    -   [x] Use the new `CheckboxGroup` component to display the "Red flag list" of symptoms.
+    -   [x] Implement the exclusive "None" option (if "None" is checked, all other symptoms are unchecked).
+    -   [x] Ensure the form requires at least one symptom or "None" to be selected to proceed.
+    -   [x] **Backend:** Map selected symptoms to their corresponding HPO codes for the submission payload.
 
 ---
 

@@ -1,0 +1,248 @@
+{
+  "steps": [
+    {
+      "title": {
+        "en": "Building Your Profile",
+        "pl": "Tworzenie Twojego Profilu"
+      },
+      "questions": [
+        {
+          "id": "age",
+          "text": {
+            "en": "What is your age range?",
+            "pl": "W jakim jesteś przedziale wiekowym?"
+          },
+          "type": "select",
+          "options": [
+            { "value": "18-29", "label": "18-29" },
+            { "value": "30-39", "label": "30-39" },
+            { "value": "40-49", "label": "40-49" },
+            { "value": "50-59", "label": "50-59" },
+            { "value": "60+", "label": "60+" }
+          ]
+        },
+        {
+          "id": "sex",
+          "text": {
+            "en": "What was your sex assigned at birth?",
+            "pl": "Jaka była Twoja płeć przypisana przy urodzeniu?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Male", "pl": "Mężczyzna" } },
+            { "label": { "en": "Female", "pl": "Kobieta" } }
+          ]
+        },
+        {
+          "id": "height",
+          "text": { "en": "Height", "pl": "Wzrost" },
+          "type": "number_input"
+        },
+        {
+          "id": "weight",
+          "text": { "en": "Weight", "pl": "Waga" },
+          "type": "number_input"
+        }
+      ]
+    },
+    {
+      "title": { "en": "Lifestyle Habits", "pl": "Nawyki Stylu Życia" },
+      "questions": [
+        {
+          "id": "smoking_status",
+          "text": {
+            "en": "What is your smoking status?",
+            "pl": "Jaki jest Twój status palenia?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Never smoked", "pl": "Nigdy nie paliłem/am" } },
+            { "label": { "en": "Former smoker", "pl": "Były palacz" } },
+            { "label": { "en": "Current smoker", "pl": "Obecny palacz" } }
+          ]
+        },
+        {
+          "id": "smoking_duration",
+          "text": {
+            "en": "For how many years have you been smoking?",
+            "pl": "Od ilu lat palisz?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Less than 5 years", "pl": "Mniej niż 5 lat" } },
+            { "label": { "en": "5-10 years", "pl": "5-10 lat" } },
+            { "label": { "en": "11-20 years", "pl": "11-20 lat" } },
+            {
+              "label": { "en": "More than 20 years", "pl": "Ponad 20 lat" }
+            }
+          ],
+          "dependsOn": {
+            "questionId": "smoking_status",
+            "value": { "en": "Current smoker", "pl": "Obecny palacz" }
+          }
+        },
+        {
+          "id": "smoking_years_quit",
+          "text": {
+            "en": "How many years has it been since you quit smoking?",
+            "pl": "Ile lat minęło, odkąd rzuciłeś/aś palenie?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Less than 1 year", "pl": "Mniej niż 1 rok" } },
+            { "label": { "en": "1-5 years", "pl": "1-5 lat" } },
+            { "label": { "en": "6-10 years", "pl": "6-10 lat" } },
+            { "label": { "en": "More than 10 years", "pl": "Ponad 10 lat" } }
+          ],
+          "dependsOn": {
+            "questionId": "smoking_status",
+            "value": { "en": "Former smoker", "pl": "Były palacz" }
+          }
+        },
+        {
+          "id": "alcohol",
+          "text": {
+            "en": "On average, how many alcoholic drinks do you have per week?",
+            "pl": "Średnio, ile napojów alkoholowych spożywasz tygodniowo?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "None", "pl": "Wcale" } },
+            { "label": "1-2" },
+            { "label": "3-7" },
+            { "label": "8-14" },
+            { "label": "15+" }
+          ]
+        }
+      ]
+    },
+    {
+      "title": { "en": "Diet & Exercise", "pl": "Dieta i Ćwiczenia" },
+      "questions": [
+        {
+          "id": "activity",
+          "text": {
+            "en": "How many days per week do you get at least 30 minutes of moderate physical activity?",
+            "pl": "Ile dni w tygodniu poświęcasz co najmniej 30 minut na umiarkowaną aktywność fizyczną?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "0 days", "pl": "0 dni" } },
+            { "label": { "en": "1-2 days", "pl": "1-2 dni" } },
+            { "label": { "en": "3-4 days", "pl": "3-4 dni" } },
+            { "label": { "en": "5+ days", "pl": "5+ dni" } }
+          ]
+        },
+        {
+          "id": "diet_fruits_veg",
+          "text": {
+            "en": "How many servings of fruits and vegetables do you eat per day?",
+            "pl": "Ile porcji owoców i warzyw jesz dziennie?"
+          },
+          "type": "select",
+          "options": [
+            { "label": "0-1" },
+            { "label": "2-3" },
+            { "label": "4-5" },
+            { "label": "6+" }
+          ]
+        },
+        {
+          "id": "diet_red_meat",
+          "text": {
+            "en": "How often do you eat red or processed meat per week?",
+            "pl": "Jak często w tygodniu jesz czerwone lub przetworzone mięso?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Never or rarely", "pl": "Nigdy lub rzadko" } },
+            { "label": { "en": "1-2 times", "pl": "1-2 razy" } },
+            { "label": { "en": "3-4 times", "pl": "3-4 razy" } },
+            { "label": { "en": "5+ times", "pl": "5+ razy" } }
+          ]
+        }
+      ]
+    },
+    {
+      "title": { "en": "Health Conditions", "pl": "Schorzenia" },
+      "questions": [
+        {
+          "id": "known_blood_pressure",
+          "text": {
+            "en": "Have you been diagnosed with high blood pressure by a healthcare professional?",
+            "pl": "Czy pracownik służby zdrowia zdiagnozował u Ciebie nadciśnienie?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Yes", "pl": "Tak" } },
+            { "label": { "en": "No", "pl": "Nie" } },
+            { "label": { "en": "I don't know", "pl": "Nie wiem" } }
+          ]
+        },
+        {
+          "id": "has_diabetes",
+          "text": {
+            "en": "Have you been diagnosed with diabetes by a healthcare professional?",
+            "pl": "Czy pracownik służby zdrowia zdiagnozował u Ciebie cukrzycę?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Yes", "pl": "Tak" } },
+            { "label": { "en": "No", "pl": "Nie" } },
+            { "label": { "en": "I don't know", "pl": "Nie wiem" } }
+          ]
+        }
+      ]
+    },
+    {
+      "title": {
+        "en": "Environmental Factors",
+        "pl": "Czynniki Środowiskowe"
+      },
+      "description": {
+        "en": "This information helps us understand environmental factors that may influence your plan.",
+        "pl": "Te informacje pomagają nam zrozumieć czynniki środowiskowe, które mogą wpłynąć na Twój plan."
+      },
+      "questions": [
+        {
+          "id": "asbestos_exposure",
+          "text": {
+            "en": "Have you ever had significant, prolonged exposure to asbestos?",
+            "pl": "Czy kiedykolwiek miałeś/aś znaczące, długotrwałe narażenie na azbest?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Yes", "pl": "Tak" } },
+            { "label": { "en": "No", "pl": "Nie" } },
+            { "label": { "en": "I don't know", "pl": "Nie wiem" } }
+          ]
+        }
+      ]
+    },
+    {
+      "title": {
+        "en": "Family Health History",
+        "pl": "Historia Zdrowia Rodziny"
+      },
+      "description": {
+        "en": "This information helps tailor your plan based on family health history. It will not be stored and remains completely anonymous.",
+        "pl": "Te informacje pomagają dostosować Twój plan na podstawie historii zdrowia rodziny. Nie będą przechowywane i pozostają całkowicie anonimowe."
+      },
+      "questions": [
+        {
+          "id": "family_history_cancer",
+          "text": {
+            "en": "Have any of your first-degree relatives (parent, sibling, child) been diagnosed with cancer?",
+            "pl": "Czy którykolwiek z Twoich krewnych pierwszego stopnia (rodzic, rodzeństwo, dziecko) miał zdiagnozowanego raka?"
+          },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Yes", "pl": "Tak" } },
+            { "label": { "en": "No", "pl": "Nie" } },
+            { "label": { "en": "I don't know", "pl": "Nie wiem" } }
+          ]
+        }
+      ]
+    }
+  ]
+}

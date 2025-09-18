@@ -10,10 +10,10 @@ This document outlines the necessary tasks to evolve the ONKONO application from
 
 *(Objective: Prepare the codebase for the new, complex form structure and data requirements.)*
 
--   [ ] **Data Model & Questionnaire Structure Refactoring**
-    -   [ ] Restructure `assessment-questions.en.json` and `assessment-questions.pl.json` into a single, unified data source that supports the i18n schema described in spec section 'E' (e.g., `{"key": "smoking_status", "label": {"en": "...", "pl": "..."}}`).
-    -   [ ] Update the frontend data fetching logic (`/api/questionnaire`) to serve this new, richer format.
-    -   [ ] Modify the `AssessmentPage` component to dynamically render questions and options from the new structure.
+-   [x] **Data Model & Questionnaire Structure Refactoring**
+    -   [x] Restructure `assessment-questions.en.json` and `assessment-questions.pl.json` into a single, unified data source that supports the i18n schema described in spec section 'E' (e.g., `{"key": "smoking_status", "label": {"en": "...", "pl": "..."}}`).
+    -   [x] Update the frontend data fetching logic (`/api/questionnaire`) to serve this new, richer format.
+    -   [x] Modify the `AssessmentPage` component to dynamically render questions and options from the new structure.
 
 -   [ ] **Component Library Expansion**
     -   [ ] Create or integrate a `CheckboxGroup` component for multi-select answers (e.g., for symptoms).

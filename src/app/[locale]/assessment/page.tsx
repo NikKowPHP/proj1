@@ -173,25 +173,7 @@ export default function AssessmentPage() {
       if (!q.dependsOn) return true;
       const dependencyAnswer = answers[q.dependsOn.questionId];
       if (!dependencyAnswer) return false;
-
-      const options =
-        questionnaire?.steps
-          .find((s) =>
-            s.questions.some((qs) => qs.id === q.dependsOn?.questionId),
-          )
-          ?.questions.find((qs) => qs.id === q.dependsOn?.questionId)
-          ?.options || [];
-      const englishOptions = ["Current smoker", "Former smoker"];
-      const polishOptions = ["Obecny palacz", "Były palacz"];
-
-      let valueToCompare = q.dependsOn.value;
-      if (locale === "pl" && englishOptions.includes(valueToCompare)) {
-        const idx = englishOptions.indexOf(valueToCompare);
-        if (idx > -1) {
-          valueToCompare = polishOptions[idx];
-        }
-      }
-      return dependencyAnswer === valueToCompare;
+      return dependencyAnswer === q.dependsOn.value;
     }) || [];
 
   const isStepComplete = () => {

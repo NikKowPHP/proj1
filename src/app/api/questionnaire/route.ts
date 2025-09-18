@@ -1,37 +1,59 @@
 import { NextRequest, NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
-import fs from "fs/promises";
-import path from "path";
+import questionnaireData from "@/lib/assessment-questions.json";
 
-export async function GET(request: NextRequest) {
-  const locale = request.nextUrl.searchParams.get("locale") || "en";
-  const supportedLocales = ["en", "pl"];
-  const finalLocale = supportedLocales.includes(locale) ? locale : "en";
+type Locale = "en" | "pl";
 
-  try {
-    const filePath = path.join(
-      process.cwd(),
-      `src/lib/assessment-questions.${finalLocale}.json`,
-    );
-    const fileContent = await fs.readFile(filePath, "utf-8");
-    const questionnaireContent = JSON.parse(fileContent);
-    return NextResponse.json(questionnaireContent);
-  } catch (error) {
-    logger.error(`Error fetching questionnaire for locale: ${finalLocale}`, error);
-    // Fallback to English if the requested locale file is missing
-    if (finalLocale !== "en") {
-      try {
-        const fallbackFilePath = path.join(
-          process.cwd(),
-          `src/lib/assessment-questions.en.json`,
-        );
-        const fallbackFileContent = await fs.readFile(fallbackFilePath, "utf-8");
-        const fallbackContent = JSON.parse(fallbackFileContent);
-        return NextResponse.json(fallbackContent);
-      } catch (fallbackError) {
-        logger.error("Failed to fetch fallback questionnaire (en)", fallbackError);
+/**
+ * A recursive function that traverses a JSON-like object and projects
+ * internationalized fields to a specific locale.
+ * @param node - The current object or value to process.
+ * @param locale - The target locale ('en' or 'pl').
+ * @returns The processed object with locale-specific strings.
+ */
+const project = (node: any, locale: Locale): any => {
+  if (Array.isArray(node)) {
+    return node.map((item) => project(item, locale));
+  }
+  if (node !== null && typeof node === "object") {
+    // Check for a simple i18n string object: {en: '...', pl: '...'}
+    if (typeof node.en === "string" && typeof node.pl === "string") {
+      return node[locale];
+    }
+
+    const newNode: { [key: string]: any } = {};
+    for (const key in node) {
+      if (key === "options" && Array.isArray(node[key])) {
+        // Options are transformed from {value, label} objects to simple strings
+        newNode[key] = node[key].map((opt: any) => {
+          const label =
+            typeof opt.label === "object" && opt.label !== null
+              ? opt.label[locale]
+              : opt.label;
+          // The value for the select is the localized label, which matches backend expectations
+          return label;
+        });
+      } else {
+        newNode[key] = project(node[key], locale);
       }
     }
+    return newNode;
+  }
+  return node;
+};
+
+export async function GET(request: NextRequest) {
+  const localeParam = request.nextUrl.searchParams.get("locale") || "en";
+  const supportedLocales: Locale[] = ["en", "pl"];
+  const finalLocale: Locale = supportedLocales.includes(localeParam as Locale)
+    ? (localeParam as Locale)
+    : "en";
+
+  try {
+    const localizedQuestionnaire = project(questionnaireData, finalLocale);
+    return NextResponse.json(localizedQuestionnaire);
+  } catch (error) {
+    logger.error(`Error processing questionnaire for locale: ${finalLocale}`, error);
     return NextResponse.json(
       { error: "Failed to fetch questionnaire" },
       { status: 500 },

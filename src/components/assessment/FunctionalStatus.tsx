@@ -9,10 +9,18 @@ interface FunctionalStatusProps {
   questions: any[];
 }
 
+const isVisible = (question: any, answers: Record<string, string>): boolean => {
+  if (!question.dependsOn) return true;
+  const dependencyAnswer = answers[question.dependsOn.questionId];
+  return dependencyAnswer === question.dependsOn.value;
+};
+
 export const FunctionalStatus = ({ answers, onAnswer, questions }: FunctionalStatusProps) => {
+  const visibleQuestions = questions.filter(q => isVisible(q, answers));
+
   return (
     <div className="space-y-6">
-      {questions.map(q => (
+      {visibleQuestions.map(q => (
         <div key={q.id} className="space-y-2">
           <Label htmlFor={q.id}>{q.text}</Label>
           {q.type === 'select' && (
@@ -46,3 +54,4 @@ export const FunctionalStatus = ({ answers, onAnswer, questions }: FunctionalSta
     </div>
   );
 };
+      

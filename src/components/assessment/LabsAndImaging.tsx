@@ -9,6 +9,8 @@ interface LabImagingEntry {
   study_type?: string;
   study_date?: number;
   study_result?: string;
+  result_value?: string;
+  result_unit?: string;
 }
 
 interface LabsAndImagingProps {
@@ -32,6 +34,8 @@ export const LabsAndImaging = ({ value, onChange }: LabsAndImagingProps) => {
     onChange(newValues);
   };
 
+  const commonUnits = ['mg/dL', 'g/dL', 'mmol/L', 'U/L', 'ng/mL', '%'];
+
   return (
     <RepeatingGroup
       values={value}
@@ -44,7 +48,7 @@ export const LabsAndImaging = ({ value, onChange }: LabsAndImagingProps) => {
           <div className="space-y-2">
             <Label>Study Type</Label>
             <Input
-              value={item.study_type}
+              value={item.study_type || ""}
               onChange={(e) => handleFieldChange(index, "study_type", e.target.value)}
               placeholder="e.g., CBC, Chest X-ray, CA-125"
             />
@@ -57,6 +61,30 @@ export const LabsAndImaging = ({ value, onChange }: LabsAndImagingProps) => {
               placeholder="e.g. 2023"
             />
           </div>
+           <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-2">
+                <Label>Result Value</Label>
+                <Input
+                value={item.result_value || ""}
+                onChange={(e) => handleFieldChange(index, "result_value", e.target.value)}
+                placeholder="e.g., 12.5"
+                />
+            </div>
+            <div className="space-y-2">
+                <Label>Units</Label>
+                <Select
+                    value={item.result_unit}
+                    onValueChange={(val) => handleFieldChange(index, "result_unit", val)}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Unit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {commonUnits.map(unit => <SelectItem key={unit} value={unit}>{unit}</SelectItem>)}
+                    </SelectContent>
+                </Select>
+            </div>
+           </div>
           <div className="space-y-2">
             <Label>Result Summary</Label>
             <Select
@@ -78,3 +106,4 @@ export const LabsAndImaging = ({ value, onChange }: LabsAndImagingProps) => {
     </RepeatingGroup>
   );
 };
+      

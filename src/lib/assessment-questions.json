@@ -169,7 +169,8 @@
               "dependsOn": { "questionId": "smoking_status", "value": ["Current", "Former"] },
               "questions": [
                 { "id": "cigs_per_day", "text": { "en": "Average cigarettes per day?", "pl": "Średnia liczba papierosów dziennie?"}, "type": "number_input", "placeholder": "e.g., 20" },
-                { "id": "smoking_years", "text": { "en": "Number of years smoked?", "pl": "Liczba lat palenia?"}, "type": "number_input", "placeholder": "e.g., 10" }
+                { "id": "smoking_years", "text": { "en": "Number of years smoked?", "pl": "Liczba lat palenia?"}, "type": "number_input", "placeholder": "e.g., 10" },
+                { "id": "quit_year", "text": { "en": "In what year did you quit?", "pl": "W którym roku rzuciłeś/aś palenie?"}, "type": "year_input", "placeholder": "e.g., 2018", "dependsOn": {"questionId": "smoking_status", "value": "Former"}}
               ]
             },
             {
@@ -194,10 +195,10 @@
                   { "id": "genetic_test_type", "text": { "en": "What type of genetic test was it?", "pl": "Jaki to był rodzaj badania genetycznego?" }, "type": "select", "options": ["Multigene panel", "Single gene", "Exome (WES)", "Genome (WGS)", "Other"], "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"} },
                   { "id": "genetic_test_year", "text": { "en": "In what year was the test performed?", "pl": "W którym roku wykonano badanie?" }, "type": "year_input", "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"} },
                   { "id": "genetic_lab", "text": { "en": "Testing laboratory (if known)", "pl": "Laboratorium wykonujące test (jeśli znane)" }, "type": "text_input", "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"} },
-                  { "id": "genetic_findings_present", "text": { "en": "Did the report mention any pathogenic/likely pathogenic variants?", "pl": "Czy w raporcie wskazano warianty patogenne/prawdopodobnie patogenne?" }, "type": "select", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}, {"value":"Don't know", "label":"Don't know"}], "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"} },
+                  { "id": "genetic_findings_present", "text": { "en": "Did the report mention any pathogenic/likely pathogenic variants?", "pl": "Czy w raporcie wskazano warianty patogenne/prawdopodobnie patogenne?" }, "type": "select", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}, {"value":"Don't know", "label":"Don't know"}], "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"}, "tooltip": {"en": "Pathogenic (P) and Likely Pathogenic (LP) variants are significant findings. VUS variants are not considered clinically actionable.", "pl": "Warianty patogenne (P) i prawdopodobnie patogenne (LP) to istotne znaleziska. Warianty VUS nie są uważane za klinicznie istotne."}},
                   { "id": "genetic_genes", "text": { "en": "If yes: which genes?", "pl": "Jeśli tak: które geny?" }, "type": "checkbox_group", "options": [{ "id": "BRCA1", "label": "BRCA1"}, { "id": "BRCA2", "label": "BRCA2"}, { "id": "MLH1", "label": "MLH1"}], "dependsOn": { "questionId": "genetic_findings_present", "value": "Yes"} },
-                  { "id": "genetic_variants_hgvs", "text": { "en": "Variant(s) (HGVS, optional)", "pl": "Wariant(y) (HGVS, opcjonalnie)" }, "type": "text_input", "dependsOn": { "questionId": "genetic_findings_present", "value": "Yes"} },
-                  { "id": "genetic_vus_present", "text": { "en": "Any VUS (Variants of Uncertain Significance)?", "pl": "Czy występują warianty o niepewnym znaczeniu (VUS)?" }, "type": "select", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}, {"value":"Don't know", "label":"Don't know"}], "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"} },
+                  { "id": "genetic_variants_hgvs", "text": { "en": "Variant(s) (HGVS, optional)", "pl": "Wariant(y) (HGVS, opcjonalnie)" }, "type": "text_input", "dependsOn": { "questionId": "genetic_findings_present", "value": "Yes"}, "tooltip": {"en": "HGVS is a standard format for reporting genetic variants, e.g., c.123A>G. Provide if known.", "pl": "HGVS to standardowy format raportowania wariantów genetycznych, np. c.123A>G. Podaj, jeśli jest znany."}},
+                  { "id": "genetic_vus_present", "text": { "en": "Any VUS (Variants of Uncertain Significance)?", "pl": "Czy występują warianty o niepewnym znaczeniu (VUS)?" }, "type": "select", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}, {"value":"Don't know", "label":"Don't know"}], "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"}, "tooltip": {"en": "VUS are common findings and usually do not require medical action unless reclassified later.", "pl": "VUS są częstymi znaleziskami i zazwyczaj не wymagają działań medycznych, chyba że zostaną później przeklasyfikowane."}},
                   { "id": "genetic_report_upload", "text": { "en": "Upload genetic report (optional)", "pl": "Prześlij raport genetyczny (opcjonalnie)" }, "type": "file_upload", "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"} },
                   { "id": "genetic_processing_consent", "type": "consent_checkbox", "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes" } }
               ]
@@ -397,6 +398,31 @@
                     "en": "I would like to provide more details on my quality of life (optional).",
                     "pl": "Chciałbym/abym podać więcej szczegółów na temat mojej jakości życia (opcjonalnie)."
                   }
+                },
+                {
+                  "id": "qlq_c30_item_29",
+                  "text": { "en": "During the past week, how would you rate your overall health?", "pl": "Jak ocenił(a)by Pan(i) ogólnie swoje zdrowie w ciągu ostatniego tygodnia?" },
+                  "type": "select",
+                  "dependsOn": { "questionId": "qlq_c30_consent", "value": "true" },
+                  "options": [
+                    { "value": "7", "label": { "en": "7 - Excellent", "pl": "7 - Doskonałe" } },
+                    { "value": "6", "label": "6" }, { "value": "5", "label": "5" },
+                    { "value": "4", "label": { "en": "4 - Average", "pl": "4 - Przeciętne" } },
+                    { "value": "3", "label": "3" }, { "value": "2", "label": "2" },
+                    { "value": "1", "label": { "en": "1 - Very poor", "pl": "1 - Bardzo złe" } }
+                  ]
+                },
+                {
+                  "id": "qlq_c30_item_2",
+                  "text": { "en": "During the past week, have you had pain?", "pl": "Czy w ciągu ostatniego tygodnia odczuwał(a) Pan(i) ból?" },
+                  "type": "select",
+                  "dependsOn": { "questionId": "qlq_c30_consent", "value": "true" },
+                  "options": [
+                    { "value": "1", "label": { "en": "1 - Not at all", "pl": "1 - Wcale nie" } },
+                    { "value": "2", "label": { "en": "2 - A little", "pl": "2 - Trochę" } },
+                    { "value": "3", "label": { "en": "3 - Quite a bit", "pl": "3 - Dość mocno" } },
+                    { "value": "4", "label": { "en": "4 - Very much", "pl": "4 - Bardzo mocno" } }
+                  ]
                 }
               ]
             }
@@ -406,3 +432,4 @@
     }
   ]
 }
+      

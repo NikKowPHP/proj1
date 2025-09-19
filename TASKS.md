@@ -38,21 +38,21 @@ This plan is broken down into logical sections. Completing these tasks will reso
 
 #### 3. Frontend: Component & Schema Updates
 
--   [ ] **Implement Full Functional Status Module:**
-    -   [ ] In `src/lib/assessment-questions.json`, replace the single `qlq_c30_consent` checkbox with the actual set of EORTC QLQ-C30 Likert scale questions as specified. Each should be a `select` or `slider` type.
-    -   [ ] Update the `FunctionalStatus.tsx` component in `src/components/assessment/FunctionalStatus.tsx` to render these new, detailed questions when the module is expanded.
--   [ ] **Enhance Labs & Imaging Module:**
-    -   [ ] In `src/components/assessment/LabsAndImaging.tsx`, modify the `RepeatingGroup` item to include new `Input` fields for "Result Value" and a `Select` for "Units" (e.g., mg/dL, IU/L).
-    -   [ ] Update the component's state and `onChange` handler to manage these new fields.
-    -   [ ] In `src/lib/assessment-questions.json`, update the `labs_and_imaging` module definition to reflect these more detailed fields.
--   [ ] **Add `quit_year` Field to UI:**
-    -   [ ] In `src/lib/assessment-questions.json`, add a new `year_input` question with the ID `quit_year` to the `smoking_details` module.
-    -   [ ] Ensure its `dependsOn` logic makes it appear only when `smoking_status` is "Former".
-    -   [ ] Update `src/components/assessment/SmokingDetails.tsx` to correctly render this new field.
--   [ ] **Implement UI Tooltips:**
-    -   [ ] In `src/app/[locale]/assessment/page.tsx`, modify the question rendering logic to check for a `q.tooltip` property.
-    -   [ ] If a tooltip exists, wrap the `Label` with `TooltipProvider`, `Tooltip`, and `TooltipTrigger` from `shadcn/ui`, adding an `Info` icon next to the label.
-    -   [ ] In `src/lib/assessment-questions.json`, add `tooltip` text to at least three complex questions in the Genetics module (e.g., for "pathogenic variants," "HGVS," and "VUS").
+-   [x] **Implement Full Functional Status Module:**
+    -   [x] In `src/lib/assessment-questions.json`, replace the single `qlq_c30_consent` checkbox with the actual set of EORTC QLQ-C30 Likert scale questions as specified. Each should be a `select` or `slider` type.
+    -   [x] Update the `FunctionalStatus.tsx` component in `src/components/assessment/FunctionalStatus.tsx` to render these new, detailed questions when the module is expanded.
+-   [x] **Enhance Labs & Imaging Module:**
+    -   [x] In `src/components/assessment/LabsAndImaging.tsx`, modify the `RepeatingGroup` item to include new `Input` fields for "Result Value" and a `Select` for "Units" (e.g., mg/dL, IU/L).
+    -   [x] Update the component's state and `onChange` handler to manage these new fields.
+    -   [x] In `src/lib/assessment-questions.json`, update the `labs_and_imaging` module definition to reflect these more detailed fields.
+-   [x] **Add `quit_year` Field to UI:**
+    -   [x] In `src/lib/assessment-questions.json`, add a new `year_input` question with the ID `quit_year` to the `smoking_details` module.
+    -   [x] Ensure its `dependsOn` logic makes it appear only when `smoking_status` is "Former".
+    -   [x] Update `src/components/assessment/SmokingDetails.tsx` to correctly render this new field.
+-   [x] **Implement UI Tooltips:**
+    -   [x] In `src/app/[locale]/assessment/page.tsx`, modify the question rendering logic to check for a `q.tooltip` property.
+    -   [x] If a tooltip exists, wrap the `Label` with `TooltipProvider`, `Tooltip`, and `TooltipTrigger` from `shadcn/ui`, adding an `Info` icon next to the label.
+    -   [x] In `src/lib/assessment-questions.json`, add `tooltip` text to at least three complex questions in the Genetics module (e.g., for "pathogenic variants," "HGVS," and "VUS").
 
 #### 4. AI & Prompt Engineering
 

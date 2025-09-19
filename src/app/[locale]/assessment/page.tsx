@@ -262,7 +262,23 @@ export default function AssessmentPage() {
             <section className="space-y-6">
               {visibleQuestions.map((q) => (
                 <div key={q.id} className="space-y-2">
-                  {q.text && <Label htmlFor={q.id}>{q.text}</Label>}
+                  {q.text && (
+                     <div className="flex items-center gap-2">
+                        <Label htmlFor={q.id}>{q.text}</Label>
+                        {q.tooltip && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Info className="h-4 w-4 text-muted-foreground" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{q.tooltip}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+                     </div>
+                  )}
                   {q.type === "select" && <Select onValueChange={(v) => setAnswer(q.id, v)} value={answers[q.id] || ""}><SelectTrigger id={q.id}><SelectValue placeholder={t("selectOption")} /></SelectTrigger><SelectContent>{q.options.map((o: any) => {
                     if (typeof o === 'object' && o.value && o.label) {
                       return <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>;
@@ -303,3 +319,4 @@ export default function AssessmentPage() {
     </div>
   );
 }
+      

@@ -102,7 +102,7 @@ export const StandardizationService = {
 
       // Sexual Health
       const sexualHealth: Record<string, any> = {};
-      const sexualHealthKeys = ['sex_active', 'sex_partner_gender', 'sex_lifetime_partners', 'sex_last12m_partners', 'sex_barrier_freq', 'sex_sti_history', 'sex_anal', 'sex_oral'];
+      const sexualHealthKeys = ['sex_active', 'sex_partner_gender', 'sex_lifetime_partners', 'sex_last12m_partners', 'sex_barrier_freq', 'sex_sti_history', 'sex_anal', 'sex_oral', 'sex_barriers_practices'];
       sexualHealthKeys.forEach(key => {
         if (answers[key]) {
           if (key === 'sex_partner_gender' || key === 'sex_sti_history') {

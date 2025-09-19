@@ -239,6 +239,10 @@ test.describe("Advanced Module Flows (en)", () => {
         await page.getByLabel('Oral sex?').click();
         await page.getByRole('option', { name: 'No' }).click();
         await expect(page.getByText('No')).toBeVisible();
+
+        await page.getByLabel('How often were barriers').click();
+        await page.getByRole('option', { name: 'Sometimes' }).click();
+        await expect(page.getByText('Sometimes')).toBeVisible();
     });
 
     test('should handle conditional logic in the Environmental Exposures module', async ({ page }) => {

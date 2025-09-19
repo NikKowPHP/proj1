@@ -118,7 +118,7 @@ export const StandardizationService = {
 
       // Environmental Exposures
       const environmental: Record<string, any> = {};
-      const envKeys = ['home_years_here', 'home_postal_coarse', 'home_year_built', 'home_basement', 'home_radon_tested', 'home_radon_value', 'home_radon_unit', 'home_radon_date', 'home_shs_home', 'home_fuels', 'home_kitchen_vent', 'env_major_road', 'env_industry', 'env_agriculture', 'env_outdoor_uv', 'water_source', 'water_well_tested', 'water_well_findings'];
+      const envKeys = ['home_years_here', 'home_postal_coarse', 'home_year_built', 'home_basement', 'home_radon_tested', 'home_radon_value', 'home_radon_unit', 'home_radon_date', 'home_shs_home', 'home_fuels', 'home_kitchen_vent', 'env_major_road', 'env_industry', 'env_agriculture', 'env_outdoor_uv', 'water_source', 'water_well_tested', 'water_well_findings', 'env_wildfire_smoke'];
       envKeys.forEach(key => {
          if (answers[key]) {
           if (key === 'home_fuels' || key === 'env_industry' || key === 'water_well_findings') {

@@ -68,15 +68,19 @@ test.describe("Phase 2: Key Features & Validation (en)", () => {
     
     // Weight (Metric)
     await weightInput.fill("29");
-    await expect(page.getByText("Please enter a weight between 30 and 300 kg.")).toBeVisible();
+    await expect(page.getByText("Weight must be between 30 and 300 kg.")).toBeVisible();
     await expect(nextButton).toBeDisabled();
+    
+    await weightInput.fill("30"); // Boundary condition
+    await expect(page.getByText("Weight must be between 30 and 300 kg.")).not.toBeVisible();
+    // Next button will still be disabled as other fields are missing
 
     await weightInput.fill("301");
-    await expect(page.getByText("Please enter a weight between 30 and 300 kg.")).toBeVisible();
+    await expect(page.getByText("Weight must be between 30 and 300 kg.")).toBeVisible();
     await expect(nextButton).toBeDisabled();
 
     await weightInput.fill("80"); // Valid
-    await expect(page.getByText("Please enter a weight between 30 and 300 kg.")).not.toBeVisible();
+    await expect(page.getByText("Weight must be between 30 and 300 kg.")).not.toBeVisible();
 
 
     // --- Imperial validation ---

@@ -124,8 +124,10 @@ test.describe("Advanced Module Flows (en)", () => {
         await page.getByRole("option", { name: "Prevention" }).click();
         await page.getByLabel("Date of birth").fill("1980-01-01");
         await page.getByLabel("Sex at birth").click();
-        await page.getByRole("option", { name: "Male" }).click();
+        await page.getByRole("option", { name: "Female" }).click();
         await page.getByLabel("First-degree relative with cancer").click();
+        await page.getByRole("option", { name: "Yes" }).click();
+        await page.getByLabel("Any chronic illnesses?").click();
         await page.getByRole("option", { name: "Yes" }).click();
         await page.getByRole('button', { name: 'Next' }).click();
         await expect(page.getByRole('heading', { name: 'Advanced Details' })).toBeVisible();
@@ -197,8 +199,8 @@ test.describe("Advanced Module Flows (en)", () => {
         await page.getByLabel('Hypertension').check();
         
         // Verify detail cards appear
-        const diabetesCard = page.locator('.//div[contains(@class, "border") and .//h3[text()="Diabetes"]]');
-        const hypertensionCard = page.locator('.//div[contains(@class, "border") and .//h3[text()="Hypertension"]]');
+        const diabetesCard = page.locator('div:near(:text("Diabetes"))').locator('..').locator('..');
+        const hypertensionCard = page.locator('div:near(:text("Hypertension"))').locator('..').locator('..');
         
         await expect(diabetesCard).toBeVisible();
         await expect(hypertensionCard).toBeVisible();
@@ -210,12 +212,90 @@ test.describe("Advanced Module Flows (en)", () => {
         
         // Verify state is maintained
         await expect(diabetesCard.getByLabel('Year of Diagnosis')).toHaveValue('2010');
-        await expect(diabetesCard.getByLabel('Current Status')).toContainText('Active');
+        await expect(diabetesCard.getByText('Active')).toBeVisible();
         
         // Uncheck one condition
         await page.getByLabel('Hypertension').uncheck();
         await expect(hypertensionCard).not.toBeVisible();
         await expect(diabetesCard).toBeVisible(); // The other should remain
     });
+
+    test('should fill out the Sexual Health module', async ({ page }) => {
+        await navigateToAdvancedStep(page);
+
+        await page.getByRole('button', { name: 'Sexual Health' }).click();
+
+        await page.getByLabel('Currently sexually active?').click();
+        await page.getByRole('option', { name: 'Yes' }).click();
+
+        await page.getByLabel('Male').check();
+        await page.getByLabel('Lifetime sexual partners').click();
+        await page.getByRole('option', { name: '2-4' }).click();
+
+        await page.getByLabel('Anal intercourse?').click();
+        await page.getByRole('option', { name: 'Yes' }).click();
+        await expect(page.getByText('Yes')).toBeVisible();
+
+        await page.getByLabel('Oral sex?').click();
+        await page.getByRole('option', { name: 'No' }).click();
+        await expect(page.getByText('No')).toBeVisible();
+    });
+
+    test('should handle conditional logic in the Environmental Exposures module', async ({ page }) => {
+        await navigateToAdvancedStep(page);
+
+        await page.getByRole('button', { name: 'Environmental Exposures' }).click();
+
+        await page.getByLabel('Primary drinking water source').click();
+        await page.getByRole('option', { name: 'Private well' }).click();
+        
+        await expect(page.getByLabel('Private well tested (12m)?')).toBeVisible();
+        await page.getByLabel('Private well tested (12m)?').click();
+        await page.getByRole('option', { name: 'Yes' }).click();
+
+        await expect(page.getByLabel('Arsenic')).toBeVisible();
+        await page.getByLabel('Arsenic').check();
+        await expect(page.getByLabel('Arsenic')).toBeChecked();
+    });
+
+    test('should correctly add and manage multiple entries in Labs & Imaging', async ({ page }) => {
+        await navigateToAdvancedStep(page);
+
+        await page.getByRole('button', { name: 'Labs & Imaging' }).click();
+        const addBtn = page.getByRole('button', { name: 'Add Lab or Imaging Study' });
+
+        await addBtn.click();
+        await addBtn.click();
+
+        const studyInputs = await page.getByPlaceholder('e.g., CBC, Chest X-ray, CA-125').all();
+        expect(studyInputs.length).toBe(2);
+
+        await studyInputs[0].fill('First Study');
+        await studyInputs[1].fill('Second Study');
+
+        await expect(page.getByDisplayValue('First Study')).toBeVisible();
+        await expect(page.getByDisplayValue('Second Study')).toBeVisible();
+
+        // Remove the first entry
+        await page.getByLabel('Remove item').first().click();
+        
+        const remainingStudyInputs = await page.getByPlaceholder('e.g., CBC, Chest X-ray, CA-125').all();
+        expect(remainingStudyInputs.length).toBe(1);
+        await expect(page.getByDisplayValue('Second Study')).toBeVisible();
+        await expect(page.getByDisplayValue('First Study')).not.toBeVisible();
+    });
+
+    test('should correctly select a Functional Status', async ({ page }) => {
+        await navigateToAdvancedStep(page);
+
+        await page.getByRole('button', { name: 'Functional Status' }).click();
+        await page.getByLabel('ECOG Performance Status').click();
+
+        // Using a partial text match for the long option label
+        const optionToSelect = page.getByText('1 - Restricted in physically strenuous activity but ambulatory');
+        await optionToSelect.click();
+        
+        await expect(page.getByText('1 - Restricted in physically strenuous activity but ambulatory')).toBeVisible();
+    });
+
 });
-      

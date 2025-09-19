@@ -14,8 +14,15 @@ interface EnvironmentalExposuresProps {
 const isVisible = (question: any, answers: Record<string, string>): boolean => {
   if (!question.dependsOn) return true;
   const dependencyAnswer = answers[question.dependsOn.questionId];
+
+  if (question.dependsOn.value === true) {
+     // Handle dependency on a checkbox group having any value
+     return !!dependencyAnswer && dependencyAnswer !== '[]' && dependencyAnswer !== 'false';
+  }
+  
   return dependencyAnswer === question.dependsOn.value;
 };
+
 
 export const EnvironmentalExposures = ({ answers, onAnswer, questions }: EnvironmentalExposuresProps) => {
   const visibleQuestions = questions.filter(q => isVisible(q, answers));
@@ -68,6 +75,7 @@ export const EnvironmentalExposures = ({ answers, onAnswer, questions }: Environ
               options={q.options}
               value={answers[q.id] ? JSON.parse(answers[q.id]) : []}
               onChange={(selected) => onAnswer(q.id, JSON.stringify(selected))}
+              exclusiveOption={q.exclusiveOptionId}
             />
           )}
            {q.type === 'grouped_input' && (

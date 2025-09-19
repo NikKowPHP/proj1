@@ -56,7 +56,7 @@ interface Question {
   options?: any; // Can be string[], CheckboxOption[], or complex objects for modules
   dependsOn?: {
     questionId: string;
-    value: string | boolean;
+    value: string | boolean | string[];
   };
   exclusiveOptionId?: string;
   modules?: any[];
@@ -233,7 +233,7 @@ export default function AssessmentPage() {
     );
   }
 
-  const advancedModules = questionnaire?.steps[1].questions.find(q => q.id === 'advanced_modules')?.modules || [];
+  const advancedModules = questionnaire?.steps.questions.find(q => q.id === 'advanced_modules')?.modules || [];
   const symptomDetailsOptions = advancedModules.find(m => m.id === 'symptom_details')?.options;
 
 
@@ -261,7 +261,12 @@ export default function AssessmentPage() {
               {visibleQuestions.map((q) => (
                 <div key={q.id} className="space-y-2">
                   {q.text && <Label htmlFor={q.id}>{q.text}</Label>}
-                  {q.type === "select" && <Select onValueChange={(v) => setAnswer(q.id, v)} value={answers[q.id] || ""}><SelectTrigger id={q.id}><SelectValue placeholder={t("selectOption")} /></SelectTrigger><SelectContent>{q.options.map((o: any) => <SelectItem key={o.label} value={o.label}>{o.label}</SelectItem>)}</SelectContent></Select>}
+                  {q.type === "select" && <Select onValueChange={(v) => setAnswer(q.id, v)} value={answers[q.id] || ""}><SelectTrigger id={q.id}><SelectValue placeholder={t("selectOption")} /></SelectTrigger><SelectContent>{q.options.map((o: any) => {
+                    if (typeof o === 'object' && o.value && o.label) {
+                      return <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>;
+                    }
+                    return <SelectItem key={o} value={o}>{o}</SelectItem>;
+                  })}</SelectContent></Select>}
                   {q.type === "number_input" && <><Input id={q.id} type="number" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
                   {q.type === "date_input" && <><Input id={q.id} type="date" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
                   {q.type === "consent_checkbox" && <div className="flex items-start space-x-3 rounded-md border p-4"><Checkbox id={q.id} checked={answers[q.id] === "true"} onCheckedChange={(c) => setAnswer(q.id, c ? "true" : "false")} /><div className="grid gap-1.5"><label htmlFor={q.id} className="text-sm leading-snug text-muted-foreground">{t.rich("consentHealth", { privacyLink: (chunks) => <Link href="/privacy" className="font-semibold text-primary hover:underline" target="_blank" rel="noopener noreferrer">{chunks}</Link> })}</label></div></div>}
@@ -275,7 +280,7 @@ export default function AssessmentPage() {
                     {m.id === 'personal_cancer_history' && <PersonalCancerHistory value={answers.personal_cancer_history ? JSON.parse(answers.personal_cancer_history) : []} onChange={(v) => setAnswer('personal_cancer_history', JSON.stringify(v))} options={m.options} />}
                     {m.id === 'screening_immunization' && <ScreeningHistory answers={answers} onAnswer={setAnswer} screeningGroups={m.screenings} immunizationQuestions={m.immunizations}/>}
                     {m.id === 'sexual_health' && <SexualHealth answers={answers} onAnswer={setAnswer} questions={m.questions} />}
-                    {m.id === 'occupational_hazards' && <OccupationalHazards value={answers.occupational_hazards ? JSON.parse(answers.occupational_hazards) : []} onChange={(v) => setAnswer('occupational_hazards', JSON.stringify(v))} options={m.options} />}
+                    {m.id === 'occupational_hazards' && <OccupationalHazards value={answers.occupational_hazards ? JSON.parse(answers.occupational_hazards) : []} onChange={(v) => setAnswer('occupational_hazards', JSON.stringify(v))} options={m.options} questions={m.questions} answers={answers} onAnswer={setAnswer}/>}
                     {m.id === 'environmental_exposures' && <EnvironmentalExposures answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'labs_and_imaging' && <LabsAndImaging value={answers.labs_and_imaging ? JSON.parse(answers.labs_and_imaging) : []} onChange={(v) => setAnswer('labs_and_imaging', JSON.stringify(v))} />}
                     {m.id === 'functional_status' && <FunctionalStatus answers={answers} onAnswer={setAnswer} questions={m.questions} />}

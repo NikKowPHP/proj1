@@ -24,20 +24,20 @@ const project = (node: any, locale: Locale): any => {
     const newNode: { [key: string]: any } = {};
     for (const key in node) {
       if (key === "options" && Array.isArray(node[key])) {
-        // Options are transformed from {value, label} objects to simple strings
         newNode[key] = node[key].map((opt: any) => {
           const label =
             typeof opt.label === "object" && opt.label !== null
               ? opt.label[locale]
               : opt.label;
 
-          if (typeof opt.id === "string") {
-            // For checkbox groups, preserve the object structure
-            return { ...opt, label };
+          if (opt.id) { // CheckboxOption {id, label}
+            return { ...opt, label: label };
           }
-
-          // For selects, return simple strings
-          return label;
+          if (opt.value) { // Select option {value, label}
+            return { value: opt.value, label: label || opt.value };
+          }
+          // Fallback for simple label object or string (e.g. ["Yes", "No"])
+          return label || opt;
         });
       } else {
         newNode[key] = project(node[key], locale);
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const localizedQuestionnaire = project(questionnaireData, finalLocale);
-    logger.info(`[API:questionnaire] Processed questionnaire for locale: ${finalLocale}`, { data: localizedQuestionnaire });
+    logger.info(`[API:questionnaire] Processed questionnaire for locale: ${finalLocale}`);
     return NextResponse.json(localizedQuestionnaire);
   } catch (error) {
     logger.error(`Error processing questionnaire for locale: ${finalLocale}`, error);

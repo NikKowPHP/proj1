@@ -1,3 +1,4 @@
+'use client'
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/services/api-client.service";
@@ -130,7 +131,7 @@ export default function AssessmentPage() {
           .find(q => q.id === 'symptoms')?.options || [];
         
         const hasRedFlag = selectedIds.some((id: string) => {
-          const option = symptomOptions.find(opt => opt.id === id);
+          const option = symptomOptions.find((opt: any) => opt.id === id);
           return option?.red_flag;
         });
         setShowSafetyBanner(hasRedFlag);
@@ -233,8 +234,8 @@ export default function AssessmentPage() {
     );
   }
 
-  const advancedModules = questionnaire?.steps.questions.find(q => q.id === 'advanced_modules')?.modules || [];
-  const symptomDetailsOptions = advancedModules.find(m => m.id === 'symptom_details')?.options;
+  const advancedModules = questionnaire?.steps.flatMap(step => step.questions).find((q: Question) => q.id === 'advanced_modules')?.modules || [];
+  const symptomDetailsOptions = advancedModules.find((m: { id: string; options?: any }) => m.id === 'symptom_details')?.options;
 
 
   return (

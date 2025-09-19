@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useCallback, useEffect } from 'react';
 import { RepeatingGroup } from '../ui/RepeatingGroup';
 import { Label } from '../ui/label';

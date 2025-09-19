@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { RepeatingGroup } from '../ui/RepeatingGroup';
 import { Label } from '../ui/label';

@@ -9,7 +9,10 @@ const safeJsonParse = (value: any): any[] => {
   if (typeof value !== 'string' || !value) return [];
   try {
     const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed : [];
+    // Allow parsing objects as well for single entries, but always return array for consistency if it's not one
+    if (Array.isArray(parsed)) return parsed;
+    if (typeof parsed === 'object' && parsed !== null) return [parsed];
+    return [];
   } catch (e) {
     return [];
   }
@@ -77,14 +80,14 @@ export const StandardizationService = {
           type: answers.genetic_test_type,
           year: answers.genetic_test_year,
           findings_present: answers.genetic_findings_present,
-          genes: safeJsonParse(answers.genetic_genes),
+          genes: answers.genetic_genes, // This is now expected to be an array from the form
           vus_present: answers.genetic_vus_present,
         };
       }
 
       // Illnesses
-      const illnessList = safeJsonParse(answers.illness_list);
-      if (illnessList.length > 0) {
+      const illnessList = answers.illness_list;
+      if (Array.isArray(illnessList) && illnessList.length > 0) {
           standardized.advanced.illnesses = illnessList.map((illnessId: string) => {
               const detailsKey = `illness_details_${illnessId}`;
               const details = answers[detailsKey] ? JSON.parse(answers[detailsKey]) : {};
@@ -93,6 +96,11 @@ export const StandardizationService = {
                   ...details
               };
           });
+      }
+
+      // Personal Cancer History
+      if (answers.personal_cancer_history) {
+        standardized.advanced.personal_cancer_history = safeJsonParse(answers.personal_cancer_history);
       }
 
        // Occupational History
@@ -131,7 +139,7 @@ export const StandardizationService = {
       sexualHealthKeys.forEach(key => {
         if (answers[key]) {
           if (key === 'sex_partner_gender' || key === 'sex_sti_history') {
-             sexualHealth[key] = safeJsonParse(answers[key]);
+             sexualHealth[key] = answers[key]; // Already an array from form
           } else {
              sexualHealth[key] = answers[key];
           }
@@ -147,7 +155,7 @@ export const StandardizationService = {
       envKeys.forEach(key => {
          if (answers[key]) {
           if (key === 'home_fuels' || key === 'env_industry' || key === 'water_well_findings') {
-            environmental[key] = safeJsonParse(answers[key]);
+            environmental[key] = answers[key]; // Already an array from form
           } else {
             environmental[key] = answers[key];
           }
@@ -163,18 +171,28 @@ export const StandardizationService = {
       }
       
       // Functional Status
-      if(answers.ecog || answers.qlq_c30_consent) {
-        standardized.advanced.functional_status = {
-          ecog: answers.ecog,
-          qlq_c30_consent: answers.qlq_c30_consent === 'true' ? true : undefined
+      const functionalStatus: Record<string, any> = {};
+      if (answers.ecog) {
+        functionalStatus.ecog = answers.ecog;
+      }
+      if (answers.qlq_c30_consent === 'true') {
+        functionalStatus.qlq_c30_consent = true;
+      }
+      for (const key in answers) {
+        if (key.startsWith('qlq_c30_item_')) {
+          functionalStatus[key] = answers[key];
         }
+      }
+      if (Object.keys(functionalStatus).length > 0) {
+        standardized.advanced.functional_status = functionalStatus;
       }
 
       // Smoking Details
-      if (answers.cigs_per_day || answers.smoking_years) {
+      if (answers.cigs_per_day || answers.smoking_years || answers.quit_year) {
         standardized.advanced.smoking_detail = {
           cigs_per_day: Number(answers.cigs_per_day) || undefined,
           years: Number(answers.smoking_years) || undefined,
+          quit_year: Number(answers.quit_year) || undefined,
         };
       }
 
@@ -189,3 +207,4 @@ export const StandardizationService = {
     return standardized;
   },
 };
+      

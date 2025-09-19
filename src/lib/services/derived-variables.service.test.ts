@@ -30,10 +30,10 @@ describe("DerivedVariablesService", () => {
       expect(derived.bmi).toBeUndefined();
     });
 
-    it("should calculate pack-years correctly for a former smoker", () => {
+    it("should calculate pack-years correctly for a former smoker with quit_year", () => {
       const standardizedData = {
         core: { smoking_status: "Former" },
-        advanced: { smoking_detail: { cigs_per_day: 20, years: 10 } },
+        advanced: { smoking_detail: { cigs_per_day: 20, years: 10, quit_year: 2020 } },
       };
       const derived = DerivedVariablesService.calculateAll(standardizedData);
       expect(derived.pack_years).toBe(10.0);
@@ -109,6 +109,69 @@ describe("DerivedVariablesService", () => {
         const standardizedData = { core: { sex_at_birth: "Prefer not to say" } };
         const derived = DerivedVariablesService.calculateAll(standardizedData);
         expect(derived.organ_inventory).toBeUndefined();
+    });
+
+    it("should set early_age_family_dx to true for a first-degree relative with early diagnosis", () => {
+        const standardizedData = {
+            advanced: {
+                family: [{ relation: 'Parent', age_dx: 45 }]
+            }
+        };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived.early_age_family_dx).toBe(true);
+    });
+
+    it("should set early_age_family_dx to false for a first-degree relative without early diagnosis", () => {
+        const standardizedData = {
+            advanced: {
+                family: [{ relation: 'Sibling', age_dx: 55 }]
+            }
+        };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived.early_age_family_dx).toBe(false);
+    });
+    
+    it("should set early_age_family_dx to false if only non-first-degree relatives have early diagnosis", () => {
+        const standardizedData = {
+            advanced: {
+                family: [{ relation: 'Grandparent', age_dx: 40 }]
+            }
+        };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived.early_age_family_dx).toBe(false);
+    });
+
+    it("should set has_known_carcinogen_exposure to true if asbestos is present", () => {
+        const standardizedData = {
+            advanced: {
+                occupational: [{ job_title: 'worker', occ_exposures: ['wood_dust', 'asbestos'] }]
+            }
+        };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived.exposure_composites.has_known_carcinogen_exposure).toBe(true);
+    });
+    
+    it("should set has_known_carcinogen_exposure to true if benzene is present in any job", () => {
+        const standardizedData = {
+            advanced: {
+                occupational: [
+                    { job_title: 'worker', occ_exposures: ['wood_dust'] },
+                    { job_title: 'painter', occ_exposures: ['benzene'] }
+                ]
+            }
+        };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived.exposure_composites.has_known_carcinogen_exposure).toBe(true);
+    });
+
+    it("should set has_known_carcinogen_exposure to false if no high-risk carcinogens are present", () => {
+        const standardizedData = {
+            advanced: {
+                occupational: [{ job_title: 'worker', occ_exposures: ['wood_dust'] }]
+            }
+        };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived.exposure_composites.has_known_carcinogen_exposure).toBe(false);
     });
   });
 });

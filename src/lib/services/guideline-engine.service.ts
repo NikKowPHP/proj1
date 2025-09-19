@@ -10,8 +10,8 @@ type Answers = Record<string, any>;
 
 interface Condition {
   questionId: string;
-  operator: "in" | "equals";
-  value: string | string[];
+  operator: "in" | "equals" | "array_contains" | "array_contains_any";
+  value: string | string[] | boolean;
 }
 
 interface Rule {
@@ -45,9 +45,30 @@ const mapAgeToRange = (age?: number): string => {
 }
 
 function checkCondition(condition: Condition, answers: Answers, derived: Answers): boolean {
-  // Prioritize derived values if the questionId matches a derived key (e.g., "age")
-  const value = derived[condition.questionId] ?? answers[condition.questionId];
-  if (value === undefined) {
+  // Special handling for occupational exposures which are nested in an array of objects
+  if (condition.questionId === 'occupational_exposures') {
+      const jobHistoryAnswer = answers['occupational_hazards'];
+      if (typeof jobHistoryAnswer !== 'string' || !jobHistoryAnswer.startsWith('[')) {
+          return false;
+      }
+      try {
+          const jobs: { occ_exposures?: string[] }[] = JSON.parse(jobHistoryAnswer);
+          if (!Array.isArray(jobs)) return false;
+
+          const allExposures = jobs.flatMap(job => job.occ_exposures || []);
+          if (condition.operator === 'array_contains') {
+              return typeof condition.value === 'string' && allExposures.includes(condition.value);
+          }
+      } catch (e) {
+          return false;
+      }
+      return false;
+  }
+
+  // Prioritize derived values, then fall back to raw answers
+  let value = derived[condition.questionId] ?? answers[condition.questionId];
+  
+  if (value === undefined || value === null) {
     return false;
   }
 
@@ -56,6 +77,26 @@ function checkCondition(condition: Condition, answers: Answers, derived: Answers
       return Array.isArray(condition.value) && condition.value.includes(value);
     case "equals":
       return value === condition.value;
+    case "array_contains":
+    case "array_contains_any": {
+      // The value might be a JSON string from the form, so we parse it.
+      if (typeof value === 'string' && value.startsWith('[')) {
+        try {
+          value = JSON.parse(value);
+        } catch (e) {
+          return false; // Not a valid JSON array string
+        }
+      }
+      
+      if (!Array.isArray(value)) return false;
+
+      if (condition.operator === 'array_contains') {
+        return typeof condition.value === 'string' && value.includes(condition.value);
+      } else { // array_contains_any
+        if (!Array.isArray(condition.value)) return false;
+        return condition.value.some(item => typeof item === 'string' && value.includes(item));
+      }
+    }
     default:
       return false;
   }

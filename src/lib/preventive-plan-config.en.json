@@ -16,6 +16,14 @@
       ]
     },
     {
+      "actionId": "LUNG_CANCER_SCREENING",
+      "category": "screenings",
+      "conditions": [
+        { "questionId": "age", "operator": "in", "value": ["50-59", "60+"] },
+        { "questionId": "occupational_exposures", "operator": "array_contains", "value": "asbestos" }
+      ]
+    },
+    {
       "actionId": "DISCUSS_SMOKING_CESSATION",
       "category": "topicsForDoctor",
       "conditions": [
@@ -43,6 +51,27 @@
         "conditions": [
             { "questionId": "activity", "operator": "in", "value": ["0 days", "1-2 days"] }
         ]
+    },
+    {
+      "actionId": "GENETIC_COUNSELING_REFERRAL",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "genetic_genes", "operator": "array_contains_any", "value": ["BRCA1", "BRCA2", "MLH1", "MSH2", "MSH6", "PMS2"] }
+      ]
+    },
+    {
+      "actionId": "EARLY_COLORECTAL_SCREENING",
+      "category": "screenings",
+      "conditions": [
+        { "questionId": "early_age_family_dx", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "DERMATOLOGY_CONSULT_BENZENE",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "occupational_exposures", "operator": "array_contains", "value": "benzene" }
+      ]
     }
   ]
 }

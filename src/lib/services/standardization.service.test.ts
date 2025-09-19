@@ -34,6 +34,33 @@ describe("StandardizationService", () => {
       { relation: "Parent", cancer_type: "breast", age_dx: 55 },
     ]);
   });
+  
+  it("should correctly structure personal cancer history", () => {
+    const answers = {
+      personal_cancer_history:
+        '[{"type":"breast","year_dx":2018,"treatments":["surgery"]}]',
+    };
+    const result = StandardizationService.standardize(answers);
+
+    expect(result.advanced.personal_cancer_history).toEqual([
+        { type: "breast", year_dx: 2018, treatments: ["surgery"] },
+    ]);
+  });
+
+  it("should correctly structure smoking details including quit_year", () => {
+    const answers = {
+      smoking_status: "Former",
+      cigs_per_day: "20",
+      smoking_years: "10",
+      quit_year: "2020",
+    };
+    const result = StandardizationService.standardize(answers);
+    expect(result.advanced.smoking_detail).toEqual({
+        cigs_per_day: 20,
+        years: 10,
+        quit_year: 2020
+    });
+  });
 
   it("should correctly structure advanced genetics data when tested", () => {
     const answers = {
@@ -96,15 +123,19 @@ describe("StandardizationService", () => {
     });
   });
 
-  it("should correctly structure functional status with QoL consent", () => {
+  it("should correctly structure functional status with QoL consent and items", () => {
     const answers = {
       'ecog': '1',
-      'qlq_c30_consent': 'true'
+      'qlq_c30_consent': 'true',
+      'qlq_c30_item_1': '2', // Example QoL item
+      'qlq_c30_item_29': '4' // Example QoL item
     };
     const result = StandardizationService.standardize(answers);
     expect(result.advanced.functional_status).toEqual({
       'ecog': '1',
-      'qlq_c30_consent': true
+      'qlq_c30_consent': true,
+      'qlq_c30_item_1': '2',
+      'qlq_c30_item_29': '4'
     });
   });
   
@@ -127,3 +158,4 @@ describe("StandardizationService", () => {
       expect(result.core.symptoms).toEqual([]);
   });
 });
+      

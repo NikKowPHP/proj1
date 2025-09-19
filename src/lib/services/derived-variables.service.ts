@@ -46,6 +46,47 @@ function calculatePackYears(smokingDetails?: { cigs_per_day?: number; years?: nu
     return parseFloat(((cigs_per_day / 20) * years).toFixed(1));
 }
 
+/**
+ * Checks for early-age cancer diagnosis in first-degree relatives.
+ * @param familyHistory - Array of family member health history.
+ * @returns `true` if an early diagnosis is found, `false` otherwise, or `null` if no relevant data.
+ */
+function calculateEarlyAgeFamilyDx(familyHistory?: { relation?: string; age_dx?: number }[]): boolean | null {
+    if (!familyHistory || !Array.isArray(familyHistory) || familyHistory.length === 0) {
+        return null;
+    }
+
+    const firstDegreeRelatives = ['Parent', 'Sibling', 'Child'];
+
+    const hasEarlyDx = familyHistory.some(
+        (relative) =>
+            relative.relation &&
+            firstDegreeRelatives.includes(relative.relation) &&
+            relative.age_dx &&
+            relative.age_dx < 50
+    );
+    
+    return hasEarlyDx;
+}
+
+/**
+ * Calculates composite flags for occupational exposures.
+ * @param occupationalHistory - Array of jobs with exposures.
+ * @returns An object with exposure flags, or null if no data.
+ */
+function calculateExposureComposites(occupationalHistory?: { occ_exposures?: string[] }[]): { has_known_carcinogen_exposure: boolean } | null {
+    if (!occupationalHistory || !Array.isArray(occupationalHistory) || occupationalHistory.length === 0) {
+        return null;
+    }
+
+    const highRiskExposures = ['asbestos', 'benzene'];
+    const allExposures = new Set(occupationalHistory.flatMap(job => job.occ_exposures || []));
+
+    const hasExposure = highRiskExposures.some(risk => allExposures.has(risk));
+    
+    return { has_known_carcinogen_exposure: hasExposure };
+}
+
 
 /**
  * A service to calculate derived health variables from standardized user data.
@@ -106,6 +147,18 @@ export const DerivedVariablesService = {
           }
       }
 
+      // Check for early-age family cancer diagnosis
+      const earlyDx = calculateEarlyAgeFamilyDx(advanced.family);
+      if (earlyDx !== null) {
+          derived.early_age_family_dx = earlyDx;
+      }
+
+      // Check for high-risk occupational exposures
+      const exposures = calculateExposureComposites(advanced.occupational);
+      if (exposures !== null) {
+          derived.exposure_composites = exposures;
+      }
+
     } catch (error) {
       logger.error("Failed to calculate derived variables", {
           error,
@@ -116,3 +169,4 @@ export const DerivedVariablesService = {
     return derived;
   },
 };
+      

@@ -42,20 +42,33 @@ const translations: Record<string, any> = {
     yourAnswers: "Your Provided Answers",
     filename: "Doctors_Discussion_Guide",
     answersMap: {
-      age: "Age",
-      sex: "Sex",
-      height: "Height",
-      weight: "Weight",
+      intent: "Goal",
+      source: "Form filled by",
+      language: "Language",
+      dob: "Date of Birth",
+      sex_at_birth: "Sex at Birth",
+      gender_identity: "Gender Identity",
+      height_cm: "Height (cm)",
+      weight_kg: "Weight (kg)",
       smoking_status: "Smoking Status",
+      cigs_per_day: "Cigarettes per day",
+      smoking_years: "Years smoked",
       smoking_duration: "Smoking Duration",
-      alcohol: "Alcohol",
-      activity: "Activity",
-      diet_fruits_veg: "Diet Fruits/Veg",
-      diet_red_meat: "Diet Red Meat",
-      known_blood_pressure: "Known Blood Pressure",
-      has_diabetes: "Has Diabetes",
-      asbestos_exposure: "Asbestos Exposure",
-      family_history_cancer: "Family History Cancer",
+      alcohol_use: "Alcohol Consumption",
+      alcohol: "Alcohol Consumption",
+      diet_pattern: "Diet Pattern",
+      activity_level: "Activity Level",
+      activity: "Weekly Activity",
+      symptoms: "Symptoms",
+      family_cancer_any: "Family History of Cancer",
+      illness_any: "Chronic Illnesses",
+      cancer_any: "Personal History of Cancer",
+      job_history_enable: "Occupation details provided",
+      family_cancer_history: "Family Cancer Details",
+      personal_cancer_history: "Personal Cancer Details",
+      illness_list: "Diagnosed Conditions",
+      occupational_hazards: "Occupational History",
+      labs_and_imaging: "Labs & Imaging",
       units: "Units",
     },
   },
@@ -70,20 +83,33 @@ const translations: Record<string, any> = {
     yourAnswers: "Twoje Udzielone Odpowiedzi",
     filename: "Przewodnik_Do_Dyskusji_Z_Lekarzem",
     answersMap: {
-      age: "Wiek",
-      sex: "Płeć",
-      height: "Wzrost",
-      weight: "Waga",
+      intent: "Cel",
+      source: "Formularz wypełniony przez",
+      language: "Język",
+      dob: "Data urodzenia",
+      sex_at_birth: "Płeć przy urodzeniu",
+      gender_identity: "Tożsamość płciowa",
+      height_cm: "Wzrost (cm)",
+      weight_kg: "Waga (kg)",
       smoking_status: "Status palenia",
-      smoking_duration: "Długość palenia",
-      alcohol: "Alkohol",
-      activity: "Aktywność",
-      diet_fruits_veg: "Dieta Owoce/Warzywa",
-      diet_red_meat: "Dieta Czerwone Mięso",
-      known_blood_pressure: "Znane ciśnienie krwi",
-      has_diabetes: "Cukrzyca",
-      asbestos_exposure: "Narażenie na azbest",
-      family_history_cancer: "Historia raka w rodzinie",
+      cigs_per_day: "Papierosy dziennie",
+      smoking_years: "Lata palenia",
+      smoking_duration: "Okres palenia",
+      alcohol_use: "Spożycie alkoholu",
+      alcohol: "Spożycie alkoholu",
+      diet_pattern: "Wzorzec żywieniowy",
+      activity_level: "Poziom aktywności",
+      activity: "Aktywność tygodniowa",
+      symptoms: "Objawy",
+      family_cancer_any: "Historia raka w rodzinie",
+      illness_any: "Choroby przewlekłe",
+      cancer_any: "Osobista historia nowotworów",
+      job_history_enable: "Podano szczegóły zawodowe",
+      family_cancer_history: "Szczegóły historii raka w rodzinie",
+      personal_cancer_history: "Szczegóły osobistej historii nowotworów",
+      illness_list: "Zdiagnozowane schorzenia",
+      occupational_hazards: "Historia zawodowa",
+      labs_and_imaging: "Badania laboratoryjne i obrazowe",
       units: "Jednostki",
     },
   },
@@ -103,6 +129,51 @@ const drawSectionHeader = (doc: jsPDFWithAutoTable, title: string, startY: numbe
 
   return startY + headerHeight + 5;
 };
+
+function formatAnswerValue(value: any, key: string): string {
+  // If value is not a string or doesn't look like an array, return it as is.
+  if (typeof value !== 'string' || !value.trim().startsWith('[') || !value.trim().endsWith(']')) {
+    return value;
+  }
+
+  try {
+    const arr = JSON.parse(value);
+    if (!Array.isArray(arr)) return value;
+    if (arr.length === 0) return "None";
+
+    // Handle simple string arrays
+    if (arr.every(item => typeof item === 'string')) {
+      // Special formatting for symptom IDs to make them more readable.
+      if (key === 'symptoms') {
+        return arr.map(s => s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())).join(', ');
+      }
+      return arr.join(', ');
+    }
+    
+    // Handle array of objects with special formatting for known keys
+    if (key === 'family_cancer_history') {
+      return arr.map(item => `${item.relation || 'Relative'}${item.cancer_type ? ` (${item.cancer_type})` : ''}`).join('; ');
+    }
+    if (key === 'personal_cancer_history') {
+      return arr.map(item => `${item.type || 'Cancer'}${item.year_dx ? ` (diagnosed ${item.year_dx})` : ''}`).join('; ');
+    }
+    if (key === 'occupational_hazards') {
+      return arr.map(item => `${item.job_title || 'Job'}${item.job_years ? ` (${item.job_years} years)` : ''}`).join('; ');
+    }
+    if (key === 'labs_and_imaging') {
+      return arr.map(item => `${item.study_type || 'Study'}${item.study_date ? ` (${item.study_date})` : ''}`).join('; ');
+    }
+
+    // Generic fallback for other object arrays
+    if (arr.every(item => typeof item === 'object' && item !== null)) {
+      return `${arr.length} detailed entry/entries provided.`;
+    }
+
+    return value; // Fallback to original string if it's a mixed array or something unexpected
+  } catch (e) {
+    return value; // Not valid JSON, return as is
+  }
+}
 
 export const generateAssessmentPdf = (
   planData: ActionPlan,
@@ -206,7 +277,7 @@ export const generateAssessmentPdf = (
       startY,
       body: Object.entries(answers).map(([key, value]) => [
         t.answersMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-        value,
+        formatAnswerValue(value, key),
       ]),
       ...commonTableStyles,
     });
@@ -216,3 +287,4 @@ export const generateAssessmentPdf = (
     `${t.filename}_${new Date().toLocaleDateString().replace(/\//g, "-")}.pdf`,
   );
 };
+      

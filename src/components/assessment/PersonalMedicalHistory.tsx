@@ -106,4 +106,3 @@ export const PersonalMedicalHistory = ({ answers, onAnswer, options }: PersonalM
     </div>
   );
 };
-      

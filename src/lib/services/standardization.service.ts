@@ -58,7 +58,7 @@ export const StandardizationService = {
       standardized.core.symptoms.forEach((symptomId: string) => {
         const detailKey = `symptom_details_${symptomId}`;
         if (answers[detailKey]) {
-          symptomDetails[symptomId] = safeJsonParse(answers[detailKey]);
+          symptomDetails[symptomId] = JSON.parse(answers[detailKey]);
         }
       });
       if (Object.keys(symptomDetails).length > 0) {
@@ -99,6 +99,31 @@ export const StandardizationService = {
       if (answers.occupational_hazards) {
         standardized.advanced.occupational = safeJsonParse(answers.occupational_hazards);
       }
+      
+      // Screening and Immunization
+      const screeningImmunization: Record<string, any> = {};
+      const screeningKeys = ['screen.colonoscopy.done', 'screen.colonoscopy.date', 'screen.mammo.done', 'screen.mammo.date', 'screen.pap.done', 'screen.pap.date', 'screen.psa.done', 'screen.psa.date', 'imm.hpv', 'imm.hbv'];
+      screeningKeys.forEach(key => {
+        if (answers[key]) {
+          screeningImmunization[key] = answers[key];
+        }
+      });
+      if (Object.keys(screeningImmunization).length > 0) {
+        standardized.advanced.screening_immunization = screeningImmunization;
+      }
+
+      // Medications / Iatrogenic
+      const medications: Record<string, any> = {};
+      const medicationKeys = ['immunosuppression_now', 'immunosuppression_cause'];
+      medicationKeys.forEach(key => {
+          if (answers[key]) {
+              medications[key] = answers[key];
+          }
+      });
+       if (Object.keys(medications).length > 0) {
+        standardized.advanced.medications_iatrogenic = medications;
+      }
+
 
       // Sexual Health
       const sexualHealth: Record<string, any> = {};
@@ -138,9 +163,10 @@ export const StandardizationService = {
       }
       
       // Functional Status
-      if(answers.ecog) {
+      if(answers.ecog || answers.qlq_c30_consent) {
         standardized.advanced.functional_status = {
-          ecog: answers.ecog
+          ecog: answers.ecog,
+          qlq_c30_consent: answers.qlq_c30_consent === 'true' ? true : undefined
         }
       }
 

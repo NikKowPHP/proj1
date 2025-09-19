@@ -89,11 +89,13 @@ export const DerivedVariablesService = {
         }
       }
       
-      // Determine organ inventory based on sex at birth
+      // Determine organ inventory based on sex at birth.
+      // NOTE: This is a baseline. The spec suggests refining this based on surgical history (e.g., hysterectomy).
+      // This would require adding questions about organ removal to the questionnaire.
       if(core.sex_at_birth === 'Female') {
           derived.organ_inventory = {
-              has_cervix: true, // Placeholder, would be refined with surgery history
-              has_uterus: true, // Placeholder
+              has_cervix: true,
+              has_uterus: true,
               has_ovaries: true,
               has_breasts: true
           }

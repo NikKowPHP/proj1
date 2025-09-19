@@ -10,7 +10,7 @@ interface ScreeningQuestion {
   id: string;
   text: string;
   type: 'select' | 'year_input';
-  options?: string[];
+  options?: {value: string, label: string}[];
   dependsOn?: {
     questionId: string;
     value: string;
@@ -31,7 +31,7 @@ interface ImmunizationQuestion {
   id: string;
   text: string;
   type: 'select';
-  options?: string[];
+  options?: {value: string, label: string}[];
 }
 
 interface ScreeningHistoryProps {
@@ -87,7 +87,7 @@ export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizat
                          <Select onValueChange={(value) => onAnswer(q.id, value)} value={answers[q.id] || ""}>
                           <SelectTrigger id={q.id}><SelectValue placeholder="Select an option" /></SelectTrigger>
                           <SelectContent>
-                            {q.options?.map((opt: string) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                            {q.options?.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       )}
@@ -121,7 +121,7 @@ export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizat
               <Select onValueChange={(value) => onAnswer(q.id, value)} value={answers[q.id] || ""}>
                 <SelectTrigger id={q.id}><SelectValue placeholder="Select an option" /></SelectTrigger>
                 <SelectContent>
-                  {q.options?.map((opt: string) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                  {q.options?.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -131,4 +131,3 @@ export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizat
     </div>
   );
 };
-      

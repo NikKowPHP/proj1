@@ -49,6 +49,7 @@ import { SafetyBanner } from "@/components/assessment/SafetyBanner";
 import { LabsAndImaging } from "@/components/assessment/LabsAndImaging";
 import { FunctionalStatus } from "@/components/assessment/FunctionalStatus";
 import { SmokingDetails } from "@/components/assessment/SmokingDetails";
+import { Medications } from "@/components/assessment/Medications";
 
 interface Question {
   id: string;
@@ -280,6 +281,7 @@ export default function AssessmentPage() {
                     {m.id === 'personal_medical_history' && <PersonalMedicalHistory answers={answers} onAnswer={setAnswer} options={m.options} />}
                     {m.id === 'personal_cancer_history' && <PersonalCancerHistory value={answers.personal_cancer_history ? JSON.parse(answers.personal_cancer_history) : []} onChange={(v) => setAnswer('personal_cancer_history', JSON.stringify(v))} options={m.options} />}
                     {m.id === 'screening_immunization' && <ScreeningHistory answers={answers} onAnswer={setAnswer} screeningGroups={m.screenings} immunizationQuestions={m.immunizations}/>}
+                    {m.id === 'medications_iatrogenic' && <Medications answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'sexual_health' && <SexualHealth answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'occupational_hazards' && <OccupationalHazards value={answers.occupational_hazards ? JSON.parse(answers.occupational_hazards) : []} onChange={(v) => setAnswer('occupational_hazards', JSON.stringify(v))} options={m.options} questions={m.questions} answers={answers} onAnswer={setAnswer}/>}
                     {m.id === 'environmental_exposures' && <EnvironmentalExposures answers={answers} onAnswer={setAnswer} questions={m.questions} />}

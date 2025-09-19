@@ -237,26 +237,64 @@
               "id": "screening_immunization",
               "title": {"en": "Screening & Immunization", "pl": "Badania Przesiewowe i Szczepienia"},
               "screenings": [
-                {"id": "colonoscopy", "text": {"en": "Colonoscopy", "pl":"Kolonoskopia"}, "questions": [
-                  {"id": "screen.colonoscopy.done", "text": {"en": "Colonoscopy ever?", "pl":"Czy kiedykolwiek miałeś/aś kolonoskopię?"}, "type": "select", "options": ["Yes", "No"]},
-                  {"id": "screen.colonoscopy.date", "text": {"en":"Last colonoscopy year", "pl":"Rok ostatniej kolonoskopii"}, "type": "year_input", "dependsOn": {"questionId": "screen.colonoscopy.done", "value": "Yes"}}
-                ]},
-                {"id": "mammogram", "text": {"en":"Mammogram", "pl":"Mammografia"}, "dependsOn": {"questionId": "sex_at_birth", "value": "Female"}, "questions": [
-                  {"id": "screen.mammo.done", "text": {"en":"Mammogram ever?", "pl":"Czy kiedykolwiek miałaś mammografię?"}, "type": "select", "options": ["Yes", "No"]},
-                  {"id": "screen.mammo.date", "text": {"en":"Last mammogram year", "pl":"Rok ostatniej mammografii"}, "type": "year_input", "dependsOn": {"questionId": "screen.mammo.done", "value": "Yes"}}
-                ]},
-                {"id": "pap_test", "text": {"en": "Pap/HPV Test", "pl": "Badanie Pap/HPV"}, "dependsOn": {"questionId": "sex_at_birth", "value": "Female"}, "questions": [
-                  {"id": "screen.pap.done", "text": {"en":"Pap/HPV test ever?", "pl": "Czy kiedykolwiek miałaś badanie Pap/HPV?"}, "type": "select", "options": ["Yes", "No"]},
-                  {"id": "screen.pap.date", "text": {"en":"Last Pap/HPV test year", "pl": "Rok ostatniego badania Pap/HPV"}, "type": "year_input", "dependsOn": {"questionId": "screen.pap.done", "value": "Yes"}}
-                ]},
-                {"id": "psa_test", "text": {"en":"PSA Test", "pl": "Badanie PSA"}, "dependsOn": {"questionId": "sex_at_birth", "value": "Male"}, "questions": [
-                  {"id": "screen.psa.done", "text": {"en":"PSA test ever?", "pl": "Czy kiedykolwiek miałeś badanie PSA?"}, "type": "select", "options": ["Yes", "No"]},
-                  {"id": "screen.psa.date", "text": {"en":"Last PSA test year", "pl": "Rok ostatniego badania PSA"}, "type": "year_input", "dependsOn": {"questionId": "screen.psa.done", "value": "Yes"}}
-                ]}
+                {
+                  "id": "colonoscopy", 
+                  "text": {"en": "Colonoscopy", "pl":"Kolonoskopia"}, 
+                  "questions": [
+                    {"id": "screen.colonoscopy.done", "text": {"en": "Colonoscopy ever?", "pl":"Czy kiedykolwiek miałeś/aś kolonoskopię?"}, "type": "select", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]},
+                    {"id": "screen.colonoscopy.date", "text": {"en":"Last colonoscopy year", "pl":"Rok ostatniej kolonoskopii"}, "type": "year_input", "dependsOn": {"questionId": "screen.colonoscopy.done", "value": "Yes"}}
+                  ]
+                },
+                {
+                  "id": "mammogram", 
+                  "text": {"en":"Mammogram", "pl":"Mammografia"}, 
+                  "dependsOn": {"questionId": "sex_at_birth", "value": "Female"}, 
+                  "questions": [
+                    {"id": "screen.mammo.done", "text": {"en":"Mammogram ever?", "pl":"Czy kiedykolwiek miałaś mammografię?"}, "type": "select", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]},
+                    {"id": "screen.mammo.date", "text": {"en":"Last mammogram year", "pl":"Rok ostatniej mammografii"}, "type": "year_input", "dependsOn": {"questionId": "screen.mammo.done", "value": "Yes"}}
+                  ]
+                },
+                {
+                  "id": "pap_test", 
+                  "text": {"en": "Pap/HPV Test", "pl": "Badanie Pap/HPV"}, 
+                  "dependsOn": {"questionId": "sex_at_birth", "value": "Female"}, 
+                  "questions": [
+                    {"id": "screen.pap.done", "text": {"en":"Pap/HPV test ever?", "pl": "Czy kiedykolwiek miałaś badanie Pap/HPV?"}, "type": "select", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]},
+                    {"id": "screen.pap.date", "text": {"en":"Last Pap/HPV test year", "pl": "Rok ostatniego badania Pap/HPV"}, "type": "year_input", "dependsOn": {"questionId": "screen.pap.done", "value": "Yes"}}
+                  ]
+                },
+                {
+                  "id": "psa_test", 
+                  "text": {"en":"PSA Test", "pl": "Badanie PSA"}, 
+                  "dependsOn": {"questionId": "sex_at_birth", "value": "Male"}, 
+                  "questions": [
+                    {"id": "screen.psa.done", "text": {"en":"PSA test ever?", "pl": "Czy kiedykolwiek miałeś badanie PSA?"}, "type": "select", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]},
+                    {"id": "screen.psa.date", "text": {"en":"Last PSA test year", "pl": "Rok ostatniego badania PSA"}, "type": "year_input", "dependsOn": {"questionId": "screen.psa.done", "value": "Yes"}}
+                  ]
+                }
               ],
               "immunizations": [
-                {"id": "imm.hpv", "text": "HPV vaccination", "type": "select", "options": ["Yes", "No", "Unsure"]},
-                {"id": "imm.hbv", "text": "HBV vaccination", "type": "select", "options": ["Yes", "No", "Unsure"]}
+                {"id": "imm.hpv", "text": {"en": "HPV vaccination", "pl": "Szczepienie przeciwko HPV"}, "type": "select", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]},
+                {"id": "imm.hbv", "text": {"en": "HBV vaccination", "pl": "Szczepienie przeciwko HBV"}, "type": "select", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]}
+              ]
+            },
+            {
+              "id": "medications_iatrogenic",
+              "title": {"en": "Medications / Iatrogenic", "pl": "Leki / Jatrogenne"},
+              "questions": [
+                {
+                  "id": "immunosuppression_now",
+                  "text": {"en": "Are you currently taking any medication that suppresses your immune system?", "pl": "Czy obecnie przyjmujesz leki osłabiające układ odpornościowy?"},
+                  "type": "select",
+                  "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]
+                },
+                {
+                  "id": "immunosuppression_cause",
+                  "text": {"en": "If yes, please specify the reason or medication.", "pl": "Jeśli tak, podaj przyczynę lub nazwę leku."},
+                  "type": "text_input",
+                  "placeholder": {"en": "e.g., for transplant, autoimmune disease, medication name", "pl": "np. po przeszczepie, choroba autoimmunologiczna, nazwa leku"},
+                  "dependsOn": { "questionId": "immunosuppression_now", "value": "Yes" }
+                }
               ]
             },
             {
@@ -350,6 +388,15 @@
                     {"value": "3", "label": "3 - Capable of only limited selfcare, confined to bed or chair more than 50% of waking hours"},
                     {"value": "4", "label": "4 - Completely disabled. Cannot carry on any selfcare. Totally confined to bed or chair"}
                   ]
+                },
+                {
+                  "id": "qlq_c30_consent",
+                  "type": "checkbox",
+                  "text": {"en": "Quality of Life Details", "pl": "Szczegóły Jakości Życia"},
+                  "checkboxLabel": {
+                    "en": "I would like to provide more details on my quality of life (optional).",
+                    "pl": "Chciałbym/abym podać więcej szczegółów na temat mojej jakości życia (opcjonalnie)."
+                  }
                 }
               ]
             }

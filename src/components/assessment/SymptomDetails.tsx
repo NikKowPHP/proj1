@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Slider } from '../ui/slider';
 import { SearchableSelect, SearchableSelectOption } from '../ui/SearchableSelect';
 import { Chip } from '../ui/chip';
+import { YearInput } from '../ui/YearInput';
 
 interface Symptom {
   id: string;
@@ -13,7 +14,8 @@ interface Symptom {
 
 interface SymptomDetailsValue {
   code?: string; // HPO code
-  onset?: string;
+  onset_year?: number;
+  onset_month?: string;
   severity?: number;
   frequency?: string;
   associated_features?: string[];
@@ -26,6 +28,11 @@ interface SymptomDetailsProps {
   symptomOptions: SearchableSelectOption[];
   featureOptions: { id: string, label: string }[];
 }
+
+const months = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
 
 export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptions, featureOptions }: SymptomDetailsProps) => {
 
@@ -66,20 +73,26 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>When did it start?</Label>
-              <Select 
-                value={value[symptom.id]?.onset}
-                onValueChange={(val) => handleDetailChange(symptom.id, 'onset', val)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select onset" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="<1week">Less than a week ago</SelectItem>
-                  <SelectItem value="1-4weeks">1-4 weeks ago</SelectItem>
-                  <SelectItem value="1-6months">1-6 months ago</SelectItem>
-                  <SelectItem value=">6months">More than 6 months ago</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-2 gap-2">
+                <Select
+                  value={value[symptom.id]?.onset_month}
+                  onValueChange={(val) => handleDetailChange(symptom.id, 'onset_month', val)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Month" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((month, i) => (
+                      <SelectItem key={month} value={String(i + 1)}>{month}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <YearInput
+                  value={value[symptom.id]?.onset_year}
+                  onChange={(val) => handleDetailChange(symptom.id, 'onset_year', val)}
+                  placeholder="Year"
+                />
+              </div>
             </div>
              <div className="space-y-2">
               <Label>Severity (0-10)</Label>

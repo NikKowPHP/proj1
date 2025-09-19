@@ -4,11 +4,13 @@ import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { SearchableSelect, SearchableSelectOption } from "../ui/SearchableSelect";
 import { YearInput } from "../ui/YearInput";
+import { Checkbox } from "../ui/checkbox";
 
 interface FamilyMember {
   relation?: string;
   cancer_type?: string;
   age_dx?: number;
+  multiple_primaries?: boolean;
 }
 
 interface FamilyCancerHistoryProps {
@@ -81,8 +83,19 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
               max={120}
             />
           </div>
+           <div className="flex items-center space-x-2">
+            <Checkbox
+              id={`multiple_primaries_${index}`}
+              checked={item.multiple_primaries}
+              onCheckedChange={(checked) => handleFieldChange(index, "multiple_primaries", !!checked)}
+            />
+            <Label htmlFor={`multiple_primaries_${index}`} className="font-normal">
+              Multiple primary cancers?
+            </Label>
+          </div>
         </div>
       )}
     </RepeatingGroup>
   );
 };
+      

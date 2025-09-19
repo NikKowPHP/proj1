@@ -10,7 +10,7 @@ Our **Public Good / Non-commercial** model ensures the core experience is 100% f
 
 ## 2. Architectural Overview
 
-The system uses a **two-stage, stateless architecture** within a **Next.js monorepo**. This approach first uses a deterministic rules engine to generate a plan and then uses an AI service to explain it. This hybrid model ensures that the core recommendations are based on auditable, hard-coded public health guidelines, while the user experience remains personalized and easy to understand. An **operational database** is used for non-user data (anonymous event logging, questionnaire versioning), but **no user-inputted health data is ever stored**.
+The system uses a **multi-stage, stateless architecture** within a **Next.js monorepo**. This approach first standardizes raw user input, calculates derived health metrics, runs a deterministic rules engine to generate a plan, and finally uses an AI service to explain it. This hybrid model ensures that the core recommendations are based on auditable, hard-coded public health guidelines, while the user experience remains personalized and easy to understand. An **operational database** is used for non-user data (anonymous event logging, questionnaire versioning), but **no user-inputted health data is ever stored**.
 
 ```mermaid
 graph TD
@@ -24,6 +24,8 @@ graph TD
     
     subgraph Backend Services & APIs
         C{Planner API (Next.js API Route)}
+        S[Standardization Service]
+        V[Derived Variables Service]
         D[Guideline Engine (Deterministic)]
         H[Email Service (Resend)]
         J[AI Explainer Service (Gemini, Groq...)]
@@ -32,13 +34,14 @@ graph TD
 
     %% User Flows
     B -- Serves UI & Questionnaire Schema --> A
-    A -- "Submits Questionnaire" --> C
+    A -- "Submits Answers" --> C
 
     %% Backend Flows
-    C -- "Fetches Active Questionnaire" --> K
-    C -- "Processes answers" --> D
-    D -- "Returns structured plan (Action IDs)" --> C
-    C -- "Sends plan to AI for explanation" --> J
+    C -- "Processes answers with" --> S
+    S -- "Returns Structured Data (Core/Advanced)" --> V
+    V -- "Calculates Age, BMI, etc." --> D
+    D -- "Returns Guideline Plan (Action IDs)" --> C
+    C -- "Assembles final payload for AI" --> J
     J -- "Returns user-friendly text (ActionPlan)" --> C
     C -- "Logs Anonymous Event" --> K
     C -- "Returns full ActionPlan to client" --> B
@@ -48,12 +51,14 @@ graph TD
 
 **Flow Description:**
 
-1.  **Client:** The user interacts with the **Next.js** PWA. Questionnaire state is managed client-side using **Zustand**.
-2.  **Submission:** Answers are sent to our **Next.js API Route**.
-3.  **Guideline Engine:** The API first passes the answers to the **deterministic Guideline Engine**. This engine checks the answers against a set of rules defined in `preventive-plan-config.json` and outputs a structured set of action IDs (e.g., `{ screenings: ["COLORECTAL_CANCER_SCREENING"] }`).
-4.  **AI Explainer:** The API then sends this structured plan to the **Composite AI Service**. The AI's sole job is to translate these action IDs into compassionate, user-friendly text, generating the final `ActionPlan`.
-5.  **Response:** The `ActionPlan` is validated via Zod and sent back to the client for display. An anonymous event log (e.g., 'SUCCESS') is written to the **Operational DB**.
-6.  **Email Export (Optional):** If requested, the client sends the `ActionPlan` and the user's answers to an endpoint that uses **Resend** to dispatch the email and immediately purges the email address from memory.
+1.  **Client:** The user interacts with the **Next.js** PWA, filling out a comprehensive form covering core demographics, lifestyle, and optional advanced modules (e.g., Family History, Genetics, Occupational Hazards).
+2.  **Submission:** The flat answers object is sent to our **Next.js API Route**.
+3.  **Standardization:** The API first uses the `StandardizationService` to transform the flat answers into a structured `core` and `advanced` data object.
+4.  **Derivation:** The structured data is passed to the `DerivedVariablesService` to calculate key metrics like `age_years`, `bmi`, and `pack_years`.
+5.  **Guideline Engine:** The API then passes the original answers and the derived variables to the **deterministic Guideline Engine**. This engine checks the data against a set of rules defined in `preventive-plan-config.json` and outputs a structured set of action IDs (e.g., `{ screenings: ["COLORECTAL_CANCER_SCREENING"] }`).
+6.  **AI Explainer:** The API assembles a final, rich payload containing the standardized data, derived variables, and the guideline plan, and sends it to the **Composite AI Service**. The AI's sole job is to translate these action IDs into compassionate, user-friendly text, generating the final `ActionPlan`.
+7.  **Response:** The `ActionPlan` is validated via Zod and sent back to the client for display. An anonymous event log (e.g., 'SUCCESS') is written to the **Operational DB**.
+8.  **Email Export (Optional):** If requested, the client sends the `ActionPlan` and the user's answers to an endpoint that uses **Resend** to dispatch the email and immediately purges the email address from memory.
 
 ## 3. Core Tech Stack
 

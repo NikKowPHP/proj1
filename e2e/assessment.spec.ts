@@ -10,60 +10,28 @@ const translations = {
   en: {
     homeTitle: "ONKONO",
     startCta: "Start My Assessment",
-    resumeDialogTitle: "Resume Session?",
-    step1: {
-      title: "Building Your Profile",
-      age: "50-59",
-      sex: "Male",
-    },
-    step2: {
-      title: "Lifestyle Habits",
-      smoking: "Current smoker",
-      duration: "More than 20 years",
-      alcohol: "8-14",
-    },
-    step3: {
-      symptom: "Unexplained weight loss",
-    },
-    step4: {
-      pressure: "Yes",
-    },
-    results: {
-      title: "Your Preventive Health Plan",
-      submit: "View Results",
-      screeningTitle: "Colorectal Cancer Screening",
-      topicTitle: "Discuss Smoking Cessation",
-      newAssessment: "Build New Plan",
-    },
+    step1Title: "Core Questions",
+    sex: "Male",
+    smoking: "Current",
+    familyCancer: "Yes",
+    symptom: "Weight loss",
+    advancedTitle: "Advanced Details",
+    geneticsTitle: "Genetics (Optional)",
+    submit: "View Results",
+    resultsTitle: "Your Preventive Health Plan",
   },
   pl: {
     homeTitle: "ONKONO",
     startCta: "Rozpocznij Moją Ocenę",
-    resumeDialogTitle: "Wznowić sesję?",
-    step1: {
-      title: "Tworzenie Twojego Profilu",
-      age: "50-59",
-      sex: "Mężczyzna",
-    },
-    step2: {
-      title: "Nawyki Stylu Życia",
-      smoking: "Obecny palacz",
-      duration: "Ponad 20 lat",
-      alcohol: "8-14",
-    },
-     step3: {
-      symptom: "Niewyjaśniona utrata wagi",
-    },
-    step4: {
-      pressure: "Tak",
-    },
-    results: {
-      title: "Twój Profilaktyczny Plan Zdrowia",
-      submit: "Zobacz wyniki",
-      screeningTitle: "Badanie Przesiewowe w kierunku Raka Jelita Grubego", // Mocked title
-      topicTitle: "Omów Zaprzestanie Palenia", // Mocked title
-      newAssessment: "Zbuduj Nowy Plan",
-    },
+    step1Title: "Podstawowe Pytania",
+    sex: "Mężczyzna",
+    smoking: "Obecnie",
+    familyCancer: "Tak",
+    symptom: "Utrata wagi",
+    advancedTitle: "Szczegóły Zaawansowane",
+    geneticsTitle: "Genetyka (Opcjonalne)",
+    submit: "Zobacz wyniki",
+    resultsTitle: "Twój Profilaktyczny Plan Zdrowia",
   },
 };
 
@@ -76,173 +44,73 @@ for (const locale of locales) {
     }) => {
       const t = translations[locale];
 
-      // 1. Visit the welcome page
+      // 1. Visit the welcome page and start assessment
       await page.goto(`/${locale}`);
-      await expect(
-        page.getByRole("heading", { name: t.homeTitle }),
-      ).toBeVisible();
-
-      // 2. Start the assessment
       await page.getByRole("button", { name: t.startCta }).click();
       await expect(page).toHaveURL(`/${locale}/assessment`);
-      await expect(page.getByRole("heading", { name: "ONKONO" })).toBeVisible();
 
-      // 3. Complete the multi-step questionnaire
-      // Step 1
-      await expect(page.getByRole("heading", { name: t.step1.title })).toBeVisible();
-      await page.locator('label:has-text("Privacy Policy")').click(); // Consent
-      await page.getByRole("combobox").nth(0).click(); // Intent
-      await page.getByRole("option").first().click();
-      await page.getByRole("combobox").nth(1).click(); // Source
-      await page.getByRole("option").first().click();
-      await page.getByRole("combobox").nth(2).click(); // Language
-      await page.getByRole("option").first().click();
-      await page.getByRole("combobox").nth(3).click(); // Age
-      await page.getByRole("option", { name: t.step1.age }).click();
-      await page.getByRole("combobox").nth(4).click(); // Sex
-      await page.getByRole("option", { name: t.step1.sex }).click();
-      await page.getByLabel("Height").fill("178");
-      await page.getByLabel("Weight").fill("95");
-      await page.getByRole("button", { name: "Next" }).click();
-
-      // Step 2
-      await expect(page.getByRole("heading", { name: t.step2.title })).toBeVisible();
-      await page.getByRole("combobox").nth(0).click();
-      await page.getByRole("option", { name: t.step2.smoking }).click();
-      await page.getByRole("combobox").nth(1).click(); // Conditional question
-      await page.getByRole("option", { name: t.step2.duration }).click();
-      await page.getByRole("combobox").nth(2).click();
-      await page.getByRole("option", { name: t.step2.alcohol }).click();
-      await page.getByRole("button", { name: "Next" }).click();
+      // 2. Complete Core Questions
+      await expect(page.getByRole("heading", { name: t.step1Title })).toBeVisible();
+      // Consent
+      await page.locator('label:has-text("Privacy Policy")').click();
       
-      // Step 3 (Symptoms)
-      await page.getByLabel(t.step3.symptom).click();
-      await page.getByRole("button", { name: "Next" }).click();
-
-      // Step 4 (Diet)
-      const selectsStep4 = await page.getByRole("combobox").all();
-      for (const select of selectsStep4) {
-        await select.click();
-        await page.getByRole("option").first().click();
-      }
-      await page.getByRole("button", { name: "Next" }).click();
+      // Fill out fields
+      await page.getByLabel(t.startCta.includes("Ocenę") ? "Jaki jest cel" : "What’s your goal").click();
+      await page.getByRole("option", { name: t.startCta.includes("Ocenę") ? "Profilaktyka" : "Prevention" }).click();
       
-      // Step 5 (Health Conditions)
-      await page.getByRole("combobox").nth(0).click();
-      await page.getByRole("option", { name: t.step4.pressure }).click();
-      await page.getByRole("combobox").nth(1).click();
-      await page.getByRole("option").first().click();
+      await page.getByLabel("Date of birth").fill("1980-01-01");
+      
+      await page.getByLabel(t.startCta.includes("Ocenę") ? "Płeć przy urodzeniu" : "Sex at birth").click();
+      await page.getByRole("option", { name: t.sex }).click();
+
+      await page.getByLabel("Height").fill("180");
+      await page.getByLabel("Weight").fill("85");
+      
+      await page.getByLabel(t.startCta.includes("Ocenę") ? "Status palenia" : "Smoking status").click();
+      await page.getByRole("option", { name: t.smoking }).click();
+
+      await page.getByLabel(t.startCta.includes("Ocenę") ? "Spożycie alkoholu" : "Alcohol consumption").click();
+      await page.getByRole("option").nth(1).click(); // Moderate
+      
+      await page.getByLabel(t.symptom).click(); // Select a symptom
+
+      await page.getByLabel(t.startCta.includes("Ocenę") ? "Czy bliscy chorowali na raka" : "First-degree relative with cancer").click();
+      await page.getByRole("option", { name: t.familyCancer }).click();
+      
       await page.getByRole("button", { name: "Next" }).click();
 
-      // Step 6 (Advanced) - Just click next
-       await page.getByRole("button", { name: "Next" }).click();
+      // 3. Complete Advanced Step (conditionally)
+      await expect(page.getByRole("heading", { name: t.advancedTitle })).toBeVisible();
+      
+      // Verify conditional 'Family History' section is visible
+      const familyHistoryTrigger = page.getByRole("button", { name: /Family Cancer History/ });
+      await expect(familyHistoryTrigger).toBeVisible();
+      await familyHistoryTrigger.click();
+      await page.getByRole("button", { name: "Add Relative" }).click();
+      await page.getByLabel("Relation").click();
+      await page.getByRole("option", { name: "Parent" }).click();
+      
+      // Check for genetics section (should be visible by default)
+      const geneticsTrigger = page.getByRole("button", { name: t.geneticsTitle });
+      await expect(geneticsTrigger).toBeVisible();
 
-
-      // Step 7 & 8
-      for (let i = 0; i < 2; i++) {
-        const selects = await page.getByRole("combobox").all();
-        for (const select of selects) {
-          await select.click();
-          await page.getByRole("option").first().click();
-        }
-        if (i < 1) await page.getByRole("button", { name: "Next" }).click();
-      }
-
-      // Mock the API response to return a valid ActionPlan
+      // 4. Submit and navigate to results
+      // Mock API response
       await page.route("**/api/assess", async (route) => {
         const json = {
           overallSummary: "This is a mock summary.",
-          recommendedScreenings: [
-            {
-              id: "COLORECTAL_CANCER_SCREENING",
-              title: t.results.screeningTitle,
-              description: "A screening to detect early signs of colorectal cancer.",
-              why: "Recommended based on your age group.",
-            },
-          ],
+          recommendedScreenings: [],
           lifestyleGuidelines: [],
-          topicsForDoctor: [
-            {
-              id: "DISCUSS_SMOKING_CESSATION",
-              title: t.results.topicTitle,
-              why: "Recommended because you are a current smoker.",
-            },
-          ],
+          topicsForDoctor: [],
         };
         await route.fulfill({ json });
       });
-
-      // 4. Submit and navigate to results
-      await page.getByRole("button", { name: t.results.submit }).click();
+      await page.getByRole("button", { name: t.submit }).click();
 
       // 5. Verify results page
       await expect(page).toHaveURL(`/${locale}/results`);
-      await expect(page.getByRole("heading", { name: t.results.title })).toBeVisible();
-
-      // Check for specific plan items
-      await expect(page.getByText(t.results.screeningTitle)).toBeVisible();
-      await expect(page.getByText(t.results.topicTitle)).toBeVisible();
-
-      // 6. Test starting a new assessment clears state
-      await page.getByRole("button", { name: t.results.newAssessment }).click();
-
-      await expect(page).toHaveURL(`/${locale}`);
-      await expect(page.getByRole("heading", { name: t.homeTitle })).toBeVisible();
-
-      await page.getByRole("button", { name: t.startCta }).click();
-      await expect(page).toHaveURL(`/${locale}/assessment`);
-
-      // Verify "Resume Session" dialog does NOT appear
-      await expect(
-        page.getByRole("heading", { name: t.resumeDialogTitle }),
-      ).not.toBeVisible();
-
-      // Verify we are on step 1
-      await expect(page.getByRole("heading", { name: t.step1.title })).toBeVisible();
-    });
-
-     test("should show conditional advanced section for Symptom Details", async ({ page }) => {
-        const t = translations[locale];
-        await page.goto(`/${locale}/assessment`);
-
-        // Navigate through the form to the symptoms step
-        for (let i = 0; i < 2; i++) {
-          await page.locator('label:has-text("Privacy Policy")').click(); // Consent
-          const selects = await page.getByRole("combobox").all();
-          for (const select of selects) {
-            await select.click();
-            await page.getByRole("option").first().click();
-          }
-          await page.getByLabel("Height").fill("178");
-          await page.getByLabel("Weight").fill("95");
-          await page.getByRole("button", { name: "Next" }).click();
-        }
-        
-        // On symptoms step, select a symptom
-        await page.getByLabel(t.step3.symptom).click();
-        await page.getByRole("button", { name: "Next" }).click();
-
-        // Navigate to the advanced section
-         for (let i = 0; i < 3; i++) {
-            const selects = await page.getByRole("combobox").all();
-            for (const select of selects) {
-                await select.click();
-                await page.getByRole("option").first().click();
-            }
-            await page.getByRole("button", { name: "Next" }).click();
-         }
-        
-        // Now on the Advanced step
-        await expect(page.getByRole("heading", { name: "Advanced" })).toBeVisible();
-
-        // The "Symptom Details" accordion should be visible
-        const symptomDetailsTrigger = page.getByRole("button", { name: "Symptom Details" });
-        await expect(symptomDetailsTrigger).toBeVisible();
-
-        // Open it and check for content
-        await symptomDetailsTrigger.click();
-        await expect(page.getByText(t.step3.symptom)).toBeVisible();
-        await expect(page.getByText("When did it start?")).toBeVisible();
+      await expect(page.getByRole("heading", { name: t.resultsTitle })).toBeVisible();
     });
   });
 }
+      

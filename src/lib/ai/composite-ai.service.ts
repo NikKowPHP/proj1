@@ -51,11 +51,11 @@ export class CompositeAIService {
   }
 
   async getPlanExplanation(
-    guidelinePlan: GuidelinePlan,
+    healthPayload: any,
     userId?: string,
     locale: string = "en",
   ) {
-    const prompt = getPreventivePlanExplainerPrompt(guidelinePlan, locale);
+    const prompt = getPreventivePlanExplainerPrompt(healthPayload, locale);
     const providerChain = this.getProviderChain("large");
     return executeWithFallbacks(
       providerChain,

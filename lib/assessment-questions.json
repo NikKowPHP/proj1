@@ -1,0 +1,264 @@
+{
+  "steps": [
+    {
+      "title": { "en": "Core Questions", "pl": "Podstawowe Pytania" },
+      "questions": [
+        {
+          "id": "consent_health",
+          "type": "consent_checkbox"
+        },
+        {
+          "id": "intent",
+          "text": { "en": "What’s your goal today?", "pl": "Jaki jest cel dzisiejszego wypełnienia?" },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Prevention", "pl": "Profilaktyka" } },
+            { "label": { "en": "I have symptoms", "pl": "Mam objawy" } },
+            { "label": { "en": "Follow-up", "pl": "Wizyta kontrolna" } }
+          ]
+        },
+        {
+          "id": "source",
+          "text": { "en": "Who is filling this form?", "pl": "Kto wypełnia formularz?" },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Self", "pl": "Osobiście" } },
+            { "label": { "en": "Caregiver", "pl": "Opiekun" } },
+            { "label": { "en": "Imported", "pl": "Zaimportowane" } }
+          ]
+        },
+        {
+          "id": "language",
+          "text": { "en": "Preferred language", "pl": "Preferowany język" },
+          "type": "select",
+          "options": [
+            { "label": { "en": "English", "pl": "Angielski" } },
+            { "label": { "en": "Polski", "pl": "Polski" } }
+          ]
+        },
+        {
+          "id": "dob",
+          "text": { "en": "Date of birth", "pl": "Data urodzenia" },
+          "type": "date_input"
+        },
+        {
+          "id": "sex_at_birth",
+          "text": { "en": "Sex at birth", "pl": "Płeć przy urodzeniu" },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Female", "pl": "Kobieta" } },
+            { "label": { "en": "Male", "pl": "Mężczyzna" } },
+            { "label": { "en": "Intersex", "pl": "Interseksualna" } },
+            { "label": { "en": "Prefer not to say", "pl": "Wolę nie odpowiadać" } }
+          ]
+        },
+        {
+          "id": "gender_identity",
+          "text": { "en": "Gender identity (optional)", "pl": "Tożsamość płciowa (opcjonalnie)" },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Female", "pl": "Kobieta" } },
+            { "label": { "en": "Male", "pl": "Mężczyzna" } },
+            { "label": { "en": "Non-binary", "pl": "Niebinarna" } },
+            { "label": { "en": "Other", "pl": "Inna" } }
+          ]
+        },
+        {
+          "id": "height_cm",
+          "text": { "en": "Height (cm)", "pl": "Wzrost (cm)" },
+          "type": "number_input"
+        },
+        {
+          "id": "weight_kg",
+          "text": { "en": "Weight (kg)", "pl": "Waga (kg)" },
+          "type": "number_input"
+        },
+        {
+          "id": "smoking_status",
+          "text": { "en": "Smoking status", "pl": "Status palenia" },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Never", "pl": "Nigdy" } },
+            { "label": { "en": "Former", "pl": "W przeszłości" } },
+            { "label": { "en": "Current", "pl": "Obecnie" } }
+          ]
+        },
+        {
+          "id": "alcohol_use",
+          "text": { "en": "Alcohol consumption", "pl": "Spożycie alkoholu" },
+          "type": "select",
+          "options": [
+            { "label": { "en": "None/rare", "pl": "Brak/rzadko" } },
+            { "label": { "en": "Moderate", "pl": "Umiarkowane" } },
+            { "label": { "en": "Heavy", "pl": "Duże" } }
+          ]
+        },
+        {
+          "id": "diet_pattern",
+          "text": { "en": "Dietary pattern", "pl": "Wzorzec żywieniowy" },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Balanced", "pl": "Zbilansowana" } },
+            { "label": { "en": "Average", "pl": "Przeciętna" } },
+            { "label": { "en": "Unhealthy", "pl": "Niezdrowa" } }
+          ]
+        },
+        {
+          "id": "activity_level",
+          "text": { "en": "Physical activity", "pl": "Aktywność fizyczna" },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Sedentary", "pl": "Siedzący tryb życia" } },
+            { "label": { "en": "Moderate", "pl": "Umiarkowana" } },
+            { "label": { "en": "High", "pl": "Wysoka" } }
+          ]
+        },
+        {
+          "id": "symptoms",
+          "text": { "en": "Current symptoms (select all) or None", "pl": "Obecne objawy (wybierz) lub Brak" },
+          "type": "checkbox_group",
+          "exclusiveOptionId": "HP:0000000",
+          "options": [
+            { "id": "HP:0012378", "label": { "en": "Fatigue", "pl": "Zmęczenie" } },
+            { "id": "HP:0004355", "label": { "en": "Weight loss", "pl": "Utrata wagi" }, "red_flag": true },
+            { "id": "HP:0001945", "label": { "en": "Fever", "pl": "Gorączka" } },
+            { "id": "HP:0000989", "label": { "en": "Skin changes", "pl": "Zmiany skórne" } },
+            { "id": "HP:0000000", "label": { "en": "None", "pl": "Brak" } }
+          ]
+        },
+        {
+          "id": "family_cancer_any",
+          "text": { "en": "First-degree relative with cancer?", "pl": "Czy bliscy chorowali na raka?" },
+          "type": "select",
+          "options": [
+            { "label": { "en": "Yes", "pl": "Tak" } },
+            { "label": { "en": "No", "pl": "Nie" } },
+            { "label": { "en": "Unsure", "pl": "Nie jestem pewien/pewna" } }
+          ]
+        }
+      ]
+    },
+    {
+      "title": { "en": "Advanced Details", "pl": "Szczegóły Zaawansowane" },
+      "description": { "en": "Providing more details is optional but helps create a more personalized plan.", "pl": "Podanie dodatkowych szczegółów jest opcjonalne, ale pomaga stworzyć bardziej spersonalizowany plan." },
+      "questions": [
+        {
+          "id": "advanced_modules",
+          "type": "advanced_modules",
+          "modules": [
+            {
+              "id": "symptom_details",
+              "title": { "en": "Symptom Details", "pl": "Szczegóły Objawów" },
+              "dependsOn": { "questionId": "symptoms", "value": true }
+            },
+            {
+              "id": "family_cancer_history",
+              "title": { "en": "Family Cancer History", "pl": "Rodzinna Historia Nowotworów" },
+              "dependsOn": { "questionId": "family_cancer_any", "value": "Yes" },
+              "options": {
+                "relations": [ "Parent", "Sibling", "Child", "Grandparent", "Other" ],
+                "cancerTypes": [
+                  { "value": "breast", "label": "Breast Cancer" },
+                  { "value": "lung", "label": "Lung Cancer" },
+                  { "value": "prostate", "label": "Prostate Cancer" },
+                  { "value": "colorectal", "label": "Colorectal Cancer" }
+                ]
+              }
+            },
+            {
+              "id": "genetics",
+              "title": { "en": "Genetics (Optional)", "pl": "Genetyka (Opcjonalne)" },
+              "questions": [
+                  { "id": "genetic_testing_done", "text": { "en": "Have you ever had genetic testing related to cancer risk?", "pl": "Czy kiedykolwiek wykonano u Pana/Pani badania genetyczne związane z ryzykiem nowotworów?" }, "type": "select", "options": ["Yes", "No", "Not sure"] },
+                  { "id": "genetic_test_type", "text": { "en": "What type of genetic test was it?", "pl": "Jaki to był rodzaj badania genetycznego?" }, "type": "select", "options": ["Multigene panel", "Single gene", "Exome (WES)", "Genome (WGS)", "Other"], "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"} },
+                  { "id": "genetic_test_year", "text": { "en": "In what year was the test performed?", "pl": "W którym roku wykonano badanie?" }, "type": "year_input", "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"} },
+                  { "id": "genetic_lab", "text": { "en": "Testing laboratory (if known)", "pl": "Laboratorium wykonujące test (jeśli znane)" }, "type": "text_input", "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"} },
+                  { "id": "genetic_findings_present", "text": { "en": "Did the report mention any pathogenic/likely pathogenic variants?", "pl": "Czy w raporcie wskazano warianty patogenne/prawdopodobnie patogenne?" }, "type": "select", "options": ["Yes", "No", "Don't know"], "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"} },
+                  { "id": "genetic_genes", "text": { "en": "If yes: which genes?", "pl": "Jeśli tak: które geny?" }, "type": "checkbox_group", "options": [{ "id": "BRCA1", "label": "BRCA1"}, { "id": "BRCA2", "label": "BRCA2"}, { "id": "MLH1", "label": "MLH1"}], "dependsOn": { "questionId": "genetic_findings_present", "value": "Yes"} },
+                  { "id": "genetic_variants_hgvs", "text": { "en": "Variant(s) (HGVS, optional)", "pl": "Wariant(y) (HGVS, opcjonalnie)" }, "type": "text_input", "dependsOn": { "questionId": "genetic_findings_present", "value": "Yes"} },
+                  { "id": "genetic_vus_present", "text": { "en": "Any VUS (Variants of Uncertain Significance)?", "pl": "Czy występują warianty o niepewnym znaczeniu (VUS)?" }, "type": "select", "options": ["Yes", "No", "Don't know"], "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"} },
+                  { "id": "genetic_report_upload", "text": { "en": "Upload genetic report (optional)", "pl": "Prześlij raport genetyczny (opcjonalnie)" }, "type": "file_upload", "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes"} },
+                  { "id": "genetic_processing_consent", "type": "consent_checkbox", "dependsOn": { "questionId": "genetic_testing_done", "value": "Yes" } }
+              ]
+            },
+            {
+              "id": "female_health",
+              "title": { "en": "Female Health", "pl": "Zdrowie Kobiet" },
+              "dependsOn": { "questionId": "sex_at_birth", "value": "Female" },
+              "questions": [
+                { "id": "menopause_status", "text": {"en": "Have you undergone menopause?", "pl": "Czy jest Pani po menopauzie?"}, "type": "select", "options": ["Yes", "No", "N/A"] },
+                { "id": "menopause_age", "text": {"en": "If yes: at what age did menopause occur?", "pl": "Jeśli tak: w jakim wieku wystąpiła menopauza?"}, "type": "year_input", "dependsOn": { "questionId": "menopause_status", "value": "Yes"} },
+                { "id": "had_children", "text": {"en": "Have you given birth to any children?", "pl": "Czy urodziła Pani dziecko/dzieci?"}, "type": "select", "options": ["Yes", "No"] },
+                { "id": "first_child_age", "text": {"en": "If yes: age at birth of first child", "pl": "Jeśli tak: wiek przy urodzeniu pierwszego dziecka"}, "type": "year_input", "dependsOn": { "questionId": "had_children", "value": "Yes"} },
+                { "id": "hrt_use", "text": {"en": "Have you ever used hormone replacement therapy (HRT)?", "pl": "Czy stosowała Pani hormonalną terapię zastępczą (HTZ)?"}, "type": "select", "options": ["Never", "Previously", "Currently"] }
+              ]
+            },
+            {
+              "id": "personal_medical_history",
+              "title": { "en": "Personal Medical History", "pl": "Osobista Historia Medyczna" },
+              "options": {
+                "illnesses": [
+                  { "id": "diabetes", "label": "Diabetes" }, { "id": "hypertension", "label": "Hypertension" }, { "id": "ibd", "label": "IBD" }
+                ]
+              }
+            },
+            {
+              "id": "personal_cancer_history",
+              "title": { "en": "Personal Cancer History", "pl": "Osobista Historia Nowotworów" },
+              "options": {
+                "cancerTypes": [ { "value": "breast", "label": "Breast Cancer" }, { "value": "lung", "label": "Lung Cancer" } ],
+                "treatmentTypes": [ { "id": "surgery", "label": "Surgery"}, { "id": "chemo", "label": "Chemotherapy"}, {"id": "radio", "label": "Radiotherapy"} ]
+              }
+            },
+            {
+              "id": "screening_immunization",
+              "title": {"en": "Screening & Immunization", "pl": "Badania Przesiewowe i Szczepienia"},
+              "screenings": [
+                {"id": "colonoscopy", "text": "Colonoscopy", "questions": [
+                  {"id": "screen.colonoscopy.done", "text": "Colonoscopy ever?", "type": "select", "options": ["Yes", "No"]},
+                  {"id": "screen.colonoscopy.date", "text": "Last colonoscopy year", "type": "year_input", "dependsOn": {"questionId": "screen.colonoscopy.done", "value": "Yes"}}
+                ]},
+                {"id": "mammogram", "text": "Mammogram", "dependsOn": {"questionId": "sex_at_birth", "value": "Female"}, "questions": [
+                  {"id": "screen.mammo.done", "text": "Mammogram ever?", "type": "select", "options": ["Yes", "No"]},
+                  {"id": "screen.mammo.date", "text": "Last mammogram year", "type": "year_input", "dependsOn": {"questionId": "screen.mammo.done", "value": "Yes"}}
+                ]}
+              ],
+              "immunizations": [
+                {"id": "imm.hpv", "text": "HPV vaccination", "type": "select", "options": ["Yes", "No", "Unsure"]},
+                {"id": "imm.hbv", "text": "HBV vaccination", "type": "select", "options": ["Yes", "No", "Unsure"]}
+              ]
+            },
+            {
+              "id": "sexual_health",
+              "title": {"en": "Sexual Health (Optional)", "pl": "Zdrowie Seksualne (Opcjonalne)"},
+              "questions": [
+                {"id": "sex.active", "text": "Currently sexually active?", "type": "select", "options": ["Yes", "No", "Prefer not to say"]},
+                {"id": "sex.barrier_freq", "text": "Condom/barrier use", "type": "select", "options": ["Always", "Sometimes", "Never", "Prefer not to say"]}
+              ]
+            },
+            {
+              "id": "occupational_hazards",
+              "title": {"en": "Occupational Hazards (Optional)", "pl": "Zagrożenia Zawodowe (Opcjonalne)"},
+              "options": {
+                "jobTitles": [{ "value": "welder", "label": "Welder"}, { "value": "miner", "label": "Miner"}],
+                "exposures": [{ "value": "asbestos", "label": "Asbestos"}, { "value": "silica", "label": "Silica"}],
+                "ppe": [{"value": "respirator", "label": "Respirator"}, {"value": "gloves", "label": "Gloves"}],
+                "shiftPatterns": ["Never", "Occasionally", "Frequently"],
+                "intensities": ["Low", "Moderate", "High", "Unsure"]
+              }
+            },
+            {
+              "id": "environmental_exposures",
+              "title": {"en": "Environmental Exposures (Optional)", "pl": "Narażenie Środowiskowe (Opcjonalne)"},
+              "questions": [
+                {"id": "home.years_here", "text": "Years at current residence", "type": "number_input"},
+                {"id": "home.radon_tested", "text": "Home tested for radon?", "type": "select", "options": ["Yes", "No", "Unsure"]}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+      

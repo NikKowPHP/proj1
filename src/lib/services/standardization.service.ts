@@ -1,101 +1,115 @@
 import { logger } from "@/lib/logger";
-import questionnaireData from "@/lib/assessment-questions.json";
 
-// In a real application, these maps would be much larger or externalized
-const cancerTypeMap: Record<string, string> = {
-  "Breast Cancer": "ICD-O-3:C50.9",
-  "Lung Cancer": "ICD-O-3:C34.9",
-};
-
-const jobTitleMap: Record<string, string> = {
-  "Software Developer": "ISCO-08:2512",
-  "Physician": "ISCO-08:2211",
+/**
+ * Safely parses a JSON string from an answers object.
+ * @param value The value to parse, which might be a JSON string.
+ * @returns The parsed object/array, or an empty array if parsing fails.
+ */
+const safeJsonParse = (value: any): any[] => {
+  if (typeof value !== 'string' || !value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
 };
 
 /**
- * A service to standardize raw form answers into a structured, coded format.
+ * A service to standardize raw form answers into a structured, coded format
+ * as specified in new_requirements.md.
  */
 export const StandardizationService = {
   /**
    * Processes the flat answer object from the form into a structured payload.
    * @param answers - The raw answers from the Zustand store.
-   * @returns A structured object with standardized codes and units.
+   * @returns A structured object with core and advanced sections.
    */
-  standardize: (answers: Record<string, string>): Record<string, any> => {
-    const standardized: Record<string, any> = {};
+  standardize: (answers: Record<string, any>): Record<string, any> => {
+    const standardized: { core: Record<string, any>, advanced: Record<string, any> } = {
+      core: {},
+      advanced: {},
+    };
 
     try {
-      // Demographics
-      standardized.demographics = {
-        age_range: answers.age,
+      // --- CORE SECTION ---
+      standardized.core = {
+        dob: answers.dob,
         sex_at_birth: answers.sex_at_birth,
-        gender_identity: answers.gender_identity,
+        height_cm: Number(answers.height_cm) || undefined,
+        weight_kg: Number(answers.weight_kg) || undefined,
+        smoking_status: answers.smoking_status,
+        alcohol_use: answers.alcohol_use,
+        symptoms: safeJsonParse(answers.symptoms),
+        family_cancer_any: answers.family_cancer_any,
+        // Optional core fields
+        intent: answers.intent,
+        source: answers.source,
         language: answers.language,
+        gender_identity: answers.gender_identity,
+        diet_pattern: answers.diet_pattern,
+        activity_level: answers.activity_level,
       };
 
-      // Measurements (Height & Weight)
-      const height = parseFloat(answers.height);
-      const weight = parseFloat(answers.weight);
-      const isMetric = answers.units === "metric";
+      // --- ADVANCED SECTION ---
       
-      standardized.measurements = {
-        height: {
-          value: isMetric ? height : parseFloat((height * 2.54).toFixed(2)),
-          unit: "cm",
-          code: "8302-2", // LOINC code for Body height
-        },
-        weight: {
-          value: isMetric ? weight : parseFloat((weight * 0.453592).toFixed(2)),
-          unit: "kg",
-          code: "29463-7", // LOINC code for Body weight
-        },
-      };
-
-      // Symptoms
-      if (answers.symptoms) {
-        const selectedSymptomIds = JSON.parse(answers.symptoms);
-        const symptomOptions = questionnaireData.steps.find(s => s.questions.some(q => q.id === 'symptoms'))?.questions.find(q => q.id === 'symptoms')?.options || [];
-        
-        standardized.symptoms = selectedSymptomIds.map((id: string) => {
-          const option = symptomOptions.find(o => o.id === id);
-          return {
-            id: id,
-            label: typeof option?.label === 'object' ? option.label.en : option?.label,
-            hpo_code: option?.hpo_code,
-            details: answers[`symptom_details_${id}`] ? JSON.parse(answers[`symptom_details_${id}`]) : {},
-          };
-        });
-      }
-
-       // Family History
-      if (answers.family_history_cancer === 'Yes' && answers.family_cancer_history) {
-        standardized.family_history = JSON.parse(answers.family_cancer_history).map((relative: any) => ({
-          ...relative,
-          cancer_type_code: cancerTypeMap[relative.cancer_type] || "ICD-O-3:UNKNOWN"
-        }));
-      }
-
-      // Genetics
-      if(answers.genetic_testing_done === 'Yes') {
-        standardized.genetics = {
-          genetic_testing_done: answers.genetic_testing_done,
-          genetic_test_type: answers.genetic_test_type,
-          genetic_findings: answers.genetic_findings,
-          // In a real scenario, findings would be mapped to HGNC/HGVS codes
+      // Symptom Details
+      const symptomDetails: Record<string, any> = {};
+      standardized.core.symptoms.forEach((symptomId: string) => {
+        const detailKey = `symptom_details_${symptomId}`;
+        if (answers[detailKey]) {
+          symptomDetails[symptomId] = safeJsonParse(answers[detailKey]);
         }
+      });
+      if (Object.keys(symptomDetails).length > 0) {
+        standardized.advanced.symptom_details = symptomDetails;
       }
       
-      // ... other sections would be standardized here ...
+      // Family History
+      if (answers.family_cancer_history) {
+        standardized.advanced.family = safeJsonParse(answers.family_cancer_history);
+      }
+      
+      // Genetics
+      if (answers.genetic_testing_done === 'Yes') {
+        standardized.advanced.genetics = {
+          tested: true,
+          type: answers.genetic_test_type,
+          year: answers.genetic_test_year,
+          findings_present: answers.genetic_findings_present,
+          genes: safeJsonParse(answers.genetic_genes),
+          vus_present: answers.genetic_vus_present,
+        };
+      }
+
+      // Illnesses
+      const illnessList = safeJsonParse(answers.illness_list);
+      if (illnessList.length > 0) {
+          standardized.advanced.illnesses = illnessList.map((illnessId: string) => {
+              const detailsKey = `illness_details_${illnessId}`;
+              const details = answers[detailsKey] ? JSON.parse(answers[detailsKey]) : {};
+              return {
+                  id: illnessId,
+                  ...details
+              };
+          });
+      }
+
+       // Occupational History
+      if (answers.occupational_hazards) {
+        standardized.advanced.occupational = safeJsonParse(answers.occupational_hazards);
+      }
+
+      // ... other advanced sections would be standardized here ...
 
     } catch (error) {
       logger.error("Failed to standardize answers", {
         error,
         answers,
       });
-      // Return a partially standardized object if possible
-      return standardized;
     }
 
     return standardized;
   },
 };
+      

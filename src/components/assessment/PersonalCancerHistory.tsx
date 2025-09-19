@@ -9,6 +9,7 @@ interface CancerDiagnosis {
   type?: string;
   year_dx?: number;
   treatments?: string[];
+  last_followup?: number;
 }
 
 interface PersonalCancerHistoryProps {
@@ -53,13 +54,23 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
               placeholder="Search cancer type..."
             />
           </div>
-          <div className="space-y-2">
-            <Label>Year of Diagnosis</Label>
-            <YearInput
-              value={item.year_dx}
-              onChange={(val) => handleFieldChange(index, 'year_dx', val)}
-              placeholder="e.g. 2015"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Year of Diagnosis</Label>
+              <YearInput
+                value={item.year_dx}
+                onChange={(val) => handleFieldChange(index, 'year_dx', val)}
+                placeholder="e.g. 2015"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Last Follow-up Year</Label>
+              <YearInput
+                value={item.last_followup}
+                onChange={(val) => handleFieldChange(index, 'last_followup', val)}
+                placeholder="e.g. 2023"
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <Label>Treatments Received</Label>
@@ -74,3 +85,4 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
     </RepeatingGroup>
   );
 };
+      

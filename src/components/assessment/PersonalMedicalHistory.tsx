@@ -5,10 +5,13 @@ import { SearchableSelectOption } from '../ui/SearchableSelect';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { YearInput } from '../ui/YearInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Textarea } from '../ui/textarea';
 
 interface IllnessDetails {
   year?: number;
   status?: string;
+  confirmed?: string;
+  meds_note?: string;
 }
 
 interface PersonalMedicalHistoryProps {
@@ -72,10 +75,27 @@ export const PersonalMedicalHistory = ({ answers, onAnswer, options }: PersonalM
                         <SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="active">Active</SelectItem>
-                            <SelectItem value="in_remission">In Remission</SelectItem>
                             <SelectItem value="resolved">Resolved</SelectItem>
                         </SelectContent>
                      </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Clinician-confirmed?</Label>
+                     <Select value={details.confirmed} onValueChange={(val) => handleDetailChange(illnessId, 'confirmed', val)}>
+                        <SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="yes">Yes</SelectItem>
+                            <SelectItem value="no">No</SelectItem>
+                        </SelectContent>
+                     </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Relevant Medications (optional)</Label>
+                    <Textarea
+                      value={details.meds_note}
+                      onChange={(e) => handleDetailChange(illnessId, 'meds_note', e.target.value)}
+                      placeholder="e.g., Aspirin, Metformin"
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -86,3 +106,4 @@ export const PersonalMedicalHistory = ({ answers, onAnswer, options }: PersonalM
     </div>
   );
 };
+      

@@ -1,4 +1,5 @@
 import { logger } from "@/lib/logger";
+import { differenceInYears } from 'date-fns';
 
 /**
  * Calculates Body Mass Index (BMI).
@@ -6,8 +7,8 @@ import { logger } from "@/lib/logger";
  * @param weight - Weight in kg.
  * @returns The calculated BMI, or null if inputs are invalid.
  */
-function calculateBmi(height: number, weight: number): number | null {
-  if (height <= 0 || weight <= 0) {
+function calculateBmi(height?: number, weight?: number): number | null {
+  if (!height || !weight || height <= 0 || weight <= 0) {
     return null;
   }
   const heightInMeters = height / 100;
@@ -15,52 +16,102 @@ function calculateBmi(height: number, weight: number): number | null {
 }
 
 /**
- * A service to calculate derived health variables from user answers.
+ * Calculates age from a date of birth string.
+ * @param dob - Date of birth in "YYYY-MM-DD" format.
+ * @returns The calculated age in years, or null if the input is invalid.
+ */
+function calculateAge(dob?: string): number | null {
+    if (!dob) return null;
+    try {
+        const birthDate = new Date(dob);
+        if (isNaN(birthDate.getTime())) return null;
+        return differenceInYears(new Date(), birthDate);
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Calculates smoking pack-years.
+ * @param smokingDetails - Object with cigs_per_day and years.
+ * @returns The calculated pack-years, or null if inputs are invalid.
+ */
+function calculatePackYears(smokingDetails?: { cigs_per_day?: number; years?: number }): number | null {
+    if (!smokingDetails || !smokingDetails.cigs_per_day || !smokingDetails.years) {
+        return null;
+    }
+    const { cigs_per_day, years } = smokingDetails;
+    if (cigs_per_day <= 0 || years <= 0) return null;
+    
+    return parseFloat(((cigs_per_day / 20) * years).toFixed(1));
+}
+
+
+/**
+ * A service to calculate derived health variables from standardized user data.
  */
 export const DerivedVariablesService = {
   /**
-   * Calculates all derivable variables from a set of answers.
-   * @param answers - A record of standardized user answers.
+   * Calculates all derivable variables from a standardized data object.
+   * @param standardizedData - A structured object from the StandardizationService.
    * @returns An object containing the derived variables.
    */
-  calculateAll: (answers: Record<string, any>): Record<string, any> => {
+  calculateAll: (standardizedData: Record<string, any>): Record<string, any> => {
     const derived: Record<string, any> = {};
 
     try {
-      // Calculate BMI
-      if (answers.measurements?.height?.value && answers.measurements?.weight?.value) {
-        const heightCm = answers.measurements.height.value;
-        const weightKg = answers.measurements.weight.value;
-        const bmi = calculateBmi(heightCm, weightKg);
-        if (bmi) {
-          derived.bmi = {
-            value: bmi,
-            unit: "kg/m2",
-            code: "39156-5", // LOINC code for BMI
-          };
-        }
+      const core = standardizedData.core || {};
+      const advanced = standardizedData.advanced || {};
+
+      // Calculate Age
+      const age = calculateAge(core.dob);
+      if (age !== null) {
+          derived.age_years = age;
       }
 
-      // Placeholder for pack-years calculation
-      if (answers.smoking?.status === 'Current smoker' || answers.smoking?.status === 'Former smoker') {
-        derived.pack_years = {
-          value: 20, // Placeholder value
-          description: "Calculated placeholder pack-years."
+      // Calculate BMI
+      const bmi = calculateBmi(core.height_cm, core.weight_kg);
+      if (bmi) {
+        derived.bmi = {
+          value: bmi,
+          unit: "kg/m2",
+          code: "39156-5", // LOINC code for BMI
         };
       }
+
+      // Calculate pack-years
+      if (core.smoking_status === 'Former' || core.smoking_status === 'Current') {
+        const packYears = calculatePackYears(advanced.smoking_detail);
+        if (packYears !== null) {
+            derived.pack_years = packYears;
+        } else if (core.smoking_status === 'Never') {
+            derived.pack_years = 0;
+        }
+      }
       
-      // Placeholder for organ inventory
-      if(answers.demographics?.sex_at_birth === 'Female') {
+      // Determine organ inventory based on sex at birth
+      if(core.sex_at_birth === 'Female') {
           derived.organ_inventory = {
-              has_cervix: true, // Placeholder
+              has_cervix: true, // Placeholder, would be refined with surgery history
               has_uterus: true, // Placeholder
+              has_ovaries: true,
+              has_breasts: true
+          }
+      } else if (core.sex_at_birth === 'Male') {
+          derived.organ_inventory = {
+              has_prostate: true,
+              has_breasts: true // Men can also get breast cancer
           }
       }
 
     } catch (error) {
-      logger.error("Failed to calculate derived variables", error);
+      logger.error("Failed to calculate derived variables", {
+          error,
+          standardizedData
+      });
     }
 
     return derived;
   },
 };
+      

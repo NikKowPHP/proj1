@@ -30,7 +30,6 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { AppHeaderContent } from "@/components/AppHeaderContent";
 import { DisclaimerFooterContent } from "@/components/DisclaimerFooterContent";
 import { DisclaimerFooterContentMobile } from "@/components/DisclaimerFooterContentMobile";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckboxGroup, CheckboxOption } from "@/components/ui/CheckboxGroup";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -50,9 +49,9 @@ import { SafetyBanner } from "@/components/assessment/SafetyBanner";
 
 interface Question {
   id: string;
-  text: string;
-  type: "select" | "number_input" | "consent_checkbox" | "checkbox_group" | "advanced_modules" | "year_input";
-  options?: any[]; // Can be string[] or CheckboxOption[]
+  text?: string;
+  type: "select" | "number_input" | "date_input" | "consent_checkbox" | "checkbox_group" | "advanced_modules";
+  options?: any; // Can be string[], CheckboxOption[], or complex objects for modules
   dependsOn?: {
     questionId: string;
     value: string | boolean;
@@ -83,8 +82,6 @@ export default function AssessmentPage() {
     totalSteps,
     setTotalSteps,
     reset,
-    units,
-    setUnits,
   } = useAssessmentStore();
 
   const [isClient, setIsClient] = useState(false);
@@ -116,12 +113,10 @@ export default function AssessmentPage() {
 
   useEffect(() => {
     if (questionnaire) {
-      console.log("[DEBUG] Questionnaire data received on client:", questionnaire);
       setTotalSteps(questionnaire.steps.length);
     }
   }, [questionnaire, setTotalSteps]);
 
-  // Safety Banner Logic
   useEffect(() => {
     if (!questionnaire) return;
     const symptomsAnswer = answers.symptoms;
@@ -149,7 +144,6 @@ export default function AssessmentPage() {
     if (currentStep < totalSteps - 1) {
       nextStep();
     } else {
-      setAnswer("units", units);
       router.push("/results");
     }
   };
@@ -159,38 +153,59 @@ export default function AssessmentPage() {
     setShowResumeDialog(false);
   };
 
-  const validateNumberInput = (id: string, value: string): string | null => {
-    if (!value.trim()) return t("requiredField");
-    const num = Number(value);
-    if (isNaN(num)) return t("validNumber");
-    if (num <= 0) return t("positiveValue");
-
-    if (id === "height" && units === "metric" && (num < 50 || num > 300))
-      return t("heightMetricRange");
-    if (id === "height" && units === "imperial" && (num < 20 || num > 120))
-      return t("heightImperialRange");
-    if (id === "weight" && units === "metric" && (num < 20 || num > 300))
-      return t("weightMetricRange");
-    if (id === "weight" && units === "imperial" && (num < 40 || num > 660))
-      return t("weightImperialRange");
-
+  const validateInput = (id: string, value: string, type: Question['type']): string | null => {
+    if (type === 'date_input' && id === 'dob') {
+        if (!value) return "This field is required.";
+        if (new Date(value) > new Date()) return "Date of birth cannot be in the future.";
+    }
+    if (type === 'number_input') {
+        const num = Number(value);
+        if (isNaN(num)) return "Must be a number.";
+        if (id === 'height_cm' && (num < 50 || num > 250)) return "Height must be between 50 and 250 cm.";
+        if (id === 'weight_kg' && (num < 30 || num > 300)) return "Weight must be between 30 and 300 kg.";
+    }
     return null;
   };
 
-  const handleInputChange = (
-    id: string,
-    value: string,
-    type: Question["type"],
-  ) => {
-    let error: string | null = null;
-    if (type === "number_input") {
-      error = validateNumberInput(id, value);
-    }
-
-    setLocalErrors((prev) => ({ ...prev, [id]: error || "" }));
-
-    setAnswer(id, value);
+  const handleInputChange = (id: string, value: string, type: Question['type']) => {
+      const error = validateInput(id, value, type);
+      setLocalErrors(prev => ({ ...prev, [id]: error || '' }));
+      setAnswer(id, value);
   };
+
+  const isQuestionVisible = (question: Question) => {
+    if (!question.dependsOn) return true;
+    const dependencyAnswer = answers[question.dependsOn.questionId];
+    if (typeof question.dependsOn.value === 'boolean') {
+      if (question.dependsOn.value) {
+        return !!dependencyAnswer && dependencyAnswer !== '[]' && dependencyAnswer !== 'false' && dependencyAnswer !== '["HP:0000000"]';
+      } else {
+        return !dependencyAnswer || dependencyAnswer === '[]' || dependencyAnswer === 'false' || dependencyAnswer === '["HP:0000000"]';
+      }
+    }
+    return dependencyAnswer === question.dependsOn.value;
+  };
+
+  const stepData = questionnaire?.steps[currentStep];
+  const visibleQuestions = stepData?.questions.filter(isQuestionVisible) || [];
+
+  const isStepComplete = () => {
+    if (!questionnaire) return false;
+    const allAnswered = visibleQuestions.every((q) => {
+      if (q.type === "consent_checkbox") return answers[q.id] === "true";
+      if (q.type === "checkbox_group") {
+        const value = answers[q.id];
+        if (!value) return false;
+        try { return JSON.parse(value).length > 0; } catch { return false; }
+      }
+      if (q.type === "advanced_modules") return true;
+      return answers[q.id] && answers[q.id].trim() !== "";
+    });
+    const noErrors = visibleQuestions.every((q) => !localErrors[q.id]);
+    return allAnswered && noErrors;
+  };
+  
+  const progressPercentage = ((currentStep + 1) / totalSteps) * 100;
 
   if (isLoading || !isClient) {
     return (
@@ -204,401 +219,64 @@ export default function AssessmentPage() {
   if (error) {
     return (
       <div className="container mx-auto p-4 max-w-2xl text-center">
-        <p className="text-destructive">
-          {t("loadingError", { error: (error as Error).message })}
-        </p>
+        <p className="text-destructive">{t("loadingError", { error: (error as Error).message })}</p>
       </div>
     );
   }
 
-  const stepData = questionnaire?.steps[currentStep];
-  const progressPercentage = ((currentStep + 1) / totalSteps) * 100;
-
-  const isQuestionVisible = (question: Question) => {
-    if (!question.dependsOn) return true;
-    const dependencyAnswer = answers[question.dependsOn.questionId];
-    if(typeof question.dependsOn.value === 'boolean') {
-        if(question.dependsOn.value) {
-            // "depends on being answered" logic
-            return !!dependencyAnswer && dependencyAnswer !== '[]' && dependencyAnswer !== 'false' && dependencyAnswer !== '["none"]';
-        } else {
-            return !dependencyAnswer || dependencyAnswer === '[]' || dependencyAnswer === 'false' || dependencyAnswer === '["none"]';
-        }
-    }
-    if (!dependencyAnswer) return false;
-    return dependencyAnswer === question.dependsOn.value;
-  };
-
-  const visibleQuestions = stepData?.questions.filter(isQuestionVisible) || [];
-
-  const isStepComplete = () => {
-    if (!questionnaire) return false;
-
-    const allAnswered = visibleQuestions.every((q) => {
-      if (q.type === "consent_checkbox") {
-        return answers[q.id] === "true";
-      }
-      if (q.type === "checkbox_group") {
-        const value = answers[q.id];
-        if (!value) return false;
-        try {
-          const arr = JSON.parse(value);
-          return Array.isArray(arr) && arr.length > 0;
-        } catch {
-          return false;
-        }
-      }
-       if (q.type === "advanced_modules") {
-        return true; // The container itself requires no validation
-      }
-      return answers[q.id] && answers[q.id].trim() !== "";
-    });
-    const noErrors = visibleQuestions.every((q) => !localErrors[q.id]);
-
-    return allAnswered && noErrors;
-  };
-
-  const hasHeightOrWeight = stepData?.questions.some(
-    (q) => q.id === "height" || q.id === "weight",
-  );
-
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Mobile-Only Header (White Background) */}
-      <header className="p-4 bg-white text-black md:hidden">
-        <AppHeaderContent />
-      </header>
-
+      <header className="p-4 bg-white text-black md:hidden"><AppHeaderContent /></header>
       <Dialog open={showResumeDialog} onOpenChange={setShowResumeDialog}>
-        <DialogContent
-          showCloseButton={false}
-          onEscapeKeyDown={(e) => e.preventDefault()}
-          onPointerDownOutside={(e) => e.preventDefault()}
-        >
-          <DialogHeader>
-            <DialogTitle>{t("resumeDialogTitle")}</DialogTitle>
-            <DialogDescription>{t("resumeDialogDescription")}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleStartNew}>
-              {t("resumeDialogStartNew")}
-            </Button>
-            <Button onClick={() => setShowResumeDialog(false)}>
-              {t("resumeDialogResume")}
-            </Button>
-          </DialogFooter>
+        <DialogContent showCloseButton={false} onEscapeKeyDown={(e) => e.preventDefault()} onPointerDownOutside={(e) => e.preventDefault()}>
+          <DialogHeader><DialogTitle>{t("resumeDialogTitle")}</DialogTitle><DialogDescription>{t("resumeDialogDescription")}</DialogDescription></DialogHeader>
+          <DialogFooter><Button variant="outline" onClick={handleStartNew}>{t("resumeDialogStartNew")}</Button><Button onClick={() => setShowResumeDialog(false)}>{t("resumeDialogResume")}</Button></DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Main Container */}
       <div className="flex flex-grow md:grid md:grid-cols-2">
-        {/* Left Column (Desktop-Only, White Background) */}
-        <div className="hidden md:flex flex-col justify-between p-12 bg-white text-black">
-          <AppHeaderContent />
-          <DisclaimerFooterContent />
-        </div>
-
-        {/* Right Column / Main Form Content (Black Background) */}
+        <div className="hidden md:flex flex-col justify-between p-12 bg-white text-black"><AppHeaderContent /><DisclaimerFooterContent /></div>
         <main className="bg-black text-white w-full flex flex-col flex-grow sm:items-center sm:justify-center p-4 pb-24 md:pb-4">
           <div className="w-full max-w-md space-y-8">
-            {/* Header section with Language Switcher */}
-            <div className=" justify-center w-full hidden sm:flex">
-              <LanguageSwitcher />
-            </div>
+            <div className=" justify-center w-full hidden sm:flex"><LanguageSwitcher /></div>
             <div>
-              <Progress
-                value={progressPercentage}
-                className="mb-4 h-3"
-                indicatorClassName="bg-primary"
-              />
+              <Progress value={progressPercentage} className="mb-4 h-3" indicatorClassName="bg-primary" />
               <h1 className="text-2xl font-bold">{stepData?.title}</h1>
-              <p className="text-gray-400 mt-2">
-                {t("step", {
-                  currentStep: currentStep + 1,
-                  totalSteps: totalSteps,
-                })}
-              </p>
+              {stepData?.description && <p className="text-gray-400 mt-2">{stepData.description}</p>}
             </div>
             {showSafetyBanner && <SafetyBanner />}
             <section className="space-y-6">
-              {" "}
-              {/* Enforces consistent vertical rhythm */}
-              {currentStep === 0 && hasHeightOrWeight && (
-                <div className="space-y-2">
-                  <Label>{t("units")}</Label>
-                  <Tabs
-                    value={units}
-                    onValueChange={(value) =>
-                      setUnits(value as "metric" | "imperial")
-                    }
-                    className="w-full"
-                  >
-                    <TabsList className="grid w-full grid-cols-2 p-1">
-                      <TabsTrigger value="metric">
-                        {t("unitsMetric")}
-                      </TabsTrigger>
-                      <TabsTrigger value="imperial">
-                        {t("unitsImperial")}
-                      </TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                </div>
-              )}
-              {visibleQuestions.map((question) => (
-                <div key={question.id} className="space-y-2">
-                  {question.type !== "consent_checkbox" && question.type !== 'advanced_modules' && (
-                    <div className="flex items-center gap-2">
-                       <Label htmlFor={question.id}>{question.text}</Label>
-                       {question.tooltip && (
-                         <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild><Info className="h-4 w-4 text-muted-foreground cursor-help" /></TooltipTrigger>
-                              <TooltipContent><p>{question.tooltip}</p></TooltipContent>
-                            </Tooltip>
-                         </TooltipProvider>
-                       )}
-                    </div>
-                  )}
-                  {question.type === "select" && (
-                    <Select
-                      onValueChange={(value) => setAnswer(question.id, value)}
-                      value={answers[question.id] || ""}
-                    >
-                      <SelectTrigger
-                        id={question.id}
-                        className="focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-primary"
-                      >
-                        <SelectValue
-                          placeholder={t("selectOption")}
-                          className="placeholder:text-gray-500"
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(question.options as string[])?.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                  {question.type === "number_input" && (
-                    <>
-                      <Input
-                        id={question.id}
-                        type="number"
-                        inputMode="decimal"
-                        placeholder={
-                          question.id === "height"
-                            ? units === "metric"
-                              ? t("heightPlaceholderMetric")
-                              : t("heightPlaceholderImperial")
-                            : units === "metric"
-                            ? t("weightPlaceholderMetric")
-                            : t("weightPlaceholderImperial")
-                        }
-                        value={answers[question.id] || ""}
-                        onChange={(e) =>
-                          handleInputChange(
-                            question.id,
-                            e.target.value,
-                            question.type,
-                          )
-                        }
-                        aria-invalid={!!localErrors[question.id]}
-                        className={`placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-primary ${
-                          localErrors[question.id] ? "border-destructive" : ""
-                        }`}
-                      />
-                      {localErrors[question.id] && (
-                        <p className="text-sm text-destructive">
-                          {localErrors[question.id]}
-                        </p>
-                      )}
-                    </>
-                  )}
-                  {question.type === "consent_checkbox" && (
-                    <div className="flex items-start space-x-3 rounded-md border p-4">
-                      <Checkbox
-                        id={question.id}
-                        checked={answers[question.id] === "true"}
-                        onCheckedChange={(checked) =>
-                          setAnswer(question.id, checked ? "true" : "false")
-                        }
-                      />
-                      <div className="grid gap-1.5 leading-none">
-                        <label
-                          htmlFor={question.id}
-                          className="text-sm leading-snug text-muted-foreground"
-                        >
-                          {t.rich("consentHealth", {
-                            privacyLink: (chunks) => (
-                              <Link
-                                href="/privacy"
-                                className="font-semibold text-primary hover:underline"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {chunks}
-                              </Link>
-                            ),
-                          })}
-                        </label>
-                      </div>
-                    </div>
-                  )}
-                  {question.type === "checkbox_group" && (
-                    <CheckboxGroup
-                      options={question.options as CheckboxOption[]}
-                      value={
-                        answers[question.id]
-                          ? JSON.parse(answers[question.id])
-                          : []
-                      }
-                      onChange={(selectedIds) =>
-                        setAnswer(question.id, JSON.stringify(selectedIds))
-                      }
-                      exclusiveOption={question.exclusiveOptionId}
-                    />
-                  )}
-                  {question.type === 'advanced_modules' && (
-                    <Accordion type="multiple" className="w-full">
-                       {question.modules?.filter(isQuestionVisible).map(module => {
-                        if (module.id === 'symptom_details') {
-                          const selectedSymptoms = answers.symptoms ?
-                                    questionnaire?.steps.flatMap(s => s.questions).find(q => q.id === 'symptoms')?.options?.filter(opt => JSON.parse(answers.symptoms).includes(opt.id)) || []
-                                    : [];
-                          console.log("[DEBUG] `answers.symptoms`:", answers.symptoms);
-                          console.log("[DEBUG] Calculated `selectedSymptoms` prop:", selectedSymptoms);
-
-                          return (
-                            <AccordionItem value={module.id} key={module.id}>
-                              <AccordionTrigger>{module.title}</AccordionTrigger>
-                              <AccordionContent>
-                                <SymptomDetails 
-                                  selectedSymptoms={selectedSymptoms}
-                                  value={
-                                    Object.keys(answers).reduce((acc, key) => {
-                                      if (key.startsWith('symptom_details_')) {
-                                        const symptomId = key.replace('symptom_details_', '');
-                                        acc[symptomId] = JSON.parse(answers[key]);
-                                      }
-                                      return acc;
-                                    }, {} as Record<string, any>)
-                                  }
-                                  onChange={(symptomId, details) => {
-                                    setAnswer(`symptom_details_${symptomId}`, JSON.stringify(details))
-                                  }}
-                                />
-                              </AccordionContent>
-                            </AccordionItem>
-                          );
-                        }
-                        
-                        return (
-                          <AccordionItem value={module.id} key={module.id}>
-                            <AccordionTrigger>{module.title}</AccordionTrigger>
-                            <AccordionContent>
-                                {module.id === 'family_cancer_history' && (
-                                  <FamilyCancerHistory 
-                                    value={answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : []}
-                                    onChange={(value) => setAnswer('family_cancer_history', JSON.stringify(value))}
-                                    options={module.options}
-                                  />
-                                )}
-                                {module.id === 'genetics' && (
-                                  <Genetics
-                                    answers={answers}
-                                    onAnswer={setAnswer}
-                                    questions={module.questions}
-                                  />
-                                )}
-                                {module.id === 'female_health' && (
-                                  <FemaleHealth
-                                    answers={answers}
-                                    onAnswer={setAnswer}
-                                    questions={module.questions}
-                                  />
-                                )}
-                                {module.id === 'personal_medical_history' && (
-                                  <PersonalMedicalHistory
-                                    answers={answers}
-                                    onAnswer={setAnswer}
-                                    options={module.options}
-                                  />
-                                )}
-                                 {module.id === 'personal_cancer_history' && (
-                                  <PersonalCancerHistory
-                                    value={answers.personal_cancer_history ? JSON.parse(answers.personal_cancer_history) : []}
-                                    onChange={(value) => setAnswer('personal_cancer_history', JSON.stringify(value))}
-                                    options={module.options}
-                                  />
-                                )}
-                                {module.id === 'screening_immunization' && (
-                                  <ScreeningHistory
-                                    answers={answers}
-                                    onAnswer={setAnswer}
-                                    questions={module.questions}
-                                  />
-                                )}
-                                {module.id === 'sexual_health' && (
-                                  <SexualHealth
-                                    answers={answers}
-                                    onAnswer={setAnswer}
-                                    questions={module.questions}
-                                  />
-                                )}
-                                {module.id === 'occupational_hazards' && (
-                                  <OccupationalHazards
-                                    value={answers.occupational_hazards ? JSON.parse(answers.occupational_hazards) : []}
-                                    onChange={(value) => setAnswer('occupational_hazards', JSON.stringify(value))}
-                                    options={module.options}
-                                  />
-                                )}
-                                 {module.id === 'environmental_exposures' && (
-                                  <EnvironmentalExposures
-                                    answers={answers}
-                                    onAnswer={setAnswer}
-                                    questions={module.questions}
-                                  />
-                                )}
-                            </AccordionContent>
-                          </AccordionItem>
-                        );
-                       })}
-                    </Accordion>
-                  )}
+              {visibleQuestions.map((q) => (
+                <div key={q.id} className="space-y-2">
+                  {q.text && <Label htmlFor={q.id}>{q.text}</Label>}
+                  {q.type === "select" && <Select onValueChange={(v) => setAnswer(q.id, v)} value={answers[q.id] || ""}><SelectTrigger id={q.id}><SelectValue placeholder={t("selectOption")} /></SelectTrigger><SelectContent>{q.options.map((o: any) => <SelectItem key={o.label} value={o.label}>{o.label}</SelectItem>)}</SelectContent></Select>}
+                  {q.type === "number_input" && <><Input id={q.id} type="number" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
+                  {q.type === "date_input" && <><Input id={q.id} type="date" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
+                  {q.type === "consent_checkbox" && <div className="flex items-start space-x-3 rounded-md border p-4"><Checkbox id={q.id} checked={answers[q.id] === "true"} onCheckedChange={(c) => setAnswer(q.id, c ? "true" : "false")} /><div className="grid gap-1.5"><label htmlFor={q.id} className="text-sm leading-snug text-muted-foreground">{t.rich("consentHealth", { privacyLink: (chunks) => <Link href="/privacy" className="font-semibold text-primary hover:underline" target="_blank" rel="noopener noreferrer">{chunks}</Link> })}</label></div></div>}
+                  {q.type === "checkbox_group" && <CheckboxGroup options={q.options as CheckboxOption[]} value={answers[q.id] ? JSON.parse(answers[q.id]) : []} onChange={(s) => setAnswer(q.id, JSON.stringify(s))} exclusiveOption={q.exclusiveOptionId} />}
+                  {q.type === 'advanced_modules' && <Accordion type="multiple" className="w-full">{q.modules?.filter(isQuestionVisible).map(m => <AccordionItem value={m.id} key={m.id}><AccordionTrigger>{m.title}</AccordionTrigger><AccordionContent>
+                    {m.id === 'symptom_details' && <SymptomDetails selectedSymptoms={answers.symptoms ? questionnaire?.steps.flatMap(s => s.questions).find(q => q.id === 'symptoms')?.options?.filter((o: any) => JSON.parse(answers.symptoms).includes(o.id)) || [] : []} value={Object.keys(answers).reduce((acc, k) => { if(k.startsWith('symptom_details_')) { const sId=k.replace('symptom_details_',''); acc[sId]=JSON.parse(answers[k]);} return acc;}, {} as Record<string,any>)} onChange={(sId, d) => setAnswer(`symptom_details_${sId}`, JSON.stringify(d))} />}
+                    {m.id === 'family_cancer_history' && <FamilyCancerHistory value={answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : []} onChange={(v) => setAnswer('family_cancer_history', JSON.stringify(v))} options={m.options} />}
+                    {m.id === 'genetics' && <Genetics answers={answers} onAnswer={setAnswer} questions={m.questions} />}
+                    {m.id === 'female_health' && <FemaleHealth answers={answers} onAnswer={setAnswer} questions={m.questions} />}
+                    {m.id === 'personal_medical_history' && <PersonalMedicalHistory answers={answers} onAnswer={setAnswer} options={m.options} />}
+                    {m.id === 'personal_cancer_history' && <PersonalCancerHistory value={answers.personal_cancer_history ? JSON.parse(answers.personal_cancer_history) : []} onChange={(v) => setAnswer('personal_cancer_history', JSON.stringify(v))} options={m.options} />}
+                    {m.id === 'screening_immunization' && <ScreeningHistory answers={answers} onAnswer={setAnswer} screeningGroups={m.screenings} immunizationQuestions={m.immunizations}/>}
+                    {m.id === 'sexual_health' && <SexualHealth answers={answers} onAnswer={setAnswer} questions={m.questions} />}
+                    {m.id === 'occupational_hazards' && <OccupationalHazards value={answers.occupational_hazards ? JSON.parse(answers.occupational_hazards) : []} onChange={(v) => setAnswer('occupational_hazards', JSON.stringify(v))} options={m.options} />}
+                    {m.id === 'environmental_exposures' && <EnvironmentalExposures answers={answers} onAnswer={setAnswer} questions={m.questions} />}
+                  </AccordionContent></AccordionItem>)}</Accordion>}
                 </div>
               ))}
             </section>
             <footer className="flex justify-between">
-              <Button
-                variant="outline"
-                onClick={prevStep}
-                disabled={currentStep === 0}
-                className="rounded-none"
-              >
-                {t("back")}
-              </Button>
-              <Button
-                variant="default"
-                onClick={handleNext}
-                disabled={!isStepComplete()}
-                className="rounded-none disabled:opacity-50"
-              >
-                {currentStep === totalSteps - 1
-                  ? t("viewResults")
-                  : t("next")}
-              </Button>
+              <Button variant="outline" onClick={prevStep} disabled={currentStep === 0} className="rounded-none">{t("back")}</Button>
+              <Button variant="default" onClick={handleNext} disabled={!isStepComplete()} className="rounded-none disabled:opacity-50">{currentStep === totalSteps - 1 ? t("viewResults") : t("next")}</Button>
             </footer>
           </div>
         </main>
       </div>
-
-      {/* Mobile-Only Footer (White Background) */}
-      <footer className="fixed bottom-0 left-0 right-0 z-10 p-4 bg-white text-black md:hidden border-t">
-        <DisclaimerFooterContentMobile />
-      </footer>
+      <footer className="fixed bottom-0 left-0 right-0 z-10 p-4 bg-white text-black md:hidden border-t"><DisclaimerFooterContentMobile /></footer>
     </div>
   );
 }
+      

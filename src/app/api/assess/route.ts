@@ -8,20 +8,12 @@ import { generatePlan } from "@/lib/services/guideline-engine.service";
 import { StandardizationService } from "@/lib/services/standardization.service";
 import { DerivedVariablesService } from "@/lib/services/derived-variables.service";
 
-const answersSchema = z
-  .object({
-    units: z.enum(["metric", "imperial"]),
-    height: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Invalid height. Must be a positive number.",
-    }),
-    weight: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Invalid weight. Must be a positive number.",
-    }),
-  })
-  .catchall(z.string().optional());
+// A flexible schema to accept the complex, potentially nested data from the new form.
+// Detailed validation is handled by the standardization and derived variable services.
+const answersSchema = z.record(z.any());
 
 const assessRequestSchema = z.object({
-  answers: z.record(z.string()),
+  answers: answersSchema,
   locale: z.string().optional().default("en"),
 });
 
@@ -105,60 +97,37 @@ export async function POST(request: NextRequest) {
     }
     
     const { answers, locale } = parsedRequest.data;
-    
-    const validatedAnswers = answersSchema.safeParse(answers);
-    if (!validatedAnswers.success) {
-      logger.warn("[API:assess] Invalid answers format.", {
-        details: validatedAnswers.error.flatten(),
-      });
-      return NextResponse.json(
-        {
-          error: "Invalid answers format",
-          details: validatedAnswers.error.flatten(),
-        },
-        { status: 400 },
-      );
-    }
-
-
-    logger.info("[API:assess] Answers successfully parsed and validated.");
+    logger.info("[API:assess] Raw answers successfully parsed.");
 
     // 1. Standardize the raw answers into a structured payload
     logger.info("[API:assess] Standardizing user answers...");
-    const standardizedPayload = StandardizationService.standardize(validatedAnswers.data);
+    const standardizedPayload = StandardizationService.standardize(answers);
     logger.info("[API:assess] Standardization complete.");
 
-    // 2. Calculate derived variables (e.g., BMI)
+    // 2. Calculate derived variables (e.g., BMI, age_years)
     logger.info("[API:assess] Calculating derived variables...");
     const derivedVariables = DerivedVariablesService.calculateAll(standardizedPayload);
     logger.info("[API:assess] Derived variables calculation complete.", { derivedVariables });
     
-    // 3. Construct the final envelope for the AI
-    const finalPayload = {
-      standardized_data: standardizedPayload,
-      derived_variables: derivedVariables,
-    };
-    
-    // 4. Run deterministic guideline engine
+    // 3. Run deterministic guideline engine
     logger.info(`[API:assess] Starting guideline engine for locale: ${locale}...`);
-    const guidelinePlan = generatePlan(
-      validatedAnswers.data as Record<string, string>,
-      locale,
-    );
+    const guidelinePlan = generatePlan(answers, derivedVariables, locale);
     logger.info(
       `[API:assess] Guideline engine completed. Found ${guidelinePlan.screenings.length} screenings, ${guidelinePlan.lifestyle.length} lifestyle tips, ${guidelinePlan.topicsForDoctor.length} topics.`,
     );
 
-    // Attach deterministic plan to the final payload for the AI
-    const payloadForAI = { ...finalPayload, guideline_plan: guidelinePlan };
+    // 4. Construct the final envelope for the AI
+    const payloadForAI = {
+      standardized_data: standardizedPayload,
+      derived_variables: derivedVariables,
+      guideline_plan: guidelinePlan,
+    };
 
     // 5. Get AI-powered explanation for the generated plan
     logger.info(`[API:assess] Requesting AI explanation in locale: ${locale}`);
     const aiService = getAIService();
-    // Note: The `getPlanExplanation` now receives the full structured payload.
-    // The prompt inside `getPreventivePlanExplainerPrompt` will need to be updated to handle this new structure.
     const { result, serviceUsed } =
-      await aiService.getPlanExplanation(payloadForAI as any, undefined, locale);
+      await aiService.getPlanExplanation(payloadForAI, undefined, locale);
     logger.info(
       `[API:assess] AI explanation received from service: ${serviceUsed}.`,
     );
@@ -201,3 +170,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+      

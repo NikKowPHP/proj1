@@ -19,6 +19,10 @@ interface ScreeningGroup {
   id: string;
   text: string;
   questions: ScreeningQuestion[];
+  dependsOn?: {
+    questionId: string;
+    value: string;
+  };
 }
 
 interface ImmunizationQuestion {
@@ -35,20 +39,25 @@ interface ScreeningHistoryProps {
   immunizationQuestions: ImmunizationQuestion[];
 }
 
-const isVisible = (question: any, answers: Record<string, string>): boolean => {
-  if (!question.dependsOn) return true;
-  // Handle dependency IDs that might be nested, e.g., "screen.colonoscopy.done"
-  const dependencyAnswer = answers[question.dependsOn.questionId];
-  return dependencyAnswer === question.dependsOn.value;
+// A generic visibility check for any object with a `dependsOn` property.
+const isVisible = (
+  item: { dependsOn?: { questionId: string; value: string } },
+  answers: Record<string, string>,
+): boolean => {
+  if (!item.dependsOn) return true;
+  const dependencyAnswer = answers[item.dependsOn.questionId];
+  return dependencyAnswer === item.dependsOn.value;
 };
 
 export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizationQuestions }: ScreeningHistoryProps) => {
+  const visibleScreeningGroups = screeningGroups.filter(group => isVisible(group, answers));
+  
   return (
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">Screening History</h3>
         <div className="space-y-4">
-          {screeningGroups.map(group => (
+          {visibleScreeningGroups.map(group => (
             <Card key={group.id}>
               <CardHeader><CardTitle>{group.text}</CardTitle></CardHeader>
               <CardContent className="space-y-4">
@@ -98,4 +107,3 @@ export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizat
     </div>
   );
 };
-      

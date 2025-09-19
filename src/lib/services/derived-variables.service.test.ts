@@ -30,40 +30,69 @@ describe("DerivedVariablesService", () => {
       expect(derived.bmi).toBeUndefined();
     });
 
-    it("should calculate pack-years correctly", () => {
-        const standardizedData = {
-            core: { smoking_status: 'Former' },
-            advanced: { smoking_detail: { cigs_per_day: 20, years: 10 } }
-        };
-        const derived = DerivedVariablesService.calculateAll(standardizedData);
-        expect(derived.pack_years).toBe(10.0);
+    it("should calculate pack-years correctly for a former smoker", () => {
+      const standardizedData = {
+        core: { smoking_status: "Former" },
+        advanced: { smoking_detail: { cigs_per_day: 20, years: 10 } },
+      };
+      const derived = DerivedVariablesService.calculateAll(standardizedData);
+      expect(derived.pack_years).toBe(10.0);
+    });
+
+    it("should calculate pack-years correctly for a current smoker", () => {
+      const standardizedData = {
+        core: { smoking_status: "Current" },
+        advanced: { smoking_detail: { cigs_per_day: 10, years: 20 } },
+      };
+      const derived = DerivedVariablesService.calculateAll(standardizedData);
+      expect(derived.pack_years).toBe(10.0);
     });
 
     it("should return 0 pack-years for never smokers", () => {
-        const standardizedData = { core: { smoking_status: 'Never' } };
-        const derived = DerivedVariablesService.calculateAll(standardizedData);
-        expect(derived.pack_years).toBe(0);
+      const standardizedData = { core: { smoking_status: "Never" } };
+      const derived = DerivedVariablesService.calculateAll(standardizedData);
+      expect(derived.pack_years).toBe(0);
+    });
+
+    it("should not calculate pack-years if smoking details are missing for a smoker", () => {
+      const standardizedData = { core: { smoking_status: "Former" } };
+      const derived = DerivedVariablesService.calculateAll(standardizedData);
+      expect(derived.pack_years).toBeUndefined();
+    });
+
+    it("should not calculate pack-years if smoking years are zero", () => {
+      const standardizedData = {
+        core: { smoking_status: "Former" },
+        advanced: { smoking_detail: { cigs_per_day: 20, years: 0 } },
+      };
+      const derived = DerivedVariablesService.calculateAll(standardizedData);
+      expect(derived.pack_years).toBeUndefined();
     });
 
     it("should create correct organ inventory for females", () => {
-        const standardizedData = { core: { sex_at_birth: 'Female' } };
-        const derived = DerivedVariablesService.calculateAll(standardizedData);
-        expect(derived.organ_inventory).toEqual({
-            has_cervix: true,
-            has_uterus: true,
-            has_ovaries: true,
-            has_breasts: true
-        });
+      const standardizedData = { core: { sex_at_birth: "Female" } };
+      const derived = DerivedVariablesService.calculateAll(standardizedData);
+      expect(derived.organ_inventory).toEqual({
+        has_cervix: true,
+        has_uterus: true,
+        has_ovaries: true,
+        has_breasts: true,
+      });
     });
 
-     it("should create correct organ inventory for males", () => {
-        const standardizedData = { core: { sex_at_birth: 'Male' } };
-        const derived = DerivedVariablesService.calculateAll(standardizedData);
-        expect(derived.organ_inventory).toEqual({
-            has_prostate: true,
-            has_breasts: true
-        });
+    it("should create correct organ inventory for males", () => {
+      const standardizedData = { core: { sex_at_birth: "Male" } };
+      const derived = DerivedVariablesService.calculateAll(standardizedData);
+      expect(derived.organ_inventory).toEqual({
+        has_prostate: true,
+        has_breasts: true,
+      });
+    });
+
+    it("should not create an organ inventory for Intersex sex at birth", () => {
+      const standardizedData = { core: { sex_at_birth: "Intersex" } };
+      const derived = DerivedVariablesService.calculateAll(standardizedData);
+      expect(derived.organ_inventory).toBeUndefined();
     });
   });
 });
-      

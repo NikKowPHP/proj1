@@ -240,8 +240,26 @@
               "id": "occupational_hazards",
               "title": {"en": "Occupational Hazards (Optional)", "pl": "Zagrożenia Zawodowe (Opcjonalne)"},
               "options": {
-                "jobTitles": [{ "value": "welder", "label": "Welder"}, { "value": "miner", "label": "Miner"}],
-                "exposures": [{ "value": "asbestos", "label": "Asbestos"}, { "value": "silica", "label": "Silica"}],
+                "jobTitles": [
+                  { "value": "driver", "label": "Driver" },
+                  { "value": "farmer", "label": "Farmer" },
+                  { "value": "firefighter", "label": "Firefighter" },
+                  { "value": "hairdresser", "label": "Hairdresser" },
+                  { "value": "mechanic", "label": "Mechanic" },
+                  { "value": "miner", "label": "Miner" },
+                  { "value": "nurse", "label": "Nurse" },
+                  { "value": "painter", "label": "Painter" },
+                  { "value": "welder", "label": "Welder" }
+                ],
+                "exposures": [
+                  { "value": "asbestos", "label": "Asbestos" },
+                  { "value": "benzene", "label": "Benzene" },
+                  { "value": "diesel_exhaust", "label": "Diesel exhaust" },
+                  { "value": "formaldehyde", "label": "Formaldehyde" },
+                  { "value": "silica", "label": "Silica" },
+                  { "value": "welding_fumes", "label": "Welding fumes" },
+                  { "value": "wood_dust", "label": "Wood dust" }
+                ],
                 "ppe": [{"value": "respirator", "label": "Respirator"}, {"value": "gloves", "label": "Gloves"}],
                 "shiftPatterns": ["Never", "Occasionally", "Frequently"],
                 "intensities": ["Low", "Moderate", "High", "Unsure"]

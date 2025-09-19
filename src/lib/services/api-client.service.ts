@@ -20,6 +20,14 @@ export const apiClient = {
       return data;
     },
   },
+  jobs: {
+    suggestExposures: async (jobTitle: string): Promise<string[]> => {
+      const { data } = await axios.get(
+        `/api/jobs/suggest-exposures?jobTitle=${jobTitle}`,
+      );
+      return data;
+    },
+  },
   export: {
     email: async (payload: {
       recipientEmail: string;
@@ -31,4 +39,3 @@ export const apiClient = {
     },
   },
 };
-      

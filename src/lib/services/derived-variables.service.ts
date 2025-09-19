@@ -80,12 +80,12 @@ export const DerivedVariablesService = {
       }
 
       // Calculate pack-years
-      if (core.smoking_status === 'Former' || core.smoking_status === 'Current') {
+      if (core.smoking_status === 'Never') {
+          derived.pack_years = 0;
+      } else if (core.smoking_status === 'Former' || core.smoking_status === 'Current') {
         const packYears = calculatePackYears(advanced.smoking_detail);
         if (packYears !== null) {
             derived.pack_years = packYears;
-        } else if (core.smoking_status === 'Never') {
-            derived.pack_years = 0;
         }
       }
       
@@ -114,4 +114,3 @@ export const DerivedVariablesService = {
     return derived;
   },
 };
-      

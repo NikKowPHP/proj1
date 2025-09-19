@@ -23,7 +23,6 @@ export default defineConfig({
     timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
     env: {
-      DATABASE_URL: process.env.DATABASE_URL!,
       APP_ENCRYPTION_KEY: process.env.APP_ENCRYPTION_KEY!,
       GEMINI_API_KEY: process.env.GEMINI_API_KEY || "",
     },
@@ -43,3 +42,4 @@ export default defineConfig({
     },
   ],
 });
+      

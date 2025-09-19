@@ -5,18 +5,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npx prisma generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "dotenv -e .env.test jest",
-    "beforetest": "dotenv -e .env.test -- docker-compose up -d db && dotenv -e .env.test -- prisma migrate dev",
     "test:coverage": "jest --coverage",
-    "prisma:seed": "ts-node prisma/seed.cts",
     "test:e2e": "playwright test"
   },
   "dependencies": {
     "@google/genai": "^1.8.0",
-    "@prisma/client": "^6.9.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-dialog": "^1.1.14",
@@ -80,7 +77,6 @@
     "node-mocks-http": "^1.17.2",
     "postcss": "^8.5.6",
     "prettier": "^3.5.3",
-    "prisma": "^6.9.0",
     "tailwindcss": "^4.1.11",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",

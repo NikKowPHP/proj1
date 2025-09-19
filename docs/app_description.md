@@ -10,7 +10,7 @@ Our **Public Good / Non-commercial** model ensures the core experience is 100% f
 
 ## 2. Architectural Overview
 
-The system uses a **multi-stage, stateless architecture** within a **Next.js monorepo**. This approach first standardizes raw user input, calculates derived health metrics, runs a deterministic rules engine to generate a plan, and finally uses an AI service to explain it. This hybrid model ensures that the core recommendations are based on auditable, hard-coded public health guidelines, while the user experience remains personalized and easy to understand. An **operational database** is used for non-user data (anonymous event logging, questionnaire versioning), but **no user-inputted health data is ever stored**.
+The system uses a **multi-stage, fully stateless architecture** within a **Next.js monorepo**. This approach first standardizes raw user input, calculates derived health metrics, runs a deterministic rules engine to generate a plan, and finally uses an AI service to explain it. This hybrid model ensures that the core recommendations are based on auditable, hard-coded public health guidelines, while the user experience remains personalized and easy to understand. **No database is used, and no user-inputted health data is ever stored on the server.**
 
 ```mermaid
 graph TD
@@ -29,7 +29,6 @@ graph TD
         D[Guideline Engine (Deterministic)]
         H[Email Service (Resend)]
         J[AI Explainer Service (Gemini, Groq...)]
-        K[Operational DB (PostgreSQL)]
     end
 
     %% User Flows
@@ -43,7 +42,6 @@ graph TD
     D -- "Returns Guideline Plan (Action IDs)" --> C
     C -- "Assembles final payload for AI" --> J
     J -- "Returns user-friendly text (ActionPlan)" --> C
-    C -- "Logs Anonymous Event" --> K
     C -- "Returns full ActionPlan to client" --> B
     A -- "Requests Email Export" --> C
     C -- "Sends one-time email report" --> H
@@ -57,7 +55,7 @@ graph TD
 4.  **Derivation:** The structured data is passed to the `DerivedVariablesService` to calculate key metrics like `age_years`, `bmi`, and `pack_years`.
 5.  **Guideline Engine:** The API then passes the original answers and the derived variables to the **deterministic Guideline Engine**. This engine checks the data against a set of rules defined in `preventive-plan-config.json` and outputs a structured set of action IDs (e.g., `{ screenings: ["COLORECTAL_CANCER_SCREENING"] }`).
 6.  **AI Explainer:** The API assembles a final, rich payload containing the standardized data, derived variables, and the guideline plan, and sends it to the **Composite AI Service**. The AI's sole job is to translate these action IDs into compassionate, user-friendly text, generating the final `ActionPlan`.
-7.  **Response:** The `ActionPlan` is validated via Zod and sent back to the client for display. An anonymous event log (e.g., 'SUCCESS') is written to the **Operational DB**.
+7.  **Response:** The `ActionPlan` is validated via Zod and sent back to the client for display. No data is persisted on the server.
 8.  **Email Export (Optional):** If requested, the client sends the `ActionPlan` and the user's answers to an endpoint that uses **Resend** to dispatch the email and immediately purges the email address from memory.
 
 ## 3. Core Tech Stack
@@ -65,8 +63,6 @@ graph TD
 | Component | Technology | Rationale |
 | :--- | :--- | :--- |
 | **Framework** | **Next.js 15+** | Full-stack environment ideal for a fast initial load and serverless API functions. |
-| **Database** | **PostgreSQL** | Used for **operational data only** (anonymous logs, questionnaire versions). **No user health inputs are ever stored.** |
-| **ORM** | **Prisma** | Provides a type-safe interface to the operational database. |
 | **Core Logic** | **Deterministic Rules Engine** | A custom service (`guideline-engine.service.ts`) that processes answers against a JSON config of public health rules. Ensures core recommendations are accurate, auditable, and not subject to AI variability. |
 | **AI Layer**| **Composite AI Service (Gemini, Groq, etc.)** | A resilient, multi-provider service used *only* to explain the output of the rules engine. This separation of concerns is critical for safety and reliability. |
 | **Notifications** | **Resend API** | Used exclusively for the optional, one-time, "send-and-forget" email export. |
@@ -97,34 +93,15 @@ The application is a free public service. There is no monetization.
 
 ## 5.5. Measuring Success (Anonymously)
 
-Success is measured through aggregated, anonymous event data stored in our operational `AssessmentLog` table:
-*   **Completion Rate:** Percentage of sessions that start the questionnaire and generate a plan.
+Success is measured through aggregated, anonymous data from our hosting and monitoring platforms:
+*   **Completion Rate:** Percentage of sessions that start the questionnaire and generate a plan (tracked via anonymous analytics events).
 *   **Export Rate:** Percentage of completed plans that result in a PDF or email export.
 *   **Performance Metrics:** Core Web Vitals and API response times via Vercel Analytics.
+*   **System Health:** Error rates and API status are monitored via Sentry.
 
 ## 6. High-Level Database Schema
 
-The schema is minimal and **never stores user-inputted health data, PII, or generated plans.**
-
-```prisma
-// prisma/schema.prisma
-
-// Logs the status of a plan generation attempt for monitoring.
-model AssessmentLog {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  status    String // e.g., "SUCCESS", "AI_VALIDATION_ERROR"
-}
-
-// Stores different versions of the questionnaire.
-model Questionnaire {
-  id        String   @id @default(cuid())
-  version   Int      @unique
-  isActive  Boolean  @default(false)
-  content   Json
-  createdAt DateTime @default(now())
-}
-```
+There is no database schema as the application is fully stateless and does not persist any user or operational data on a server-side database.
 
 ## 7. Development & Compliance Practices
 

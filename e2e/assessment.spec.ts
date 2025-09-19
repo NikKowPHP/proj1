@@ -113,4 +113,109 @@ for (const locale of locales) {
     });
   });
 }
+
+
+test.describe("Advanced Module Flows (en)", () => {
+
+    const navigateToAdvancedStep = async (page) => {
+        await page.goto("/en/assessment");
+        await page.locator('label:has-text("Privacy Policy")').click();
+        await page.getByLabel("What’s your goal").click();
+        await page.getByRole("option", { name: "Prevention" }).click();
+        await page.getByLabel("Date of birth").fill("1980-01-01");
+        await page.getByLabel("Sex at birth").click();
+        await page.getByRole("option", { name: "Male" }).click();
+        await page.getByLabel("First-degree relative with cancer").click();
+        await page.getByRole("option", { name: "Yes" }).click();
+        await page.getByRole('button', { name: 'Next' }).click();
+        await expect(page.getByRole('heading', { name: 'Advanced Details' })).toBeVisible();
+    };
+
+    test("should auto-select exposures based on Job Title (JEM)", async ({ page }) => {
+        await navigateToAdvancedStep(page);
+        
+        await page.route("**/api/jobs/suggest-exposures?jobTitle=welder", async (route) => {
+            await route.fulfill({ json: ["welding_fumes"] });
+        });
+
+        await page.getByRole('button', { name: 'Occupational Hazards' }).click();
+        await page.getByRole('button', { name: 'Add Job' }).click();
+        
+        await page.getByLabel('Job Title').click();
+        await page.getByRole('option', { name: 'Welder' }).click();
+
+        const weldingFumesChip = page.getByRole('button', { name: 'Welding fumes' });
+        await expect(weldingFumesChip).toHaveAttribute('data-selected', 'true');
+    });
+
+    test("should handle conditional logic and validation in Genetics module", async ({ page }) => {
+        await navigateToAdvancedStep(page);
+        
+        await page.getByRole('button', { name: 'Genetics (Optional)' }).click();
+        
+        // Initially, dependent fields should be hidden
+        await expect(page.getByLabel('What type of genetic test')).not.toBeVisible();
+        await expect(page.getByLabel('If yes: which genes?')).not.toBeVisible();
+        
+        // Show conditional fields
+        await page.getByLabel('Have you ever had genetic').click();
+        await page.getByRole('option', { name: 'Yes' }).click();
+        await expect(page.getByLabel('What type of genetic test')).toBeVisible();
+
+        // Test year validation
+        const futureYear = (new Date().getFullYear() + 1).toString();
+        await page.getByLabel('In what year was the test performed?').fill(futureYear);
+        await expect(page.getByText('Year cannot be in the future.')).toBeVisible();
+        await page.getByLabel('In what year was the test performed?').fill("2022");
+        await expect(page.getByText('Year cannot be in the future.')).not.toBeVisible();
+
+        // Test HGVS validation
+        await page.getByLabel('Did the report mention').click();
+        await page.getByRole('option', { name: 'Yes' }).click();
+        await page.getByLabel('Variant(s) (HGVS, optional)').fill("invalid-variant");
+        await expect(page.getByText('Please enter a valid HGVS format')).toBeVisible();
+        await page.getByLabel('Variant(s) (HGVS, optional)').fill("c.123A>G");
+        await expect(page.getByText('Please enter a valid HGVS format')).not.toBeVisible();
+
+        // Check gene selection
+        await page.getByLabel('BRCA1').check();
+        await page.getByLabel('MLH1').check();
+        await expect(page.getByLabel('BRCA1')).toBeChecked();
+        await expect(page.getByLabel('MLH1')).toBeChecked();
+    });
+
+    test("should correctly add and manage multiple conditions in Personal Medical History", async ({ page }) => {
+        await navigateToAdvancedStep(page);
+        
+        await page.getByRole('button', { name: 'Personal Medical History' }).click();
+        
+        // Initially no detail cards are visible
+        await expect(page.getByRole('heading', { name: 'Diabetes' })).not.toBeVisible();
+
+        // Select two conditions
+        await page.getByLabel('Diabetes').check();
+        await page.getByLabel('Hypertension').check();
+        
+        // Verify detail cards appear
+        const diabetesCard = page.locator('.//div[contains(@class, "border") and .//h3[text()="Diabetes"]]');
+        const hypertensionCard = page.locator('.//div[contains(@class, "border") and .//h3[text()="Hypertension"]]');
+        
+        await expect(diabetesCard).toBeVisible();
+        await expect(hypertensionCard).toBeVisible();
+
+        // Interact with details of one card
+        await diabetesCard.getByLabel('Year of Diagnosis').fill('2010');
+        await diabetesCard.getByLabel('Current Status').click();
+        await page.getByRole('option', { name: 'Active' }).click();
+        
+        // Verify state is maintained
+        await expect(diabetesCard.getByLabel('Year of Diagnosis')).toHaveValue('2010');
+        await expect(diabetesCard.getByLabel('Current Status')).toContainText('Active');
+        
+        // Uncheck one condition
+        await page.getByLabel('Hypertension').uncheck();
+        await expect(hypertensionCard).not.toBeVisible();
+        await expect(diabetesCard).toBeVisible(); // The other should remain
+    });
+});
       

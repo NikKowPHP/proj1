@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { YearInput } from '../ui/YearInput';
@@ -50,6 +50,21 @@ const isVisible = (
 };
 
 export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizationQuestions }: ScreeningHistoryProps) => {
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
+
+  const handleValidatedChange = (id: string, value: string | undefined) => {
+    let error: string | undefined = undefined;
+    const numValue = value ? Number(value) : undefined;
+    const currentYear = new Date().getFullYear();
+
+    if (numValue && numValue > currentYear) {
+      error = 'Year cannot be in the future.';
+    }
+
+    setErrors(prev => ({ ...prev, [id]: error }));
+    onAnswer(id, value ? String(value) : "");
+  };
+  
   const visibleScreeningGroups = screeningGroups.filter(group => isVisible(group, answers));
   
   return (
@@ -61,27 +76,34 @@ export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizat
             <Card key={group.id}>
               <CardHeader><CardTitle>{group.text}</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                {group.questions.filter(q => isVisible(q, answers)).map(q => (
-                  <div key={q.id} className="space-y-2">
-                    <Label htmlFor={q.id}>{q.text}</Label>
-                    {q.type === 'select' && (
-                       <Select onValueChange={(value) => onAnswer(q.id, value)} value={answers[q.id] || ""}>
-                        <SelectTrigger id={q.id}><SelectValue placeholder="Select an option" /></SelectTrigger>
-                        <SelectContent>
-                          {q.options?.map((opt: string) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    )}
-                    {q.type === 'year_input' && (
-                       <YearInput
-                        id={q.id}
-                        value={answers[q.id]}
-                        onChange={(val) => onAnswer(q.id, val ? String(val) : "")}
-                        placeholder="e.g. 2022"
-                      />
-                    )}
-                  </div>
-                ))}
+                {group.questions.filter(q => isVisible(q, answers)).map(q => {
+                  const error = errors[q.id];
+                  return (
+                    <div key={q.id} className="space-y-2">
+                      <Label htmlFor={q.id}>{q.text}</Label>
+                      {q.type === 'select' && (
+                         <Select onValueChange={(value) => onAnswer(q.id, value)} value={answers[q.id] || ""}>
+                          <SelectTrigger id={q.id}><SelectValue placeholder="Select an option" /></SelectTrigger>
+                          <SelectContent>
+                            {q.options?.map((opt: string) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      )}
+                      {q.type === 'year_input' && (
+                         <>
+                          <YearInput
+                            id={q.id}
+                            value={answers[q.id]}
+                            onChange={(val) => handleValidatedChange(q.id, val ? String(val) : "")}
+                            placeholder="e.g. 2022"
+                            aria-invalid={!!error}
+                          />
+                          {error && <p className="text-sm text-destructive">{error}</p>}
+                         </>
+                      )}
+                    </div>
+                  )
+                })}
               </CardContent>
             </Card>
           ))}
@@ -107,3 +129,4 @@ export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizat
     </div>
   );
 };
+      

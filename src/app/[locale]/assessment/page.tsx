@@ -159,8 +159,10 @@ export default function AssessmentPage() {
         if (new Date(value) > new Date()) return "Date of birth cannot be in the future.";
     }
     if (type === 'number_input') {
+        if (!value.trim()) return null; // Allow empty optional fields
         const num = Number(value);
-        if (isNaN(num)) return "Must be a number.";
+        if (isNaN(num)) return t('validNumber');
+        if (num <= 0) return t('positiveValue');
         if (id === 'height_cm' && (num < 50 || num > 250)) return "Height must be between 50 and 250 cm.";
         if (id === 'weight_kg' && (num < 30 || num > 300)) return "Weight must be between 30 and 300 kg.";
     }
@@ -199,6 +201,8 @@ export default function AssessmentPage() {
         try { return JSON.parse(value).length > 0; } catch { return false; }
       }
       if (q.type === "advanced_modules") return true;
+      // Make non-required fields optional for completion check
+      if (['gender_identity', 'height_cm', 'weight_kg', 'diet_pattern', 'activity_level'].includes(q.id)) return true;
       return answers[q.id] && answers[q.id].trim() !== "";
     });
     const noErrors = visibleQuestions.every((q) => !localErrors[q.id]);

@@ -7,6 +7,7 @@ import { z } from "zod";
 import { generatePlan } from "@/lib/services/guideline-engine.service";
 import { StandardizationService } from "@/lib/services/standardization.service";
 import { DerivedVariablesService } from "@/lib/services/derived-variables.service";
+import { del } from '@vercel/blob';
 
 // A flexible schema to accept the complex, potentially nested data from the new form.
 // Detailed validation is handled by the standardization and derived variable services.
@@ -66,7 +67,7 @@ async function logAssessmentStatus(status: string) {
 
 export async function POST(request: NextRequest) {
   const forwarded = request.headers.get("x-forwarded-for");
-  const ip = forwarded ? forwarded.split(/, /) : "127.0.0.1";
+  const ip = forwarded ? forwarded.split(/, /)[0] : "127.0.0.1";
   logger.info(`[API:assess] Request received from IP: ${ip}`);
 
   const limit = ipRateLimiter(ip);
@@ -77,6 +78,8 @@ export async function POST(request: NextRequest) {
       { status: 429 },
     );
   }
+
+  let reportUrlToDelete: string | undefined;
 
   try {
     const body = await request.json();
@@ -97,6 +100,7 @@ export async function POST(request: NextRequest) {
     }
     
     const { answers, locale } = parsedRequest.data;
+    reportUrlToDelete = answers.genetic_report_upload;
     logger.info("[API:assess] Raw answers successfully parsed.");
 
     // 1. Standardize the raw answers into a structured payload
@@ -121,6 +125,7 @@ export async function POST(request: NextRequest) {
       standardized_data: standardizedPayload,
       derived_variables: derivedVariables,
       guideline_plan: guidelinePlan,
+      genetic_report_ref: reportUrlToDelete
     };
 
     // 5. Get AI-powered explanation for the generated plan
@@ -168,6 +173,15 @@ export async function POST(request: NextRequest) {
       { error: "Failed to process plan" },
       { status: 500 },
     );
+  } finally {
+     if (reportUrlToDelete) {
+        try {
+            await del(reportUrlToDelete);
+            logger.info(`[API:assess] Successfully deleted temporary report: ${reportUrlToDelete}`);
+        } catch (delError) {
+            logger.error(`[API:assess] FAILED to delete temporary report: ${reportUrlToDelete}`, { delError });
+        }
+    }
   }
 }
       

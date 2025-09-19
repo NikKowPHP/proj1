@@ -5,6 +5,7 @@ type StructuredHealthPayload = {
   standardized_data: Record<string, any>;
   derived_variables: Record<string, any>;
   guideline_plan: GuidelinePlan;
+  genetic_report_ref?: string;
 };
 
 export const getPreventivePlanExplainerPrompt = (
@@ -27,7 +28,7 @@ You are an AI health assistant. Your task is to act as a compassionate explainer
 5.  **LANGUAGE:** ${languageInstruction}
 
 **INPUT DATA (Full Health Profile & Deterministic Plan):**
-This data contains the user's profile and the action IDs you must explain.
+This data contains the user's profile and the action IDs you must explain. A reference to an uploaded genetic report may be included as 'genetic_report_ref'.
 ${JSON.stringify(healthPayload, null, 2)}
 
 **YOUR TASK:**

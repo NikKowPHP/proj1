@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { RepeatingGroup } from '../ui/RepeatingGroup';
 import { Label } from '../ui/label';
 import { SearchableSelect, SearchableSelectOption } from '../ui/SearchableSelect';
@@ -22,6 +22,8 @@ interface PersonalCancerHistoryProps {
 }
 
 export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCancerHistoryProps) => {
+  const [errors, setErrors] = useState<Record<number, { year_dx?: string, last_followup?: string }>>({});
+
   const handleAdd = () => {
     onChange([...value, { treatments: [] }]);
   };
@@ -33,6 +35,18 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
   const handleFieldChange = (index: number, field: keyof CancerDiagnosis, fieldValue: any) => {
     const newValues = [...value];
     newValues[index] = { ...newValues[index], [field]: fieldValue };
+
+    if (field === 'year_dx' || field === 'last_followup') {
+      const currentYear = new Date().getFullYear();
+      if (fieldValue > currentYear) {
+        setErrors(prev => ({ ...prev, [index]: { ...prev[index], [field]: 'Year cannot be in the future.' }}));
+      } else {
+        const newErrors = { ...errors[index] };
+        delete newErrors[field];
+        setErrors(prev => ({ ...prev, [index]: newErrors }));
+      }
+    }
+    
     onChange(newValues);
   };
 
@@ -61,7 +75,9 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
                 value={item.year_dx}
                 onChange={(val) => handleFieldChange(index, 'year_dx', val)}
                 placeholder="e.g. 2015"
+                aria-invalid={!!errors[index]?.year_dx}
               />
+              {errors[index]?.year_dx && <p className="text-sm text-destructive">{errors[index].year_dx}</p>}
             </div>
             <div className="space-y-2">
               <Label>Last Follow-up Year</Label>
@@ -69,7 +85,9 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
                 value={item.last_followup}
                 onChange={(val) => handleFieldChange(index, 'last_followup', val)}
                 placeholder="e.g. 2023"
+                aria-invalid={!!errors[index]?.last_followup}
               />
+              {errors[index]?.last_followup && <p className="text-sm text-destructive">{errors[index].last_followup}</p>}
             </div>
           </div>
           <div className="space-y-2">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Checkbox } from '../ui/checkbox';
@@ -7,6 +7,12 @@ import { useTranslations } from 'next-intl';
 import { Input } from '../ui/input';
 import { YearInput } from '../ui/YearInput';
 import { CheckboxGroup } from '../ui/CheckboxGroup';
+import { Button } from '../ui/button';
+import Spinner from '../ui/Spinner';
+import { Paperclip, Trash2, AlertCircle } from 'lucide-react';
+import { logger } from '@/lib/logger';
+import { cn } from '@/lib/utils';
+import { FileUploadComponent } from './FileUpload';
 
 interface GeneticsProps {
   answers: Record<string, any>;
@@ -20,8 +26,24 @@ const isVisible = (question: any, answers: Record<string, string>): boolean => {
   return dependencyAnswer === question.dependsOn.value;
 };
 
+
 export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
   const t = useTranslations("AssessmentPage");
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
+
+  const handleValidatedChange = (id: string, value: any) => {
+    let error: string | undefined = undefined;
+    const currentYear = new Date().getFullYear();
+
+    if (id === 'genetic_test_year' && value > currentYear) {
+      error = 'Year cannot be in the future.';
+    } else if (id === 'genetic_variants_hgvs' && value && !/^(c|p)\..+>.+$/.test(value)) {
+      error = 'Please enter a valid HGVS format (e.g., c.123A>G).';
+    }
+
+    setErrors(prev => ({ ...prev, [id]: error }));
+    onAnswer(id, value);
+  };
 
   const visibleQuestions = questions.filter(q => isVisible(q, answers));
 
@@ -29,6 +51,7 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
     <div className="space-y-6">
       {visibleQuestions.map(q => {
         const key = q.id;
+        const error = errors[key];
         switch (q.type) {
           case 'select':
             return (
@@ -46,14 +69,16 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
             return (
               <div key={key} className="space-y-2">
                 <Label htmlFor={key}>{q.text}</Label>
-                <YearInput id={key} value={answers[key]} onChange={(val) => onAnswer(key, val)} />
+                <YearInput id={key} value={answers[key]} onChange={(val) => handleValidatedChange(key, val)} aria-invalid={!!error} />
+                {error && <p className="text-sm text-destructive">{error}</p>}
               </div>
             );
           case 'text_input':
             return (
               <div key={key} className="space-y-2">
                 <Label htmlFor={key}>{q.text}</Label>
-                <Input id={key} value={answers[key] || ""} onChange={(e) => onAnswer(key, e.target.value)} />
+                <Input id={key} value={answers[key] || ""} onChange={(e) => handleValidatedChange(key, e.target.value)} aria-invalid={!!error} />
+                {error && <p className="text-sm text-destructive">{error}</p>}
               </div>
             );
           case 'checkbox_group': // for genes
@@ -69,11 +94,7 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
             );
           case 'file_upload':
             return (
-              <div key={key} className="space-y-2">
-                <Label htmlFor={key}>{q.text}</Label>
-                <Input id={key} type="file" />
-                <p className="text-xs text-muted-foreground">Feature not yet implemented.</p>
-              </div>
+              <FileUploadComponent key={key} question={q} answers={answers} onAnswer={onAnswer} />
             )
           case 'consent_checkbox':
             return (

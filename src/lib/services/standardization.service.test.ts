@@ -35,7 +35,7 @@ describe("StandardizationService", () => {
     ]);
   });
 
-  it("should correctly structure advanced genetics data", () => {
+  it("should correctly structure advanced genetics data when tested", () => {
     const answers = {
       genetic_testing_done: "Yes",
       genetic_test_type: "Multigene panel",
@@ -46,6 +46,36 @@ describe("StandardizationService", () => {
     expect(result.advanced.genetics.tested).toBe(true);
     expect(result.advanced.genetics.type).toBe("Multigene panel");
     expect(result.advanced.genetics.genes).toEqual(["BRCA1", "BRCA2"]);
+  });
+
+  it("should correctly structure occupational hazards data", () => {
+      const answers = {
+        occupational_hazards: '[{"job_title":"welder","job_years":10,"occ_exposures":["welding_fumes"]}]'
+      };
+      const result = StandardizationService.standardize(answers);
+      expect(result.advanced.occupational).toEqual([
+          { job_title: "welder", job_years: 10, occ_exposures: ["welding_fumes"] }
+      ]);
+  });
+  
+  it("should correctly structure personal medical history with details", () => {
+      const answers = {
+        illness_list: '["diabetes", "hypertension"]',
+        illness_details_diabetes: '{"year":2010,"status":"active"}',
+        illness_details_hypertension: '{"year":2015,"status":"resolved"}'
+      };
+      const result = StandardizationService.standardize(answers);
+      expect(result.advanced.illnesses).toHaveLength(2);
+      expect(result.advanced.illnesses).toContainEqual({ id: "diabetes", year: 2010, status: "active" });
+      expect(result.advanced.illnesses).toContainEqual({ id: "hypertension", year: 2015, status: "resolved" });
+  });
+
+  it("should not create a genetics block if testing was not done", () => {
+      const answers = {
+          genetic_testing_done: "No",
+      };
+      const result = StandardizationService.standardize(answers);
+      expect(result.advanced.genetics).toBeUndefined();
   });
   
   it("should handle empty or invalid JSON strings gracefully", () => {

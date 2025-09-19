@@ -69,6 +69,16 @@ describe("DerivedVariablesService", () => {
       expect(derived.pack_years).toBeUndefined();
     });
 
+    it("should not calculate pack-years if cigs_per_day is zero", () => {
+        const standardizedData = {
+          core: { smoking_status: "Former" },
+          advanced: { smoking_detail: { cigs_per_day: 0, years: 10 } },
+        };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived.pack_years).toBeUndefined();
+    });
+
+
     it("should create correct organ inventory for females", () => {
       const standardizedData = { core: { sex_at_birth: "Female" } };
       const derived = DerivedVariablesService.calculateAll(standardizedData);
@@ -94,5 +104,12 @@ describe("DerivedVariablesService", () => {
       const derived = DerivedVariablesService.calculateAll(standardizedData);
       expect(derived.organ_inventory).toBeUndefined();
     });
+    
+    it("should not create an organ inventory for 'Prefer not to say'", () => {
+        const standardizedData = { core: { sex_at_birth: "Prefer not to say" } };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived.organ_inventory).toBeUndefined();
+    });
   });
 });
+      

@@ -130,12 +130,11 @@
           "id": "family_cancer_any",
           "text": { "en": "First-degree relative with cancer?", "pl": "Czy bliscy chorowali na raka?" },
           "type": "select",
-          "options": [
-            { "label": { "en": "Yes", "pl": "Tak" } },
-            { "label": { "en": "No", "pl": "Nie" } },
-            { "label": { "en": "Unsure", "pl": "Nie jestem pewien/pewna" } }
-          ]
-        }
+          "options": [ { "label": "Yes" }, { "label": "No" }, { "label": "Unsure" } ]
+        },
+        { "id": "illness_any", "text": {"en": "Any chronic illnesses?", "pl": "Czy masz jakieś choroby przewlekłe?"}, "type": "select", "options": [{"label": "Yes"}, {"label": "No"}] },
+        { "id": "cancer_any", "text": {"en": "Ever diagnosed with cancer?", "pl": "Czy kiedykolwiek zdiagnozowano u Ciebie raka?"}, "type": "select", "options": [{"label": "Yes"}, {"label": "No"}] },
+        { "id": "job_history_enable", "text": {"en": "Add work/occupation details (optional)?", "pl": "Dodać szczegóły dotyczące pracy/zawodu (opcjonalnie)?"}, "type": "select", "options": [{"label": "Yes"}, {"label": "No"}] }
       ]
     },
     {
@@ -149,7 +148,29 @@
             {
               "id": "symptom_details",
               "title": { "en": "Symptom Details", "pl": "Szczegóły Objawów" },
-              "dependsOn": { "questionId": "symptoms", "value": true }
+              "dependsOn": { "questionId": "symptoms", "value": true },
+              "options": {
+                "symptomList": [
+                  { "value": "HP:0012378", "label": "Fatigue" },
+                  { "value": "HP:0004355", "label": "Weight loss" },
+                  { "value": "HP:0001945", "label": "Fever" },
+                  { "value": "HP:0000989", "label": "Skin changes" }
+                ],
+                "associatedFeatures": [
+                  { "id": "nausea", "label": "Nausea" },
+                  { "id": "dizziness", "label": "Dizziness" },
+                  { "id": "headache", "label": "Headache" }
+                ]
+              }
+            },
+            {
+              "id": "smoking_details",
+              "title": { "en": "Smoking Details", "pl": "Szczegóły Dotyczące Palenia" },
+              "dependsOn": { "questionId": "smoking_status", "value": ["Current", "Former"] },
+              "questions": [
+                { "id": "cigs_per_day", "text": { "en": "Average cigarettes per day?", "pl": "Średnia liczba papierosów dziennie?"}, "type": "number_input", "placeholder": "e.g., 20" },
+                { "id": "smoking_years", "text": { "en": "Number of years smoked?", "pl": "Liczba lat palenia?"}, "type": "number_input", "placeholder": "e.g., 10" }
+              ]
             },
             {
               "id": "family_cancer_history",
@@ -196,6 +217,7 @@
             {
               "id": "personal_medical_history",
               "title": { "en": "Personal Medical History", "pl": "Osobista Historia Medyczna" },
+              "dependsOn": { "questionId": "illness_any", "value": "Yes" },
               "options": {
                 "illnesses": [
                   { "id": "diabetes", "label": "Diabetes" }, { "id": "hypertension", "label": "Hypertension" }, { "id": "ibd", "label": "IBD" }
@@ -205,6 +227,7 @@
             {
               "id": "personal_cancer_history",
               "title": { "en": "Personal Cancer History", "pl": "Osobista Historia Nowotworów" },
+              "dependsOn": { "questionId": "cancer_any", "value": "Yes" },
               "options": {
                 "cancerTypes": [ { "value": "breast", "label": "Breast Cancer" }, { "value": "lung", "label": "Lung Cancer" } ],
                 "treatmentTypes": [ { "id": "surgery", "label": "Surgery"}, { "id": "chemo", "label": "Chemotherapy"}, {"id": "radio", "label": "Radiotherapy"} ]
@@ -221,6 +244,14 @@
                 {"id": "mammogram", "text": "Mammogram", "dependsOn": {"questionId": "sex_at_birth", "value": "Female"}, "questions": [
                   {"id": "screen.mammo.done", "text": "Mammogram ever?", "type": "select", "options": ["Yes", "No"]},
                   {"id": "screen.mammo.date", "text": "Last mammogram year", "type": "year_input", "dependsOn": {"questionId": "screen.mammo.done", "value": "Yes"}}
+                ]},
+                {"id": "pap_test", "text": "Pap/HPV Test", "dependsOn": {"questionId": "sex_at_birth", "value": "Female"}, "questions": [
+                  {"id": "screen.pap.done", "text": "Pap/HPV test ever?", "type": "select", "options": ["Yes", "No"]},
+                  {"id": "screen.pap.date", "text": "Last Pap/HPV test year", "type": "year_input", "dependsOn": {"questionId": "screen.pap.done", "value": "Yes"}}
+                ]},
+                {"id": "psa_test", "text": "PSA Test", "dependsOn": {"questionId": "sex_at_birth", "value": "Male"}, "questions": [
+                  {"id": "screen.psa.done", "text": "PSA test ever?", "type": "select", "options": ["Yes", "No"]},
+                  {"id": "screen.psa.date", "text": "Last PSA test year", "type": "year_input", "dependsOn": {"questionId": "screen.psa.done", "value": "Yes"}}
                 ]}
               ],
               "immunizations": [
@@ -232,13 +263,23 @@
               "id": "sexual_health",
               "title": {"en": "Sexual Health (Optional)", "pl": "Zdrowie Seksualne (Opcjonalne)"},
               "questions": [
-                {"id": "sex.active", "text": "Currently sexually active?", "type": "select", "options": ["Yes", "No", "Prefer not to say"]},
-                {"id": "sex.barrier_freq", "text": "Condom/barrier use", "type": "select", "options": ["Always", "Sometimes", "Never", "Prefer not to say"]}
+                {"id": "sex_active", "text": {"en": "Currently sexually active?", "pl": "Czy jesteś obecnie aktywny/a seksualnie?"}, "type": "select", "options": ["Yes", "No", "Prefer not to say"]},
+                {"id": "sex_partner_gender", "text": {"en": "Gender of partners", "pl": "Płeć partnerów/partnerek"}, "type": "checkbox_group", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": [{"id": "male", "label": {"en":"Male", "pl": "Mężczyźni"}}, {"id": "female", "label": {"en":"Female", "pl": "Kobiety"}}, {"id": "other", "label": {"en":"Other", "pl": "Inne"}}, {"id": "prefer_not_to_say", "label": {"en":"Prefer not to say", "pl": "Wolę nie odpowiadać"}}]},
+                {"id": "sex_lifetime_partners", "text": {"en": "Lifetime sexual partners", "pl": "Liczba partnerów/partnerek seksualnych w ciągu całego życia"}, "type": "select", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": ["1", "2-4", "5-9", "10+", "Prefer not to say"]},
+                {"id": "sex_last12m_partners", "text": {"en": "Partners in last 12 months", "pl": "Liczba partnerów/partnerek w ciągu ostatnich 12 miesięcy"}, "type": "select", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": ["0", "1", "2-4", "5+", "Prefer not to say"]},
+                {"id": "sex_barrier_freq", "text": {"en": "Condom/barrier use frequency", "pl": "Częstotliwość używania prezerwatyw/barier"}, "type": "select", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": ["Always", "Sometimes", "Never", "Prefer not to say"]},
+                {"id": "sex_sti_history", "text": {"en": "History of sexually transmitted infections (STIs)", "pl": "Historia infekcji przenoszonych drogą płciową (STI)"}, "type": "checkbox_group", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "exclusiveOptionId": "none", "options": [{"id": "hpv", "label": "HPV"}, {"id": "chlamydia", "label": "Chlamydia"}, {"id": "hiv", "label": "HIV"}, {"id": "none", "label": {"en": "None", "pl": "Brak"}}]},
+                {"id": "sex_anal", "text": {"en": "Anal intercourse?", "pl": "Stosunek analny?"}, "type": "select", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": ["Yes", "No", "Prefer not to say"]},
+                {"id": "sex_oral", "text": {"en": "Oral sex?", "pl": "Seks oralny?"}, "type": "select", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": ["Yes", "No", "Prefer not to say"]}
               ]
             },
             {
               "id": "occupational_hazards",
               "title": {"en": "Occupational Hazards (Optional)", "pl": "Zagrożenia Zawodowe (Opcjonalne)"},
+              "dependsOn": { "questionId": "job_history_enable", "value": "Yes" },
+              "questions": [
+                {"id": "employment_status", "text": {"en": "What is your current employment status?", "pl": "Jaki jest Pana/Pani obecny status zatrudnienia?"}, "type": "select", "options": ["Employed", "Self-employed", "Unemployed", "Student", "Retired"]}
+              ],
               "options": {
                 "jobTitles": [
                   { "value": "driver", "label": "Driver" },
@@ -269,8 +310,41 @@
               "id": "environmental_exposures",
               "title": {"en": "Environmental Exposures (Optional)", "pl": "Narażenie Środowiskowe (Opcjonalne)"},
               "questions": [
-                {"id": "home.years_here", "text": "Years at current residence", "type": "number_input"},
-                {"id": "home.radon_tested", "text": "Home tested for radon?", "type": "select", "options": ["Yes", "No", "Unsure"]}
+                {"id": "home_years_here", "text": {"en": "Years at current residence", "pl": "Lata w obecnym miejscu zamieszkania"}, "type": "number_input"},
+                {"id": "home_postal_coarse", "text": {"en": "Postal code (first part only for privacy)", "pl": "Kod pocztowy (tylko pierwsza część dla prywatności)"}, "type": "text_input", "placeholder": "e.g., 01-1xx"},
+                {"id": "home_year_built", "text": {"en": "Year building was constructed", "pl": "Rok budowy budynku"}, "type": "year_input", "placeholder": "e.g., 1985"},
+                {"id": "home_basement", "text": {"en": "Does your home have a basement?", "pl": "Czy Twój dom ma piwnicę?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
+                {"id": "home_radon_tested", "text": {"en": "Home tested for radon?", "pl": "Czy dom był badany na obecność radonu?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
+                {"id": "home_radon_value", "text": {"en": "Radon test result", "pl": "Wynik testu na radon"}, "type": "grouped_input", "dependsOn": {"questionId": "home_radon_tested", "value": "Yes"}, "options": {"unitQuestionId": "home_radon_unit", "units": ["Bq/m³", "pCi/L"]}},
+                {"id": "home_radon_date", "text": {"en": "When was it tested?", "pl": "Kiedy wykonano test?"}, "type": "year_input", "dependsOn": {"questionId": "home_radon_tested", "value": "Yes"}},
+                {"id": "home_shs_home", "text": {"en": "Secondhand smoke exposure at home", "pl": "Narażenie na dym tytoniowy w domu"}, "type": "select", "options": ["Never", "Occasionally", "Frequently", "Unsure"]},
+                {"id": "home_fuels", "text": {"en": "Primary cooking/heating fuels", "pl": "Główne paliwa do gotowania/ogrzewania"}, "type": "checkbox_group", "options": [{"id": "gas", "label": "Natural gas"}, {"id": "wood", "label": "Wood/biomass"}, {"id": "coal", "label": "Coal"}, {"id": "electricity", "label": "Electricity"}]},
+                {"id": "home_kitchen_vent", "text": {"en": "Ventilation when cooking", "pl": "Wentylacja podczas gotowania"}, "type": "select", "dependsOn": {"questionId": "home_fuels", "value": true}, "options": ["Always", "Sometimes", "Never"]},
+                {"id": "env_major_road", "text": {"en": "Distance to a major road", "pl": "Odległość od głównej drogi"}, "type": "select", "options": ["<50m", "50-300m", ">300m", "Unsure"]},
+                {"id": "env_outdoor_uv", "text": {"en": "Prolonged outdoor activity (work/hobby)", "pl": "Długotrwała aktywność na zewnątrz (praca/hobby)"}, "type": "select", "options": ["Rarely", "Some days", "Most days"]},
+                {"id": "water_source", "text": {"en": "Primary drinking water source", "pl": "Główne źródło wody pitnej"}, "type": "select", "options": ["Municipal", "Private well", "Bottled only", "Unsure"]}
+              ]
+            },
+            {
+              "id": "labs_and_imaging",
+              "title": {"en": "Labs & Imaging (Optional)", "pl": "Badania Laboratoryjne i Obrazowe (Opcjonalne)"}
+            },
+            {
+              "id": "functional_status",
+              "title": {"en": "Functional Status (Optional)", "pl": "Stan Funkcjonalny (Opcjonalne)"},
+              "questions": [
+                {
+                  "id": "ecog",
+                  "text": {"en": "ECOG Performance Status", "pl": "Skala sprawności ECOG"},
+                  "type": "select",
+                  "options": [
+                    {"value": "0", "label": "0 - Fully active, able to carry on all pre-disease performance without restriction"},
+                    {"value": "1", "label": "1 - Restricted in physically strenuous activity but ambulatory"},
+                    {"value": "2", "label": "2 - Ambulatory and capable of all selfcare but unable to carry out any work activities"},
+                    {"value": "3", "label": "3 - Capable of only limited selfcare, confined to bed or chair more than 50% of waking hours"},
+                    {"value": "4", "label": "4 - Completely disabled. Cannot carry on any selfcare. Totally confined to bed or chair"}
+                  ]
+                }
               ]
             }
           ]
@@ -279,4 +353,3 @@
     }
   ]
 }
-      

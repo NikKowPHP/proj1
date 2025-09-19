@@ -49,7 +49,8 @@ test.describe("Phase 2: Key Features & Validation (en)", () => {
     const weightInput = page.getByLabel("Weight");
     const nextButton = page.getByRole("button", { name: "Next" });
 
-    // Metric validation
+    // --- Metric validation ---
+    // Height
     await heightInput.fill("abc");
     await expect(page.getByText("Please enter a valid number.")).toBeVisible();
     await expect(nextButton).toBeDisabled();
@@ -60,18 +61,28 @@ test.describe("Phase 2: Key Features & Validation (en)", () => {
 
     await heightInput.fill("40");
     await expect(
-      page.getByText("Please enter a height between 50 and 300 cm."),
+      page.getByText("Please enter a height between 50 and 250 cm."),
     ).toBeVisible();
     await expect(nextButton).toBeDisabled();
-
     await heightInput.fill("170"); // Valid
-    await expect(
-      page.getByText("Please enter a height between 50 and 300 cm."),
-    ).not.toBeVisible();
+    
+    // Weight (Metric)
+    await weightInput.fill("29");
+    await expect(page.getByText("Please enter a weight between 30 and 300 kg.")).toBeVisible();
+    await expect(nextButton).toBeDisabled();
 
-    // Switch to Imperial and test weight
+    await weightInput.fill("301");
+    await expect(page.getByText("Please enter a weight between 30 and 300 kg.")).toBeVisible();
+    await expect(nextButton).toBeDisabled();
+
+    await weightInput.fill("80"); // Valid
+    await expect(page.getByText("Please enter a weight between 30 and 300 kg.")).not.toBeVisible();
+
+
+    // --- Imperial validation ---
     await page.getByRole("tab", { name: "Imperial (inches / lbs)" }).click();
 
+    // Weight (Imperial)
     await weightInput.fill("30");
     await expect(
       page.getByText("Please enter a weight between 40 and 660 lbs."),
@@ -276,4 +287,3 @@ test.describe("Phase 4: Static Pages & Footer", () => {
     await expect(html).not.toHaveClass(/dark/);
   });
 });
-      

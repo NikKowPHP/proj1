@@ -98,7 +98,7 @@
     "positiveValue": "Value must be positive.",
     "heightMetricRange": "Please enter a height between 50 and 300 cm.",
     "heightImperialRange": "Please enter a height between 20 and 120 inches.",
-    "weightMetricRange": "Please enter a weight between 20 and 300 kg.",
+    "weightMetricRange": "Please enter a weight between 30 and 300 kg.",
     "weightImperialRange": "Please enter a weight between 40 and 660 lbs.",
     "heightPlaceholderMetric": "e.g., 175",
     "heightPlaceholderImperial": "e.g., 69",

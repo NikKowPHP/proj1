@@ -1,4 +1,3 @@
-"use client";
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/services/api-client.service";
@@ -46,6 +45,9 @@ import { EnvironmentalExposures } from "@/components/assessment/EnvironmentalExp
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
 import { SafetyBanner } from "@/components/assessment/SafetyBanner";
+import { LabsAndImaging } from "@/components/assessment/LabsAndImaging";
+import { FunctionalStatus } from "@/components/assessment/FunctionalStatus";
+import { SmokingDetails } from "@/components/assessment/SmokingDetails";
 
 interface Question {
   id: string;
@@ -185,6 +187,9 @@ export default function AssessmentPage() {
         return !dependencyAnswer || dependencyAnswer === '[]' || dependencyAnswer === 'false' || dependencyAnswer === '["HP:0000000"]';
       }
     }
+    if(Array.isArray(question.dependsOn.value)){
+      return question.dependsOn.value.includes(dependencyAnswer);
+    }
     return dependencyAnswer === question.dependsOn.value;
   };
 
@@ -228,6 +233,10 @@ export default function AssessmentPage() {
     );
   }
 
+  const advancedModules = questionnaire?.steps[1].questions.find(q => q.id === 'advanced_modules')?.modules || [];
+  const symptomDetailsOptions = advancedModules.find(m => m.id === 'symptom_details')?.options;
+
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="p-4 bg-white text-black md:hidden"><AppHeaderContent /></header>
@@ -258,7 +267,7 @@ export default function AssessmentPage() {
                   {q.type === "consent_checkbox" && <div className="flex items-start space-x-3 rounded-md border p-4"><Checkbox id={q.id} checked={answers[q.id] === "true"} onCheckedChange={(c) => setAnswer(q.id, c ? "true" : "false")} /><div className="grid gap-1.5"><label htmlFor={q.id} className="text-sm leading-snug text-muted-foreground">{t.rich("consentHealth", { privacyLink: (chunks) => <Link href="/privacy" className="font-semibold text-primary hover:underline" target="_blank" rel="noopener noreferrer">{chunks}</Link> })}</label></div></div>}
                   {q.type === "checkbox_group" && <CheckboxGroup options={q.options as CheckboxOption[]} value={answers[q.id] ? JSON.parse(answers[q.id]) : []} onChange={(s) => setAnswer(q.id, JSON.stringify(s))} exclusiveOption={q.exclusiveOptionId} />}
                   {q.type === 'advanced_modules' && <Accordion type="multiple" className="w-full">{q.modules?.filter(isQuestionVisible).map(m => <AccordionItem value={m.id} key={m.id}><AccordionTrigger>{m.title}</AccordionTrigger><AccordionContent>
-                    {m.id === 'symptom_details' && <SymptomDetails selectedSymptoms={answers.symptoms ? questionnaire?.steps.flatMap(s => s.questions).find(q => q.id === 'symptoms')?.options?.filter((o: any) => JSON.parse(answers.symptoms).includes(o.id)) || [] : []} value={Object.keys(answers).reduce((acc, k) => { if(k.startsWith('symptom_details_')) { const sId=k.replace('symptom_details_',''); acc[sId]=JSON.parse(answers[k]);} return acc;}, {} as Record<string,any>)} onChange={(sId, d) => setAnswer(`symptom_details_${sId}`, JSON.stringify(d))} />}
+                    {m.id === 'symptom_details' && <SymptomDetails selectedSymptoms={answers.symptoms ? questionnaire?.steps.flatMap(s => s.questions).find(q => q.id === 'symptoms')?.options?.filter((o: any) => JSON.parse(answers.symptoms).includes(o.id)) || [] : []} value={Object.keys(answers).reduce((acc, k) => { if(k.startsWith('symptom_details_')) { const sId=k.replace('symptom_details_',''); acc[sId]=JSON.parse(answers[k]);} return acc;}, {} as Record<string,any>)} onChange={(sId, d) => setAnswer(`symptom_details_${sId}`, JSON.stringify(d))} symptomOptions={symptomDetailsOptions?.symptomList || []} featureOptions={symptomDetailsOptions?.associatedFeatures || []} />}
                     {m.id === 'family_cancer_history' && <FamilyCancerHistory value={answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : []} onChange={(v) => setAnswer('family_cancer_history', JSON.stringify(v))} options={m.options} />}
                     {m.id === 'genetics' && <Genetics answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'female_health' && <FemaleHealth answers={answers} onAnswer={setAnswer} questions={m.questions} />}
@@ -268,6 +277,9 @@ export default function AssessmentPage() {
                     {m.id === 'sexual_health' && <SexualHealth answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'occupational_hazards' && <OccupationalHazards value={answers.occupational_hazards ? JSON.parse(answers.occupational_hazards) : []} onChange={(v) => setAnswer('occupational_hazards', JSON.stringify(v))} options={m.options} />}
                     {m.id === 'environmental_exposures' && <EnvironmentalExposures answers={answers} onAnswer={setAnswer} questions={m.questions} />}
+                    {m.id === 'labs_and_imaging' && <LabsAndImaging value={answers.labs_and_imaging ? JSON.parse(answers.labs_and_imaging) : []} onChange={(v) => setAnswer('labs_and_imaging', JSON.stringify(v))} />}
+                    {m.id === 'functional_status' && <FunctionalStatus answers={answers} onAnswer={setAnswer} questions={m.questions} />}
+                    {m.id === 'smoking_details' && <SmokingDetails answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                   </AccordionContent></AccordionItem>)}</Accordion>}
                 </div>
               ))}
@@ -283,4 +295,3 @@ export default function AssessmentPage() {
     </div>
   );
 }
-      

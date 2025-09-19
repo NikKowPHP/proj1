@@ -20,6 +20,9 @@ interface JobEntry {
 interface OccupationalHazardsProps {
   value: JobEntry[];
   onChange: (value: JobEntry[]) => void;
+  questions: any[];
+  answers: Record<string, any>;
+  onAnswer: (id: string, value: any) => void;
   options: {
     jobTitles: SearchableSelectOption[];
     exposures: SearchableSelectOption[];
@@ -147,7 +150,7 @@ const JobEntryItem = ({
 };
 
 
-export const OccupationalHazards = ({ value, onChange, options }: OccupationalHazardsProps) => {
+export const OccupationalHazards = ({ value, onChange, questions, answers, onAnswer, options }: OccupationalHazardsProps) => {
   const handleAdd = () => {
     onChange([...value, { occ_exposures: [], ppe_usage: [] }]);
   };
@@ -171,22 +174,35 @@ export const OccupationalHazards = ({ value, onChange, options }: OccupationalHa
   }, [value, handleFieldChange]);
 
   return (
-    <RepeatingGroup
-      values={value}
-      onAdd={handleAdd}
-      onRemove={handleRemove}
-      addLabel="Add Job"
-    >
-      {(item, index) => (
-        <JobEntryItem
-          key={index}
-          item={item}
-          index={index}
-          onFieldChange={handleFieldChange}
-          onChipToggle={handleChipToggle}
-          options={options}
-        />
-      )}
-    </RepeatingGroup>
+    <div className="space-y-4">
+      {questions.map(q => (
+         <div key={q.id} className="space-y-2">
+          <Label htmlFor={q.id}>{q.text}</Label>
+           <Select onValueChange={(val) => onAnswer(q.id, val)} value={answers[q.id] || ""}>
+            <SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger>
+            <SelectContent>
+              {q.options.map((opt: string) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+      ))}
+      <RepeatingGroup
+        values={value}
+        onAdd={handleAdd}
+        onRemove={handleRemove}
+        addLabel="Add Job"
+      >
+        {(item, index) => (
+          <JobEntryItem
+            key={index}
+            item={item}
+            index={index}
+            onFieldChange={handleFieldChange}
+            onChipToggle={handleChipToggle}
+            options={options}
+          />
+        )}
+      </RepeatingGroup>
+    </div>
   );
 };

@@ -98,7 +98,7 @@
     "positiveValue": "Wartość musi być dodatnia.",
     "heightMetricRange": "Proszę podać wzrost w zakresie 50-300 cm.",
     "heightImperialRange": "Proszę podać wzrost w zakresie 20-120 cali.",
-    "weightMetricRange": "Proszę podać wagę w zakresie 20-300 kg.",
+    "weightMetricRange": "Proszę podać wagę w zakresie 30-300 kg.",
     "weightImperialRange": "Proszę podać wagę w zakresie 40-660 funtów.",
     "heightPlaceholderMetric": "np. 175",
     "heightPlaceholderImperial": "np. 69",

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardHeader } from '../ui/card';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Slider } from '../ui/slider';
-import { Textarea } from '../ui/textarea';
+import { SearchableSelect, SearchableSelectOption } from '../ui/SearchableSelect';
+import { Chip } from '../ui/chip';
 
 interface Symptom {
   id: string;
@@ -11,23 +12,35 @@ interface Symptom {
 }
 
 interface SymptomDetailsValue {
+  code?: string; // HPO code
   onset?: string;
   severity?: number;
   frequency?: string;
-  notes?: string;
+  associated_features?: string[];
 }
 
 interface SymptomDetailsProps {
   selectedSymptoms: Symptom[];
   value: Record<string, SymptomDetailsValue>;
   onChange: (symptomId: string, details: SymptomDetailsValue) => void;
+  symptomOptions: SearchableSelectOption[];
+  featureOptions: { id: string, label: string }[];
 }
 
-export const SymptomDetails = ({ selectedSymptoms, value, onChange }: SymptomDetailsProps) => {
+export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptions, featureOptions }: SymptomDetailsProps) => {
 
   const handleDetailChange = (symptomId: string, field: keyof SymptomDetailsValue, fieldValue: any) => {
     const currentDetails = value[symptomId] || {};
     onChange(symptomId, { ...currentDetails, [field]: fieldValue });
+  };
+
+  const handleFeatureToggle = (symptomId: string, featureId: string) => {
+    const currentDetails = value[symptomId] || {};
+    const currentFeatures = currentDetails.associated_features || [];
+    const newFeatures = currentFeatures.includes(featureId)
+      ? currentFeatures.filter(id => id !== featureId)
+      : [...currentFeatures, featureId];
+    onChange(symptomId, { ...currentDetails, associated_features: newFeatures });
   };
   
   if (selectedSymptoms.length === 0) {
@@ -43,7 +56,12 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange }: SymptomDet
       {selectedSymptoms.map(symptom => (
         <Card key={symptom.id}>
           <CardHeader>
-            <CardTitle>{symptom.label}</CardTitle>
+             <SearchableSelect
+              value={value[symptom.id]?.code || symptom.id}
+              onChange={(val) => handleDetailChange(symptom.id, 'code', val)}
+              options={symptomOptions}
+              placeholder="Select or refine symptom..."
+            />
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -93,12 +111,19 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange }: SymptomDet
               </Select>
             </div>
              <div className="space-y-2">
-              <Label>Additional Notes</Label>
-              <Textarea
-                value={value[symptom.id]?.notes || ''}
-                onChange={(e) => handleDetailChange(symptom.id, 'notes', e.target.value)}
-                placeholder="Any other details? (e.g., 'Worse in the morning')"
-              />
+              <Label>Associated Features</Label>
+              <div className="flex flex-wrap gap-2">
+                {featureOptions.map(feature => (
+                  <Chip
+                    key={feature.id}
+                    variant="selectable"
+                    selected={(value[symptom.id]?.associated_features || []).includes(feature.id)}
+                    onClick={() => handleFeatureToggle(symptom.id, feature.id)}
+                  >
+                    {feature.label}
+                  </Chip>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>

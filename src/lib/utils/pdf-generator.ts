@@ -70,6 +70,8 @@ const translations: Record<string, any> = {
       occupational_hazards: "Occupational History",
       labs_and_imaging: "Labs & Imaging",
       units: "Units",
+      symptom_details_prefix: "Details for Symptom",
+      illness_details_prefix: "Details for",
     },
   },
   pl: {
@@ -111,6 +113,8 @@ const translations: Record<string, any> = {
       occupational_hazards: "Historia zawodowa",
       labs_and_imaging: "Badania laboratoryjne i obrazowe",
       units: "Jednostki",
+      symptom_details_prefix: "Szczegóły objawu",
+      illness_details_prefix: "Szczegóły dla",
     },
   },
 };
@@ -131,49 +135,70 @@ const drawSectionHeader = (doc: jsPDFWithAutoTable, title: string, startY: numbe
 };
 
 function formatAnswerValue(value: any, key: string): string {
-  // If value is not a string or doesn't look like an array, return it as is.
-  if (typeof value !== 'string' || !value.trim().startsWith('[') || !value.trim().endsWith(']')) {
+  if (typeof value !== 'string' || !value.trim().length) {
     return value;
+  }
+  
+  const trimmedValue = value.trim();
+  if (!((trimmedValue.startsWith('[') && trimmedValue.endsWith(']')) || (trimmedValue.startsWith('{') && trimmedValue.endsWith('}')))) {
+      return value;
   }
 
   try {
-    const arr = JSON.parse(value);
-    if (!Array.isArray(arr)) return value;
-    if (arr.length === 0) return "None";
+    const parsed = JSON.parse(value);
 
-    // Handle simple string arrays
-    if (arr.every(item => typeof item === 'string')) {
-      // Special formatting for symptom IDs to make them more readable.
-      if (key === 'symptoms') {
-        return arr.map(s => s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())).join(', ');
+    if (Array.isArray(parsed)) {
+      if (parsed.length === 0) return "None";
+
+      if (parsed.every(item => typeof item === 'string')) {
+        return parsed.join(', ');
       }
-      return arr.join(', ');
-    }
-    
-    // Handle array of objects with special formatting for known keys
-    if (key === 'family_cancer_history') {
-      return arr.map(item => `${item.relation || 'Relative'}${item.cancer_type ? ` (${item.cancer_type})` : ''}`).join('; ');
-    }
-    if (key === 'personal_cancer_history') {
-      return arr.map(item => `${item.type || 'Cancer'}${item.year_dx ? ` (diagnosed ${item.year_dx})` : ''}`).join('; ');
-    }
-    if (key === 'occupational_hazards') {
-      return arr.map(item => `${item.job_title || 'Job'}${item.job_years ? ` (${item.job_years} years)` : ''}`).join('; ');
-    }
-    if (key === 'labs_and_imaging') {
-      return arr.map(item => `${item.study_type || 'Study'}${item.study_date ? ` (${item.study_date})` : ''}`).join('; ');
+      
+      if (key === 'family_cancer_history') {
+        return parsed.map(item => `${item.relation || 'Relative'}${item.cancer_type ? ` (${item.cancer_type} at age ${item.age_dx || 'N/A'})` : ''}`).join('; ');
+      }
+      if (key === 'personal_cancer_history') {
+        return parsed.map(item => `${item.type || 'Cancer'}${item.year_dx ? ` (diagnosed ${item.year_dx})` : ''}`).join('; ');
+      }
+      if (key === 'occupational_hazards') {
+        return parsed.map(item => `${item.job_title || 'Job'}${item.job_years ? ` (${item.job_years} years)` : ''}`).join('; ');
+      }
+      if (key === 'labs_and_imaging') {
+        return parsed.map(item => `${item.study_type || 'Study'}${item.study_date ? ` (${item.study_date})` : ''}`).join('; ');
+      }
+
+      if (parsed.every(item => typeof item === 'object' && item !== null)) {
+        return `${parsed.length} detailed entry/entries provided.`;
+      }
+      
+      return value;
     }
 
-    // Generic fallback for other object arrays
-    if (arr.every(item => typeof item === 'object' && item !== null)) {
-      return `${arr.length} detailed entry/entries provided.`;
+    if (typeof parsed === 'object' && parsed !== null) {
+        return Object.entries(parsed)
+            .map(([k, v]) => `${k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}: ${v}`)
+            .join(', ');
     }
 
-    return value; // Fallback to original string if it's a mixed array or something unexpected
+    return value;
   } catch (e) {
-    return value; // Not valid JSON, return as is
+    return value;
   }
 }
+
+const formatQuestionKey = (key: string, t: any): string => {
+    if (key.startsWith('symptom_details_')) {
+        const symptomId = key.replace('symptom_details_', '');
+        return `${t.answersMap['symptom_details_prefix'] || 'Details for Symptom'} (${symptomId})`;
+    }
+     if (key.startsWith('illness_details_')) {
+        const illnessId = key.replace('illness_details_', '');
+        const formattedIllnessId = illnessId.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        return `${t.answersMap['illness_details_prefix'] || 'Details for'} ${formattedIllnessId}`;
+    }
+    return t.answersMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
 
 export const generateAssessmentPdf = (
   planData: ActionPlan,
@@ -193,25 +218,24 @@ export const generateAssessmentPdf = (
   doc.setTextColor(THEME.TEXT_COLOR);
   doc.setCharSpace(STYLING.CHAR_SPACE);
 
-  // FIX: Resized logo and adjusted margins
   doc.addImage(onkonoLogoBase64, "PNG", pageMargin, 20, 45, 10.5);
 
   doc.setFontSize(STYLING.FONT_SIZES.TITLE);
   doc.setFont("OpenSans", "bold");
-  doc.text(t.title, pageMargin, 45); // FIX: Adjusted Y position
+  doc.text(t.title, pageMargin, 45);
   
   doc.setFont("OpenSans", "normal");
   doc.setFontSize(STYLING.FONT_SIZES.BODY);
   doc.setTextColor(100);
-  doc.text(t.disclaimer, pageMargin, 53, { lineHeightFactor: STYLING.LINE_HEIGHT }); // FIX: Added line height
+  doc.text(t.disclaimer, pageMargin, 53, { lineHeightFactor: STYLING.LINE_HEIGHT });
 
-  let startY = 65; // FIX: Increased margin
+  let startY = 65;
 
   if (planData.overallSummary) {
     doc.setFontSize(STYLING.FONT_SIZES.SUMMARY);
     const summaryLines = doc.splitTextToSize(planData.overallSummary, doc.internal.pageSize.getWidth() - (pageMargin * 2));
-    doc.text(summaryLines, pageMargin, startY, { lineHeightFactor: STYLING.LINE_HEIGHT }); // FIX: Added line height
-    startY += summaryLines.length * STYLING.FONT_SIZES.SUMMARY * 0.35 * STYLING.LINE_HEIGHT + 12; // FIX: Increased margin
+    doc.text(summaryLines, pageMargin, startY, { lineHeightFactor: STYLING.LINE_HEIGHT });
+    startY += summaryLines.length * STYLING.FONT_SIZES.SUMMARY * 0.35 * STYLING.LINE_HEIGHT + 12;
   }
   
   const checkPageBreak = (currentY: number) => {
@@ -222,7 +246,6 @@ export const generateAssessmentPdf = (
     return currentY;
   };
 
-  // Define common styles for all tables to keep them consistent
   const commonTableStyles = {
     showHead: false,
     theme: "plain",
@@ -230,8 +253,8 @@ export const generateAssessmentPdf = (
       cellPadding: { top: 1.5, right: 3, bottom: 1.5, left: 1 },
       font: "OpenSans",
       fontSize: STYLING.FONT_SIZES.BODY,
-      valign: 'top', // FIX: Ensures top alignment for all cells
-      lineHeight: STYLING.LINE_HEIGHT, // FIX: Adds line height to table text
+      valign: 'top',
+      lineHeight: STYLING.LINE_HEIGHT,
     },
     columnStyles: { 0: { fontStyle: 'bold' } },
     margin: { left: pageMargin },
@@ -245,7 +268,7 @@ export const generateAssessmentPdf = (
       body: planData.recommendedScreenings.map((s) => [s.title, s.why]),
       ...commonTableStyles,
     });
-    startY = (doc.autoTable.previous?.finalY ?? startY) + 12; // FIX: Increased margin
+    startY = (doc.autoTable.previous?.finalY ?? startY) + 12;
   }
 
   if (planData.lifestyleGuidelines.length > 0) {
@@ -276,7 +299,7 @@ export const generateAssessmentPdf = (
     doc.autoTable({
       startY,
       body: Object.entries(answers).map(([key, value]) => [
-        t.answersMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        formatQuestionKey(key, t),
         formatAnswerValue(value, key),
       ]),
       ...commonTableStyles,
@@ -287,4 +310,3 @@ export const generateAssessmentPdf = (
     `${t.filename}_${new Date().toLocaleDateString().replace(/\//g, "-")}.pdf`,
   );
 };
-      

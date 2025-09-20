@@ -198,21 +198,41 @@ export const OccupationalHazards = ({ value, onChange, questions, answers, onAns
 
   return (
     <div className="space-y-4">
-      {questions.map(q => (
-         <div key={q.id} className="space-y-2">
-          <Label htmlFor={q.id}>{q.text}</Label>
-           <Select onValueChange={(val) => onAnswer(q.id, val)} value={answers[q.id] || ""}>
-            <SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger>
-            <SelectContent>
-              {q.options.map((opt: string | { value: string; label: string }) => {
-                const value = typeof opt === 'object' ? opt.value : opt;
-                const label = typeof opt === 'object' ? opt.label : opt;
-                return <SelectItem key={value} value={value}>{label}</SelectItem>;
-              })}
-            </SelectContent>
-          </Select>
-        </div>
-      ))}
+      {questions.map(q => {
+          switch (q.type) {
+            case 'select':
+              return (
+                <div key={q.id} className="space-y-2">
+                  <Label htmlFor={q.id}>{q.text}</Label>
+                  <Select onValueChange={(val) => onAnswer(q.id, val)} value={answers[q.id] || ""}>
+                    <SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger>
+                    <SelectContent>
+                      {(q.options || []).map((opt: string | { value: string; label: string }) => {
+                        const value = typeof opt === 'object' ? opt.value : opt;
+                        const label = typeof opt === 'object' ? opt.label : opt;
+                        return <SelectItem key={value} value={value}>{label}</SelectItem>;
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              );
+            case 'number_input':
+              return (
+                <div key={q.id} className="space-y-2">
+                  <Label htmlFor={q.id}>{q.text}</Label>
+                  <Input
+                    id={q.id}
+                    type="number"
+                    value={answers[q.id] || ""}
+                    onChange={(e) => onAnswer(q.id, e.target.value)}
+                    placeholder={q.placeholder}
+                  />
+                </div>
+              );
+            default:
+              return null;
+          }
+        })}
       <RepeatingGroup
         values={value}
         onAdd={handleAdd}

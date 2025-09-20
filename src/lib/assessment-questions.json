@@ -137,7 +137,7 @@
         },
         { "id": "illness_any", "text": {"en": "Any chronic illnesses?", "pl": "Czy masz jakieś choroby przewlekłe?"}, "type": "select", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}] },
         { "id": "cancer_any", "text": {"en": "Ever diagnosed with cancer?", "pl": "Czy kiedykolwiek zdiagnozowano u Ciebie raka?"}, "type": "select", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}] },
-        { "id": "job_history_enable", "text": {"en": "Add work/occupation details (optional)?", "pl": "Dodać szczegóły dotyczące pracy/zawodu (opcjonalnie)?"}, "type": "select", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}] }
+        { "id": "job_history_enable", "text": {"en": "After these core questions, would you like to add details about your occupation? (Optional)", "pl": "Czy po tych podstawowych pytaniach chcesz dodać szczegóły dotyczące swojego zawodu? (Opcjonalnie)"}, "type": "select", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}] }
       ]
     },
     {
@@ -476,3 +476,4 @@
     }
   ]
 }
+      

@@ -38,9 +38,11 @@ export const EnvironmentalExposures = ({ answers, onAnswer, questions }: Environ
                 <SelectValue placeholder="Select an option" />
               </SelectTrigger>
               <SelectContent>
-                {q.options.map((opt: string) => (
-                  <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-                ))}
+                {q.options.map((opt: string | { value: string; label: string }) => {
+                  const value = typeof opt === 'object' ? opt.value : opt;
+                  const label = typeof opt === 'object' ? opt.label : opt;
+                  return <SelectItem key={value} value={value}>{label}</SelectItem>;
+                })}
               </SelectContent>
             </Select>
           )}
@@ -105,3 +107,4 @@ export const EnvironmentalExposures = ({ answers, onAnswer, questions }: Environ
     </div>
   );
 };
+      

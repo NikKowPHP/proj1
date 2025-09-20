@@ -82,7 +82,7 @@ const JobEntryItem = ({
         isMounted = false;
     };
 
-  }, [item.job_title, index]);
+  }, [item.job_title, index, onFieldChange]);
 
   return (
     <div className="space-y-4">
@@ -204,7 +204,11 @@ export const OccupationalHazards = ({ value, onChange, questions, answers, onAns
            <Select onValueChange={(val) => onAnswer(q.id, val)} value={answers[q.id] || ""}>
             <SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger>
             <SelectContent>
-              {q.options.map((opt: string) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+              {q.options.map((opt: string | { value: string; label: string }) => {
+                const value = typeof opt === 'object' ? opt.value : opt;
+                const label = typeof opt === 'object' ? opt.label : opt;
+                return <SelectItem key={value} value={value}>{label}</SelectItem>;
+              })}
             </SelectContent>
           </Select>
         </div>
@@ -229,3 +233,4 @@ export const OccupationalHazards = ({ value, onChange, questions, answers, onAns
     </div>
   );
 };
+      

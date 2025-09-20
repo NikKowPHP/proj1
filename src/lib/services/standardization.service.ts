@@ -1,4 +1,8 @@
 import { logger } from "@/lib/logger";
+import { cancerTypesMap } from "@/lib/mappings/cancer-types.map";
+import { jobTitlesMap } from "@/lib/mappings/job-titles.map";
+import { medicalConditionsMap } from "@/lib/mappings/medical-conditions.map";
+import { occupationalExposuresMap } from "@/lib/mappings/occupational-exposures.map";
 
 /**
  * Safely parses a JSON string from an answers object.
@@ -70,7 +74,11 @@ export const StandardizationService = {
       
       // Family History
       if (answers.family_cancer_history) {
-        standardized.advanced.family = safeJsonParse(answers.family_cancer_history);
+        const familyHistory = safeJsonParse(answers.family_cancer_history);
+        standardized.advanced.family = familyHistory.map((member: any) => ({
+          ...member,
+          cancer_code: cancerTypesMap[member.cancer_type] || undefined,
+        }));
       }
       
       // Genetics
@@ -79,20 +87,23 @@ export const StandardizationService = {
           tested: true,
           type: answers.genetic_test_type,
           year: answers.genetic_test_year,
+          lab: answers.genetic_lab,
           findings_present: answers.genetic_findings_present,
-          genes: answers.genetic_genes, // This is now expected to be an array from the form
+          genes: answers.genetic_genes ? JSON.parse(answers.genetic_genes) : [],
+          variants_hgvs: answers.genetic_variants_hgvs,
           vus_present: answers.genetic_vus_present,
         };
       }
 
       // Illnesses
-      const illnessList = answers.illness_list;
+      const illnessList = safeJsonParse(answers.illness_list);
       if (Array.isArray(illnessList) && illnessList.length > 0) {
           standardized.advanced.illnesses = illnessList.map((illnessId: string) => {
               const detailsKey = `illness_details_${illnessId}`;
               const details = answers[detailsKey] ? JSON.parse(answers[detailsKey]) : {};
               return {
                   id: illnessId,
+                  code: medicalConditionsMap[illnessId] || undefined,
                   ...details
               };
           });
@@ -100,12 +111,27 @@ export const StandardizationService = {
 
       // Personal Cancer History
       if (answers.personal_cancer_history) {
-        standardized.advanced.personal_cancer_history = safeJsonParse(answers.personal_cancer_history);
+        const personalCancerHistory = safeJsonParse(answers.personal_cancer_history);
+        standardized.advanced.personal_cancer_history = personalCancerHistory.map((cancer: any) => ({
+          ...cancer,
+          type_code: cancerTypesMap[cancer.type] || undefined,
+        }));
       }
 
        // Occupational History
       if (answers.occupational_hazards) {
-        standardized.advanced.occupational = safeJsonParse(answers.occupational_hazards);
+        const occupationalHistory = safeJsonParse(answers.occupational_hazards);
+        standardized.advanced.occupational = occupationalHistory.map((job: any) => {
+          const exposures = job.occ_exposures || [];
+          return {
+            ...job,
+            isco: jobTitlesMap[job.job_title] || undefined,
+            occ_exposures_coded: exposures.map((exp: string) => ({
+              id: exp,
+              code: occupationalExposuresMap[exp] || undefined,
+            })),
+          };
+        });
       }
       
       // Screening and Immunization
@@ -207,4 +233,3 @@ export const StandardizationService = {
     return standardized;
   },
 };
-      

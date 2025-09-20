@@ -62,7 +62,7 @@ Based on the input data, generate a response in the following single JSON format
 
 **SPECIFIC ACTION ID CONTENT MAP (Use these as a basis for generating content):**
 - **COLORECTAL_CANCER_SCREENING**: Explain it's for early detection, generally recommended for ages 45+. Personalize by mentioning the user's age.
-- **EARLY_COLORECTAL_SCREENING**: Explain this is recommended earlier than the standard age because of a family history of early-onset cancer, as indicated by the `early_age_family_dx` flag. This is a proactive measure.
+- **EARLY_COLORECTAL_SCREENING**: Explain this is recommended earlier than the standard age because of a family history of early-onset cancer, as indicated by the 'early_age_family_dx' flag. This is a proactive measure.
 - **LUNG_CANCER_SCREENING**: Explain it's a low-dose CT scan, often recommended for individuals over 50 with a significant smoking history or other risk factors like asbestos exposure. Personalize by referencing 'derived.pack_years' or occupational history if available.
 - **DISCUSS_SMOKING_CESSATION**: Encourage a conversation about resources and support for quitting. Personalize by mentioning their smoking status and 'derived.pack_years'.
 - **BLOOD_PRESSURE_CHECK**: Note its importance for cardiovascular health, especially if they reported a history of high blood pressure.
@@ -74,4 +74,3 @@ Based on the input data, generate a response in the following single JSON format
 Now, generate the structured explanation based on the provided health payload.
 `;
 };
-      

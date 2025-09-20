@@ -301,7 +301,7 @@ export default function AssessmentPage() {
                     {m.id === 'sexual_health' && <SexualHealth answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'occupational_hazards' && <OccupationalHazards value={answers.occupational_hazards ? JSON.parse(answers.occupational_hazards) : []} onChange={(v) => setAnswer('occupational_hazards', JSON.stringify(v))} options={m.options} questions={m.questions} answers={answers} onAnswer={setAnswer}/>}
                     {m.id === 'environmental_exposures' && <EnvironmentalExposures answers={answers} onAnswer={setAnswer} questions={m.questions} />}
-                    {m.id === 'labs_and_imaging' && <LabsAndImaging value={answers.labs_and_imaging ? JSON.parse(answers.labs_and_imaging) : []} onChange={(v) => setAnswer('labs_and_imaging', JSON.stringify(v))} />}
+                    {m.id === 'labs_and_imaging' && <LabsAndImaging value={answers.labs_and_imaging ? JSON.parse(answers.labs_and_imaging) : []} onChange={(v) => setAnswer('labs_and_imaging', JSON.stringify(v))} options={m.options} />}
                     {m.id === 'functional_status' && <FunctionalStatus answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'smoking_details' && <SmokingDetails answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                   </AccordionContent></AccordionItem>)}</Accordion>}
@@ -319,4 +319,3 @@ export default function AssessmentPage() {
     </div>
   );
 }
-      

@@ -9,6 +9,7 @@ import { YearInput } from '../ui/YearInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { apiClient } from '@/lib/services/api-client.service';
 import { logger } from '@/lib/logger';
+import { Input } from '../ui/input';
 
 interface JobEntry {
   job_title?: string;
@@ -17,6 +18,8 @@ interface JobEntry {
   ppe_usage?: string[];
   occ_exposures?: string[];
   occ_exposure_intensity?: string;
+  occ_exposure_duration?: number;
+  occ_radiation_badge?: string;
 }
 
 interface OccupationalHazardsProps {
@@ -31,6 +34,7 @@ interface OccupationalHazardsProps {
     ppe: SearchableSelectOption[];
     shiftPatterns: string[];
     intensities: string[];
+    radiationBadgeOptions: string[];
   };
 }
 
@@ -137,16 +141,33 @@ const JobEntryItem = ({
         </div>
       </div>
        {(item.occ_exposures || []).length > 0 && (
-        <div className="space-y-2">
-          <Label>Intensity of exposure</Label>
-           <Select value={item.occ_exposure_intensity} onValueChange={val => onFieldChange(index, 'occ_exposure_intensity', val)}>
-            <SelectTrigger><SelectValue placeholder="Select intensity" /></SelectTrigger>
-            <SelectContent>
-              {options.intensities.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
-            </SelectContent>
-          </Select>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Approx. years exposed</Label>
+              <Input type="number" value={item.occ_exposure_duration || ''} onChange={e => onFieldChange(index, 'occ_exposure_duration', e.target.value ? Number(e.target.value) : undefined)} placeholder="e.g., 5"/>
+            </div>
+            <div className="space-y-2">
+              <Label>Intensity of exposure</Label>
+              <Select value={item.occ_exposure_intensity} onValueChange={val => onFieldChange(index, 'occ_exposure_intensity', val)}>
+                <SelectTrigger><SelectValue placeholder="Select intensity" /></SelectTrigger>
+                <SelectContent>
+                  {options.intensities.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
       )}
+      <div className="space-y-2">
+        <Label>Worked with radiation badge?</Label>
+        <Select value={item.occ_radiation_badge} onValueChange={val => onFieldChange(index, 'occ_radiation_badge', val)}>
+            <SelectTrigger><SelectValue placeholder="Select an option" /></SelectTrigger>
+            <SelectContent>
+              {options.radiationBadgeOptions.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+            </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 };

@@ -62,7 +62,12 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
                 <Select onValueChange={(value) => onAnswer(key, value)} value={answers[key] || ""}>
                   <SelectTrigger id={key}><SelectValue placeholder="Select an option" /></SelectTrigger>
                   <SelectContent>
-                    {q.options.map((opt: string) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                    {q.options.map((opt: string | {value: string, label: string}) => {
+                      if(typeof opt === 'object'){
+                        return <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      }
+                      return <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                    })}
                   </SelectContent>
                 </Select>
               </div>
@@ -89,8 +94,8 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
                 <Label>{q.text}</Label>
                 <CheckboxGroup
                   options={q.options}
-                  value={answers[key] || []}
-                  onChange={(val) => onAnswer(key, val)}
+                  value={answers[key] ? JSON.parse(answers[key]) : []}
+                  onChange={(val) => onAnswer(key, JSON.stringify(val))}
                 />
               </div>
             );
@@ -126,4 +131,3 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
     </div>
   );
 };
-      

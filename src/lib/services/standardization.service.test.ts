@@ -23,7 +23,7 @@ describe("StandardizationService", () => {
     expect(result.advanced).toEqual({});
   });
 
-  it("should correctly structure advanced family history", () => {
+  it("should correctly structure and code advanced family history", () => {
     const answers = {
       family_cancer_history:
         '[{"relation":"Parent","cancer_type":"breast","age_dx":55}]',
@@ -31,19 +31,19 @@ describe("StandardizationService", () => {
     const result = StandardizationService.standardize(answers);
 
     expect(result.advanced.family).toEqual([
-      { relation: "Parent", cancer_type: "breast", age_dx: 55 },
+      { relation: "Parent", cancer_type: "breast", age_dx: 55, cancer_code: "254837009" },
     ]);
   });
   
-  it("should correctly structure personal cancer history", () => {
+  it("should correctly structure and code personal cancer history", () => {
     const answers = {
       personal_cancer_history:
-        '[{"type":"breast","year_dx":2018,"treatments":["surgery"]}]',
+        '[{"type":"prostate","year_dx":2018,"treatments":["surgery"]}]',
     };
     const result = StandardizationService.standardize(answers);
 
     expect(result.advanced.personal_cancer_history).toEqual([
-        { type: "breast", year_dx: 2018, treatments: ["surgery"] },
+        { type: "prostate", year_dx: 2018, treatments: ["surgery"], type_code: "399068003" },
     ]);
   });
 
@@ -67,25 +67,40 @@ describe("StandardizationService", () => {
       genetic_testing_done: "Yes",
       genetic_test_type: "Multigene panel",
       genetic_genes: '["BRCA1","BRCA2"]',
+      genetic_lab: "Some Lab",
+      genetic_variants_hgvs: "c.123A>G",
     };
     const result = StandardizationService.standardize(answers);
 
     expect(result.advanced.genetics.tested).toBe(true);
     expect(result.advanced.genetics.type).toBe("Multigene panel");
     expect(result.advanced.genetics.genes).toEqual(["BRCA1", "BRCA2"]);
+    expect(result.advanced.genetics.lab).toEqual("Some Lab");
+    expect(result.advanced.genetics.variants_hgvs).toEqual("c.123A>G");
   });
 
-  it("should correctly structure occupational hazards data", () => {
+  it("should correctly structure and code occupational hazards data", () => {
       const answers = {
-        occupational_hazards: '[{"job_title":"welder","job_years":10,"occ_exposures":["welding_fumes"]}]'
+        occupational_hazards: '[{"job_title":"welder","job_years":10,"occ_exposures":["welding_fumes", "asbestos"],"occ_exposure_duration":8,"occ_radiation_badge":"No"}]'
       };
       const result = StandardizationService.standardize(answers);
       expect(result.advanced.occupational).toEqual([
-          { job_title: "welder", job_years: 10, occ_exposures: ["welding_fumes"] }
+          { 
+            job_title: "welder", 
+            job_years: 10, 
+            occ_exposures: ["welding_fumes", "asbestos"],
+            occ_exposure_duration: 8,
+            occ_radiation_badge: "No",
+            isco: "7212",
+            occ_exposures_coded: [
+              { id: "welding_fumes", code: "426156009" },
+              { id: "asbestos", code: "406482008" }
+            ]
+          }
       ]);
   });
   
-  it("should correctly structure personal medical history with details", () => {
+  it("should correctly structure and code personal medical history with details", () => {
       const answers = {
         illness_list: '["diabetes", "hypertension"]',
         illness_details_diabetes: '{"year":2010,"status":"active","confirmed":"yes"}',
@@ -93,8 +108,8 @@ describe("StandardizationService", () => {
       };
       const result = StandardizationService.standardize(answers);
       expect(result.advanced.illnesses).toHaveLength(2);
-      expect(result.advanced.illnesses).toContainEqual({ id: "diabetes", year: 2010, status: "active", confirmed: "yes" });
-      expect(result.advanced.illnesses).toContainEqual({ id: "hypertension", year: 2015, status: "resolved", confirmed: "no" });
+      expect(result.advanced.illnesses).toContainEqual({ id: "diabetes", code: "44054006", year: 2010, status: "active", confirmed: "yes" });
+      expect(result.advanced.illnesses).toContainEqual({ id: "hypertension", code: "38341003", year: 2015, status: "resolved", confirmed: "no" });
   });
 
   it("should correctly structure screening and immunization history", () => {
@@ -158,4 +173,3 @@ describe("StandardizationService", () => {
       expect(result.core.symptoms).toEqual([]);
   });
 });
-      

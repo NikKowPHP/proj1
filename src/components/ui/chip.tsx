@@ -43,7 +43,9 @@ const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
         className={cn(chipVariants({ variant, size, className }))}
         ref={ref as any}
         data-selected={selected}
-        {...props}
+        {...(isSelectable
+          ? ({ ...props, type: "button" } as any)
+          : (props as React.HTMLAttributes<HTMLDivElement>))}
       >
         {children}
         {onRemove && (
@@ -65,3 +67,4 @@ const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
 Chip.displayName = "Chip";
 
 export { Chip, chipVariants };
+      

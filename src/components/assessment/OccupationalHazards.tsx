@@ -61,7 +61,7 @@ const JobEntryItem = ({
     const fetchSuggestions = async () => {
       try {
         logger.info(`[JEM] Fetching suggestions for job: ${item.job_title}`);
-        const suggestions = await apiClient.jobs.suggestExposures(item.job_title);
+        const suggestions = await apiClient.jobs.suggestExposures(item.job_title!);
         if (isMounted) {
             if (suggestions && suggestions.length > 0) {
                 logger.info(`[JEM] Applying suggestions:`, suggestions);
@@ -81,7 +81,7 @@ const JobEntryItem = ({
     return () => {
         isMounted = false;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [item.job_title, index]);
 
   return (

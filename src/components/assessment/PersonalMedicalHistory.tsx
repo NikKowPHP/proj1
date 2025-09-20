@@ -41,7 +41,7 @@ export const PersonalMedicalHistory = ({ answers, onAnswer, options }: PersonalM
       <div className="space-y-2">
         <Label>Select any conditions you have been diagnosed with:</Label>
         <CheckboxGroup
-          options={options.illnesses}
+          options={options.illnesses.map(option => ({ id: option.value, label: option.label }))}
           value={selectedIllnesses}
           onChange={handleIllnessSelect}
         />
@@ -53,7 +53,7 @@ export const PersonalMedicalHistory = ({ answers, onAnswer, options }: PersonalM
           {selectedIllnesses.map((illnessId: string) => {
              const detailsKey = `illness_details_${illnessId}`;
              const details: IllnessDetails = answers[detailsKey] ? JSON.parse(answers[detailsKey]) : {};
-             const illnessLabel = options.illnesses.find(i => i.id === illnessId)?.label || illnessId;
+             const illnessLabel = options.illnesses.find(i => i.value === illnessId)?.label || illnessId;
 
             return (
               <Card key={illnessId}>

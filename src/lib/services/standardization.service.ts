@@ -135,12 +135,22 @@ export const StandardizationService = {
           }
       }
 
-      // Illnesses
-      const illnessList = safeJsonParse(answers.illness_list);
-      if (Array.isArray(illnessList) && illnessList.length > 0) {
+      // Illnesses (Mapped from Core cond.summary)
+      // cond.summary is likely an array of strings (e.g. ["hbv", "diabetes"]) or a JSON string depending on storage.
+      // Usually checkbox groups store as array or stringified array. safeJsonParse handles stringified.
+      // If it's already an array, safeJsonParse returns it? safeJsonParse expects string.
+      // Let's handle both.
+      let illnessList = answers['cond.summary'];
+      if (typeof illnessList === 'string') {
+          illnessList = safeJsonParse(illnessList);
+      } else if (!Array.isArray(illnessList)) {
+          illnessList = [];
+      }
+
+      if (illnessList.length > 0) {
           standardized.advanced.illnesses = illnessList.map((illnessId: string) => {
               const detailsKey = `illness_details_${illnessId}`;
-              const details = answers[detailsKey] ? JSON.parse(answers[detailsKey]) : {};
+              const details = answers[detailsKey] ? (typeof answers[detailsKey] === 'string' ? JSON.parse(answers[detailsKey]) : answers[detailsKey]) : {};
               return {
                   id: illnessId,
                   code: medicalConditionsMap[illnessId] || undefined,

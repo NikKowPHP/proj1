@@ -4,7 +4,7 @@
       "title": { "en": "Core Questions", "pl": "Podstawowe Pytania" },
       "questions": [
         {
-          "id": "consent_health",
+          "id": "consent.health",
           "type": "consent_checkbox"
         },
         {
@@ -278,9 +278,11 @@
           "type": "radio",
           "options": [ { "value": "Yes", "label": "Yes" }, { "value": "No", "label": "No" }, { "value": "Unsure", "label": "Unsure" } ]
         },
-        { "id": "illness_any", "text": {"en": "Any chronic illnesses?", "pl": "Czy masz jakieś choroby przewlekłe?"}, "type": "radio", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}] },
-        { "id": "cancer_any", "text": {"en": "Ever diagnosed with cancer?", "pl": "Czy kiedykolwiek zdiagnozowano u Ciebie raka?"}, "type": "radio", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}] },
-        { "id": "job_history_enable", "text": {"en": "After these core questions, would you like to add details about your occupation? (Optional)", "pl": "Czy po tych podstawowych pytaniach chcesz dodać szczegóły dotyczące swojego zawodu? (Opcjonalnie)"}, "type": "select", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}] }
+        { "id": "cond.summary", "text": {"en": "Summary of Chronic Conditions (Select all that apply)", "pl": "Podsumowanie chorób przewlekłych"}, "type": "checkbox_group", "options": [
+            {"id": "diabetes", "label": "Diabetes"}, {"id": "hypertension", "label": "Hypertension"}, {"id": "ibd", "label": "IBD"}, {"id": "hbv", "label": "Hepatitis B"}, {"id": "hcv", "label": "Hepatitis C"}, {"id": "cirrhosis", "label": "Cirrhosis"}, {"id": "hpv", "label": "HPV Infection"}, {"id": "hiv", "label": "HIV"}, {"id": "transplant", "label": "Organ Transplant"}, {"id": "immunosuppression", "label": "Immunosuppression"}, {"id": "psc", "label": "PSC (Primary Sclerosing Cholangitis)"}, {"id": "pancreatitis", "label": "Chronic Pancreatitis"}, {"id": "copd", "label": "COPD"}, {"id": "other", "label": "Other"}
+        ] },
+        { "id": "ca.any_history", "text": {"en": "Ever diagnosed with cancer?", "pl": "Czy kiedykolwiek zdiagnozowano u Ciebie raka?"}, "type": "radio", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}, {"value": "Unsure", "label": "Unsure"}] },
+        { "id": "occ.exposure_any", "text": {"en": "Any significant occupational exposure?", "pl": "Czy było jakiekolwiek istotne narażenie zawodowe?"}, "type": "radio", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}, {"value": "Unsure", "label": "Unsure"}] }
       ]
     },
     {
@@ -390,26 +392,32 @@
                 { "id": "menopause_age", "text": {"en": "If yes: at what age did menopause occur?", "pl": "Jeśli tak: w jakim wieku wystąpiła menopauza?"}, "type": "year_input", "dependsOn": { "questionId": "menopause_status", "value": "Yes"} },
                 { "id": "had_children", "text": {"en": "Have you given birth to any children?", "pl": "Czy urodziła Pani dziecko/dzieci?"}, "type": "select", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}] },
                 { "id": "first_child_age", "text": {"en": "If yes: age at birth of first child", "pl": "Jeśli tak: wiek przy urodzeniu pierwszego dziecka"}, "type": "year_input", "dependsOn": { "questionId": "had_children", "value": "Yes"} },
-                { "id": "hrt_use", "text": {"en": "Have you ever used hormone replacement therapy (HRT)?", "pl": "Czy stosowała Pani hormonalną terapię zastępczą (HTZ)?"}, "type": "select", "options": ["Never", "Previously", "Currently"] }
+                { "id": "hrt_use", "text": {"en": "Have you ever used hormone replacement therapy (HRT)?", "pl": "Czy stosowała Pani hormonalną terapię zastępczą (HTZ)?"}, "type": "select", "options": ["Never", "Previously", "Currently"] },
+                { "id": "meds.hrt.type", "text": {"en": "Type of HRT", "pl": "Rodzaj HTZ"}, "type": "select", "options": ["Estrogen only", "Combined (Estrogen + Progesterone)", "Unsure"], "dependsOn": { "questionId": "hrt_use", "value": ["Previously", "Currently"]} },
+                { "id": "meds.hrt.duration_yrs", "text": {"en": "Duration of use (years)", "pl": "Czas stosowania (lata)"}, "type": "number_input", "dependsOn": { "questionId": "hrt_use", "value": ["Previously", "Currently"]} }
               ]
             },
             {
               "id": "personal_medical_history",
               "title": { "en": "Personal Medical History", "pl": "Osobista Historia Medyczna" },
-              "dependsOn": { "questionId": "illness_any", "value": "Yes" },
+              "dependsOn": { "questionId": "cond.summary", "value": "true" },
               "options": {
                 "illnesses": [
-                  { "id": "diabetes", "label": "Diabetes" }, { "id": "hypertension", "label": "Hypertension" }, { "id": "ibd", "label": "IBD" }
+                  { "id": "diabetes", "label": "Diabetes" }, { "id": "hypertension", "label": "Hypertension" }, { "id": "ibd", "label": "IBD" },
+                  { "id": "hbv", "label": "Hepatitis B" }, { "id": "hcv", "label": "Hepatitis C" }, { "id": "cirrhosis", "label": "Cirrhosis" },
+                  { "id": "hpv", "label": "HPV Infection" }, { "id": "hiv", "label": "HIV" }, { "id": "transplant", "label": "Organ Transplant" },
+                  { "id": "immunosuppression", "label": "Immunosuppression" }, { "id": "psc", "label": "PSC" },
+                  { "id": "pancreatitis", "label": "Chronic Pancreatitis" }, { "id": "copd", "label": "COPD" }, { "id": "other", "label": "Other" }
                 ]
               }
             },
             {
               "id": "personal_cancer_history",
               "title": { "en": "Personal Cancer History", "pl": "Osobista Historia Nowotworów" },
-              "dependsOn": { "questionId": "cancer_any", "value": "Yes" },
+              "dependsOn": { "questionId": "ca.any_history", "value": "Yes" },
               "options": {
                 "cancerTypes": [ { "value": "breast", "label": "Breast Cancer" }, { "value": "lung", "label": "Lung Cancer" } ],
-                "treatmentTypes": [ { "id": "surgery", "label": "Surgery"}, { "id": "chemo", "label": "Chemotherapy"}, {"id": "radio", "label": "Radiotherapy"} ],
+                "treatmentTypes": [ { "id": "surgery", "label": "Surgery"}, { "id": "chemo", "label": "Chemotherapy"}, {"id": "radio", "label": "Radiotherapy"}, {"id": "endo", "label": "Endocrine Therapy"}, {"id": "immuno", "label": "Immunotherapy"}, {"id": "hsct", "label": "Stem-cell Transplant"} ],
                 "stageOptions": [{"value": "I", "label": "Stage I"}, {"value": "II", "label": "Stage II"}, {"value": "III", "label": "Stage III"}, {"value": "IV", "label": "Stage IV"}, {"value": "0", "label": "Stage 0 (in situ)"}],
                 "lateralityOptions": [{"value": "Left", "label": "Left"}, {"value": "Right", "label": "Right"}, {"value": "Bilateral", "label": "Bilateral"}, {"value": "Midline", "label": "Midline/Central"}]
               }
@@ -417,75 +425,90 @@
             {
               "id": "screening_immunization",
               "title": {"en": "Screening & Immunization", "pl": "Badania Przesiewowe i Szczepienia"},
+              "questions": [
+                  {
+                      "id": "screen.summary",
+                      "text": {"en": "Which of the following screening tests have you EVER had?", "pl": "Które z poniższych badań przesiewowych kiedykolwiek wykonałeś/aś?"},
+                      "type": "checkbox_group",
+                      "options": [
+                          {"id": "colonoscopy", "label": {"en": "Colonoscopy", "pl": "Kolonoskopia"}},
+                          {"id": "mammogram", "label": {"en": "Mammogram", "pl": "Mammografia"}},
+                          {"id": "pap_test", "label": {"en": "Pap/HPV Test", "pl": "Badanie Pap/HPV"}},
+                          {"id": "psa_test", "label": {"en": "PSA Test", "pl": "Badanie PSA"}},
+                          {"id": "lung_scan", "label": {"en": "Lung Cancer Screening (CT)", "pl": "Tomografia płuc (CT)"}},
+                          {"id": "skin_exam", "label": {"en": "Full Body Skin Exam", "pl": "Pełne badanie skóry"}},
+                          {"id": "liver_us", "label": {"en": "Liver Ultrasound", "pl": "USG Wątroby"}},
+                          {"id": "gastroscopy", "label": {"en": "Gastroscopy", "pl": "Gastroskopia"}},
+                          {"id": "none", "label": {"en": "None of the above", "pl": "Żadne z powyższych"}}
+                      ],
+                      "exclusiveOptionId": "none"
+                  }
+              ],
               "screenings": [
                 {
                   "id": "colonoscopy", 
                   "text": {"en": "Colonoscopy", "pl":"Kolonoskopia"}, 
+                  "dependsOn": {"questionId": "screen.summary", "value": "colonoscopy"},
                   "questions": [
-                    {"id": "screen.colonoscopy.done", "text": {"en": "Colonoscopy ever?", "pl":"Czy kiedykolwiek miałeś/aś kolonoskopię?"}, "type": "select", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]},
-                    {"id": "screen.colonoscopy.date", "text": {"en":"Last colonoscopy year", "pl":"Rok ostatniej kolonoskopii"}, "type": "year_input", "dependsOn": {"questionId": "screen.colonoscopy.done", "value": "Yes"}}
+                    {"id": "screen.colonoscopy.date", "text": {"en":"Year of last colonoscopy", "pl":"Rok ostatniej kolonoskopii"}, "type": "year_input"}
                   ]
                 },
                 {
                   "id": "mammogram", 
                   "text": {"en":"Mammogram", "pl":"Mammografia"}, 
-                  "dependsOn": {"questionId": "sex_at_birth", "value": "Female"}, 
+                  "dependsOn": {"questionId": "screen.summary", "value": "mammogram"}, 
                   "questions": [
-                    {"id": "screen.mammo.done", "text": {"en":"Mammogram ever?", "pl":"Czy kiedykolwiek miałaś mammografię?"}, "type": "select", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]},
-                    {"id": "screen.mammo.date", "text": {"en":"Last mammogram year", "pl":"Rok ostatniej mammografii"}, "type": "year_input", "dependsOn": {"questionId": "screen.mammo.done", "value": "Yes"}}
+                    {"id": "screen.mammo.date", "text": {"en":"Year of last mammogram", "pl":"Rok ostatniej mammografii"}, "type": "year_input"}
                   ]
                 },
                 {
                   "id": "pap_test", 
                   "text": {"en": "Pap/HPV Test", "pl": "Badanie Pap/HPV"}, 
-                  "dependsOn": {"questionId": "sex_at_birth", "value": "Female"}, 
+                  "dependsOn": {"questionId": "screen.summary", "value": "pap_test"}, 
                   "questions": [
-                    {"id": "screen.pap.done", "text": {"en":"Pap/HPV test ever?", "pl": "Czy kiedykolwiek miałaś badanie Pap/HPV?"}, "type": "select", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]},
-                    {"id": "screen.pap.date", "text": {"en":"Last Pap/HPV test year", "pl": "Rok ostatniego badania Pap/HPV"}, "type": "year_input", "dependsOn": {"questionId": "screen.pap.done", "value": "Yes"}},
-                    {"id": "screen.cervix.last_type", "text": {"en":"Type of last test", "pl": "Rodzaj ostatniego badania"}, "type": "select", "options": ["Pap", "HPV", "Co-testing", "Unsure"], "dependsOn": {"questionId": "screen.pap.done", "value": "Yes"}},
-                    {"id": "screen.cervix.last_result", "text": {"en":"Last result", "pl": "Ostatni wynik"}, "type": "select", "options": ["Normal", "Abnormal", "Unsure"], "dependsOn": {"questionId": "screen.pap.done", "value": "Yes"}}
+                    {"id": "screen.pap.date", "text": {"en":"Year of last test", "pl": "Rok ostatniego badania"}, "type": "year_input"},
+                    {"id": "screen.cervix.last_type", "text": {"en":"Type of last test", "pl": "Rodzaj ostatniego badania"}, "type": "select", "options": ["Pap", "HPV", "Co-testing", "Unsure"]},
+                    {"id": "screen.cervix.last_result", "text": {"en":"Last result", "pl": "Ostatni wynik"}, "type": "select", "options": ["Normal", "Abnormal", "Unsure"]}
                   ]
                 },
                 {
                   "id": "psa_test", 
                   "text": {"en":"PSA Test", "pl": "Badanie PSA"}, 
-                  "dependsOn": {"questionId": "sex_at_birth", "value": "Male"}, 
+                  "dependsOn": {"questionId": "screen.summary", "value": "psa_test"}, 
                   "questions": [
-                    {"id": "screen.psa.done", "text": {"en":"PSA test ever?", "pl": "Czy kiedykolwiek miałeś badanie PSA?"}, "type": "select", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]},
-                    {"id": "screen.psa.date", "text": {"en":"Last PSA test year", "pl": "Rok ostatniego badania PSA"}, "type": "year_input", "dependsOn": {"questionId": "screen.psa.done", "value": "Yes"}}
+                    {"id": "screen.psa.date", "text": {"en":"Year of last test", "pl": "Rok ostatniego badania"}, "type": "year_input"}
                   ]
                 },
                 {
                   "id": "screen.lung",
                   "text": {"en": "Lung Cancer Screening (LDCT)", "pl": "Badanie przesiewowe raka płuc (LDCT)"},
-                  "dependsOn": {"questionId": "smoking_status", "value": ["Current", "Former"]}, 
+                  "dependsOn": {"questionId": "screen.summary", "value": "lung_scan"}, 
                   "questions": [
-                    {"id": "screen.lung.ldct_ever", "text": {"en": "LDCT scan ever?", "pl": "Czy kiedykolwiek miałaś/eś tomografię niskodawkową (LDCT)?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
-                    {"id": "screen.lung.ldct_last_year", "text": {"en": "Year of last LDCT", "pl": "Rok ostatniego LDCT"}, "type": "year_input", "dependsOn": {"questionId": "screen.lung.ldct_ever", "value": "Yes"}}
+                    {"id": "screen.lung.ldct_last_year", "text": {"en": "Year of last LDCT", "pl": "Rok ostatniego LDCT"}, "type": "year_input"}
                   ]
                 },
                 {
                    "id": "screen.skin",
                    "text": {"en": "Skin Cancer Screening", "pl": "Badanie skóry"},
+                   "dependsOn": {"questionId": "screen.summary", "value": "skin_exam"},
                    "questions": [
-                     {"id": "screen.skin.full_exam_ever", "text": {"en": "Full body skin exam ever?", "pl": "Czy kiedykolwiek miałeś/aś pełne badanie skóry?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
-                     {"id": "screen.skin.last_year", "text": {"en": "Year of last exam", "pl": "Rok ostatniego badania"}, "type": "year_input", "dependsOn": {"questionId": "screen.skin.full_exam_ever", "value": "Yes"}}
+                     {"id": "screen.skin.last_year", "text": {"en": "Year of last exam", "pl": "Rok ostatniego badania"}, "type": "year_input"}
                    ]
                 },
                 {
                    "id": "screen.hcc",
                    "text": {"en": "Liver Cancer Screening", "pl": "Badanie wątroby"},
+                   "dependsOn": {"questionId": "screen.summary", "value": "liver_us"},
                    "questions": [
-                     {"id": "screen.hcc.us_ever", "text": {"en": "Liver ultrasound ever?", "pl": "Czy kiedykolwiek miałeś/aś USG wątroby?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
-                     {"id": "screen.hcc.us_last_year", "text": {"en": "Year of last ultrasound", "pl": "Rok ostatniego USG"}, "type": "year_input", "dependsOn": {"questionId": "screen.hcc.us_ever", "value": "Yes"}}
+                     {"id": "screen.hcc.us_last_year", "text": {"en": "Year of last ultrasound", "pl": "Rok ostatniego USG"}, "type": "year_input"}
                    ]
                 },
                 {
                     "id": "screen.upper_endo",
                     "text": {"en": "Upper Endoscopy", "pl": "Gastroskopia"},
+                    "dependsOn": {"questionId": "screen.summary", "value": "gastroscopy"},
                     "questions": [
-                      {"id": "screen.upper_endo.ever", "text": {"en": "Upper endoscopy ever?", "pl": "Czy kiedykolwiek miałeś/aś gastroskopię?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
-                      {"id": "screen.upper_endo.last_year", "text": {"en": "Year of last endoscopy", "pl": "Rok ostatniej gastroskopii"}, "type": "year_input", "dependsOn": {"questionId": "screen.upper_endo.ever", "value": "Yes"}}
+                      {"id": "screen.upper_endo.last_year", "text": {"en": "Year of last endoscopy", "pl": "Rok ostatniej gastroskopii"}, "type": "year_input"}
                     ]
                 }
               ],
@@ -554,11 +577,14 @@
             },
             {
               "id": "occupational_hazards",
-              "title": {"en": "Occupational Hazards (Optional)", "pl": "Zagrożenia Zawodowe (Opcjonalne)"},
-              "dependsOn": { "questionId": "job_history_enable", "value": "Yes" },
+              "title": { "en": "Occupational Hazards (Optional)", "pl": "Zagrożenia Zawodowe (Opcjonalne)"},
+              "dependsOn": { "questionId": "occ.exposure_any", "value": "Yes" },
               "questions": [
-                {"id": "occ.hazards.subs", "text": {"en": "Check all hazards you have been exposed to:", "pl": "Zaznacz wszystkie zagrożenia, na które byłeś/aś narażony/a:"}, "type": "checkbox_group", "options": [
-                  {"id": "asbestos", "label": "Asbestos"}, {"id": "silica", "label": "Silica dust"}, {"id": "diesel", "label": "Diesel exhaust"}, {"id": "pesticides", "label": "Pesticides"}, {"id": "solvents", "label": "Solvents"}, {"id": "welding", "label": "Welding fumes"}, {"id": "radiation", "label": "Ionizing Radiation"}, {"id": "none", "label": "None"}
+                { "id": "occ.hazards.subs", "text": {"en": "Check all hazards you have been exposed to:", "pl": "Zaznacz wszystkie zagrożenia, na które byłeś/aś narażony/a:"}, "type": "checkbox_group", "options": [
+                  {"id": "asbestos", "label": "Asbestos"}, {"id": "silica", "label": "Silica dust"}, {"id": "diesel", "label": "Diesel exhaust"}, {"id": "pesticides", "label": "Pesticides"}, {"id": "solvents", "label": "Solvents"}, {"id": "welding", "label": "Welding fumes"}, {"id": "radiation", "label": "Ionizing Radiation"},
+                  {"id": "wood_dust", "label": "Wood dust"}, {"id": "leather_dust", "label": "Leather dust"}, {"id": "metal_fluids", "label": "Metalworking fluids"}, {"id": "soot", "label": "Soot/coal tar"}, {"id": "rubber", "label": "Rubber production"}, {"id": "benzene", "label": "Benzene"}, {"id": "formaldehyde", "label": "Formaldehyde"}, {"id": "uv_sunlight", "label": "Sunlight (UV) (Outdoor worker)"},
+                  {"id": "shift_night", "label": "Night shift work (long term)"}, {"id": "firefighter", "label": "Firefighter"}, {"id": "hairdresser", "label": "Hairdresser/Barber"}, {"id": "painter", "label": "Painter"},
+                  {"id": "none", "label": "None"}
                 ], "exclusiveOptionId": "none"},
                 {"id": "employment_status", "text": {"en": "What is your current employment status?", "pl": "Jaki jest Pana/Pani obecny status zatrudnienia?"}, "type": "select", "options": ["Employed", "Self-employed", "Unemployed", "Student", "Retired"]},
                 {"id": "occ_exposure_duration", "text": {"en": "Approx. years exposed (sum)", "pl": "Przybliżona liczba lat ekspozycji (suma)"}, "type": "number_input", "placeholder": "e.g., 5"},

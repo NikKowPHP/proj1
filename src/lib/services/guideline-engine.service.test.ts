@@ -43,44 +43,47 @@ jest.mock(
 
 describe("Guideline Engine Service", () => {
   it("should recommend colorectal screening for a 45-year-old", () => {
-    const answers = { age: "40-49" };
-    const plan = generatePlan(answers, "en");
+    const answers = {};
+    const derived = { age_years: 45 }; // Maps to 40-49
+    const plan = generatePlan(answers, derived, "en");
     expect(plan.screenings).toContain("COLORECTAL_SCREENING");
     expect(plan.topicsForDoctor).toHaveLength(0);
   });
 
   it("should recommend discussing smoking for a current smoker (English)", () => {
     const answers = { smoking_status: "Current smoker" };
-    const plan = generatePlan(answers, "en");
+    const plan = generatePlan(answers, {}, "en");
     expect(plan.topicsForDoctor).toContain("DISCUSS_SMOKING");
     expect(plan.screenings).toHaveLength(0);
   });
 
   it("should recommend discussing smoking for a current smoker (Polish)", () => {
     const answers = { smoking_status: "Obecny palacz" };
-    const plan = generatePlan(answers, "pl");
+    const plan = generatePlan(answers, {}, "pl");
     expect(plan.topicsForDoctor).toContain("DISCUSS_SMOKING");
   });
 
   it("should trigger multiple rules correctly", () => {
-    const answers = { age: "50-59", smoking_status: "Current smoker" };
-    const plan = generatePlan(answers, "en");
+    const answers = { smoking_status: "Current smoker" };
+    const derived = { age_years: 55 }; // Maps to 50-59
+    const plan = generatePlan(answers, derived, "en");
     expect(plan.screenings).toContain("COLORECTAL_SCREENING");
     expect(plan.topicsForDoctor).toContain("DISCUSS_SMOKING");
   });
 
   it("should recommend nothing if no conditions are met", () => {
-    const answers = { age: "18-29", smoking_status: "Never smoked" };
-    const plan = generatePlan(answers, "en");
+    const answers = { smoking_status: "Never smoked" };
+    const derived = { age_years: 25 }; // Maps to 18-29
+    const plan = generatePlan(answers, derived, "en");
     expect(plan.screenings).toHaveLength(0);
     expect(plan.lifestyle).toHaveLength(0);
     expect(plan.topicsForDoctor).toHaveLength(0);
   });
 
   it("should return the original user answers with the plan", () => {
-    const answers = { age: "18-29" };
-    const plan = generatePlan(answers, "en");
+    const answers = {};
+    const derived = { age_years: 25 };
+    const plan = generatePlan(answers, derived, "en");
     expect(plan.userAnswers).toEqual(answers);
   });
 });
-      

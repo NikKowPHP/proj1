@@ -46,7 +46,14 @@ export const StandardizationService = {
         height_cm: Number(answers.height_cm) || undefined,
         weight_kg: Number(answers.weight_kg) || undefined,
         smoking_status: answers.smoking_status,
-        alcohol_use: answers.alcohol_use,
+        alcohol_status: answers['alcohol.status'],
+        alcohol_former_since: Number(answers['alcohol.former_since']) || undefined,
+        // Alcohol (AUDIT-C)
+        alcohol_audit: {
+            q1: Number(answers['auditc.q1_freq']),
+            q2: Number(answers['auditc.q2_typical']),
+            q3: Number(answers['auditc.q3_6plus']),
+        },
         symptoms: safeJsonParse(answers.symptoms),
         family_cancer_any: answers.family_cancer_any,
         // Optional core fields
@@ -54,8 +61,28 @@ export const StandardizationService = {
         source: answers.source,
         language: answers.language,
         gender_identity: answers.gender_identity,
-        diet_pattern: answers.diet_pattern,
-        activity_level: answers.activity_level,
+        // Diet (WCRF FFQ)
+        diet: {
+            vegetables: Number(answers.diet_vegetables),
+            red_meat: Number(answers.diet_red_meat),
+            processed_meat: Number(answers.diet_processed_meat),
+            sugary_drinks: Number(answers.diet_sugary_drinks),
+            whole_grains: Number(answers['diet.whole_grains_servings_day']),
+            fast_food: Number(answers['diet.fastfoods_freq_week']),
+            legumes: Number(answers['diet.legumes_freq_week']),
+            upf_share: answers['diet.upf_share_pct'],
+            ssb_container: answers['diet.ssb_container'],
+        },
+        // Physical Activity (IPAQ)
+        physical_activity: {
+            vigorous_days: Number(answers.ipaq_vigorous),
+            vigorous_min: Number(answers.ipaq_vigorous_min),
+            moderate_days: Number(answers.ipaq_moderate),
+            moderate_min: Number(answers.ipaq_moderate_min),
+            walking_days: Number(answers.ipaq_walking),
+            walking_min: Number(answers.ipaq_walking_min),
+            sitting_min: Number(answers.ipaq_sitting),
+        },
       };
 
       // --- ADVANCED SECTION ---
@@ -78,6 +105,7 @@ export const StandardizationService = {
         standardized.advanced.family = familyHistory.map((member: any) => ({
           ...member,
           cancer_code: cancerTypesMap[member.cancer_type] || undefined,
+          // New fields are passed through automatically via spread, but explicitly listed for clarity if needed
         }));
       }
       
@@ -93,6 +121,17 @@ export const StandardizationService = {
           variants_hgvs: answers.genetic_variants_hgvs,
           vus_present: answers.genetic_vus_present,
         };
+      }
+      // PRS
+      if (answers['gen.prs_done'] === 'Yes') {
+          standardized.advanced.genetics = {
+              ...standardized.advanced.genetics,
+              prs: {
+                  done: true,
+                  red_flags: answers['gen.prs_cancers_flagged'] ? (Array.isArray(answers['gen.prs_cancers_flagged']) ? answers['gen.prs_cancers_flagged'] : [answers['gen.prs_cancers_flagged']]) : [],
+                  risk_band: answers['gen.prs_overall_band']
+              }
+          }
       }
 
       // Illnesses
@@ -118,25 +157,41 @@ export const StandardizationService = {
         }));
       }
 
-       // Occupational History
+       // Occupational History (Hazard Centric)
       if (answers.occupational_hazards) {
         const occupationalHistory = safeJsonParse(answers.occupational_hazards);
-        standardized.advanced.occupational = occupationalHistory.map((job: any) => {
-          const exposures = job.occ_exposures || [];
+        // Map hazard-centric entries
+        standardized.advanced.occupational = occupationalHistory.map((entry: any) => {
           return {
-            ...job,
-            isco: jobTitlesMap[job.job_title] || undefined,
-            occ_exposures_coded: exposures.map((exp: string) => ({
-              id: exp,
-              code: occupationalExposuresMap[exp] || undefined,
-            })),
+             hazard: entry.hazardId,
+             hazard_code: occupationalExposuresMap[entry.hazardId] || undefined,
+             job_title: entry.main_job_title,
+             isco: jobTitlesMap[entry.main_job_title] || undefined,
+             years: entry.years_total,
+             hours_week: entry.hours_per_week,
+             current: entry.current_exposure,
+             ppe: entry.ppe_use
           };
         });
       }
       
       // Screening and Immunization
       const screeningImmunization: Record<string, any> = {};
-      const screeningKeys = ['screen.colonoscopy.done', 'screen.colonoscopy.date', 'screen.mammo.done', 'screen.mammo.date', 'screen.pap.done', 'screen.pap.date', 'screen.psa.done', 'screen.psa.date', 'imm.hpv', 'imm.hbv'];
+      const screeningKeys = [
+          'screen.colonoscopy.done', 'screen.colonoscopy.date', 
+          'screen.mammo.done', 'screen.mammo.date', 
+          'screen.pap.done', 'screen.pap.date', 
+          'screen.psa.done', 'screen.psa.date', 
+          'imm.hpv', 'imm.hbv',
+          // New Screening
+          'screen.lung.ldct_ever', 'screen.lung.ldct_last_year',
+          'screen.skin.full_exam_ever', 'screen.skin.last_year',
+          'screen.hcc.us_ever', 'screen.hcc.us_last_year',
+          'screen.upper_endo.ever', 'screen.upper_endo.last_year',
+          // New Immunization
+          'imm.hav.any', 'imm.flu.last_season', 'imm.covid.doses',
+          'imm.td_tdap.year_last', 'imm.pneumo.ever', 'imm.zoster.ever'
+      ];
       screeningKeys.forEach(key => {
         if (answers[key]) {
           screeningImmunization[key] = answers[key];
@@ -161,14 +216,25 @@ export const StandardizationService = {
 
       // Sexual Health
       const sexualHealth: Record<string, any> = {};
-      const sexualHealthKeys = ['sex_active', 'sex_partner_gender', 'sex_lifetime_partners', 'sex_last12m_partners', 'sex_barrier_freq', 'sex_sti_history', 'sex_anal', 'sex_oral', 'sex_barriers_practices'];
+      const sexualHealthKeys = [
+          'sex_active', 
+          'sex_partner_gender', 
+          'sex_lifetime_partners', 
+          'sex_last12m_partners', 
+          'sex_barrier_freq', 
+          'sex_sti_history', 
+          'sex_anal', 
+          'sex_oral', 
+          'sex_barriers_practices',
+          // New
+          'sexhx.new_partner_12m',
+          'sexhx.sex_work_ever',
+          'sexhx.sti_treated_12m',
+          'sexhx.hpv_precancer_history' // Female only
+      ];
       sexualHealthKeys.forEach(key => {
         if (answers[key]) {
-          if (key === 'sex_partner_gender' || key === 'sex_sti_history') {
-             sexualHealth[key] = answers[key]; // Already an array from form
-          } else {
              sexualHealth[key] = answers[key];
-          }
         }
       });
       if (Object.keys(sexualHealth).length > 0) {
@@ -177,14 +243,18 @@ export const StandardizationService = {
 
       // Environmental Exposures
       const environmental: Record<string, any> = {};
-      const envKeys = ['home_years_here', 'home_postal_coarse', 'home_year_built', 'home_basement', 'home_radon_tested', 'home_radon_value', 'home_radon_unit', 'home_radon_date', 'home_shs_home', 'home_fuels', 'home_kitchen_vent', 'env_major_road', 'env_industry', 'env_agriculture', 'env_outdoor_uv', 'water_source', 'water_well_tested', 'water_well_findings', 'env_wildfire_smoke'];
+      const envKeys = [
+          'home_years_here', 'home_postal_coarse', 'home_year_built', 'home_basement', 
+          'home_radon_tested', 'home_radon_value', 'home_radon_unit', 'home_radon_date', 
+          'home_shs_home', 'home_fuels', 'home_kitchen_vent', 'env_major_road', 
+          'env_industry', 'env_agriculture', 'env_outdoor_uv', 'water_source', 
+          'water_well_tested', 'water_well_findings', 'env_wildfire_smoke',
+          // New
+          'env.pesticide.mix_freq', 'env.pesticide.apply_freq'
+      ];
       envKeys.forEach(key => {
          if (answers[key]) {
-          if (key === 'home_fuels' || key === 'env_industry' || key === 'water_well_findings') {
-            environmental[key] = answers[key]; // Already an array from form
-          } else {
-            environmental[key] = answers[key];
-          }
+           environmental[key] = answers[key];
         }
       });
        if (Object.keys(environmental).length > 0) {
@@ -214,14 +284,44 @@ export const StandardizationService = {
       }
 
       // Smoking Details
-      if (answers.cigs_per_day || answers.smoking_years || answers.quit_year) {
-        standardized.advanced.smoking_detail = {
+      // Consolidating new logic
+      const smokingDetails: any = {
+          pattern: answers['smoking.pattern'],
+          start_age: Number(answers['smoking.start_age']) || undefined,
           cigs_per_day: Number(answers.cigs_per_day) || undefined,
           years: Number(answers.smoking_years) || undefined,
-          quit_year: Number(answers.quit_year) || undefined,
-        };
-      }
+          quit_year: Number(answers['smoking.quit_year']) || undefined, // Updated key
+          cigars_week: Number(answers['smoking.other_cigar_per_week']) || undefined,
+          pipe_week: Number(answers['smoking.pipe_per_week']) || undefined,
+          shisha_week: Number(answers['smoking.shisha_per_week']) || undefined,
+          vape: {
+              status: answers['vape.status'],
+              days_30d: Number(answers['vape.days_30d']) || undefined,
+              device: answers['vape.device_type'],
+              nicotine: answers['vape.nicotine'],
+          },
+          htp: {
+              status: answers['htp.status'],
+              days_30d: Number(answers['htp.days_30d']) || undefined,
+          },
+          shs: {
+              home_freq: answers['shs.home_freq'],
+              work_freq: answers['shs.work_freq'],
+              public_30d: answers['shs.public_30d_bars'],
+              hours_7d: Number(answers['shs.hours_7d']) || undefined,
+          }
+      };
 
+      // Clean undefined
+      const cleanObject = (obj: any): any => {
+         Object.keys(obj).forEach(key => {
+             if (obj[key] && typeof obj[key] === 'object') cleanObject(obj[key]);
+             else if (obj[key] === undefined) delete obj[key];
+         });
+         return obj;
+      };
+      
+      standardized.advanced.smoking_detail = cleanObject(smokingDetails);
 
     } catch (error) {
       logger.error("Failed to standardize answers", {
@@ -232,4 +332,118 @@ export const StandardizationService = {
 
     return standardized;
   },
+
+  /**
+   * Converts the standardized data into a FHIR Bundle.
+   * @param standardizedData - The output from standardize().
+   * @returns A FHIR Bundle resource.
+   */
+  toFhir: (standardizedData: Record<string, any>): Record<string, any> => {
+      const bundle: Record<string, any> = {
+          resourceType: "Bundle",
+          type: "collection",
+          entry: []
+      };
+
+      try {
+          const core = standardizedData.core || {};
+          const advanced = standardizedData.advanced || {};
+          const patientId = "patient-001"; // Placeholder
+
+          // 1. Patient Resource
+          bundle.entry.push({
+              resource: {
+                  resourceType: "Patient",
+                  id: patientId,
+                  birthDate: core.dob,
+                  gender: core.sex_at_birth === 'Male' ? 'male' : (core.sex_at_birth === 'Female' ? 'female' : 'other'),
+                  ...(core.height_cm && core.weight_kg ? {
+                      // Extensions could go here
+                  } : {})
+              }
+          });
+
+          // 2. Observations (Vital Signs / Biometrics)
+          if (core.height_cm) {
+              bundle.entry.push({
+                  resource: {
+                      resourceType: "Observation",
+                      status: "final",
+                      code: { coding: [{ system: "http://loinc.org", code: "8302-2", display: "Body height" }] },
+                      subject: { reference: `Patient/${patientId}` },
+                      valueQuantity: { value: core.height_cm, unit: "cm", system: "http://unitsofmeasure.org", code: "cm" }
+                  }
+              });
+          }
+           if (core.weight_kg) {
+              bundle.entry.push({
+                  resource: {
+                      resourceType: "Observation",
+                      status: "final",
+                      code: { coding: [{ system: "http://loinc.org", code: "29463-7", display: "Body weight" }] },
+                      subject: { reference: `Patient/${patientId}` },
+                      valueQuantity: { value: core.weight_kg, unit: "kg", system: "http://unitsofmeasure.org", code: "kg" }
+                  }
+              });
+          }
+
+          // 3. Observations (Social History)
+          if (core.smoking_status) {
+              bundle.entry.push({
+                  resource: {
+                      resourceType: "Observation",
+                      status: "final",
+                      code: { coding: [{ system: "http://loinc.org", code: "72166-2", display: "Tobacco smoking status" }] },
+                      subject: { reference: `Patient/${patientId}` },
+                      valueCodeableConcept: { text: core.smoking_status }
+                  }
+              });
+          }
+          
+          // 4. Family Member History
+           if (advanced.family && Array.isArray(advanced.family)) {
+               advanced.family.forEach((member: any, index: number) => {
+                   bundle.entry.push({
+                       resource: {
+                           resourceType: "FamilyMemberHistory",
+                           id: `family-${index}`,
+                           status: "completed",
+                           patient: { reference: `Patient/${patientId}` },
+                           relationship: { text: member.relation },
+                           condition: [
+                               {
+                                   code: { text: member.cancer_type },
+                                   onsetAge: { value: member.age_dx, unit: "a", system: "http://unitsofmeasure.org", code: "a" }
+                               }
+                           ]
+                       }
+                   });
+               });
+           }
+
+          // 5. Conditions (Personal History)
+          if (advanced.personal_cancer_history && Array.isArray(advanced.personal_cancer_history)) {
+              advanced.personal_cancer_history.forEach((cancer: any, index: number) => {
+                   bundle.entry.push({
+                       resource: {
+                           resourceType: "Condition",
+                           id: `history-cancer-${index}`,
+                           clinicalStatus: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-clinical", code: "active" }] }, // Assuming active history
+                           verificationStatus: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-ver-status", code: "confirmed" }] },
+                           category: [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-category", code: "problem-list-item" }] }],
+                           code: { text: cancer.type },
+                           subject: { reference: `Patient/${patientId}` },
+                           onsetDateTime: cancer.year_dx ? `${cancer.year_dx}` : undefined
+                       }
+                   });
+              });
+          }
+
+
+      } catch (error) {
+           logger.error("Failed to map to FHIR", { error });
+      }
+
+      return bundle;
+  }
 };

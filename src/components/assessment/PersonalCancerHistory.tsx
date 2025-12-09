@@ -6,12 +6,20 @@ import { Label } from '../ui/label';
 import { SearchableSelect, SearchableSelectOption } from '../ui/SearchableSelect';
 import { YearInput } from '../ui/YearInput';
 import { CheckboxGroup } from '../ui/CheckboxGroup';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Checkbox } from '../ui/checkbox';
 
 interface CancerDiagnosis {
   type?: string;
   year_dx?: number;
   treatments?: string[];
   last_followup?: number;
+  // New fields
+  stage_group?: string; // I, II, III, IV, 0
+  laterality?: string; // Left, Right, Bilateral
+  recurrence_ever?: boolean;
+  metastatic_ever?: boolean;
+  genetic_flag?: boolean;
 }
 
 interface PersonalCancerHistoryProps {
@@ -20,6 +28,8 @@ interface PersonalCancerHistoryProps {
   options: {
     cancerTypes: SearchableSelectOption[];
     treatmentTypes: {id: string, label: string}[];
+    stageOptions?: {value: string, label: string}[];
+    lateralityOptions?: {value: string, label: string}[];
   };
 }
 
@@ -60,7 +70,7 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
       addLabel="Add Diagnosis"
     >
       {(item, index) => (
-        <div className="space-y-4">
+        <div className="space-y-4 border-b pb-4 mb-4 last:border-0 last:pb-0 last:mb-0">
           <div className="space-y-2">
             <Label>Type of Cancer</Label>
             <SearchableSelect
@@ -70,6 +80,7 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
               placeholder="Search cancer type..."
             />
           </div>
+          
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Year of Diagnosis</Label>
@@ -81,7 +92,7 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
               />
               {errors[index]?.year_dx && <p className="text-sm text-destructive">{errors[index].year_dx}</p>}
             </div>
-            <div className="space-y-2">
+             <div className="space-y-2">
               <Label>Last Follow-up Year</Label>
               <YearInput
                 value={item.last_followup}
@@ -92,6 +103,76 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
               {errors[index]?.last_followup && <p className="text-sm text-destructive">{errors[index].last_followup}</p>}
             </div>
           </div>
+
+           <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+               <Label>Stage at Diagnosis</Label>
+               <Select value={item.stage_group} onValueChange={(val) => handleFieldChange(index, 'stage_group', val)}>
+                 <SelectTrigger><SelectValue placeholder="Select stage" /></SelectTrigger>
+                 <SelectContent>
+                   {(options.stageOptions || []).map(opt => (
+                     <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                   ))}
+                   {/* Fallback if options not passed */}
+                   {!options.stageOptions && (
+                      <>
+                        <SelectItem value="0">Stage 0</SelectItem>
+                        <SelectItem value="I">Stage I</SelectItem>
+                        <SelectItem value="II">Stage II</SelectItem>
+                        <SelectItem value="III">Stage III</SelectItem>
+                        <SelectItem value="IV">Stage IV</SelectItem>
+                      </>
+                   )}
+                 </SelectContent>
+               </Select>
+            </div>
+            <div className="space-y-2">
+               <Label>Laterality</Label>
+               <Select value={item.laterality} onValueChange={(val) => handleFieldChange(index, 'laterality', val)}>
+                 <SelectTrigger><SelectValue placeholder="Select side" /></SelectTrigger>
+                 <SelectContent>
+                   {(options.lateralityOptions || []).map(opt => (
+                     <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                   ))}
+                   {!options.lateralityOptions && (
+                     <>
+                        <SelectItem value="Left">Left</SelectItem>
+                        <SelectItem value="Right">Right</SelectItem>
+                        <SelectItem value="Bilateral">Bilateral</SelectItem>
+                     </>
+                   )}
+                 </SelectContent>
+               </Select>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-4">
+             <div className="flex items-center space-x-2">
+                <Checkbox
+                  id={`recurrence_${index}`}
+                  checked={item.recurrence_ever}
+                  onCheckedChange={(c) => handleFieldChange(index, 'recurrence_ever', !!c)}
+                />
+                <Label htmlFor={`recurrence_${index}`} className="font-normal">Recurrence ever?</Label>
+             </div>
+             <div className="flex items-center space-x-2">
+                <Checkbox
+                  id={`metastatic_${index}`}
+                  checked={item.metastatic_ever}
+                  onCheckedChange={(c) => handleFieldChange(index, 'metastatic_ever', !!c)}
+                />
+                <Label htmlFor={`metastatic_${index}`} className="font-normal">Metastatic ever?</Label>
+             </div>
+             <div className="flex items-center space-x-2">
+                <Checkbox
+                  id={`genetic_${index}`}
+                  checked={item.genetic_flag}
+                  onCheckedChange={(c) => handleFieldChange(index, 'genetic_flag', !!c)}
+                />
+                <Label htmlFor={`genetic_${index}`} className="font-normal">Linked to known genetic syndrome?</Label>
+             </div>
+          </div>
+
           <div className="space-y-2">
             <Label>Treatments Received</Label>
             <CheckboxGroup
@@ -105,4 +186,3 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
     </RepeatingGroup>
   );
 };
-      

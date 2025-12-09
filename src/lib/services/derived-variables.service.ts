@@ -89,6 +89,145 @@ function calculateExposureComposites(occupationalHistory?: { occ_exposures?: str
 
 
 /**
+ * Calculates AUDIT-C Score (Alcohol).
+ * @param answers - Object with q1, q2, q3 values (0-4).
+ * @returns Object with score and risk category.
+ */
+function calculateAuditC(answers?: { q1?: number, q2?: number, q3?: number }, sex?: string): { score: number, risk: string } | null {
+    if (!answers || answers.q1 === undefined || answers.q2 === undefined || answers.q3 === undefined) return null;
+    const score = (answers.q1 || 0) + (answers.q2 || 0) + (answers.q3 || 0);
+    const threshold = sex === 'Female' ? 3 : 4;
+    const risk = score >= threshold ? 'Hazardous' : 'Low Risk';
+    return { score, risk };
+}
+
+/**
+ * Calculates IPAQ Physical Activity Score.
+ * @param data - Object with days/minutes for vigorous, moderate, walking.
+ * @returns Object with MET-minutes and Category (Low, Moderate, High).
+ */
+function calculateIpaq(data?: any): { metMinutes: number, category: string } | null {
+    if (!data) return null;
+    
+    // Ensure all inputs are numbers, default to 0 if missing/NaN
+    const vigDays = Number(data.vigorous_days) || 0;
+    const vigMin = Number(data.vigorous_min) || 0;
+    const modDays = Number(data.moderate_days) || 0;
+    const modMin = Number(data.moderate_min) || 0;
+    const walkDays = Number(data.walking_days) || 0;
+    const walkMin = Number(data.walking_min) || 0;
+
+    const vigMets = 8.0 * vigMin * vigDays;
+    const modMets = 4.0 * modMin * modDays;
+    const walkMets = 3.3 * walkMin * walkDays;
+    
+    const totalMetMinutes = vigMets + modMets + walkMets;
+    const totalDays = vigDays + modDays + walkDays;
+
+    let category = 'Low';
+
+    // Criteria for High
+    if ((vigDays >= 3 && totalMetMinutes >= 1500) || (totalDays >= 7 && totalMetMinutes >= 3000)) {
+        category = 'High';
+    } 
+    // Criteria for Moderate
+    else if (
+        (vigDays >= 3 && vigMin >= 20) || 
+        (modDays >= 5 && modMin >= 30) || 
+        (walkDays >= 5 && walkMin >= 30) || // Walking is usually included in moderate 5 days rule if duration is sufficient (~30min)
+        (totalDays >= 5 && totalMetMinutes >= 600)
+    ) {
+        category = 'Moderate';
+    }
+
+    return { metMinutes: Math.round(totalMetMinutes), category };
+}
+
+/**
+ * Calculates WCRF Dietary/Lifestyle Compliance Score (Simplified).
+ * @param diet - Diet answers.
+ * @param alcoholScore - AUDIT-C score.
+ * @param bmi - BMI value.
+ * @param ipaqCategory - Physical activity category.
+ */
+function calculateWcrf(diet?: any, alcoholScore?: number, bmi?: number, ipaqCategory?: string): { score: number, max: number, compliance: string } | null {
+    if (!diet) return null;
+    
+    let score = 0;
+    let max = 4; // Diet (1), Alcohol (1), Body Fat (1), Activity (1)
+
+    // 1. Plant Foods (Fruit/Veg >= 3 servings is pretty good, 5 is best)
+    // Values: 0 (<1), 1 (1-2), 3 (3-4), 5 (5+)
+    if ((diet.vegetables || 0) >= 5) score += 1;
+    else if ((diet.vegetables || 0) >= 3) score += 0.5;
+
+    // 2. Animal Foods (Red Meat < 3 times/week)
+    // Values: 0 (Never), 1 (1-2), 3 (3-4), 5 (5+)
+    // Processed Meat (None)
+    // Values: 0 (None), 1 (Very little), ...
+    // Combined logic: No processed meat AND limited red meat
+    if ((diet.processed_meat || 0) <= 1 && (diet.red_meat || 0) <= 1) score += 1;
+    else if ((diet.processed_meat || 0) <= 1 || (diet.red_meat || 0) <= 1) score += 0.5;
+
+    // 3. Alcohol
+    if (alcoholScore !== undefined) {
+        if (alcoholScore < 3) score += 1; // Assuming <3 is low risk/low consumption
+        else if (alcoholScore < 5) score += 0.5;
+    }
+
+    // 4. Body Fatness / Activity
+    // Use BMI and IPAQ
+    if (bmi && bmi >= 18.5 && bmi < 25) score += 0.5;
+    if (ipaqCategory === 'High' || ipaqCategory === 'Moderate') score += 0.5;
+
+    return { 
+        score, 
+        max, 
+        compliance: score >= 3 ? 'High' : (score >= 2 ? 'Moderate' : 'Low') 
+    };
+}
+
+/**
+ * Checks for hereditary cancer syndromes (Lynch, HBOC).
+ * Simplified pattern matching.
+ */
+function calculateFamilySyndromes(familyHistory?: any[]): string[] {
+    const syndromes: string[] = [];
+    if (!familyHistory || !Array.isArray(familyHistory)) return syndromes;
+
+    const lynchCancers = ['colorectal', 'endometrial', 'ovarian', 'stomach', 'pancreatic', 'biliary', 'urinary', 'brain', 'skin']; // approximations
+    const hbocCancers = ['breast', 'ovarian', 'pancreatic', 'prostate'];
+
+    // Convert to easier format
+    const relatives = familyHistory.map(f => ({
+        relation: f.relation,
+        cancer: f.cancer_type ? f.cancer_type.toLowerCase() : '',
+        age: f.age_dx
+    }));
+
+    // Check Lynch: 3+ relatives with Lynch cancers, at least one < 50
+    const lynchMatches = relatives.filter(r => lynchCancers.some(c => r.cancer.includes(c)));
+    const lynchYoung = lynchMatches.some(r => r.age && r.age < 50);
+    if (lynchMatches.length >= 3 && lynchYoung) {
+        syndromes.push('Potential Lynch Syndrome');
+    }
+
+    // Check HBOC: 
+    // 1. Breast cancer < 45
+    // 2. 3+ relatives with breast/ovarian
+    // 3. Male breast cancer
+    const breastOvarianMatches = relatives.filter(r => hbocCancers.some(c => r.cancer.includes(c)));
+    const breastYoung = relatives.some(r => r.cancer.includes('breast') && r.age && r.age <= 45);
+    const maleBreast = relatives.some(r => r.cancer.includes('breast') && (r.relation === 'Father' || r.relation === 'Brother')); // Approximate gender check from relation
+
+    if (breastYoung || breastOvarianMatches.length >= 3 || maleBreast) {
+        syndromes.push('Potential HBOC');
+    }
+
+    return syndromes;
+}
+
+/**
  * A service to calculate derived health variables from standardized user data.
  */
 export const DerivedVariablesService = {
@@ -158,6 +297,24 @@ export const DerivedVariablesService = {
       if (exposures !== null) {
           derived.exposure_composites = exposures;
       }
+
+      // --- New Logic ---
+
+      // AUDIT-C
+      const audit = calculateAuditC(core.alcohol_audit, core.sex_at_birth);
+      if (audit) derived.alcohol_audit = audit;
+
+      // IPAQ
+      const ipaq = calculateIpaq(core.physical_activity);
+      if (ipaq) derived.physical_activity_ipaq = ipaq;
+
+      // WCRF
+      const wcrf = calculateWcrf(core.diet, audit?.score, bmi || undefined, ipaq?.category);
+      if (wcrf) derived.wcrf_score = wcrf;
+
+      // Family Syndromes
+      const syndromes = calculateFamilySyndromes(advanced.family);
+      if (syndromes.length > 0) derived.hereditary_syndromes = syndromes;
 
     } catch (error) {
       logger.error("Failed to calculate derived variables", {

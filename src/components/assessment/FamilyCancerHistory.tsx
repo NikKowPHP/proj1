@@ -10,9 +10,13 @@ import { Checkbox } from "../ui/checkbox";
 
 interface FamilyMember {
   relation?: string;
+  side_of_family?: string; // Maternal, Paternal
+  vital_status?: string; // Alive, Deceased
+  age_now_death?: number; // Age now or at death
   cancer_type?: string;
   age_dx?: number;
   multiple_primaries?: boolean;
+  known_genetic_syndrome?: boolean;
 }
 
 interface FamilyCancerHistoryProps {
@@ -25,7 +29,7 @@ interface FamilyCancerHistoryProps {
 }
 
 export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHistoryProps) => {
-  const [errors, setErrors] = useState<Record<number, { age_dx?: string }>>({});
+  const [errors, setErrors] = useState<Record<number, { age_dx?: string, age_now_death?: string }>>({});
 
   const handleAdd = () => {
     onChange([...value, {}]);
@@ -36,14 +40,14 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
   };
 
   const handleFieldChange = (index: number, field: keyof FamilyMember, fieldValue: any) => {
-    if (field === "age_dx") {
+    if (field === "age_dx" || field === "age_now_death") {
       const num = Number(fieldValue);
-      if (fieldValue && (isNaN(num) || num < 0 || num > 100)) {
-        setErrors(prev => ({ ...prev, [index]: { ...prev[index], age_dx: 'Age must be between 0 and 100.' } }));
+      if (fieldValue && (isNaN(num) || num < 0 || num > 120)) {
+        setErrors(prev => ({ ...prev, [index]: { ...prev[index], [field]: 'Invalid age.' } }));
       } else {
-        const newErrors = { ...errors };
-        if (newErrors[index]) delete newErrors[index].age_dx;
-        setErrors(newErrors);
+        const newErrors = { ...errors[index] };
+        delete newErrors[field];
+        setErrors(prev => ({ ...prev, [index]: newErrors }));
       }
     }
 
@@ -60,25 +64,73 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
       addLabel="Add Relative"
     >
       {(item, index) => (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Relation</Label>
-            <Select
-              value={item.relation}
-              onValueChange={(val) => handleFieldChange(index, "relation", val)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select relation" />
-              </SelectTrigger>
-              <SelectContent>
-                {options.relations.map((relation) => (
-                  <SelectItem key={relation} value={relation}>
-                    {relation}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <div className="space-y-4 border-b pb-4 mb-4 last:border-0 last:pb-0 last:mb-0">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Relation</Label>
+              <Select
+                value={item.relation}
+                onValueChange={(val) => handleFieldChange(index, "relation", val)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select relation" />
+                </SelectTrigger>
+                <SelectContent>
+                  {options.relations.map((relation) => (
+                    <SelectItem key={relation} value={relation}>
+                      {relation}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+             <div className="space-y-2">
+              <Label>Side of Family</Label>
+              <Select
+                value={item.side_of_family}
+                onValueChange={(val) => handleFieldChange(index, "side_of_family", val)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select side" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Maternal">Maternal</SelectItem>
+                  <SelectItem value="Paternal">Paternal</SelectItem>
+                  <SelectItem value="N/A">N/A (e.g. Sibling)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+               <Label>Vital Status</Label>
+               <Select
+                value={item.vital_status}
+                onValueChange={(val) => handleFieldChange(index, "vital_status", val)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Alive">Alive</SelectItem>
+                  <SelectItem value="Deceased">Deceased</SelectItem>
+                  <SelectItem value="Unknown">Unknown</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+               <Label>{item.vital_status === 'Deceased' ? 'Age at Death' : 'Current Age'}</Label>
+               <Input
+                  type="number"
+                  value={item.age_now_death ?? ""}
+                  onChange={(e) => handleFieldChange(index, "age_now_death", e.target.value ? Number(e.target.value) : undefined)}
+                  placeholder="e.g. 65"
+               />
+               {errors[index]?.age_now_death && <p className="text-sm text-destructive">{errors[index].age_now_death}</p>}
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label>Type of Cancer</Label>
              <SearchableSelect
@@ -101,19 +153,31 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
             />
             {errors[index]?.age_dx && <p className="text-sm text-destructive">{errors[index].age_dx}</p>}
           </div>
-           <div className="flex items-center space-x-2">
-            <Checkbox
-              id={`multiple_primaries_${index}`}
-              checked={item.multiple_primaries}
-              onCheckedChange={(checked) => handleFieldChange(index, "multiple_primaries", !!checked)}
-            />
-            <Label htmlFor={`multiple_primaries_${index}`} className="font-normal">
-              Multiple primary cancers?
-            </Label>
+          
+           <div className="flex flex-wrap gap-4">
+             <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`multiple_primaries_${index}`}
+                checked={item.multiple_primaries}
+                onCheckedChange={(checked) => handleFieldChange(index, "multiple_primaries", !!checked)}
+              />
+              <Label htmlFor={`multiple_primaries_${index}`} className="font-normal">
+                Multiple primary cancers?
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`genetic_syndrome_${index}`}
+                checked={item.known_genetic_syndrome}
+                onCheckedChange={(checked) => handleFieldChange(index, "known_genetic_syndrome", !!checked)}
+              />
+              <Label htmlFor={`genetic_syndrome_${index}`} className="font-normal">
+                Known Genetic Syndrome?
+              </Label>
+            </div>
           </div>
         </div>
       )}
     </RepeatingGroup>
   );
 };
-      

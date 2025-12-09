@@ -3,6 +3,7 @@ import { cancerTypesMap } from "@/lib/mappings/cancer-types.map";
 import { jobTitlesMap } from "@/lib/mappings/job-titles.map";
 import { medicalConditionsMap } from "@/lib/mappings/medical-conditions.map";
 import { occupationalExposuresMap } from "@/lib/mappings/occupational-exposures.map";
+import { environmentalExposuresMap } from "@/lib/mappings/environmental-exposures.map";
 
 /**
  * Safely parses a JSON string from an answers object.
@@ -283,6 +284,25 @@ export const StandardizationService = {
           'home_years_here', 'home_postal_coarse', 'home_year_built', 'home_basement',
           'home_shs_home', 'env_outdoor_uv', 'env.uv.sunburn_child', 'env.uv.sunburn_adult'
       ];
+      
+      envKeys.forEach(key => {
+          if (answers[key]) {
+              environmental[key] = answers[key];
+          }
+      });
+
+      // Map environmental summary to codes
+      if (answers['env.summary']) {
+          const envList = safeJsonParse(answers['env.summary']);
+          environmental.coded_exposures = envList.map((id: string) => ({
+              id: id,
+              code: environmentalExposuresMap[id] || undefined
+          })).filter((item: any) => item.id !== 'none');
+      }
+
+      if (Object.keys(environmental).length > 0) {
+        standardized.advanced.environmental = environmental;
+      }
       envKeys.forEach(key => {
          if (answers[key]) {
            environmental[key] = answers[key];

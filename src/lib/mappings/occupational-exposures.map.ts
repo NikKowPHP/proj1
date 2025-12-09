@@ -10,5 +10,14 @@ export const occupationalExposuresMap: Record<string, string> = {
   'welding_fumes': '426156009', // Exposure to welding fumes (event)
   'benzene': '76543000', // Exposure to benzene (event)
   'formaldehyde': '284587009', // Exposure to formaldehyde (event)
-  // ... add more from spec as needed
+  'pesticides': '418933005', // Exposure to pesticide (event)
+  'solvents': '422329007', // Exposure to organic solvent (event)
+  'radiation': '417387002', // Exposure to ionizing radiation (event)
+  'leather_dust': '414441007', // Exposure to leather dust (event)
+  'metal_fluids': '422961005', // Exposure to metalworking fluid (event)
+  'soot': '419799009', // Exposure to soot (event)
+  'rubber': '419137000', // Exposure to rubber fume (event)
+  'shift_night': '406505007', // Night shift worker (finding)
+  'firefighter': '413348003', // Exposure to fire smoke (event) - proxy for firefighter hazard
+  'uv_sunlight': '69930006', // Exposure to UV radiation (event)
 };

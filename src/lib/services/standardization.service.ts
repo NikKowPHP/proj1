@@ -63,10 +63,10 @@ export const StandardizationService = {
         gender_identity: answers.gender_identity,
         // Diet (WCRF FFQ)
         diet: {
-            vegetables: Number(answers.diet_vegetables),
-            red_meat: Number(answers.diet_red_meat),
-            processed_meat: Number(answers.diet_processed_meat),
-            sugary_drinks: Number(answers.diet_sugary_drinks),
+            vegetables: Number(answers['diet.fv_portions_day']),
+            red_meat: Number(answers['diet.red_meat_servings_week']), // Old: diet_red_meat
+            processed_meat: Number(answers['diet.processed_meat_servings_week']), // Old: diet_processed_meat
+            sugary_drinks: Number(answers['diet.ssb_servings_week']),
             whole_grains: Number(answers['diet.whole_grains_servings_day']),
             fast_food: Number(answers['diet.fastfoods_freq_week']),
             legumes: Number(answers['diet.legumes_freq_week']),
@@ -75,12 +75,12 @@ export const StandardizationService = {
         },
         // Physical Activity (IPAQ)
         physical_activity: {
-            vigorous_days: Number(answers.ipaq_vigorous),
+            vigorous_days: Number(answers['pa.vig.days7']),
             vigorous_min: Number(answers.ipaq_vigorous_min),
-            moderate_days: Number(answers.ipaq_moderate),
+            moderate_days: Number(answers['pa.mod.days7']),
             moderate_min: Number(answers.ipaq_moderate_min),
-            walking_days: Number(answers.ipaq_walking),
-            walking_min: Number(answers.ipaq_walking_min),
+            walking_days: Number(answers['pa.walk.days7']),
+            walking_min: Number(answers['pa.walk.minperday']), // Old: ipaq_walking_min
             sitting_min: Number(answers.ipaq_sitting),
         },
       };
@@ -110,13 +110,14 @@ export const StandardizationService = {
       }
       
       // Genetics
-      if (answers.genetic_testing_done === 'Yes') {
+      if (['yes_report', 'yes_no_details'].includes(answers['gen.testing_ever'])) {
         standardized.advanced.genetics = {
           tested: true,
           type: answers.genetic_test_type,
           year: answers.genetic_test_year,
           lab: answers.genetic_lab,
-          findings_present: answers.genetic_findings_present,
+          findings_present: answers['gen.path_variant_self'] === 'yes', // Old logic mapped
+          variant_self_status: answers['gen.path_variant_self'],
           genes: answers.genetic_genes ? JSON.parse(answers.genetic_genes) : [],
           variants_hgvs: answers.genetic_variants_hgvs,
           vus_present: answers.genetic_vus_present,
@@ -169,6 +170,7 @@ export const StandardizationService = {
              isco: jobTitlesMap[entry.main_job_title] || undefined,
              years: entry.years_total,
              hours_week: entry.hours_per_week,
+             year_first: entry.year_first_exposed,
              current: entry.current_exposure,
              ppe: entry.ppe_use
           };
@@ -188,6 +190,7 @@ export const StandardizationService = {
           'screen.skin.full_exam_ever', 'screen.skin.last_year',
           'screen.hcc.us_ever', 'screen.hcc.us_last_year',
           'screen.upper_endo.ever', 'screen.upper_endo.last_year',
+          'screen.cervix.last_type', 'screen.cervix.last_result', // Added
           // New Immunization
           'imm.hav.any', 'imm.flu.last_season', 'imm.covid.doses',
           'imm.td_tdap.year_last', 'imm.pneumo.ever', 'imm.zoster.ever'
@@ -209,7 +212,7 @@ export const StandardizationService = {
               medications[key] = answers[key];
           }
       });
-       if (Object.keys(medications).length > 0) {
+        if (Object.keys(medications).length > 0) {
         standardized.advanced.medications_iatrogenic = medications;
       }
 
@@ -217,18 +220,23 @@ export const StandardizationService = {
       // Sexual Health
       const sexualHealth: Record<string, any> = {};
       const sexualHealthKeys = [
+          'sexhx.section_opt_in',
           'sex_active', 
           'sex_partner_gender', 
-          'sex_lifetime_partners', 
+          'sexhx.lifetime_partners_cat', // Old: sex_lifetime_partners
           'sex_last12m_partners', 
-          'sex_barrier_freq', 
+          'sexhx.condom_use_12m', // Old: sex_barrier_freq
           'sex_sti_history', 
           'sex_anal', 
           'sex_oral', 
           'sex_barriers_practices',
           // New
           'sexhx.new_partner_12m',
+          'sexhx.age_first_sex',
+          'sexhx.sex_sites_ever',
+          'sexhx.sex_sites_12m',
           'sexhx.sex_work_ever',
+          'sexhx.sex_work_role',
           'sexhx.sti_treated_12m',
           'sexhx.hpv_precancer_history' // Female only
       ];
@@ -250,7 +258,8 @@ export const StandardizationService = {
           'env_industry', 'env_agriculture', 'env_outdoor_uv', 'water_source', 
           'water_well_tested', 'water_well_findings', 'env_wildfire_smoke',
           // New
-          'env.pesticide.mix_freq', 'env.pesticide.apply_freq'
+          'env.pesticide.mix_freq', 'env.pesticide.apply_freq',
+          'env.asbestos.home_status', 'env.air.high_pollution_years', 'env.uv.sunburn_child'
       ];
       envKeys.forEach(key => {
          if (answers[key]) {
@@ -288,9 +297,10 @@ export const StandardizationService = {
       const smokingDetails: any = {
           pattern: answers['smoking.pattern'],
           start_age: Number(answers['smoking.start_age']) || undefined,
-          cigs_per_day: Number(answers.cigs_per_day) || undefined,
+          cigs_per_day: Number(answers['smoking.intensity']) || undefined,
           years: Number(answers.smoking_years) || undefined,
-          quit_year: Number(answers['smoking.quit_year']) || undefined, // Updated key
+          quit_date: answers['smoking.quit_date'], // Updated key
+          other_tobacco: answers['smoking.other_tobacco_smoked'],
           cigars_week: Number(answers['smoking.other_cigar_per_week']) || undefined,
           pipe_week: Number(answers['smoking.pipe_per_week']) || undefined,
           shisha_week: Number(answers['smoking.shisha_per_week']) || undefined,
@@ -303,6 +313,7 @@ export const StandardizationService = {
           htp: {
               status: answers['htp.status'],
               days_30d: Number(answers['htp.days_30d']) || undefined,
+              sticks_day: Number(answers['htp.sticks_per_day']) || undefined,
           },
           shs: {
               home_freq: answers['shs.home_freq'],
@@ -321,6 +332,11 @@ export const StandardizationService = {
          return obj;
       };
       
+      // Update alcohol with beverage mix
+      if (answers['alcohol.beverage_mix']) {
+          standardized.core.alcohol_beverage_mix = answers['alcohol.beverage_mix'];
+      }
+
       standardized.advanced.smoking_detail = cleanObject(smokingDetails);
 
     } catch (error) {

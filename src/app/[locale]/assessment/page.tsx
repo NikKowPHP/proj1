@@ -50,6 +50,8 @@ import { LabsAndImaging } from "@/components/assessment/LabsAndImaging";
 import { FunctionalStatus } from "@/components/assessment/FunctionalStatus";
 import { SmokingDetails } from "@/components/assessment/SmokingDetails";
 import { Medications } from "@/components/assessment/Medications";
+import { StandardizationService } from "@/lib/services/standardization.service";
+import { DerivedVariablesService } from "@/lib/services/derived-variables.service";
 
 interface Question {
   id: string;
@@ -145,6 +147,26 @@ export default function AssessmentPage() {
   }, [answers.symptoms, questionnaire]);
 
   const handleNext = () => {
+    // Adult Gate Logic
+    if (answers.dob) { 
+        try {
+             const standardized = StandardizationService.standardize(answers);
+             const derived = DerivedVariablesService.calculateAll(standardized);
+             if (derived.adult_gate_ok === false) {
+                 setLocalErrors(prev => ({ ...prev, dob: "You must be 18 or older to proceed." }));
+                 return;
+             } else {
+                 setLocalErrors(prev => {
+                     const newErrors = {...prev};
+                     delete newErrors.dob;
+                     return newErrors;
+                 });
+             }
+        } catch (e) {
+            console.error("Gate check failed", e);
+        }
+    }
+
     if (currentStep < totalSteps - 1) {
       nextStep();
     } else {

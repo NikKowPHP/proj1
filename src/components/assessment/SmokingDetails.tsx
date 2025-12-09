@@ -22,6 +22,14 @@ export const SmokingDetails = ({ answers, onAnswer, questions }: SmokingDetailsP
               onChange={(val) => onAnswer(q.id, val ? String(val) : '')}
               placeholder={q.placeholder}
             />
+          ) : q.type === 'date_input' ? (
+            <Input
+              id={q.id}
+              type="date"
+              value={answers[q.id] || ""}
+              onChange={(e) => onAnswer(q.id, e.target.value)}
+              placeholder={q.placeholder}
+            />
           ) : (
             <Input
               id={q.id}

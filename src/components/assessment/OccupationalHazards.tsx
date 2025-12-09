@@ -21,6 +21,7 @@ export interface HazardExposure {
   hours_per_week?: number;
   current_exposure?: string; // Yes/No
   ppe_use?: string[];
+  year_first_exposed?: number;
 }
 
 interface OccupationalHazardsProps {
@@ -97,6 +98,20 @@ const HazardDetailItem = ({
                 placeholder="e.g. 40"
              />
           </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+           <div className="space-y-2">
+             <Label>Year First Exposed</Label>
+             <Input 
+                type="number"
+                value={item.year_first_exposed ?? ""}
+                onChange={(e) => handleFieldChange("year_first_exposed", e.target.value ? Number(e.target.value) : undefined)}
+                placeholder="e.g. 1990"
+             />
+           </div>
+           <div className="space-y-2">
+             {/* Spacer or future field */}
+           </div>
         </div>
         <div className="space-y-2">
             <Label>Currently Exposed?</Label>

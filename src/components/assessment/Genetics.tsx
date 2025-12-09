@@ -25,6 +25,10 @@ interface GeneticsProps {
 const isVisible = (question: any, answers: Record<string, string>): boolean => {
   if (!question.dependsOn) return true;
   const dependencyAnswer = answers[question.dependsOn.questionId];
+  
+  if (Array.isArray(question.dependsOn.value)) {
+    return question.dependsOn.value.includes(dependencyAnswer);
+  }
   return dependencyAnswer === question.dependsOn.value;
 };
 

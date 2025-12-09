@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 export interface CheckboxOption {
   id: string;
   label: string;
+  category?: string;
+  red_flag?: boolean;
 }
 
 interface CheckboxGroupProps {
@@ -29,20 +31,15 @@ export const CheckboxGroup = ({
 
     if (exclusiveOption) {
       if (optionId === exclusiveOption) {
-        // If "None" is checked, deselect everything else and select only "None"
         newValue = checked ? [exclusiveOption] : [];
       } else {
-        // If another option is checked
         if (checked) {
-          // Add it and remove "None" if it's there
           newValue = [...value.filter((id) => id !== exclusiveOption), optionId];
         } else {
-          // Just remove it
           newValue = value.filter((id) => id !== optionId);
         }
       }
     } else {
-      // Standard non-exclusive behavior
       if (checked) {
         newValue = [...value, optionId];
       } else {
@@ -53,19 +50,60 @@ export const CheckboxGroup = ({
     onChange(newValue);
   };
 
-  return (
-    <div className={cn("space-y-2", className)}>
-      {options.map((option) => (
-        <div key={option.id} className="flex items-center space-x-2">
-          <Checkbox
-            id={option.id}
-            checked={value.includes(option.id)}
-            onCheckedChange={(checked) => handleCheckedChange(!!checked, option.id)}
-          />
-          <Label htmlFor={option.id} className="font-normal">
-            {option.label}
-          </Label>
+  // Group options by category
+  const groupedOptions = options.reduce((acc, option) => {
+    const category = option.category || "Other";
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(option);
+    return acc;
+  }, {} as Record<string, CheckboxOption[]>);
+
+  const categories = Object.keys(groupedOptions).sort();
+  // If no categories (everything is "Other" and original options didn't have category), 
+  // revert to simple list to avoid "Other" header unless explicitly mixed.
+  const hasCategories = options.some(o => !!o.category);
+
+  if (!hasCategories) {
+      return (
+        <div className={cn("space-y-2", className)}>
+          {options.map((option) => (
+            <div key={option.id} className="flex items-center space-x-2">
+              <Checkbox
+                id={option.id}
+                checked={value.includes(option.id)}
+                onCheckedChange={(checked) => handleCheckedChange(!!checked, option.id)}
+              />
+              <Label htmlFor={option.id} className="font-normal">
+                {option.label}
+              </Label>
+            </div>
+          ))}
         </div>
+      );
+  }
+
+  return (
+    <div className={cn("space-y-4", className)}>
+      {categories.map(category => (
+          <div key={category} className="space-y-2">
+              <h4 className="font-semibold text-sm text-gray-700">{category}</h4>
+              <div className="space-y-2 pl-2">
+                {groupedOptions[category].map((option) => (
+                    <div key={option.id} className="flex items-center space-x-2">
+                    <Checkbox
+                        id={option.id}
+                        checked={value.includes(option.id)}
+                        onCheckedChange={(checked) => handleCheckedChange(!!checked, option.id)}
+                    />
+                    <Label htmlFor={option.id} className="font-normal">
+                        {option.label}
+                    </Label>
+                    </div>
+                ))}
+              </div>
+          </div>
       ))}
     </div>
   );

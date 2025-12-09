@@ -161,13 +161,15 @@ function calculateWcrf(diet?: any, alcoholScore?: number, bmi?: number, ipaqCate
     if ((diet.vegetables || 0) >= 5) score += 1;
     else if ((diet.vegetables || 0) >= 3) score += 0.5;
 
-    // 2. Animal Foods (Red Meat < 3 times/week)
-    // Values: 0 (Never), 1 (1-2), 3 (3-4), 5 (5+)
-    // Processed Meat (None)
-    // Values: 0 (None), 1 (Very little), ...
-    // Combined logic: No processed meat AND limited red meat
-    if ((diet.processed_meat || 0) <= 1 && (diet.red_meat || 0) <= 1) score += 1;
-    else if ((diet.processed_meat || 0) <= 1 || (diet.red_meat || 0) <= 1) score += 0.5;
+    // 2. Animal Foods (Red Meat < 3 times/week or < 500g/week approx 3-5 servings)
+    // Diet is now servings/week (0-20)
+    // Guideline: Moderate amounts of red meat and little/no processed meat
+    const redMeatServings = diet.red_meat || 0;
+    const processedMeatServings = diet.processed_meat || 0;
+
+    // Logic: Red Meat <= 3 servings (approx 350-500g) is good, Processed Meat < 1 (basically minimal)
+    if (processedMeatServings <= 1 && redMeatServings <= 3) score += 1;
+    else if (processedMeatServings <= 1 || redMeatServings <= 3) score += 0.5;
 
     // 3. Alcohol
     if (alcoholScore !== undefined) {
@@ -247,6 +249,17 @@ export const DerivedVariablesService = {
       const age = calculateAge(core.dob);
       if (age !== null) {
           derived.age_years = age;
+          // Adult Gate
+          derived.adult_gate_ok = age >= 18;
+          
+          // Age Map
+          if (age >= 18 && age <= 39) derived.age_band = "18-39";
+          else if (age >= 40 && age <= 49) derived.age_band = "40-49";
+          else if (age >= 50 && age <= 59) derived.age_band = "50-59";
+          else if (age >= 60 && age <= 69) derived.age_band = "60-69";
+          else if (age >= 70) derived.age_band = "70+";
+      } else {
+          derived.adult_gate_ok = false; // Block if age calculation fails
       }
 
       // Calculate BMI
@@ -257,6 +270,15 @@ export const DerivedVariablesService = {
           unit: "kg/m2",
           code: "39156-5", // LOINC code for BMI
         };
+      }
+      
+      // Diet Calcs
+      // PDF Rule: Red Meat * 100, Processed Meat * 50
+      if (typeof core.diet?.red_meat === 'number') {
+          derived.red_meat_gwk = core.diet.red_meat * 100;
+      }
+      if (typeof core.diet?.processed_meat === 'number') {
+          derived.proc_meat_gwk = core.diet.processed_meat * 50;
       }
 
       // Calculate pack-years
@@ -309,6 +331,17 @@ export const DerivedVariablesService = {
       if (ipaq) derived.physical_activity_ipaq = ipaq;
 
       // WCRF
+      // Update WCRF to use grams/week derived variables if possible, or mapping
+      // Standard WCRF: Red meat < 500g/week (approx 5 servings), Processed meat little/none
+      // We pass the raw servings/week to calculateWcrf which we will update locally here or in the helper
+      // Helper calculateWcrf uses raw 'diet' object. Let's update that object passed to match helper expectations or update helper.
+      // The helper 'calculateWcrf' currently expects `metrics value` (0-5 scale logic from previous code).
+      // We should update `calculateWcrf` function above to handle the real numeric inputs. 
+      // BUT `calculateWcrf` is defined above in this file. I need to update it too.
+      // For now, I'm just calling it. I should update `calculateWcrf` via separate replacement or try to bundle.
+      // I'll stick to replacing `DerivedVariablesService` block here and will do a separate update for `calculateWcrf` if needed.
+      // Actually, I can bundle the update to `calculateWcrf` in a multi-replace or just assume I'll fix it next.
+      // I'll fix it next to be safe.
       const wcrf = calculateWcrf(core.diet, audit?.score, bmi || undefined, ipaq?.category);
       if (wcrf) derived.wcrf_score = wcrf;
 

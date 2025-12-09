@@ -17,6 +17,8 @@ interface FamilyMember {
   age_dx?: number;
   multiple_primaries?: boolean;
   known_genetic_syndrome?: boolean;
+  sex_at_birth?: string;
+  is_blood_related?: boolean;
 }
 
 interface FamilyCancerHistoryProps {
@@ -84,7 +86,7 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
                 </SelectContent>
               </Select>
             </div>
-             <div className="space-y-2">
+            <div className="space-y-2">
               <Label>Side of Family</Label>
               <Select
                 value={item.side_of_family}
@@ -100,6 +102,34 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+             <div className="space-y-2">
+                <Label>Sex at Birth</Label>
+                <Select
+                  value={item.sex_at_birth}
+                  onValueChange={(val) => handleFieldChange(index, "sex_at_birth", val)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select sex" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Male">Male</SelectItem>
+                  </SelectContent>
+                </Select>
+             </div>
+             <div className="space-y-2 flex items-end pb-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`blood_related_${index}`}
+                    checked={item.is_blood_related}
+                    onCheckedChange={(c) => handleFieldChange(index, "is_blood_related", !!c)}
+                  />
+                  <Label htmlFor={`blood_related_${index}`} className="font-normal">Blood Related?</Label>
+                </div>
+             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

@@ -20,6 +20,7 @@ interface CancerDiagnosis {
   recurrence_ever?: boolean;
   metastatic_ever?: boolean;
   genetic_flag?: boolean;
+  status_current?: string; // No evidence of disease, In remission, Active treatment, Stable
 }
 
 interface PersonalCancerHistoryProps {
@@ -171,6 +172,19 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
                 />
                 <Label htmlFor={`genetic_${index}`} className="font-normal">Linked to known genetic syndrome?</Label>
              </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Current Status</Label>
+            <Select value={item.status_current} onValueChange={(val) => handleFieldChange(index, 'status_current', val)}>
+              <SelectTrigger><SelectValue placeholder="Select current status" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="no_evidence">No evidence of disease</SelectItem>
+                <SelectItem value="in_remission">In remission</SelectItem>
+                <SelectItem value="active_treatment">Active treatment</SelectItem>
+                <SelectItem value="stable">Stable</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

@@ -8,13 +8,17 @@ import { SearchableSelect, SearchableSelectOption } from "../ui/SearchableSelect
 import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
 
+interface CancerDiagnosis {
+  cancer_type?: string;
+  age_dx?: number;
+}
+
 interface FamilyMember {
   relation?: string;
   side_of_family?: string; // Maternal, Paternal
   vital_status?: string; // Alive, Deceased
   age_now_death?: number; // Age now or at death
-  cancer_type?: string;
-  age_dx?: number;
+  cancers?: CancerDiagnosis[]; // Array of cancers instead of single cancer
   multiple_primaries?: boolean;
   known_genetic_syndrome?: boolean;
   sex_at_birth?: string;
@@ -31,10 +35,10 @@ interface FamilyCancerHistoryProps {
 }
 
 export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHistoryProps) => {
-  const [errors, setErrors] = useState<Record<number, { age_dx?: string, age_now_death?: string }>>({});
+  const [errors, setErrors] = useState<Record<number, { age_now_death?: string }>>({});
 
   const handleAdd = () => {
-    onChange([...value, {}]);
+    onChange([...value, { cancers: [] }]);
   };
 
   const handleRemove = (index: number) => {
@@ -42,7 +46,7 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
   };
 
   const handleFieldChange = (index: number, field: keyof FamilyMember, fieldValue: any) => {
-    if (field === "age_dx" || field === "age_now_death") {
+    if (field === "age_now_death") {
       const num = Number(fieldValue);
       if (fieldValue && (isNaN(num) || num < 0 || num > 120)) {
         setErrors(prev => ({ ...prev, [index]: { ...prev[index], [field]: 'Invalid age.' } }));
@@ -55,6 +59,34 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
 
     const newValues = [...value];
     newValues[index] = { ...newValues[index], [field]: fieldValue };
+    onChange(newValues);
+  };
+
+  const handleAddCancer = (memberIndex: number) => {
+    const newValues = [...value];
+    const currentCancers = newValues[memberIndex].cancers || [];
+    newValues[memberIndex] = {
+      ...newValues[memberIndex],
+      cancers: [...currentCancers, {}]
+    };
+    onChange(newValues);
+  };
+
+  const handleRemoveCancer = (memberIndex: number, cancerIndex: number) => {
+    const newValues = [...value];
+    const currentCancers = newValues[memberIndex].cancers || [];
+    newValues[memberIndex] = {
+      ...newValues[memberIndex],
+      cancers: currentCancers.filter((_, i) => i !== cancerIndex)
+    };
+    onChange(newValues);
+  };
+
+  const handleCancerFieldChange = (memberIndex: number, cancerIndex: number, field: keyof CancerDiagnosis, cancerFieldValue: any) => {
+    const newValues = [...value]; // Corrected from this.value
+    const cancers = newValues[memberIndex].cancers || [];
+    cancers[cancerIndex] = { ...cancers[cancerIndex], [field]: cancerFieldValue };
+    newValues[memberIndex] = { ...newValues[memberIndex], cancers };
     onChange(newValues);
   };
 
@@ -161,27 +193,49 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
             </div>
           </div>
 
+          {/* Cancer History - Nested Repeating Group */}
           <div className="space-y-2">
-            <Label>Type of Cancer</Label>
-             <SearchableSelect
-              value={item.cancer_type}
-              onChange={(val) => handleFieldChange(index, "cancer_type", val)}
-              options={options.cancerTypes}
-              placeholder="Search cancer type..."
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Age at Diagnosis</Label>
-            <Input
-              type="number"
-              value={item.age_dx ?? ""}
-              onChange={(e) => handleFieldChange(index, "age_dx", e.target.value ? Number(e.target.value) : undefined)}
-              placeholder="e.g. 55"
-              min={0}
-              max={100}
-              aria-invalid={!!errors[index]?.age_dx}
-            />
-            {errors[index]?.age_dx && <p className="text-sm text-destructive">{errors[index].age_dx}</p>}
+            <Label className="font-semibold">Cancer History</Label>
+            <div className="pl-4 border-l-2 border-gray-200 space-y-3">
+              {(item.cancers || []).map((cancer, cancerIndex) => (
+                <div key={cancerIndex} className="space-y-2 bg-gray-50 p-3 rounded relative">
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveCancer(index, cancerIndex)}
+                    className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm"
+                  >
+                    Remove
+                  </button>
+                  <div className="space-y-2">
+                    <Label>Type of Cancer</Label>
+                    <SearchableSelect
+                      value={cancer.cancer_type}
+                      onChange={(val) => handleCancerFieldChange(index, cancerIndex, "cancer_type", val)}
+                      options={options.cancerTypes}
+                      placeholder="Search cancer type..."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Age at Diagnosis</Label>
+                    <Input
+                      type="number"
+                      value={cancer.age_dx ?? ""}
+                      onChange={(e) => handleCancerFieldChange(index, cancerIndex, "age_dx", e.target.value ? Number(e.target.value) : undefined)}
+                      placeholder="e.g. 55"
+                      min={0}
+                      max={100}
+                    />
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => handleAddCancer(index)}
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                + Add Cancer
+              </button>
+            </div>
           </div>
           
            <div className="flex flex-wrap gap-4">

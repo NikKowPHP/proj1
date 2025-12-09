@@ -207,48 +207,14 @@
             "dependsOn": { "questionId": "diet.ssb_servings_week", "operator": ">", "value": 0 }
         },
         {
-             "id": "pa.vig.days7",
-             "text": { "en": "Vigorous physical activity (days/week)", "pl": "Intensywna aktywność fizyczna (dni/tydzień)" },
-              "type": "number_input",
-              "min": 0,
-              "max": 7
-        },
-        {
-              "id": "ipaq_vigorous_min",
-              "text": { "en": "Average minutes of vigorous activity per day", "pl": "Średnia liczba minut intensywnej aktywności" },
-              "type": "number_input",
-              "dependsOn": { "questionId": "pa.vig.days7", "operator": ">", "value": 0 }
-        },
-        {
-            "id": "pa.mod.days7",
-            "text": { "en": "Moderate physical activity (days/week)", "pl": "Umiarkowana aktywność fizyczna (dni/tydzień)" },
-             "type": "number_input",
-             "min": 0,
-             "max": 7
-        },
-        {
-             "id": "ipaq_moderate_min",
-             "text": { "en": "Average minutes of moderate activity per day", "pl": "Średnia liczba minut umiarkowanej aktywności" },
-             "type": "number_input",
-             "dependsOn": { "questionId": "pa.mod.days7", "operator": ">", "value": 0 }
-        },
-        {
-            "id": "pa.walk.days7",
-            "text": { "en": "Walking (days/week)", "pl": "Spacerowanie (dni/tydzień)" },
-             "type": "number_input",
-             "min": 0,
-             "max": 7
-        },
-          {
-              "id": "pa.walk.minperday",
-              "text": { "en": "Average minutes of walking per day", "pl": "Średnia liczba minut spaceru" },
-              "type": "number_input",
-              "dependsOn": { "questionId": "pa.walk.days7", "operator": ">", "value": 0 }
-         },
-        {
-             "id": "ipaq_sitting",
-             "text": { "en": "Hours spent sitting per day", "pl": "Godziny spędzane na siedząco dziennie" },
-             "type": "number_input"
+            "id": "pa.activity_level",
+            "text": { "en": "Physical Activity Level", "pl": "Poziom aktywności fizycznej" },
+            "type": "radio",
+            "options": [
+              { "value": "Sedentary", "label": { "en": "Sedentary (little or no exercise)", "pl": "Siedzący (mało lub brak ćwiczeń)" } },
+              { "value": "Moderate", "label": { "en": "Moderate (exercise 1-3 days/week)", "pl": "Umiarkowany (ćwiczenia 1-3 dni/tydzień)" } },
+              { "value": "High", "label": { "en": "High (exercise 4+ days/week)", "pl": "Wysoki (ćwiczenia 4+ dni/tydzień)" } }
+            ]
         },
         {
           "id": "symptoms",
@@ -321,10 +287,11 @@
               "dependsOn": { "questionId": "smoking_status", "value": ["Current", "Former"] },
               "questions": [
                 { "id": "smoking.pattern", "text": {"en": "Smoking pattern", "pl": "Wzorzec palenia"}, "type": "radio", "options": ["Every day", "Some days"] },
-                { "id": "smoking.intensity", "text": { "en": "Average cigarettes per day?", "pl": "Średnia liczba papierosów dziennie?"}, "type": "number_input", "placeholder": "e.g., 20", "dependsOn": {"questionId": "smoking.pattern", "value": "Every day"} },
+                { "id": "smoking.intensity_unit", "text": {"en": "Unit for smoking intensity", "pl": "Jednostka intensywności palenia"}, "type": "radio", "options": ["Cigarettes per day", "Packs per day"], "dependsOn": {"questionId": "smoking.pattern", "value": "Every day"} },
+                { "id": "smoking.intensity", "text": { "en": "Average smoking intensity?", "pl": "Średnia intensywność palenia?"}, "type": "number_input", "placeholder": "e.g., 20", "dependsOn": {"questionId": "smoking.pattern", "value": "Every day"} },
                 { "id": "smoking.start_age", "text": { "en": "Age you started smoking?", "pl": "Wiek rozpoczęcia palenia?"}, "type": "number_input", "placeholder": "e.g., 18" },
-                { "id": "smoking_years", "text": { "en": "Number of years smoked (excluding breaks)?", "pl": "Liczba lat palenia (bez przerw)?"}, "type": "number_input", "placeholder": "e.g., 10" },
-                { "id": "smoking.quit_date", "text": { "en": "Start date of quitting", "pl": "Data rzucenia palenia"}, "type": "date_input", "dependsOn": {"questionId": "smoking_status", "value": "Former"}},
+                { "id": "smoking.years_smoked", "text": { "en": "Number of years smoked (excluding breaks)?", "pl": "Liczba lat palenia (bez przerw)?"}, "type": "number_input", "placeholder": "e.g., 10" },
+                { "id": "smoking.quit_date", "text": { "en": "Year you quit smoking (ISO-8601)", "pl": "Rok rzucenia palenia"}, "type": "year_input", "dependsOn": {"questionId": "smoking_status", "value": "Former"}},
                 { "id": "smoking.other_tobacco_smoked", "text": {"en": "Other tobacco products used?", "pl": "Inne wyroby tytoniowe?"}, "type": "checkbox_group", "options": [{"id": "cigars", "label": "Cigars/Cigarillos"}, {"id": "pipe", "label": "Pipe"}, {"id": "shisha", "label": "Waterpipe"}, {"id": "none", "label": "None"}] },
                 { "id": "smoking.other_cigar_per_week", "text": {"en": "Cigars/Cigarillos per week", "pl": "Cygara/Cygaretki na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "value": true} },
                 { "id": "smoking.pipe_per_week", "text": {"en": "Pipe bowls per week", "pl": "Fajki na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "value": true} },
@@ -342,7 +309,8 @@
                 { "id": "shs.home_freq", "text": {"en": "Secondhand smoke at home (days/week)", "pl": "Bierne palenie w domu (dni/tydzień)"}, "type": "select", "options": ["0", "1-2", "3-4", "Daily"] },
                 { "id": "shs.work_freq", "text": {"en": "Secondhand smoke at work (days/week)", "pl": "Bierne palenie w pracy (dni/tydzień)"}, "type": "select", "options": ["0", "1-2", "3-4", "Daily"] },
                 { "id": "shs.public_30d_bars", "text": {"en": "Exposed in bars/restaurants (last 30d)?", "pl": "Narażenie w barach/restauracjach (ost. 30 dni)?"}, "type": "radio", "options": ["Yes", "No"] },
-                { "id": "shs.hours_7d", "text": {"en": "Total hours exposed to SHS in last 7 days", "pl": "Całkowita liczba godzin narażenia na dym w ciągu ostatnich 7 dni"}, "type": "number_input" }
+                { "id": "shs.hours_7d", "text": {"en": "Total hours exposed to SHS in last 7 days", "pl": "Całkowita liczba godzin narażenia na dym w ciągu ostatnich 7 dni"}, "type": "number_input" },
+                { "id": "shs.life_course", "text": {"en": "When were you exposed to secondhand smoke?", "pl": "Kiedy byłeś narażony na dym tytoniowy z drugiej ręki?"}, "type": "checkbox_group", "options": [{"id": "childhood", "label": "Childhood"}, {"id": "adult", "label": "Adult"}, {"id": "work", "label": "Work"}, {"id": "social", "label": "Social settings"}] }
               ]
             },
             {
@@ -381,6 +349,20 @@
                    {"id": "gen.prs_overall_band", "text": {"en": "Overall PRS Risk Band", "pl": "Ogólna kategoria ryzyka PRS"}, "type": "select", "dependsOn": {"questionId": "gen.prs_done", "value": "Yes"}, "options": ["Low", "Average", "High", "Very High"]},
 
                    { "id": "genetic_processing_consent", "type": "consent_checkbox", "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"] } }
+               ]
+             },
+             {
+               "id": "physical_activity_details",
+               "title": { "en": "Physical Activity Details (IPAQ)", "pl": "Szczegóły Aktywności Fizycznej (IPAQ)" },
+               "dependsOn": { "questionId": "pa.activity_level", "value": true },
+               "questions": [
+                 { "id": "pa.vig.days7", "text": { "en": "Vigorous physical activity (days/week)", "pl": "Intensywna aktywność fizyczna (dni/tydzień)" }, "type": "number_input", "min": 0, "max": 7 },
+                 { "id": "ipaq_vigorous_min", "text": { "en": "Average minutes of vigorous activity per day", "pl": "Średnia liczba minut intensywnej aktywności" }, "type": "number_input", "dependsOn": { "questionId": "pa.vig.days7", "operator": ">", "value": 0 } },
+                 { "id": "pa.mod.days7", "text": { "en": "Moderate physical activity (days/week)", "pl": "Umiarkowana aktywność fizyczna (dni/tydzień)" }, "type": "number_input", "min": 0, "max": 7 },
+                 { "id": "ipaq_moderate_min", "text": { "en": "Average minutes of moderate activity per day", "pl": "Średnia liczba minut umiarkowanej aktywności" }, "type": "number_input", "dependsOn": { "questionId": "pa.mod.days7", "operator": ">", "value": 0 } },
+                 { "id": "pa.walk.days7", "text": { "en": "Walking (days/week)", "pl": "Spacerowanie (dni/tydzień)" }, "type": "number_input", "min": 0, "max": 7 },
+                 { "id": "pa.walk.minperday", "text": { "en": "Average minutes of walking per day", "pl": "Średnia liczba minut spaceru" }, "type": "number_input", "dependsOn": { "questionId": "pa.walk.days7", "operator": ">", "value": 0 } },
+                 { "id": "ipaq_sitting", "text": { "en": "Hours spent sitting per day", "pl": "Godziny spędzane na siedząco dziennie" }, "type": "number_input" }
                ]
              },
             {
@@ -547,13 +529,13 @@
               "title": {"en": "Sexual Health (Optional)", "pl": "Zdrowie Seksualne (Opcjonalne)"},
               "questions": [
                 {"id": "sexhx.section_opt_in", "text": {"en": "Would you like to answer equal optional questions about sexual health?", "pl": "Czy chciałbyś odpowiedzieć na kilka opcjonalnych pytań dotyczących zdrowia seksualnego?"}, "type": "select", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}, {"value":"Prefer not to say", "label":"Prefer not to say"}]},
-                {"id": "sex_active", "text": {"en": "Currently sexually active?", "pl": "Czy jesteś obecnie aktywny/a seksualnie?"}, "type": "select", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}, {"value":"Prefer not to say", "label":"Prefer not to say"}], "dependsOn": {"questionId": "sexhx.section_opt_in", "value": "Yes"}},
+                {"id": "sexhx.ever_sexual_contact", "text": {"en": "Have you ever had any sexual contact?", "pl": "Czy kiedykolwiek miał(a)eś kontakt seksualny?"}, "type": "radio", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}, {"value":"Prefer not to say", "label":"Prefer not to say"}], "dependsOn": {"questionId": "sexhx.section_opt_in", "value": "Yes"}},
                 
-                {"id": "sexhx.new_partner_12m", "text": {"en": "New partner in last 12 months?", "pl": "Nowy partner w ciągu ostatnich 12 miesięcy?"}, "type": "select", "options": ["Yes", "No"], "dependsOn": {"questionId": "sex_active", "value": "Yes"}},
+                {"id": "sexhx.new_partner_12m", "text": {"en": "New partner in last 12 months?", "pl": "Nowy partner w ciągu ostatnich 12 miesięcy?"}, "type": "select", "options": ["Yes", "No"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sex_partner_gender", "text": {"en": "Gender of partners", "pl": "Płeć partnerów/partnerek"}, "type": "checkbox_group", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": [{"id": "male", "label": {"en":"Male", "pl": "Mężczyźni"}}, {"id": "female", "label": {"en":"Female", "pl": "Kobiety"}}, {"id": "other", "label": {"en":"Other", "pl": "Inne"}}, {"id": "prefer_not_to_say", "label": {"en":"Prefer not to say", "pl": "Wolę nie odpowiadać"}}]},
-                {"id": "sexhx.lifetime_partners_cat", "text": {"en": "Lifetime sexual partners", "pl": "Liczba partnerów/partnerek seksualnych w ciągu całego życia"}, "type": "select", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": ["1", "2-4", "5-9", "10+", "Prefer not to say"]},
-                {"id": "sex_last12m_partners", "text": {"en": "Partners in last 12 months", "pl": "Liczba partnerów/partnerek w ciągu ostatnich 12 miesięcy"}, "type": "select", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": ["0", "1", "2-4", "5+", "Prefer not to say"]},
+                {"id": "sex_partner_gender", "text": {"en": "Gender of partners", "pl": "Płeć partnerów/partnerek"}, "type": "checkbox_group", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": [{"id": "male", "label": {"en":"Male", "pl": "Mężczyźni"}}, {"id": "female", "label": {"en":"Female", "pl": "Kobiety"}}, {"id": "other", "label": {"en":"Other", "pl": "Inne"}}, {"id": "prefer_not_to_say", "label": {"en":"Prefer not to say", "pl": "Wolę nie odpowiadać"}}]},
+                {"id": "sexhx.lifetime_partners_cat", "text": {"en": "Lifetime sexual partners", "pl": "Liczba partnerów/partnerek seksualnych w ciągu całego życia"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["1", "2-4", "5-9", "10+", "Prefer not to say"]},
+                {"id": "sex_last12m_partners", "text": {"en": "Partners in last 12 months", "pl": "Liczba partnerów/partnerek w ciągu ostatnich 12 miesięcy"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["0", "1", "2-4", "5+", "Prefer not to say"]},
                 
                 {"id": "sexhx.sex_work_ever", "text": {"en": "Ever engaged in sex work?", "pl": "Praca seksualna kiedykolwiek?"}, "type": "radio", "options": ["Yes", "No", "Prefer not to say"]},
                 {"id": "sexhx.sex_work_role", "text": {"en": "Role in sex work", "pl": "Rola w pracy seksualnej"}, "type": "text_input", "dependsOn": {"questionId": "sexhx.sex_work_ever", "value": "Yes"}},
@@ -562,17 +544,18 @@
                 {"id": "sexhx.sex_sites_ever", "text": {"en": "Number of sexual partners (Lifetime)", "pl": "Liczba partnerów seksualnych (Całe życie)"}, "type": "select", "options": ["1-5", "6-10", "10+", "Prefer not to say"]},
                 {"id": "sexhx.sex_sites_12m", "text": {"en": "Number of sexual partners (Last 12m)", "pl": "Liczba partnerów seksualnych (Ost. 12 mies.)"}, "type": "select", "options": ["0", "1", "2+", "Prefer not to say"]},
                 
-                {"id": "sexhx.condom_use_12m", "text": {"en": "Condom/barrier use frequency", "pl": "Częstotliwość używania prezerwatyw/barier"}, "type": "select", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": ["Always", "Sometimes", "Never", "Prefer not to say"]},
+                {"id": "sexhx.condom_use_12m", "text": {"en": "Condom/barrier use frequency", "pl": "Częstotliwość używania prezerwatyw/barier"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["Always", "Sometimes", "Never", "Prefer not to say"]},
                 
-                {"id": "sex_sti_history", "text": {"en": "History of sexually transmitted infections (STIs)", "pl": "Historia infekcji przenoszonych drogą płciową (STI)"}, "type": "checkbox_group", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "exclusiveOptionId": "none", "options": [{"id": "hpv", "label": "HPV"}, {"id": "chlamydia", "label": "Chlamydia"}, {"id": "hiv", "label": "HIV"}, {"id": "syphilis", "label": "Syphilis"}, {"id": "gonorrhea", "label": "Gonorrhea"}, {"id": "none", "label": {"en": "None", "pl": "Brak"}}]},
+                {"id": "sexhx.sti_history_other", "text": {"en": "History of sexually transmitted infections (STIs)?", "pl": "Historia infekcji przenoszonych drogą płciową (STI)?"}, "type": "radio", "options": ["Yes", "No", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                {"id": "sexhx.sti_types_other", "text": {"en": "Which STIs have you been diagnosed with?", "pl": "Które STI zostały u Ciebie zdiagnozowane?"}, "type": "checkbox_group", "dependsOn": {"questionId": "sexhx.sti_history_other", "value": "Yes"}, "options": [{"id": "hpv", "label": "HPV"}, {"id": "chlamydia", "label": "Chlamydia"}, {"id": "hiv", "label": "HIV"}, {"id": "syphilis", "label": "Syphilis"}, {"id": "gonorrhea", "label": "Gonorrhea"}]},
                 
-                {"id": "sexhx.sti_treated_12m", "text": {"en": "Were you treated for an STI in the last 12 months?", "pl": "Czy byłeś/aś leczony/a na STI w ciągu ostatnich 12 miesięcy?"}, "type": "select", "options": ["Yes", "No"], "dependsOn": {"questionId": "sex_sti_history", "value": true}},
+                {"id": "sexhx.sti_treated_12m", "text": {"en": "Were you treated for an STI in the last 12 months?", "pl": "Czy byłeś/aś leczony/a na STI w ciągu ostatnich 12 miesięcy?"}, "type": "select", "options": ["Yes", "No"], "dependsOn": {"questionId": "sexhx.sti_history_other", "value": "Yes"}},
                 
                 {"id": "sexhx.hpv_precancer_history", "text": {"en": "History of HPV-related precancer (CIN2/3, HSIL)?", "pl": "Historia zmian przedrakowych HPV (CIN2/3, HSIL)?"}, "type": "select", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "sex_at_birth", "value": "Female"}},
 
-                {"id": "sex_anal", "text": {"en": "Anal intercourse?", "pl": "Stosunek analny?"}, "type": "select", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": ["Yes", "No", "Prefer not to say"]},
-                {"id": "sex_oral", "text": {"en": "Oral sex?", "pl": "Seks oralny?"}, "type": "select", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": ["Yes", "No", "Prefer not to say"]},
-                {"id": "sex_barriers_practices", "text": {"en": "How often were barriers (e.g., condoms) used during these practices?", "pl": "Jak często stosowano bariery (np. prezerwatywy) podczas tych praktyk?"}, "type": "select", "dependsOn": {"questionId": "sex_active", "value": "Yes"}, "options": ["Always", "Sometimes", "Never", "Prefer not to say"]}
+                {"id": "sex_anal", "text": {"en": "Anal intercourse?", "pl": "Stosunek analny?"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["Yes", "No", "Prefer not to say"]},
+                {"id": "sex_oral", "text": {"en": "Oral sex?", "pl": "Seks oralny?"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["Yes", "No", "Prefer not to say"]},
+                {"id": "sex_barriers_practices", "text": {"en": "How often were barriers (e.g., condoms) used during these practices?", "pl": "Jak często stosowano bariery (np. prezerwatywy) podczas tych praktyk?"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["Always", "Sometimes", "Never", "Prefer not to say"]}
               ]
             },
             {
@@ -639,18 +622,22 @@
                 {"id": "home_radon_value", "text": {"en": "Radon test result", "pl": "Wynik testu na radon"}, "type": "grouped_input", "dependsOn": {"questionId": "home_radon_tested", "value": "Yes"}, "options": {"unitQuestionId": "home_radon_unit", "units": ["Bq/m³", "pCi/L"]}},
                 {"id": "home_radon_date", "text": {"en": "When was it tested?", "pl": "Kiedy wykonano test?"}, "type": "year_input", "dependsOn": {"questionId": "home_radon_tested", "value": "Yes"}},
                 {"id": "home_shs_home", "text": {"en": "Secondhand smoke exposure at home", "pl": "Narażenie na dym tytoniowy w domu"}, "type": "select", "options": ["Never", "Occasionally", "Frequently", "Unsure"]},
-                {"id": "home_fuels", "text": {"en": "Primary cooking/heating fuels", "pl": "Główne paliwa do gotowania/ogrzewania"}, "type": "checkbox_group", "options": [{"id": "gas", "label": "Natural gas"}, {"id": "wood", "label": "Wood/biomass"}, {"id": "coal", "label": "Coal"}, {"id": "electricity", "label": "Electricity"}]},
-                {"id": "home_kitchen_vent", "text": {"en": "Ventilation when cooking", "pl": "Wentylacja podczas gotowania"}, "type": "select", "dependsOn": {"questionId": "home_fuels", "value": true}, "options": ["Always", "Sometimes", "Never"]},
+                {"id": "env.indoor.solidfuel_ever", "text": {"en": "Solid fuel cooking/heating exposure", "pl": "Narażenie na paliwo stałe przy gotowaniu/ogrzewaniu"}, "type": "radio", "options": ["Never", "Childhood", "Adult", "Both"]},
+                {"id": "home_kitchen_vent", "text": {"en": "Ventilation when cooking", "pl": "Wentylacja podczas gotowania"}, "type": "select", "dependsOn": {"questionId": "env.indoor.solidfuel_ever", "value": ["Childhood", "Adult", "Both"]}, "options": ["Always", "Sometimes", "Never"]},
                 {"id": "env.air.high_pollution_years", "text": {"en": "Years lived in high pollution area", "pl": "Lata mieszkania w rejonie o wysokim zanieczyszczeniu"}, "type": "number_input"},
                 {"id": "env_major_road", "text": {"en": "Distance to a major road", "pl": "Odległość od głównej drogi"}, "type": "select", "options": ["<50m", "50-300m", ">300m", "Unsure"]},
                 {"id": "env_industry", "text": {"en": "Heavy industry within ~5 km", "pl": "Przemysł ciężki w promieniu ~5 km"}, "type": "checkbox_group", "exclusiveOptionId": "none", "options": [{"id": "none", "label": "None"}, {"id": "refinery", "label": "Refinery"}, {"id": "chemical_plant", "label": "Chemical plant"}, {"id": "smelter", "label": "Smelter/Foundry"}, {"id": "power_plant", "label": "Power plant"}, {"id": "incinerator", "label": "Incinerator"}, {"id": "other", "label": "Other"}, {"id": "unsure", "label": "Unsure"}]},
                 {"id": "env_agriculture", "text": {"en": "Adjacent to large farmland", "pl": "Sąsiedztwo dużych pól uprawnych"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
                 {"id": "env.uv.sunburn_child", "text": {"en": "Severe sunburns in childhood?", "pl": "Poważne oparzenia słoneczne w dzieciństwie?"}, "type": "select", "options": ["Never", "Once/Twice", "Several times", "Many times"]},
+                {"id": "env.uv.sunburn_adult", "text": {"en": "Severe sunburns in adulthood?", "pl": "Poważne oparzenia słoneczne w dorosłości?"}, "type": "select", "options": ["Never", "1-2", "3-5", "6+"]},
+                {"id": "env.uv.sunbed_use", "text": {"en": "Ever used tanning beds/sunbeds?", "pl": "Czy kiedykolwiek używałeś solarium?"}, "type": "radio", "options": ["Never", "Former", "Current"]},
                 {"id": "env_outdoor_uv", "text": {"en": "Prolonged outdoor activity (work/hobby)", "pl": "Długotrwała aktywność na zewnątrz (praca/hobby)"}, "type": "select", "options": ["Rarely", "Some days", "Most days"]},
                 {"id": "water_source", "text": {"en": "Primary drinking water source", "pl": "Główne źródło wody pitnej"}, "type": "select", "options": ["Municipal", "Private well", "Bottled only", "Unsure"]},
                 {"id": "water_well_tested", "text": {"en": "Private well tested (12m)?", "pl": "Czy prywatna studnia była badana (12m)?"}, "type": "select", "dependsOn": {"questionId": "water_source", "value": "Private well"}, "options": ["Yes", "No", "Unsure"]},
                 {"id": "water_well_findings", "text": {"en": "Findings (if known)", "pl": "Wyniki (jeśli znane)"}, "type": "checkbox_group", "dependsOn": {"questionId": "water_well_tested", "value": "Yes"}, "options": [{"id": "arsenic", "label": "Arsenic"}, {"id": "nitrates", "label": "Nitrates"}, {"id": "other", "label": "Other"}]},
                 {"id": "env.pesticide.mix_freq", "text": {"en": "Frequency of mixing/applying pesticides", "pl": "Częstotliwość mieszania/stosowania pestycydów"}, "type": "select", "options": ["Never", "Less than once a month", "Monthly", "Weekly"]},
+                {"id": "env.pesticide.years_use", "text": {"en": "Total years using pesticides", "pl": "Całkowita liczba lat używania pestycydów"}, "type": "number_input", "dependsOn": {"questionId": "env.pesticide.mix_freq", "operator": "!=", "value": "Never"}},
+                {"id": "env.pesticide.protection", "text": {"en": "Protection used when applying pesticides", "pl": "Ochrona stosowana podczas stosowania pestycydów"}, "type": "checkbox_group", "dependsOn": {"questionId": "env.pesticide.mix_freq", "operator": "!=", "value": "Never"}, "options": [{"id": "gloves", "label": "Gloves"}, {"id": "mask", "label": "Mask/Respirator"}, {"id": "none", "label": "None"}]},
                 {"id": "env.pesticide.apply_freq", "text": {"en": "Frequency of pesticide application", "pl": "Częstotliwość stosowania pestycydów"}, "type": "select", "options": ["Never", "Seasonsal", "Year-round"]},
                 {"id": "env_wildfire_smoke", "text": {"en": "Wildfire smoke exposure", "pl": "Narażenie na dym z pożarów lasów"}, "type": "select", "options": ["Never", "Occasional", "Frequent", "Unsure"]}
               ]

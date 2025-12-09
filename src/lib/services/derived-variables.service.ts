@@ -154,7 +154,7 @@ function calculateWcrf(diet?: any, alcoholScore?: number, bmi?: number, ipaqCate
     if (!diet) return null;
     
     let score = 0;
-    let max = 4; // Diet (1), Alcohol (1), Body Fat (1), Activity (1)
+    const max = 4; // Diet (1), Alcohol (1), Body Fat (1), Activity (1)
 
     // 1. Plant Foods (Fruit/Veg >= 3 servings is pretty good, 5 is best)
     // Values: 0 (<1), 1 (1-2), 3 (3-4), 5 (5+)

@@ -37,7 +37,7 @@ import { SymptomDetails } from "@/components/assessment/SymptomDetails";
 import { FamilyCancerHistory } from "@/components/assessment/FamilyCancerHistory";
 import { Genetics } from "@/components/assessment/Genetics";
 import { FemaleHealth } from "@/components/assessment/FemaleHealth";
-import { PersonalMedicalHistory } from "@/components/assessment/PersonalMedicalHistory";
+import { GenericModule } from "@/components/assessment/GenericModule";
 import { PersonalCancerHistory } from "@/components/assessment/PersonalCancerHistory";
 import { ScreeningHistory } from "@/components/assessment/ScreeningHistory";
 import { SexualHealth } from "@/components/assessment/SexualHealth";
@@ -212,6 +212,15 @@ export default function AssessmentPage() {
       }
     }
     if(Array.isArray(question.dependsOn.value)){
+      // If dependencyAnswer is a JSON array string (from checkbox), parse it
+      try {
+        const parsedAnswer = JSON.parse(dependencyAnswer);
+        if(Array.isArray(parsedAnswer)) {
+           return parsedAnswer.some(val => (question.dependsOn?.value as string[]).includes(val));
+        }
+      } catch {
+        // Not a JSON array
+      }
       return question.dependsOn.value.includes(dependencyAnswer);
     }
     return dependencyAnswer === question.dependsOn.value;
@@ -316,7 +325,7 @@ export default function AssessmentPage() {
                     {m.id === 'family_cancer_history' && <FamilyCancerHistory value={answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : []} onChange={(v) => setAnswer('family_cancer_history', JSON.stringify(v))} options={m.options} />}
                     {m.id === 'genetics' && <Genetics answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'female_health' && <FemaleHealth answers={answers} onAnswer={setAnswer} questions={m.questions} />}
-                    {m.id === 'personal_medical_history' && <PersonalMedicalHistory answers={answers} onAnswer={setAnswer} options={m.options} />}
+                    {m.id === 'chronic_condition_details' && <GenericModule answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'personal_cancer_history' && <PersonalCancerHistory value={answers.personal_cancer_history ? JSON.parse(answers.personal_cancer_history) : []} onChange={(v) => setAnswer('personal_cancer_history', JSON.stringify(v))} options={m.options} />}
                     {m.id === 'screening_immunization' && <ScreeningHistory answers={answers} onAnswer={setAnswer} screeningGroups={m.screenings} immunizationQuestions={m.immunizations}/>}
                     {m.id === 'medications_iatrogenic' && <Medications answers={answers} onAnswer={setAnswer} questions={m.questions} />}

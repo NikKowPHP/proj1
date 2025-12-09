@@ -149,8 +149,16 @@ export const StandardizationService = {
 
       if (illnessList.length > 0) {
           standardized.advanced.illnesses = illnessList.map((illnessId: string) => {
-              const detailsKey = `illness_details_${illnessId}`;
-              const details = answers[detailsKey] ? (typeof answers[detailsKey] === 'string' ? JSON.parse(answers[detailsKey]) : answers[detailsKey]) : {};
+              // New Logic: specific fields per illness
+              const details: any = {};
+              
+              if (illnessId === 'hbv') details.status = answers['cond.hbv.status'];
+              if (illnessId === 'hcv') details.status = answers['cond.hcv.status'];
+              if (illnessId === 'cirrhosis') details.etiology = answers['cond.cirrhosis.etiology'];
+              if (illnessId === 'ibd') details.type = answers['cond.ibd.type'];
+              if (illnessId === 'diabetes') details.type = answers['cond.diabetes.type'];
+              if (illnessId === 'hypertension') details.controlled = answers['cond.hypertension.controlled'];
+
               return {
                   id: illnessId,
                   code: medicalConditionsMap[illnessId] || undefined,

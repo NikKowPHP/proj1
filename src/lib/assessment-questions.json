@@ -390,18 +390,53 @@
               ]
             },
             {
-              "id": "personal_medical_history",
-              "title": { "en": "Personal Medical History", "pl": "Osobista Historia Medyczna" },
-              "dependsOn": { "questionId": "cond.summary", "value": "true" },
-              "options": {
-                "illnesses": [
-                  { "id": "diabetes", "label": "Diabetes" }, { "id": "hypertension", "label": "Hypertension" }, { "id": "ibd", "label": "IBD" },
-                  { "id": "hbv", "label": "Hepatitis B" }, { "id": "hcv", "label": "Hepatitis C" }, { "id": "cirrhosis", "label": "Cirrhosis" },
-                  { "id": "hpv", "label": "HPV Infection" }, { "id": "hiv", "label": "HIV" }, { "id": "transplant", "label": "Organ Transplant" },
-                  { "id": "immunosuppression", "label": "Immunosuppression" }, { "id": "psc", "label": "PSC" },
-                  { "id": "pancreatitis", "label": "Chronic Pancreatitis" }, { "id": "copd", "label": "COPD" }, { "id": "other", "label": "Other" }
-                ]
-              }
+              "id": "chronic_condition_details",
+              "title": { "en": "Condition Details", "pl": "Szczegóły Chorób" },
+              "dependsOn": { "questionId": "cond.summary", "value": ["hbv", "hcv", "cirrhosis", "ibd", "diabetes", "hypertension"] },
+              "questions": [
+                {
+                  "id": "cond.hbv.status",
+                  "text": { "en": "Hepatitis B Status", "pl": "Status WZW B" },
+                  "type": "radio",
+                  "options": ["Chronic/Active", "Cured/Cleared", "Unsure"],
+                  "dependsOn": { "questionId": "cond.summary", "value": "hbv" }
+                },
+                {
+                  "id": "cond.hcv.status",
+                  "text": { "en": "Hepatitis C Status", "pl": "Status WZW C" },
+                  "type": "radio",
+                  "options": ["Chronic/Active", "Cured (SVR)", "Unsure"],
+                  "dependsOn": { "questionId": "cond.summary", "value": "hcv" }
+                },
+                {
+                  "id": "cond.cirrhosis.etiology",
+                  "text": { "en": "Main cause of Cirrhosis", "pl": "Główna przyczyna marskości" },
+                  "type": "select",
+                  "options": ["Alcohol", "Viral (Hep B/C)", "Fatty Liver (NASH)", "Autoimmune", "Other"],
+                  "dependsOn": { "questionId": "cond.summary", "value": "cirrhosis" }
+                },
+                {
+                  "id": "cond.ibd.type",
+                  "text": { "en": "Type of IBD", "pl": "Typ IBD" },
+                  "type": "radio",
+                  "options": ["Ulcerative Colitis", "Crohn's Disease", "Unsure"],
+                  "dependsOn": { "questionId": "cond.summary", "value": "ibd" }
+                },
+                {
+                  "id": "cond.diabetes.type",
+                   "text": {"en": "Type of Diabetes", "pl": "Typ cukrzycy"},
+                   "type": "radio",
+                   "options": ["Type 1", "Type 2", "Gestational", "Unsure"],
+                   "dependsOn": { "questionId": "cond.summary", "value": "diabetes"}
+                },
+                {
+                   "id": "cond.hypertension.controlled",
+                   "text": {"en": "Is your hypertension controlled with medication?", "pl": "Czy nadciśnienie jest kontrolowane lekami?"},
+                   "type": "radio",
+                   "options": ["Yes", "No", "Unsure"],
+                   "dependsOn": { "questionId": "cond.summary", "value": "hypertension"}
+                }
+              ]
             },
             {
               "id": "personal_cancer_history",

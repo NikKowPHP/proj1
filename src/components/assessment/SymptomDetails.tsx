@@ -19,6 +19,7 @@ interface SymptomDetailsValue {
   severity?: number;
   frequency?: string;
   associated_features?: string[];
+  notes?: string;
 }
 
 interface SymptomDetailsProps {
@@ -137,6 +138,15 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
                   </Chip>
                 ))}
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Notes (optional)</Label>
+               <textarea
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={value[symptom.id]?.notes || ""}
+                onChange={(e) => handleDetailChange(symptom.id, 'notes', e.target.value)}
+                placeholder="Describe your symptom in more detail..."
+              />
             </div>
           </CardContent>
         </Card>

@@ -12,6 +12,7 @@ import { Checkbox } from '../ui/checkbox';
 interface CancerDiagnosis {
   type?: string;
   year_dx?: number;
+  age_at_dx?: number;
   treatments?: string[];
   last_followup?: number;
   // New fields
@@ -92,6 +93,16 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
                 aria-invalid={!!errors[index]?.year_dx}
               />
               {errors[index]?.year_dx && <p className="text-sm text-destructive">{errors[index].year_dx}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label>Age at Diagnosis (Optional)</Label>
+               <input
+                type="number"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={item.age_at_dx || ""}
+                onChange={(e) => handleFieldChange(index, 'age_at_dx', e.target.value ? Number(e.target.value) : undefined)}
+                placeholder="e.g. 45"
+              />
             </div>
              <div className="space-y-2">
               <Label>Last Follow-up Year</Label>

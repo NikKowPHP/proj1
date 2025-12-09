@@ -30,6 +30,18 @@ describe("DerivedVariablesService", () => {
       expect(derived.bmi).toBeUndefined();
     });
 
+    it("should set bmi_obesity flag to true if BMI >= 30", () => {
+      const standardizedData = { core: { height_cm: 170, weight_kg: 90 } }; // BMI ~31.1
+      const derived = DerivedVariablesService.calculateAll(standardizedData);
+      expect(derived.flags.bmi_obesity).toBe(true);
+    });
+
+    it("should set bmi_obesity flag to false if BMI < 30", () => {
+      const standardizedData = { core: { height_cm: 180, weight_kg: 75 } }; // BMI ~23.1
+      const derived = DerivedVariablesService.calculateAll(standardizedData);
+      expect(derived.flags.bmi_obesity).toBe(false);
+    });
+
     it("should calculate pack-years correctly for a former smoker with quit_year", () => {
       const standardizedData = {
         core: { smoking_status: "Former" },

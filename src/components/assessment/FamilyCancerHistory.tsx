@@ -11,6 +11,7 @@ import { Checkbox } from "../ui/checkbox";
 interface CancerDiagnosis {
   cancer_type?: string;
   age_dx?: number;
+  laterality?: string;
 }
 
 interface FamilyMember {
@@ -225,6 +226,20 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
                       min={0}
                       max={100}
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Laterality (if applicable)</Label>
+                    <Select
+                      value={cancer.laterality}
+                      onValueChange={(val) => handleCancerFieldChange(index, cancerIndex, "laterality", val)}
+                    >
+                      <SelectTrigger><SelectValue placeholder="Select side" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Left">Left</SelectItem>
+                        <SelectItem value="Right">Right</SelectItem>
+                        <SelectItem value="Bilateral">Bilateral</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               ))}

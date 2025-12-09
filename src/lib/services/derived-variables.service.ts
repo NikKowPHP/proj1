@@ -270,6 +270,8 @@ export const DerivedVariablesService = {
           unit: "kg/m2",
           code: "39156-5", // LOINC code for BMI
         };
+        derived.flags = derived.flags || {};
+        derived.flags.bmi_obesity = bmi >= 30;
       }
       
       // Diet Calcs

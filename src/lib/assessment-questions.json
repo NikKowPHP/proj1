@@ -224,17 +224,25 @@
           "options": [
             { "id": "HP:0012378", "category": "A. Weight/Appetite", "label": { "en": "Fatigue", "pl": "Zmęczenie" } },
             { "id": "HP:0004355", "category": "A. Weight/Appetite", "label": { "en": "Unexplained weight loss", "pl": "Niewyjaśniona utrata wagi" }, "red_flag": true },
+            { "id": "HP:0030082", "category": "A. Weight/Appetite", "label": { "en": "Night sweats", "pl": "Nocne poty" }, "red_flag": true },
             { "id": "HP:0002239", "category": "G. GI", "label": { "en": "Abdominal pain", "pl": "Ból brzucha" } },
             { "id": "HP:0002014", "category": "G. GI", "label": { "en": "Diarrhea", "pl": "Biegunka" } },
             { "id": "HP:0012532", "category": "G. GI", "label": { "en": "Constipation", "pl": "Zaparcie" } },
+            { "id": "HP:0002028", "category": "G. GI", "label": { "en": "Abdominal bloating (persistent)", "pl": "Wzdęcia (uporczywe)" } },
+            { "id": "HP:0002015", "category": "G. GI", "label": { "en": "Dysphagia (Difficulty swallowing)", "pl": "Trudności w połykaniu" }, "red_flag": true },
             { "id": "HP:0002027", "category": "G. GI", "label": { "en": "Melena (Black tarry stool)", "pl": "Smoliste stolce" }, "red_flag": true },
             { "id": "HP:0001945", "category": "B. Systemic", "label": { "en": "Fever", "pl": "Gorączka" } },
             { "id": "HP:0000989", "category": "H. Skin/Mouth", "label": { "en": "Skin changes (new mole, sore)", "pl": "Zmiany skórne (nowy pieprzyk, rana)" } },
+            { "id": "HP:0000952", "category": "H. Skin/Mouth", "label": { "en": "Jaundice (Yellow skin/eyes)", "pl": "Żółtaczka" }, "red_flag": true },
             { "id": "HP:0002860", "category": "F. Breathing/ENT", "label": { "en": "Hemoptysis (Coughing blood)", "pl": "Krwioplucie" }, "red_flag": true },
+            { "id": "HP:0001609", "category": "F. Breathing/ENT", "label": { "en": "Hoarseness (Persistent)", "pl": "Chrypka (Utrzymująca się)" }, "red_flag": true },
+            { "id": "HP:0002118", "category": "F. Breathing/ENT", "label": { "en": "Persistent cough", "pl": "Uporczywy kaszel" } },
             { "id": "HP:0000132", "category": "J. Urinary", "label": { "en": "Hematuria (Blood in urine)", "pl": "Krwiomocz" }, "red_flag": true },
             { "id": "HP:0000868", "category": "E. Bleeding", "label": { "en": "Postmenopausal bleeding", "pl": "Krwawienie pomenopauzalne" }, "red_flag": true },
+            { "id": "HP:0012532", "category": "I. Reproductive", "label": { "en": "Post-coital bleeding", "pl": "Krwawienie po stosunku" }, "red_flag": true },
             { "id": "HP:0001250", "category": "K. Neurologic", "label": { "en": "Seizures (new onset)", "pl": "Napady padaczkowe (nowe)" }, "red_flag": true },
             { "id": "HP:0003002", "category": "I. Breast/Testicular", "label": { "en": "Breast lump", "pl": "Guzek piersi" }, "red_flag": true },
+            { "id": "HP:0002716", "category": "B. Systemic", "label": { "en": "Lymphadenopathy (Swollen nodes)", "pl": "Powiększone węzły chłonne" } },
             { "id": "HP:0000000", "label": { "en": "None", "pl": "Brak" } }
           ]
         },
@@ -248,6 +256,8 @@
             {"id": "diabetes", "label": "Diabetes"}, {"id": "hypertension", "label": "Hypertension"}, {"id": "ibd", "label": "IBD"}, {"id": "hbv", "label": "Hepatitis B"}, {"id": "hcv", "label": "Hepatitis C"}, {"id": "cirrhosis", "label": "Cirrhosis"}, {"id": "hpv", "label": "HPV Infection"}, {"id": "hiv", "label": "HIV"}, {"id": "transplant", "label": "Organ Transplant"}, {"id": "immunosuppression", "label": "Immunosuppression"}, {"id": "psc", "label": "PSC (Primary Sclerosing Cholangitis)"}, {"id": "pancreatitis", "label": "Chronic Pancreatitis"}, {"id": "copd", "label": "COPD"}, {"id": "other", "label": "Other"}
         ] },
         { "id": "ca.any_history", "text": {"en": "Ever diagnosed with cancer?", "pl": "Czy kiedykolwiek zdiagnozowano u Ciebie raka?"}, "type": "radio", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}, {"value": "Unsure", "label": "Unsure"}] },
+        { "id": "ca.active_treatment_now", "text": {"en": "Are you currently receiving aggressive cancer treatment (e.g., Chemo/Radiation)?", "pl": "Czy obecnie otrzymujesz agresywne leczenie przeciwnowotworowe (np. chemioterapia/radioterapia)?"}, "type": "radio", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}], "dependsOn": {"questionId": "ca.any_history", "value": "Yes"} },
+
         { "id": "occ.exposure_any", "text": {"en": "Any significant occupational exposure?", "pl": "Czy było jakiekolwiek istotne narażenie zawodowe?"}, "type": "radio", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}, {"value": "Unsure", "label": "Unsure"}] }
       ]
     },
@@ -432,7 +442,8 @@
                   "text": {"en": "Colonoscopy", "pl":"Kolonoskopia"}, 
                   "dependsOn": {"questionId": "screen.summary", "value": "colonoscopy"},
                   "questions": [
-                    {"id": "screen.colonoscopy.date", "text": {"en":"Year of last colonoscopy", "pl":"Rok ostatniej kolonoskopii"}, "type": "year_input"}
+                    {"id": "screen.colonoscopy.date", "text": {"en":"Year of last colonoscopy", "pl":"Rok ostatniej kolonoskopii"}, "type": "year_input"},
+                    {"id": "screen.colonoscopy.finding", "text": {"en":"Result/Finding", "pl":"Wynik"}, "type": "select", "options": ["Normal", "Polyp(s)", "Cancer", "Other", "Unsure"]}
                   ]
                 },
                 {
@@ -440,7 +451,8 @@
                   "text": {"en":"Mammogram", "pl":"Mammografia"}, 
                   "dependsOn": {"questionId": "screen.summary", "value": "mammogram"}, 
                   "questions": [
-                    {"id": "screen.mammo.date", "text": {"en":"Year of last mammogram", "pl":"Rok ostatniej mammografii"}, "type": "year_input"}
+                    {"id": "screen.mammo.date", "text": {"en":"Year of last mammogram", "pl":"Rok ostatniej mammografii"}, "type": "year_input"},
+                    {"id": "screen.mammo.result", "text": {"en":"Result", "pl":"Wynik"}, "type": "select", "options": ["Normal", "Abnormal", "Unsure"]}
                   ]
                 },
                 {
@@ -458,7 +470,8 @@
                   "text": {"en":"PSA Test", "pl": "Badanie PSA"}, 
                   "dependsOn": {"questionId": "screen.summary", "value": "psa_test"}, 
                   "questions": [
-                    {"id": "screen.psa.date", "text": {"en":"Year of last test", "pl": "Rok ostatniego badania"}, "type": "year_input"}
+                    {"id": "screen.psa.date", "text": {"en":"Year of last test", "pl":"Rok ostatniego badania"}, "type": "year_input"},
+                    {"id": "screen.psa.result", "text": {"en":"Result", "pl":"Wynik"}, "type": "select", "options": ["Normal", "Elevated", "Unsure"]}
                   ]
                 },
                 {
@@ -466,7 +479,8 @@
                   "text": {"en": "Lung Cancer Screening (LDCT)", "pl": "Badanie przesiewowe raka płuc (LDCT)"},
                   "dependsOn": {"questionId": "screen.summary", "value": "lung_scan"}, 
                   "questions": [
-                    {"id": "screen.lung.ldct_last_year", "text": {"en": "Year of last LDCT", "pl": "Rok ostatniego LDCT"}, "type": "year_input"}
+                    {"id": "screen.lung.ldct_last_year", "text": {"en": "Year of last LDCT", "pl": "Rok ostatniego LDCT"}, "type": "year_input"},
+                    {"id": "screen.lung.result", "text": {"en":"Result", "pl":"Wynik"}, "type": "select", "options": ["Normal", "Abnormal/Nodule", "Unsure"]}
                   ]
                 },
                 {
@@ -474,7 +488,8 @@
                    "text": {"en": "Skin Cancer Screening", "pl": "Badanie skóry"},
                    "dependsOn": {"questionId": "screen.summary", "value": "skin_exam"},
                    "questions": [
-                     {"id": "screen.skin.last_year", "text": {"en": "Year of last exam", "pl": "Rok ostatniego badania"}, "type": "year_input"}
+                      {"id": "screen.skin.last_year", "text": {"en": "Year of last exam", "pl": "Rok ostatniego badania"}, "type": "year_input"},
+                      {"id": "screen.skin.finding", "text": {"en": "Finding", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Pre-cancerous", "Melanoma", "Other", "Unsure"]}
                    ]
                 },
                 {
@@ -482,7 +497,8 @@
                    "text": {"en": "Liver Cancer Screening", "pl": "Badanie wątroby"},
                    "dependsOn": {"questionId": "screen.summary", "value": "liver_us"},
                    "questions": [
-                     {"id": "screen.hcc.us_last_year", "text": {"en": "Year of last ultrasound", "pl": "Rok ostatniego USG"}, "type": "year_input"}
+                      {"id": "screen.hcc.us_last_year", "text": {"en": "Year of last ultrasound", "pl": "Rok ostatniego USG"}, "type": "year_input"},
+                      {"id": "screen.hcc.result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Abnormal", "Unsure"]}
                    ]
                 },
                 {
@@ -490,7 +506,8 @@
                     "text": {"en": "Upper Endoscopy", "pl": "Gastroskopia"},
                     "dependsOn": {"questionId": "screen.summary", "value": "gastroscopy"},
                     "questions": [
-                      {"id": "screen.upper_endo.last_year", "text": {"en": "Year of last endoscopy", "pl": "Rok ostatniej gastroskopii"}, "type": "year_input"}
+                      {"id": "screen.upper_endo.last_year", "text": {"en": "Year of last endoscopy", "pl": "Rok ostatniej gastroskopii"}, "type": "year_input"},
+                      {"id": "screen.upper_endo.finding", "text": {"en": "Finding", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Gastritis", "Barrett's", "Ulcer", "Cancer", "Other"]}
                     ]
                 }
               ],
@@ -618,9 +635,11 @@
                 {"id": "home_year_built", "text": {"en": "Year building was constructed", "pl": "Rok budowy budynku"}, "type": "year_input", "placeholder": "e.g., 1985"},
                 {"id": "home_basement", "text": {"en": "Does your home have a basement?", "pl": "Czy Twój dom ma piwnicę?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
                 {"id": "env.asbestos.home_status", "text": {"en": "Asbestos in home known?", "pl": "Czy wiadomo o obecności azbestu w domu?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
+                {"id": "env.asbestos.disturbance", "text": {"en": "Is the asbestos disturbed/damaged?", "pl": "Czy azbest jest uszkodzony?"}, "type": "select", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "env.asbestos.home_status", "value": "Yes"}},
                 {"id": "home_radon_tested", "text": {"en": "Home tested for radon?", "pl": "Czy dom był badany na obecność radonu?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
                 {"id": "home_radon_value", "text": {"en": "Radon test result", "pl": "Wynik testu na radon"}, "type": "grouped_input", "dependsOn": {"questionId": "home_radon_tested", "value": "Yes"}, "options": {"unitQuestionId": "home_radon_unit", "units": ["Bq/m³", "pCi/L"]}},
                 {"id": "home_radon_date", "text": {"en": "When was it tested?", "pl": "Kiedy wykonano test?"}, "type": "year_input", "dependsOn": {"questionId": "home_radon_tested", "value": "Yes"}},
+                {"id": "env.radon.mitigation_done", "text": {"en": "Has mitigation been performed?", "pl": "Czy wykonano mitygację?"}, "type": "select", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "home_radon_tested", "value": "Yes"}},
                 {"id": "home_shs_home", "text": {"en": "Secondhand smoke exposure at home", "pl": "Narażenie na dym tytoniowy w domu"}, "type": "select", "options": ["Never", "Occasionally", "Frequently", "Unsure"]},
                 {"id": "env.indoor.solidfuel_ever", "text": {"en": "Solid fuel cooking/heating exposure", "pl": "Narażenie na paliwo stałe przy gotowaniu/ogrzewaniu"}, "type": "radio", "options": ["Never", "Childhood", "Adult", "Both"]},
                 {"id": "home_kitchen_vent", "text": {"en": "Ventilation when cooking", "pl": "Wentylacja podczas gotowania"}, "type": "select", "dependsOn": {"questionId": "env.indoor.solidfuel_ever", "value": ["Childhood", "Adult", "Both"]}, "options": ["Always", "Sometimes", "Never"]},

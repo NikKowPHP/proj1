@@ -187,17 +187,25 @@
            "max": 20
         },
         {
-           "id": "diet.legumes_freq_week",
-           "text": { "en": "Legumes/beans frequency (times/week)", "pl": "Częstość spożywania roślin strączkowych (razy/tydzień)" },
-           "type": "number_input",
-           "min": 0,
-           "max": 20
+            "id": "diet.legumes_freq_week",
+            "text": { "en": "Legumes/beans frequency (times/week)", "pl": "Częstość spożywania roślin strączkowych (razy/tydzień)" },
+            "type": "number_input",
+            "min": 0,
+            "max": 20,
+            "dependsOn": {
+              "or": [
+                { "questionId": "diet.fv_portions_day", "operator": "<", "value": 4 },
+                { "questionId": "diet.whole_grains_servings_day", "operator": "<", "value": 1.5 }
+              ]
+            }
         },
         {
            "id": "diet.upf_share_pct",
            "text": { "en": "Estimated share of Ultra-Processed Foods (%)", "pl": "Szacowany udział żywności wysokoprzetworzonej (%)" },
-           "type": "select",
-           "options": ["<10%", "10-30%", "30-50%", ">50%"]
+           "type": "slider",
+           "min": 0,
+           "max": 100,
+           "dependsOn": { "questionId": "diet.fastfoods_freq_week", "operator": ">=", "value": 2 }
         },
         {
             "id": "diet.ssb_container",
@@ -232,11 +240,11 @@
             { "id": "HP:0002015", "category": "G. GI", "label": { "en": "Dysphagia (Difficulty swallowing)", "pl": "Trudności w połykaniu" }, "red_flag": true },
             { "id": "HP:0002027", "category": "G. GI", "label": { "en": "Melena (Black tarry stool)", "pl": "Smoliste stolce" }, "red_flag": true },
             { "id": "HP:0001945", "category": "B. Systemic", "label": { "en": "Fever", "pl": "Gorączka" } },
-            { "id": "HP:0000989", "category": "H. Skin/Mouth", "label": { "en": "Skin changes (new mole, sore)", "pl": "Zmiany skórne (nowy pieprzyk, rana)" } },
+            { "id": "HP:0000989", "category": "H. Skin/Mouth", "label": { "en": "Skin changes (new mole, sore)", "pl": "Zmiany skórne (nowy pieprzyk, rana)" }, "red_flag": true },
             { "id": "HP:0000952", "category": "H. Skin/Mouth", "label": { "en": "Jaundice (Yellow skin/eyes)", "pl": "Żółtaczka" }, "red_flag": true },
             { "id": "HP:0002860", "category": "F. Breathing/ENT", "label": { "en": "Hemoptysis (Coughing blood)", "pl": "Krwioplucie" }, "red_flag": true },
             { "id": "HP:0001609", "category": "F. Breathing/ENT", "label": { "en": "Hoarseness (Persistent)", "pl": "Chrypka (Utrzymująca się)" }, "red_flag": true },
-            { "id": "HP:0002118", "category": "F. Breathing/ENT", "label": { "en": "Persistent cough", "pl": "Uporczywy kaszel" } },
+            { "id": "HP:0002118", "category": "F. Breathing/ENT", "label": { "en": "Persistent cough", "pl": "Uporczywy kaszel" }, "red_flag": true },
             { "id": "HP:0000132", "category": "J. Urinary", "label": { "en": "Hematuria (Blood in urine)", "pl": "Krwiomocz" }, "red_flag": true },
             { "id": "HP:0000868", "category": "E. Bleeding", "label": { "en": "Postmenopausal bleeding", "pl": "Krwawienie pomenopauzalne" }, "red_flag": true },
             { "id": "HP:0012532", "category": "I. Reproductive", "label": { "en": "Post-coital bleeding", "pl": "Krwawienie po stosunku" }, "red_flag": true },
@@ -356,7 +364,7 @@
                    
                    {"id": "gen.prs_done", "text": {"en": "Polygenic Risk Score (PRS) done?", "pl": "Badanie Polygenic Risk Score (PRS)?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
                    {"id": "gen.prs_cancers_flagged", "text": {"en": "Cancers with increased risk in PRS", "pl": "Nowotwory o zwiększonym ryzyku w PRS"}, "type": "checkbox_group", "dependsOn": {"questionId": "gen.prs_done", "value": "Yes"}, "options": [{"id": "breast", "label": "Breast"}, {"id": "prostate", "label": "Prostate"}, {"id": "colorectal", "label": "Colorectal"}, {"id": "lung", "label": "Lung"}]},
-                   {"id": "gen.prs_overall_band", "text": {"en": "Overall PRS Risk Band", "pl": "Ogólna kategoria ryzyka PRS"}, "type": "select", "dependsOn": {"questionId": "gen.prs_done", "value": "Yes"}, "options": ["Low", "Average", "High", "Very High"]},
+                   {"id": "gen.prs_overall_band", "text": {"en": "Overall PRS Risk Band", "pl": "Ogólna kategoria ryzyka PRS"}, "type": "select", "dependsOn": {"questionId": "gen.prs_done", "value": "Yes"}, "options": ["lower", "average", "higher", "mixed", "not_sure"]},
 
                    { "id": "genetic_processing_consent", "type": "consent_checkbox", "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"] } }
                ]
@@ -367,12 +375,12 @@
                "dependsOn": { "questionId": "pa.activity_level", "value": true },
                "questions": [
                  { "id": "pa.vig.days7", "text": { "en": "Vigorous physical activity (days/week)", "pl": "Intensywna aktywność fizyczna (dni/tydzień)" }, "type": "number_input", "min": 0, "max": 7 },
-                 { "id": "ipaq_vigorous_min", "text": { "en": "Average minutes of vigorous activity per day", "pl": "Średnia liczba minut intensywnej aktywności" }, "type": "number_input", "dependsOn": { "questionId": "pa.vig.days7", "operator": ">", "value": 0 } },
+                 { "id": "pa.vig.minperday", "text": { "en": "Average minutes of vigorous activity per day", "pl": "Średnia liczba minut intensywnej aktywności" }, "type": "number_input", "dependsOn": { "questionId": "pa.vig.days7", "operator": ">", "value": 0 } },
                  { "id": "pa.mod.days7", "text": { "en": "Moderate physical activity (days/week)", "pl": "Umiarkowana aktywność fizyczna (dni/tydzień)" }, "type": "number_input", "min": 0, "max": 7 },
-                 { "id": "ipaq_moderate_min", "text": { "en": "Average minutes of moderate activity per day", "pl": "Średnia liczba minut umiarkowanej aktywności" }, "type": "number_input", "dependsOn": { "questionId": "pa.mod.days7", "operator": ">", "value": 0 } },
+                 { "id": "pa.mod.minperday", "text": { "en": "Average minutes of moderate activity per day", "pl": "Średnia liczba minut umiarkowanej aktywności" }, "type": "number_input", "dependsOn": { "questionId": "pa.mod.days7", "operator": ">", "value": 0 } },
                  { "id": "pa.walk.days7", "text": { "en": "Walking (days/week)", "pl": "Spacerowanie (dni/tydzień)" }, "type": "number_input", "min": 0, "max": 7 },
                  { "id": "pa.walk.minperday", "text": { "en": "Average minutes of walking per day", "pl": "Średnia liczba minut spaceru" }, "type": "number_input", "dependsOn": { "questionId": "pa.walk.days7", "operator": ">", "value": 0 } },
-                 { "id": "ipaq_sitting", "text": { "en": "Hours spent sitting per day", "pl": "Godziny spędzane na siedząco dziennie" }, "type": "number_input" }
+                 { "id": "pa.sit.min_day", "text": { "en": "Hours spent sitting per day", "pl": "Godziny spędzane na siedząco dziennie" }, "type": "number_input" }
                ]
              },
             {
@@ -585,9 +593,9 @@
                 
                 {"id": "sexhx.new_partner_12m", "text": {"en": "New partner in last 12 months?", "pl": "Nowy partner w ciągu ostatnich 12 miesięcy?"}, "type": "select", "options": ["Yes", "No"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sex_partner_gender", "text": {"en": "Gender of partners", "pl": "Płeć partnerów/partnerek"}, "type": "checkbox_group", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": [{"id": "male", "label": {"en":"Male", "pl": "Mężczyźni"}}, {"id": "female", "label": {"en":"Female", "pl": "Kobiety"}}, {"id": "other", "label": {"en":"Other", "pl": "Inne"}}, {"id": "prefer_not_to_say", "label": {"en":"Prefer not to say", "pl": "Wolę nie odpowiadać"}}]},
+                {"id": "sexhx.partner_genders", "text": {"en": "Gender of partners", "pl": "Płeć partnerów/partnerek"}, "type": "checkbox_group", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": [{"id": "male", "label": {"en":"Male", "pl": "Mężczyźni"}}, {"id": "female", "label": {"en":"Female", "pl": "Kobiety"}}, {"id": "other", "label": {"en":"Other", "pl": "Inne"}}, {"id": "prefer_not_to_say", "label": {"en":"Prefer not to say", "pl": "Wolę nie odpowiadać"}}]},
                 {"id": "sexhx.lifetime_partners_cat", "text": {"en": "Lifetime sexual partners", "pl": "Liczba partnerów/partnerek seksualnych w ciągu całego życia"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["1", "2-4", "5-9", "10+", "Prefer not to say"]},
-                {"id": "sex_last12m_partners", "text": {"en": "Partners in last 12 months", "pl": "Liczba partnerów/partnerek w ciągu ostatnich 12 miesięcy"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["0", "1", "2-4", "5+", "Prefer not to say"]},
+                {"id": "sexhx.partners_12m_cat", "text": {"en": "Partners in last 12 months", "pl": "Liczba partnerów/partnerek w ciągu ostatnich 12 miesięcy"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["0", "1", "2-4", "5+", "Prefer not to say"]},
                 
                 {"id": "sexhx.sex_work_ever", "text": {"en": "Ever engaged in sex work?", "pl": "Praca seksualna kiedykolwiek?"}, "type": "radio", "options": ["Yes", "No", "Prefer not to say"]},
                 {"id": "sexhx.sex_work_role", "text": {"en": "Role in sex work", "pl": "Rola w pracy seksualnej"}, "type": "text_input", "dependsOn": {"questionId": "sexhx.sex_work_ever", "value": "Yes"}},
@@ -665,36 +673,43 @@
               "id": "environmental_exposures",
               "title": {"en": "Environmental Exposures (Optional)", "pl": "Narażenie Środowiskowe (Opcjonalne)"},
               "questions": [
-                {"id": "home_years_here", "text": {"en": "Years at current residence", "pl": "Lata w obecnym miejscu zamieszkania"}, "type": "number_input"},
-                {"id": "home_postal_coarse", "text": {"en": "Postal code (first part only for privacy)", "pl": "Kod pocztowy (tylko pierwsza część dla prywatności)"}, "type": "text_input", "placeholder": "e.g., 01-1xx"},
-                {"id": "home_year_built", "text": {"en": "Year building was constructed", "pl": "Rok budowy budynku"}, "type": "year_input", "placeholder": "e.g., 1985"},
-                {"id": "home_basement", "text": {"en": "Does your home have a basement?", "pl": "Czy Twój dom ma piwnicę?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
-                {"id": "env.asbestos.home_status", "text": {"en": "Asbestos in home known?", "pl": "Czy wiadomo o obecności azbestu w domu?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
-                {"id": "env.asbestos.disturbance", "text": {"en": "Is the asbestos disturbed/damaged?", "pl": "Czy azbest jest uszkodzony?"}, "type": "select", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "env.asbestos.home_status", "value": "Yes"}},
-                {"id": "home_radon_tested", "text": {"en": "Home tested for radon?", "pl": "Czy dom był badany na obecność radonu?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
-                {"id": "home_radon_value", "text": {"en": "Radon test result", "pl": "Wynik testu na radon"}, "type": "grouped_input", "dependsOn": {"questionId": "home_radon_tested", "value": "Yes"}, "options": {"unitQuestionId": "home_radon_unit", "units": ["Bq/m³", "pCi/L"]}},
-                {"id": "home_radon_date", "text": {"en": "When was it tested?", "pl": "Kiedy wykonano test?"}, "type": "year_input", "dependsOn": {"questionId": "home_radon_tested", "value": "Yes"}},
-                {"id": "env.radon.mitigation_done", "text": {"en": "Has mitigation been performed?", "pl": "Czy wykonano mitygację?"}, "type": "select", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "home_radon_tested", "value": "Yes"}},
-                {"id": "home_shs_home", "text": {"en": "Secondhand smoke exposure at home", "pl": "Narażenie na dym tytoniowy w domu"}, "type": "select", "options": ["Never", "Occasionally", "Frequently", "Unsure"]},
-                {"id": "env.indoor.solidfuel_ever", "text": {"en": "Solid fuel cooking/heating exposure", "pl": "Narażenie na paliwo stałe przy gotowaniu/ogrzewaniu"}, "type": "radio", "options": ["Never", "Childhood", "Adult", "Both"]},
-                {"id": "home_kitchen_vent", "text": {"en": "Ventilation when cooking", "pl": "Wentylacja podczas gotowania"}, "type": "select", "dependsOn": {"questionId": "env.indoor.solidfuel_ever", "value": ["Childhood", "Adult", "Both"]}, "options": ["Always", "Sometimes", "Never"]},
-                {"id": "env.air.high_pollution_years", "text": {"en": "Years lived in high pollution area", "pl": "Lata mieszkania w rejonie o wysokim zanieczyszczeniu"}, "type": "number_input"},
-                {"id": "env_major_road", "text": {"en": "Distance to a major road", "pl": "Odległość od głównej drogi"}, "type": "select", "options": ["<50m", "50-300m", ">300m", "Unsure"]},
-                {"id": "env_industry", "text": {"en": "Heavy industry within ~5 km", "pl": "Przemysł ciężki w promieniu ~5 km"}, "type": "checkbox_group", "exclusiveOptionId": "none", "options": [{"id": "none", "label": "None"}, {"id": "refinery", "label": "Refinery"}, {"id": "chemical_plant", "label": "Chemical plant"}, {"id": "smelter", "label": "Smelter/Foundry"}, {"id": "power_plant", "label": "Power plant"}, {"id": "incinerator", "label": "Incinerator"}, {"id": "other", "label": "Other"}, {"id": "unsure", "label": "Unsure"}]},
-                {"id": "env_agriculture", "text": {"en": "Adjacent to large farmland", "pl": "Sąsiedztwo dużych pól uprawnych"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
-                {"id": "env.uv.sunburn_child", "text": {"en": "Severe sunburns in childhood?", "pl": "Poważne oparzenia słoneczne w dzieciństwie?"}, "type": "select", "options": ["Never", "Once/Twice", "Several times", "Many times"]},
-                {"id": "env.uv.sunburn_adult", "text": {"en": "Severe sunburns in adulthood?", "pl": "Poważne oparzenia słoneczne w dorosłości?"}, "type": "select", "options": ["Never", "1-2", "3-5", "6+"]},
-                {"id": "env.uv.sunbed_use", "text": {"en": "Ever used tanning beds/sunbeds?", "pl": "Czy kiedykolwiek używałeś solarium?"}, "type": "radio", "options": ["Never", "Former", "Current"]},
-                {"id": "env_outdoor_uv", "text": {"en": "Prolonged outdoor activity (work/hobby)", "pl": "Długotrwała aktywność na zewnątrz (praca/hobby)"}, "type": "select", "options": ["Rarely", "Some days", "Most days"]},
-                {"id": "water_source", "text": {"en": "Primary drinking water source", "pl": "Główne źródło wody pitnej"}, "type": "select", "options": ["Municipal", "Private well", "Bottled only", "Unsure"]},
-                {"id": "water_well_tested", "text": {"en": "Private well tested (12m)?", "pl": "Czy prywatna studnia była badana (12m)?"}, "type": "select", "dependsOn": {"questionId": "water_source", "value": "Private well"}, "options": ["Yes", "No", "Unsure"]},
-                {"id": "water_well_findings", "text": {"en": "Findings (if known)", "pl": "Wyniki (jeśli znane)"}, "type": "checkbox_group", "dependsOn": {"questionId": "water_well_tested", "value": "Yes"}, "options": [{"id": "arsenic", "label": "Arsenic"}, {"id": "nitrates", "label": "Nitrates"}, {"id": "other", "label": "Other"}]},
-                {"id": "env.pesticide.mix_freq", "text": {"en": "Frequency of mixing/applying pesticides", "pl": "Częstotliwość mieszania/stosowania pestycydów"}, "type": "select", "options": ["Never", "Less than once a month", "Monthly", "Weekly"]},
-                {"id": "env.pesticide.years_use", "text": {"en": "Total years using pesticides", "pl": "Całkowita liczba lat używania pestycydów"}, "type": "number_input", "dependsOn": {"questionId": "env.pesticide.mix_freq", "operator": "!=", "value": "Never"}},
-                {"id": "env.pesticide.protection", "text": {"en": "Protection used when applying pesticides", "pl": "Ochrona stosowana podczas stosowania pestycydów"}, "type": "checkbox_group", "dependsOn": {"questionId": "env.pesticide.mix_freq", "operator": "!=", "value": "Never"}, "options": [{"id": "gloves", "label": "Gloves"}, {"id": "mask", "label": "Mask/Respirator"}, {"id": "none", "label": "None"}]},
-                {"id": "env.pesticide.apply_freq", "text": {"en": "Frequency of pesticide application", "pl": "Częstotliwość stosowania pestycydów"}, "type": "select", "options": ["Never", "Seasonsal", "Year-round"]},
-                {"id": "env_wildfire_smoke", "text": {"en": "Wildfire smoke exposure", "pl": "Narażenie na dym z pożarów lasów"}, "type": "select", "options": ["Never", "Occasional", "Frequent", "Unsure"]}
+                {
+                  "id": "env.summary",
+                  "text": { "en": "Select all that apply to your history", "pl": "Zaznacz wszystkie, które dotyczą Twojej historii" },
+                  "type": "checkbox_group",
+                  "options": [
+                    { "id": "traffic_air", "label": { "en": "Lived near heavy traffic or in high pollution city", "pl": "Mieszkanie w pobliżu dużego ruchu lub w mieście o dużym zanieczyszczeniu" } },
+                    { "id": "industry", "label": { "en": "Lived near heavy industry/power plant", "pl": "Mieszkanie w pobliżu przemysłu ciężkiego/elektrowni" } },
+                    { "id": "solid_fuel", "label": { "en": "Used coal/wood for cooking/heating indoors", "pl": "Używanie węgla/drewna do gotowania/ogrzewania w domu" } },
+                    { "id": "radon", "label": { "en": "Lived in high radon area", "pl": "Mieszkanie w rejonie o wysokim stężeniu radonu" } },
+                    { "id": "asbestos", "label": { "en": "Known asbestos in home", "pl": "Znany azbest w domu" } },
+                    { "id": "private_well", "label": { "en": "Drank from private well", "pl": "Picie wody z prywatnej studni" } },
+                    { "id": "pesticides", "label": { "en": "Regular pesticide use (mixing/applying)", "pl": "Regularne stosowanie pestycydów (mieszanie/stosowanie)" } },
+                    { "id": "sunbed", "label": { "en": "Sunbed/Tanning salon use", "pl": "Korzystanie z solarium" } },
+                    { "id": "none", "label": { "en": "None of the above", "pl": "Żadne z powyższych" } }
+                  ],
+                  "exclusiveOptionId": "none"
+                },
+                
+                { "id": "env.air.high_pollution_years", "text": {"en": "Years lived in area?", "pl": "Lata mieszkania w rejonie?"}, "type": "number_input", "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "traffic_air"} },
+                { "id": "env.industry.type", "text": {"en": "Industry type", "pl": "Rodzaj przemysłu"}, "type": "checkbox_group", "options": [{"id": "refinery", "label": "Refinery"}, {"id": "chemical", "label": "Chemical Plant"}, {"id": "smelter", "label": "Smelter"}], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "industry"} },
+                
+                { "id": "env.indoor.solidfuel_years", "text": {"en": "Years of exposure?", "pl": "Lata narażenia?"}, "type": "number_input", "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "solid_fuel"} },
+                { "id": "env.indoor.ventilation", "text": {"en": "Was ventilation used?", "pl": "Czy używano wentylacji?"}, "type": "select", "options": ["Always", "Sometimes", "Never"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "solid_fuel"} },
+                
+                { "id": "env.radon.tested", "text": {"en": "Was home tested?", "pl": "Czy dom był badany?"}, "type": "select", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "radon"} },
+                { "id": "env.radon.result", "text": {"en": "Result", "pl": "Wynik"}, "type": "text_input", "dependsOn": {"questionId": "env.radon.tested", "value": "Yes"} },
+                
+                { "id": "env.asbestos.disturbance", "text": {"en": "Was asbestos disturbed/damaged?", "pl": "Czy azbest był uszkodzony?"}, "type": "select", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "asbestos"} },
+                
+                { "id": "env.water.well_tested", "text": {"en": "Was water tested?", "pl": "Czy woda była badana?"}, "type": "select", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "private_well"} },
+                { "id": "env.water.arsenic", "text": {"en": "History of arsenic?", "pl": "Historia arsenu?"}, "type": "checkbox", "dependsOn": {"questionId": "env.water.well_tested", "value": "Yes"} },
+                
+                { "id": "env.pesticide.type", "text": {"en": "Type/Frequency", "pl": "Rodzaj/Częstotliwość"}, "type": "select", "options": ["Occupational", "Home/Garden (Heavy)", "Occasional"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
+                
+                { "id": "env.uv.sunbed_freq", "text": {"en": "Frequency", "pl": "Częstotliwość"}, "type": "select", "options": ["Rarely", "Often", "Very Often"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "sunbed"} }
               ]
+
             },
             {
               "id": "labs_and_imaging",

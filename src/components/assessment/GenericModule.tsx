@@ -123,7 +123,37 @@ export const GenericModule = ({ answers, onAnswer, questions }: GenericModulePro
              return (
               <div key={key} className="space-y-2">
                 <Label htmlFor={key}>{q.text}</Label>
-                <Input type="number" id={key} value={answers[key] || ""} onChange={(e) => handleValidatedChange(key, e.target.value)} aria-invalid={!!error} />
+                <div className="flex items-center space-x-2">
+                   <button
+                        type="button"
+                        onClick={() => {
+                            const val = Number(answers[key] || 0);
+                            handleValidatedChange(key, Math.max(0, val - 1));
+                        }}
+                         className="h-10 w-10 flex items-center justify-center rounded-md border bg-muted hover:bg-muted/80"
+                    >
+                        -
+                    </button>
+                    <Input 
+                        type="number" 
+                        inputMode="decimal"
+                        id={key} 
+                        value={answers[key] || ""} 
+                        onChange={(e) => handleValidatedChange(key, e.target.value)} 
+                        aria-invalid={!!error} 
+                        className="text-center"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => {
+                            const val = Number(answers[key] || 0);
+                            handleValidatedChange(key, val + 1);
+                        }}
+                        className="h-10 w-10 flex items-center justify-center rounded-md border bg-muted hover:bg-muted/80"
+                    >
+                        +
+                    </button>
+                </div>
                 {error && <p className="text-sm text-destructive">{error}</p>}
               </div>
             );

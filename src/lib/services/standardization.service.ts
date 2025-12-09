@@ -76,12 +76,12 @@ export const StandardizationService = {
         // Physical Activity (IPAQ)
         physical_activity: {
             vigorous_days: Number(answers['pa.vig.days7']),
-            vigorous_min: Number(answers.ipaq_vigorous_min),
+            vigorous_min: Number(answers['pa.vig.minperday']),
             moderate_days: Number(answers['pa.mod.days7']),
-            moderate_min: Number(answers.ipaq_moderate_min),
+            moderate_min: Number(answers['pa.mod.minperday']),
             walking_days: Number(answers['pa.walk.days7']),
             walking_min: Number(answers['pa.walk.minperday']), // Old: ipaq_walking_min
-            sitting_min: Number(answers.ipaq_sitting),
+            sitting_min: Number(answers['pa.sit.min_day']),
         },
       };
 
@@ -240,11 +240,11 @@ export const StandardizationService = {
       const sexualHealthKeys = [
           'sexhx.section_opt_in',
           'sex_active', 
-          'sex_partner_gender', 
+          'sexhx.partner_genders', 
           'sexhx.lifetime_partners_cat', // Old: sex_lifetime_partners
-          'sex_last12m_partners', 
+          'sexhx.partners_12m_cat', 
           'sexhx.condom_use_12m', // Old: sex_barrier_freq
-          'sex_sti_history', 
+          'sexhx.sti_history_other', 
           'sex_anal', 
           'sex_oral', 
           'sex_barriers_practices',
@@ -270,14 +270,18 @@ export const StandardizationService = {
       // Environmental Exposures
       const environmental: Record<string, any> = {};
       const envKeys = [
-          'home_years_here', 'home_postal_coarse', 'home_year_built', 'home_basement', 
-          'home_radon_tested', 'home_radon_value', 'home_radon_unit', 'home_radon_date', 
-          'home_shs_home', 'home_fuels', 'home_kitchen_vent', 'env_major_road', 
-          'env_industry', 'env_agriculture', 'env_outdoor_uv', 'water_source', 
-          'water_well_tested', 'water_well_findings', 'env_wildfire_smoke',
-          // New
-          'env.pesticide.mix_freq', 'env.pesticide.apply_freq',
-          'env.asbestos.home_status', 'env.air.high_pollution_years', 'env.uv.sunburn_child'
+          'env.summary',
+          // Detail fields
+          'env.air.high_pollution_years', 'env.industry.type',
+          'env.indoor.solidfuel_years', 'env.indoor.ventilation',
+          'env.radon.tested', 'env.radon.result', 'env.radon.mitigation_done',
+          'env.asbestos.disturbance',
+          'env.water.well_tested', 'env.water.arsenic',
+          'env.pesticide.type',
+          'env.uv.sunbed_freq',
+          // Retained/Common fields
+          'home_years_here', 'home_postal_coarse', 'home_year_built', 'home_basement',
+          'home_shs_home', 'env_outdoor_uv', 'env.uv.sunburn_child', 'env.uv.sunburn_adult'
       ];
       envKeys.forEach(key => {
          if (answers[key]) {

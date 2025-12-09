@@ -67,19 +67,30 @@ export const CheckboxGroup = ({
 
   if (!hasCategories) {
       return (
-        <div className={cn("space-y-2", className)}>
-          {options.map((option) => (
-            <div key={option.id} className="flex items-center space-x-2">
+        <div className={cn("flex flex-wrap gap-2", className)}>
+          {options.map((option) => {
+            const isSelected = value.includes(option.id);
+            return (
+            <div key={option.id}>
               <Checkbox
                 id={option.id}
-                checked={value.includes(option.id)}
+                checked={isSelected}
                 onCheckedChange={(checked) => handleCheckedChange(!!checked, option.id)}
+                className="sr-only"
               />
-              <Label htmlFor={option.id} className="font-normal">
+              <Label 
+                htmlFor={option.id} 
+                className={cn(
+                    "flex items-center justify-center px-4 py-2 rounded-full border cursor-pointer transition-colors text-sm font-medium",
+                    isSelected 
+                        ? "bg-primary text-primary-foreground border-primary" 
+                        : "bg-background hover:bg-accent hover:text-accent-foreground border-input"
+                )}
+              >
                 {option.label}
               </Label>
             </div>
-          ))}
+          )})}
         </div>
       );
   }
@@ -89,19 +100,31 @@ export const CheckboxGroup = ({
       {categories.map(category => (
           <div key={category} className="space-y-2">
               <h4 className="font-semibold text-sm text-gray-700">{category}</h4>
-              <div className="space-y-2 pl-2">
-                {groupedOptions[category].map((option) => (
-                    <div key={option.id} className="flex items-center space-x-2">
-                    <Checkbox
-                        id={option.id}
-                        checked={value.includes(option.id)}
-                        onCheckedChange={(checked) => handleCheckedChange(!!checked, option.id)}
-                    />
-                    <Label htmlFor={option.id} className="font-normal">
-                        {option.label}
-                    </Label>
-                    </div>
-                ))}
+              <div className="flex flex-wrap gap-2">
+                {groupedOptions[category].map((option) => {
+                    const isSelected = value.includes(option.id);
+                    return (
+                        <div key={option.id}>
+                            <Checkbox
+                                id={option.id}
+                                checked={isSelected}
+                                onCheckedChange={(checked) => handleCheckedChange(!!checked, option.id)}
+                                className="sr-only" // Hide default checkbox
+                            />
+                            <Label 
+                                htmlFor={option.id} 
+                                className={cn(
+                                    "flex items-center justify-center px-4 py-2 rounded-full border cursor-pointer transition-colors text-sm font-medium",
+                                    isSelected 
+                                        ? "bg-primary text-primary-foreground border-primary" 
+                                        : "bg-background hover:bg-accent hover:text-accent-foreground border-input"
+                                )}
+                            >
+                                {option.label}
+                            </Label>
+                        </div>
+                    );
+                })}
               </div>
           </div>
       ))}

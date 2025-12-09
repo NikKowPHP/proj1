@@ -13,6 +13,28 @@ interface EnvironmentalExposuresProps {
 
 const isVisible = (question: any, answers: Record<string, string>): boolean => {
   if (!question.dependsOn) return true;
+  
+  // Support for object-based dependsOn with operator
+  if (typeof question.dependsOn === 'object' && question.dependsOn.operator) {
+      const { questionId, operator, value } = question.dependsOn;
+      const dependencyAnswer = answers[questionId];
+      
+      if (!dependencyAnswer) return false;
+
+      if (operator === 'array_contains') {
+          // Check if the dependency answer (which should be a JSON array string) contains the value
+          try {
+              const parsed = JSON.parse(dependencyAnswer);
+              return Array.isArray(parsed) && parsed.includes(value);
+          } catch (e) {
+              return false;
+          }
+      }
+      // Add other operators if needed, currently only array_contains is required for this refactor
+      return false;
+  }
+
+  // Legacy simple dependency handling
   const dependencyAnswer = answers[question.dependsOn.questionId];
 
   if (question.dependsOn.value === true) {

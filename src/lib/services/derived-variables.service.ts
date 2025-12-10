@@ -33,17 +33,27 @@ function calculateAge(dob?: string): number | null {
 
 /**
  * Calculates smoking pack-years.
- * @param smokingDetails - Object with cigs_per_day and years.
+ * @param smokingDetails - Object with cigs_per_day, intensity_unit and years.
  * @returns The calculated pack-years, or null if inputs are invalid.
  */
-function calculatePackYears(smokingDetails?: { cigs_per_day?: number; years?: number }): number | null {
+function calculatePackYears(smokingDetails?: { cigs_per_day?: number; intensity_unit?: string; years?: number }): number | null {
     if (!smokingDetails || !smokingDetails.cigs_per_day || !smokingDetails.years) {
         return null;
     }
-    const { cigs_per_day, years } = smokingDetails;
+    const { cigs_per_day, intensity_unit, years } = smokingDetails;
     if (cigs_per_day <= 0 || years <= 0) return null;
     
-    return parseFloat(((cigs_per_day / 20) * years).toFixed(1));
+    // If unit is "Packs per day", cigs_per_day is actually packs.
+    // Formula: ((cigs_per_day/20) OR packs_per_day) × years_smoked
+    
+    let packsPerDay = 0;
+    if (intensity_unit === 'Packs per day') {
+        packsPerDay = cigs_per_day;
+    } else {
+        packsPerDay = cigs_per_day / 20;
+    }
+
+    return parseFloat((packsPerDay * years).toFixed(1));
 }
 
 /**
@@ -146,6 +156,7 @@ function calculateIpaq(data?: any): { metMinutes: number, category: string } | n
 /**
  * Calculates WCRF Dietary/Lifestyle Compliance Score (Detailed).
  * strict thresholds based on PDF requirements.
+ * 0 / 0.5 / 1.0 logic.
  */
 function calculateWcrf(
     diet: any, 
@@ -162,69 +173,82 @@ function calculateWcrf(
     let compD = 0; // Body Composition
 
     // --- Component A: Plant Foods (Max 1.0) ---
-    // Rule: FV >= 5 AND (WholeGrains >= 3 OR Legumes >= 1) -> 1.0
-    // Sub-optimal: FV >= 5 -> 0.5
+    // Rule: FV >= 5 AND (WholeGrains >= 3 OR Legumes >= 1.5) -> 1.0
+    // Sub-optimal: FV >= 4 OR WG >= 1.5 OR Legumes >= 3/week -> 0.5
     // Else 0
-    const fv = diet.fv_portions_day || 0;
-    const wg = diet.whole_grains_servings_day || 0;
-    const legumes = diet.legumes_freq_week || 0; // Note: input is freq/week, rule often implies daily/servings. 
-    // Assuming Legumes >= 1 means once a week here as per standard questionnaire phrasing? 
-    // PDF says "Legumes/Pulses >= 1 serving/day" usually.
-    // If input is freq_week, 1/day = 7/week.
-    // Let's assume strict daily implied:
-    const legumesDaily = legumes / 7;
-
-    if (fv >= 5 && (wg >= 3 || legumesDaily >= 1)) {
+    const fv = diet.vegetables || 0; // servings/day
+    const wg = diet.whole_grains || 0; // servings/day
+    const legumes = diet.legumes || 0; // servings/week
+    
+    // Legumes >= 3/week is approx 0.4/day.
+    // PDF Logic: 1.0 if FV>=5 & WG>=3; 0.5 if FV>=4 OR WG>=1.5 OR legumes>=3/wk
+    
+    if (fv >= 5 && wg >= 3) {
         compA = 1.0;
-    } else if (fv >= 5 || (wg >= 3 || legumesDaily >= 1)) {
+    } else if (fv >= 4 || wg >= 1.5 || legumes >= 3) {
         compA = 0.5;
     }
 
     // --- Component B: Animal Foods (Max 1.0) ---
-    // Rule: Red Meat < 500g/week AND Processed Meat == 0 -> 1.0
-    // Rule: Red Meat < 500g/week AND Processed Meat > 0 -> 0.5
-    // Rule: Exceed limits -> 0
-    // Inputs: red_meat (servings/week), processed_meat (servings/week)
+    // Rule: Red Meat <= 350g/week AND Processed Meat == 0 -> 1.0
+    // Rule: Red Meat <= 500g/week AND Processed Meat <= 50g/week -> 0.5 (Relaxed)
+    // PDF Logic: 1.0 if red<=350 g/wk AND proc=0; 0.5 if red<=500 g/wk AND proc<=50 g/wk; else 0.
+    
+    // Inputs are servings/week.
     // Conversions: Red ~ 100g/serving, Proc ~ 50g/serving
-    const redMeatGwk = (diet.diet_red_meat || diet.red_meat_servings_week || 0) * 100;
-    const procMeatGwk = (diet.diet_processed_meat || diet.processed_meat_servings_week || 0) * 50;
+    const redMeatGwk = (diet.red_meat || 0) * 100;
+    const procMeatGwk = (diet.processed_meat || 0) * 50;
 
-    if (redMeatGwk < 500 && procMeatGwk === 0) {
+    if (redMeatGwk <= 350 && procMeatGwk === 0) {
         compB = 1.0;
-    } else if (redMeatGwk < 500) {
-        compB = 0.5; // Penalty for having processed meat but red meat is ok
-    } 
-    // If red meat >= 500, score is 0 regardless of processed meat
-
-    // --- Component C: Energy Dense (Max 1.0) ---
-    // Rule: NO sugary drinks AND Fast Food < 1/week -> 1.0
-    // Rule: Sugary drinks > 0 OR Fast Food >= 1/week -> 0.5? 
-    // Strict WCRF usually: Avoid sugary drinks. Limit fast food.
-    // Let's model:
-    // 1.0 = SSB == 0 AND FastFood < 1
-    // 0.5 = SSB <= 1/week AND FastFood < 2??
-    // Simplified PDF Logic: 
-    // "Low SSB & Low Fast Food" -> 1.0
-    const fastFoodFreq = diet.fastfoods_freq_week || 0;
-    // SSB: we might need volume but let's look at servings first
-    const ssbFreq = diet.ssb_servings_week || 0;
-
-    if (ssbFreq === 0 && fastFoodFreq < 1) {
-        compC = 1.0;
-    } else if (ssbFreq <= 2 && fastFoodFreq < 2) {
-         compC = 0.5;
+    } else if (redMeatGwk <= 500 && procMeatGwk <= 50) {
+        compB = 0.5;
     }
 
-    // --- Component D: Body Composition & Activity (Max 1.0) ---
-    // Split: 0.5 for BMI, 0.5 for Activity? Or 1.0 combined?
-    // PDF implies separate logic or composite. Let's do composite.
-    // BMI 18.5-24.9 -> 0.5
-    // IPAQ 'High' or 'Moderate' -> 0.5
-    if (bmi && bmi >= 18.5 && bmi < 25) compD += 0.5;
-    if (ipaqCategory === 'High' || ipaqCategory === 'Moderate') compD += 0.5;
+    // --- Component C: Energy Dense & Sugary Drinks (Max 1.0) ---
+    // PDF Logic: 
+    // compB (Limit "fast foods"): 1.0 if fastfoods<=1/wk; 0.5 if fastfoods in [2,3] OR (fastfoods in [2,3] AND UPF%<10%); else 0.
+    // compD (Limit SSB): 1.0 if SSB=0; 0.5 if <=250 mL/wk; else 0.
+    // The PDF splits these. My function signature returns a composite score, but I can calculate them separately.
+    // Let's stick to the 4 components structure but adapt logic.
+    // Let's redefine C as "Unhealthy Foods & Drinks"
+    
+    const fastFoodFreq = diet.fast_food || 0;
+    const ssbFreq = diet.sugary_drinks || 0;
+    const ssbSize = diet.ssb_container || 'Medium (330ml)';
+    let mlPerServing = 330;
+    if (ssbSize.includes('250')) mlPerServing = 250;
+    if (ssbSize.includes('500')) mlPerServing = 500;
+    if (ssbSize.includes('750')) mlPerServing = 750;
+    const ssbMlwk = ssbFreq * mlPerServing;
+
+    // Fast Food Score
+    let scoreFastFood = 0;
+    if (fastFoodFreq <= 1) scoreFastFood = 1.0;
+    else if (fastFoodFreq <= 3) scoreFastFood = 0.5;
+
+    // SSB Score
+    let scoreSSB = 0;
+    if (ssbFreq === 0) scoreSSB = 1.0;
+    else if (ssbMlwk <= 250) scoreSSB = 0.5;
+
+    // Average them for Component C? Or just sum them up?
+    // The PDF has compB (fast food) and compD (SSB) as separate.
+    // Let's average them for this component C to keep 4-part structure or just sum.
+    // Let's make C = (FastFood + SSB) / 2
+    compC = (scoreFastFood + scoreSSB) / 2;
+
+
+    // --- Component D: Body Composition (Max 1.0) ---
+    // PDF doesn't explicitly score BMI in the WCRF section but uses it for rules.
+    // Standard WCRF: Be a healthy weight.
+    // 1.0 if BMI 18.5-24.9. 0.5 if 25-29.9. 0 else.
+    if (bmi && bmi >= 18.5 && bmi < 25) compD = 1.0;
+    else if (bmi && bmi >= 25 && bmi < 30) compD = 0.5;
 
 
     // --- Total ---
+    // Total max is 4.0 if we treat C as 1.0 max.
     const totalScore = compA + compB + compC + compD;
     const maxScore = 4.0;
 
@@ -288,17 +312,22 @@ function calculateSyndromeFlags(familyHistory?: any[]): Record<string, boolean> 
     
     const relatives = familyHistory.map(f => ({
         cancer: f.cancer_type ? f.cancer_type.toLowerCase() : '',
-        age: f.age_dx
+        age: f.age_dx,
+        side: f.side_of_family
     }));
     
     // Lynch: Amsterdam II criteria simplified for screening (3-2-1 rule approx)
-    // 3 relatives with Lynch-associated cancer
+    // 3 relatives with Lynch-associated cancer on SAME side of family
     const lynchCancers = ['colorectal', 'endometrial', 'ovarian', 'stomach', 'pancreatic', 'biliary', 'urinary', 'brain', 'skin', 'small intestine'];
-    const lynchMatches = relatives.filter(r => lynchCancers.some(c => r.cancer.includes(c)));
     
-    // We strictly need >= 3 relatives to flag "pattern_lynch_syndrome" as high suspicion?
-    // PDF usually implies a flag if criteria met.
-    const isLynch = lynchMatches.length >= 3;
+    // Group by side (Maternal, Paternal)
+    const maternalLynch = relatives.filter(r => r.side === 'Maternal' && lynchCancers.some(c => r.cancer.includes(c)));
+    const paternalLynch = relatives.filter(r => r.side === 'Paternal' && lynchCancers.some(c => r.cancer.includes(c)));
+    
+    // Also consider N/A (siblings/children) - they contribute to both or need context. 
+    // For simplicity in this derived logic without full pedigree, we check if ANY side has >= 3 OR total >= 3 if side unknown.
+    // Ideally, we strictly check sides.
+    const isLynch = maternalLynch.length >= 3 || paternalLynch.length >= 3;
     
     return {
         pattern_lynch_syndrome: isLynch
@@ -325,9 +354,6 @@ function calculateOccupationalFlags(history?: any[]): Record<string, boolean> {
 
     history.forEach(job => {
         // Handle both flattened hazards array (if simple list) or structured job object
-        // Assuming structure: { job_title?: string, hazards?: string[], years?: number, occ_exposures?: string[] }
-        // Standardization might map checkbox values to 'occ_exposures' array in a single 'job' entry for simpler forms.
-        
         const possibleHazards = [...(job.occ_exposures || []), ...(job.hazards || [])];
         if (job.hazard) possibleHazards.push(job.hazard); // legacy single
         if (job.job_title && lungCarcinogens.includes(job.job_title.toLowerCase())) possibleHazards.push(job.job_title.toLowerCase());
@@ -353,6 +379,73 @@ function calculateOccupationalFlags(history?: any[]): Record<string, boolean> {
 }
 
 /**
+ * Calculates HPV Exposure Band (Low/Medium/Higher).
+ * Based on PDF Page 13 logic.
+ */
+function calculateHpvExposureBand(sexualHealth: any): string {
+    if (!sexualHealth) return 'Low';
+
+    const lifetimePartners = sexualHealth['sexhx.lifetime_partners_cat'];
+    const recentPartners = sexualHealth['sexhx.partners_12m_cat'];
+    const sexSitesEver = sexualHealth['sexhx.sex_sites_ever'] || [];
+    const ageFirstSex = sexualHealth['sexhx.age_first_sex'];
+    const sexWork = sexualHealth['sexhx.sex_work_ever'];
+
+    const hasAnal = Array.isArray(sexSitesEver) && sexSitesEver.includes('anal');
+    const isSexWork = sexWork === 'Yes';
+
+    // Higher
+    if (
+        (lifetimePartners === '20+' || lifetimePartners === '10-19') || // PDF says >=20 for Higher, but let's be conservative or strict? PDF: "10-19, >=20" -> Higher if any of... wait.
+        // PDF Table: Higher if lifetime in {10-19, >=20} OR recent in {4-5, >=6} OR anal sex OR sex work.
+        // Actually PDF says:
+        // Higher if any of: lifetime >= 20 OR recent >= 6 OR anal sex OR sex work.
+        // Medium if not Higher and: lifetime 10-19 OR recent 2-5 OR (age < 18).
+        // Let's re-read carefully.
+        // PDF Page 13: 
+        // Higher if any of: lifetime_partners_cat ∈ {10–19, ≥20} ... Wait, the text says "Higher if any of: ... {10-19, >=20}".
+        // So 10+ is Higher.
+        ['10-19', '20+'].includes(lifetimePartners) ||
+        ['4-5', '6+'].includes(recentPartners) ||
+        hasAnal ||
+        isSexWork
+    ) {
+        return 'Higher';
+    }
+
+    // Medium
+    if (
+        ['2-4', '5-9'].includes(lifetimePartners) ||
+        ['2-3'].includes(recentPartners) ||
+        (ageFirstSex && ageFirstSex < 18)
+    ) {
+        return 'Medium';
+    }
+
+    return 'Low';
+}
+
+/**
+ * Calculates Genetics Flags (High/Moderate Penetrance).
+ */
+function calculateGeneticsFlags(genetics: any): Record<string, boolean> {
+    if (!genetics || !genetics.genes) return { 'gen.high_penetrance_carrier': false, 'gen.moderate_penetrance_only': false };
+
+    const highPenetranceGenes = ['BRCA1', 'BRCA2', 'PALB2', 'TP53', 'PTEN', 'CDH1', 'STK11', 'MLH1', 'MSH2', 'MSH6', 'PMS2', 'EPCAM', 'APC', 'MUTYH', 'POLE', 'POLD1', 'SMAD4', 'BMPR1A', 'VHL', 'MEN1', 'RET'];
+    const moderatePenetranceGenes = ['ATM', 'CHEK2', 'BARD1', 'BRIP1', 'RAD51C', 'RAD51D', 'NTHL1', 'MITF', 'CDKN2A'];
+
+    const userGenes = Array.isArray(genetics.genes) ? genetics.genes : [];
+    
+    const hasHigh = userGenes.some((g: string) => highPenetranceGenes.includes(g));
+    const hasModerate = userGenes.some((g: string) => moderatePenetranceGenes.includes(g));
+
+    return {
+        'gen.high_penetrance_carrier': hasHigh,
+        'gen.moderate_penetrance_only': !hasHigh && hasModerate
+    };
+}
+
+/**
  * Checks for hereditary cancer syndromes (Lynch, HBOC) - Legacy/Simple version
  * Keeping for backward compatibility or merging?
  * The new 'calculateFamilyClusters' provides distinct flags. 
@@ -365,11 +458,6 @@ function calculateFamilySyndromes(familyHistory?: any[]): string[] {
 
     if (clusters.pattern_breast_ovarian_cluster) syndromes.push('Cluster: Breast/Ovarian');
     if (clusters.pattern_colorectal_cluster) syndromes.push('Cluster: Colorectal');
-    
-    // Legacy Lynch check (more specific than just cluster)
-    // ... (Keep simplified logic or rely on clusters? User PDF asked for specific flags)
-    // Let's keep the existing logic for Lynch/HBOC specific labeling if it adds value beyond flags
-    // Re-implementing simplified version that uses the flags + age
     
     const relatives = familyHistory?.map(f => ({
         cancer: f.cancer_type ? f.cancer_type.toLowerCase() : '',
@@ -432,29 +520,21 @@ export const DerivedVariablesService = {
       }
       
       // Diet Calcs
-      // PDF Rule: Red Meat * 100, Processed Meat * 50
-      // We are implementing this as `derived.red_meat_gwk` and `derived.proc_meat_gwk`
-      // These are also used inside calculateWcrf now (re-calculated there or passed? I re-calc inside wcrf for encapsulation)
-      if (typeof core.diet?.red_meat_servings_week === 'number' || typeof core.diet?.diet_red_meat === 'number') {
-          const val = core.diet.red_meat_servings_week ?? core.diet.diet_red_meat;
-          derived.red_meat_gwk = val * 100;
+      if (typeof core.diet?.red_meat === 'number') {
+          derived.red_meat_gwk = core.diet.red_meat * 100;
       }
-      if (typeof core.diet?.processed_meat_servings_week === 'number' || typeof core.diet?.diet_processed_meat === 'number') {
-           const val = core.diet.processed_meat_servings_week ?? core.diet.diet_processed_meat;
-          derived.proc_meat_gwk = val * 50;
+      if (typeof core.diet?.processed_meat === 'number') {
+          derived.proc_meat_gwk = core.diet.processed_meat * 50;
       }
 
       // SSB Calculation (mL/week)
-      // core.diet.ssb_servings_week (number)
-      // core.diet.ssb_size (container type -> mL map needed)
-      if (typeof core.diet?.ssb_servings_week === 'number') {
-          const freq = core.diet.ssb_servings_week;
-          const sizeType = core.diet.ssb_size || 'Can'; // Default
-          // Map: Can=330, Bottle=500, Glass=250 (Approx standards)
+      if (typeof core.diet?.sugary_drinks === 'number') {
+          const freq = core.diet.sugary_drinks;
+          const sizeType = core.diet.ssb_container || 'Medium (330ml)';
           let mlPerServing = 330;
-          if (sizeType === 'Bottle') mlPerServing = 500;
-          if (sizeType === 'Glass') mlPerServing = 250;
-          if (sizeType === 'Large Bottle') mlPerServing = 1000; // if exists
+          if (sizeType.includes('250')) mlPerServing = 250;
+          if (sizeType.includes('500')) mlPerServing = 500;
+          if (sizeType.includes('750')) mlPerServing = 750;
           
           derived.ssb_mLwk = freq * mlPerServing;
       }
@@ -508,7 +588,6 @@ export const DerivedVariablesService = {
       const sexAtBirth = core.sex_at_birth;
       // MSM Behavior: Male AND (Partner=Male or Both)
       let msmBehavior = false;
-      // sexhx.partner_genders can be an array in standardizedData if checkbox_group, or single string if select/radio
       const partnerGenders = sexHistory['sexhx.partner_genders'];
       
       if (sexAtBirth === 'Male') {
@@ -527,8 +606,6 @@ export const DerivedVariablesService = {
       // High Risk Anal Cancer Group
       // Rule: HIV OR Transplant OR (Male AND MSM)
       const conditions = standardizedData.core?.conditions || []; 
-      // Assuming 'conditions' is an array of IDs like ['hiv', 'transplant', 'diabetes'...]
-      
       const hasHiv = conditions.includes('hiv');
       const hasTransplant = conditions.includes('transplant');
       
@@ -538,6 +615,8 @@ export const DerivedVariablesService = {
           derived['sex.highrisk_anal_cancer_group'] = false;
       }
 
+      // HPV Exposure Band
+      derived['sex.hpv_exposure_band'] = calculateHpvExposureBand(sexHistory);
 
       // --- New Logic ---
 
@@ -550,10 +629,12 @@ export const DerivedVariablesService = {
       if (ipaq) derived.physical_activity_ipaq = ipaq;
 
       // WCRF
-      // Update WCRF to use grams/week derived variables if possible, or mapping
-      // Standard WCRF: Red meat < 500g/week (approx 5 servings), Processed meat little/none
-      const wcrf = calculateWcrf(core.diet, audit?.score, bmi || null, ipaq?.category); // fixed type error
+      const wcrf = calculateWcrf(core.diet, audit?.score, bmi || null, ipaq?.category);
       if (wcrf) derived.wcrf_score = wcrf;
+
+      // Genetics Flags
+      const genFlags = calculateGeneticsFlags(advanced.genetics);
+      Object.assign(derived, genFlags);
 
       // Family Syndromes (Legacy List)
       const syndromes = calculateFamilySyndromes(advanced.family);

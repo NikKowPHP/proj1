@@ -38,7 +38,7 @@ interface FamilyCancerHistoryProps {
 
 export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHistoryProps) => {
   const t = useTranslations("AssessmentPage");
-  const [errors, setErrors] = useState<Record<number, { age_now_death?: string }>>({});
+  const [errors, setErrors] = useState<Record<number, { age_now_death?: string, side_of_family?: string }>>({});
 
   const handleAdd = (relation?: string) => {
     let side = undefined;
@@ -158,12 +158,12 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Side of Family</Label>
+              <Label>Side of Family {['Aunt', 'Uncle', 'Grandmother', 'Grandfather', 'Cousin'].some(r => item.relation?.includes(r)) && <span className="text-red-500">*</span>}</Label>
               <Select
                 value={item.side_of_family}
                 onValueChange={(val) => handleFieldChange(index, "side_of_family", val)}
               >
-                <SelectTrigger>
+                <SelectTrigger className={errors[index]?.side_of_family ? "border-red-500" : ""}>
                   <SelectValue placeholder="Select side" />
                 </SelectTrigger>
                 <SelectContent>
@@ -319,3 +319,4 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
     </div>
   );
 };
+      

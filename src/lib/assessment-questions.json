@@ -40,11 +40,12 @@
           "id": "dob",
           "text": { "en": "Date of birth (Year only)", "pl": "Rok urodzenia (RRRR)" },
           "type": "year_input",
-          "validation": { "min": 1900, "maxCurrentYear": true, "softMin": 1920 }
+          "validation": { "min": 1900, "maxCurrentYear": true, "softMin": 1920, "message": { "en": "This tool is currently for adults.", "pl": "Ta wersja narzędzia jest przeznaczona dla osób dorosłych." } }
         },
         {
           "id": "sex_at_birth",
           "text": { "en": "Sex at birth", "pl": "Płeć przy urodzeniu" },
+          "helperText": { "en": "We need this information to recommend appropriate screenings (e.g. breast, ovarian, prostate). If you prefer not to say, select 'Prefer not to say'.", "pl": "Potrzebujemy tej informacji, aby dobrać właściwe badania (np. piersi, jajników, prostaty). Jeśli wolisz nie podawać, wybierz 'Wolę nie podawać'." },
           "type": "radio",
           "options": [
             { "value": "Female", "label": { "en": "Female", "pl": "Kobieta" } },
@@ -327,6 +328,7 @@
                 { "id": "smoking.intensity", "text": { "en": "Average smoking intensity?", "pl": "Średnia intensywność palenia?"}, "type": "number_input", "placeholder": "e.g., 20", "dependsOn": {"questionId": "smoking.pattern", "value": "Every day"} },
                 { "id": "smoking.start_age", "text": { "en": "Age you started smoking?", "pl": "Wiek rozpoczęcia palenia?"}, "type": "number_input", "placeholder": "e.g., 18" },
                 { "id": "smoking.years_smoked", "text": { "en": "Number of years smoked (excluding breaks)?", "pl": "Liczba lat palenia (bez przerw)?"}, "type": "number_input", "placeholder": "e.g., 10" },
+                { "id": "smoking.brinkman_index", "text": { "en": "Brinkman Index (Auto)", "pl": "Wskaźnik Brinkmana (Auto)"}, "type": "number_input", "dependsOn": {"questionId": "smoking_status", "value": "Hidden"} },
                 { "id": "smoking.quit_date", "text": { "en": "Year you quit smoking (ISO-8601)", "pl": "Rok rzucenia palenia"}, "type": "year_input", "dependsOn": {"questionId": "smoking_status", "value": "Former"}},
                 { "id": "smoking.other_tobacco_smoked", "text": {"en": "Other tobacco products used?", "pl": "Inne wyroby tytoniowe?"}, "type": "checkbox_group", "options": [{"id": "cigars", "label": "Cigars"}, {"id": "cigarillos", "label": "Cigarillos"}, {"id": "pipe", "label": "Pipe"}, {"id": "roll_your_own", "label": "Roll-your-own"}, {"id": "shisha", "label": "Waterpipe"}, {"id": "none", "label": "None"}] },
                 { "id": "smoking.other_cigar_per_week", "text": {"en": "Cigars/Cigarillos per week", "pl": "Cygara/Cygaretki na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "value": true} },
@@ -335,7 +337,12 @@
                 
                 { "id": "vape.status", "text": {"en": "E-cigarette/Vaping status", "pl": "Status e-papierosów/wapowania"}, "type": "radio", "options": ["Never", "Former", "Current"] },
                 { "id": "vape.days_30d", "text": {"en": "Days vaped in last 30 days", "pl": "Dni wapowania w ciągu ostatnich 30 dni"}, "type": "number_input", "dependsOn": {"questionId": "vape.status", "value": "Current"} },
-                { "id": "vape.device_type", "text": {"en": "Device type", "pl": "Typ urządzenia"}, "type": "select", "options": ["Disposable", "Pod system", "Tank system", "Mod"], "dependsOn": {"questionId": "vape.status", "value": ["Current", "Former"]} },
+                { "id": "vape.device_type", "text": {"en": "Device type", "pl": "Typ urządzenia"}, "type": "select", "options": [
+                    {"value": "Disposable", "label": {"en": "Disposable", "pl": "Jednorazowe"}}, 
+                    {"value": "Prefilled pod", "label": {"en": "Prefilled pod or cartridge", "pl": "Wymienne wkłady (pod/kartridż)"}}, 
+                    {"value": "Refillable tank", "label": {"en": "Refillable tank or mod", "pl": "Napełniany zbiornik lub mod"}}, 
+                    {"value": "Other", "label": {"en": "Other", "pl": "Inne"}}
+                ], "dependsOn": {"questionId": "vape.status", "value": ["Current", "Former"]} },
                 { "id": "vape.nicotine", "text": {"en": "Contains nicotine?", "pl": "Zawiera nikotynę?"}, "type": "radio", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "vape.status", "value": ["Current", "Former"]} },
 
                 { "id": "htp.status", "text": {"en": "Heated Tobacco Products (e.g., IQOS)", "pl": "Podgrzewacze tytoniu (np. IQOS)"}, "type": "radio", "options": ["Never", "Former", "Current"] },
@@ -388,7 +395,18 @@
                    { "id": "genetic_test_type", "text": { "en": "What type of genetic test was it?", "pl": "Jaki to był rodzaj badania genetycznego?" }, "type": "select", "options": ["Multigene panel", "Single gene", "Exome (WES)", "Genome (WGS)", "Other"], "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"]} },
                    { "id": "genetic_test_year", "text": { "en": "In what year was the test performed?", "pl": "W którym roku wykonano badanie?" }, "type": "year_input", "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"]} },
                    { "id": "genetic_lab", "text": { "en": "Testing laboratory (if known)", "pl": "Laboratorium wykonujące test (jeśli znane)" }, "type": "text_input", "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"]} },
-                   { "id": "genetic_genes", "text": { "en": "If yes: which genes?", "pl": "Jeśli tak: które geny?" }, "type": "checkbox_group", "options": [{ "id": "BRCA1", "label": "BRCA1"}, { "id": "BRCA2", "label": "BRCA2"}, { "id": "PALB2", "label": "PALB2"}, { "id": "TP53", "label": "TP53"}, { "id": "PTEN", "label": "PTEN"}, { "id": "CDH1", "label": "CDH1"}, { "id": "STK11", "label": "STK11"}, { "id": "NF1", "label": "NF1"}, { "id": "ATM", "label": "ATM"}, { "id": "CHEK2", "label": "CHEK2"}, { "id": "BARD1", "label": "BARD1"}, { "id": "BRIP1", "label": "BRIP1"}, { "id": "RAD51C", "label": "RAD51C"}, { "id": "RAD51D", "label": "RAD51D"}, { "id": "MLH1", "label": "MLH1"}, { "id": "MSH2", "label": "MSH2"}, { "id": "MSH6", "label": "MSH6"}, { "id": "PMS2", "label": "PMS2"}, { "id": "EPCAM", "label": "EPCAM"}, { "id": "APC", "label": "APC"}, { "id": "MUTYH", "label": "MUTYH"}, { "id": "POLE", "label": "POLE"}, { "id": "POLD1", "label": "POLD1"}, { "id": "SMAD4", "label": "SMAD4"}, { "id": "BMPR1A", "label": "BMPR1A"}, { "id": "NTHL1", "label": "NTHL1"}, { "id": "VHL", "label": "VHL"}, { "id": "FH", "label": "FH"}, { "id": "FLCN", "label": "FLCN"}, { "id": "MET", "label": "MET"}, { "id": "RET", "label": "RET"}, { "id": "MAX", "label": "MAX"}, { "id": "TSC1", "label": "TSC1"}, { "id": "TSC2", "label": "TSC2"}, { "id": "CDKN2A", "label": "CDKN2A"}, { "id": "CDK4", "label": "CDK4"}, { "id": "MITF", "label": "MITF"}], "dependsOn": { "questionId": "gen.path_variant_self", "value": "yes"} },
+                   { "id": "genetic_genes", "text": { "en": "If yes: which genes?", "pl": "Jeśli tak: które geny?" }, "type": "checkbox_group", "options": [
+                       { "id": "BRCA1", "label": "BRCA1"}, { "id": "BRCA2", "label": "BRCA2"}, { "id": "PALB2", "label": "PALB2"}, { "id": "TP53", "label": "TP53"}, { "id": "PTEN", "label": "PTEN"}, 
+                       { "id": "CDH1", "label": "CDH1"}, { "id": "STK11", "label": "STK11"}, { "id": "NF1", "label": "NF1"}, { "id": "ATM", "label": "ATM"}, { "id": "CHEK2", "label": "CHEK2"}, 
+                       { "id": "BARD1", "label": "BARD1"}, { "id": "BRIP1", "label": "BRIP1"}, { "id": "RAD51C", "label": "RAD51C"}, { "id": "RAD51D", "label": "RAD51D"}, { "id": "MLH1", "label": "MLH1"}, 
+                       { "id": "MSH2", "label": "MSH2"}, { "id": "MSH6", "label": "MSH6"}, { "id": "PMS2", "label": "PMS2"}, { "id": "EPCAM", "label": "EPCAM"}, { "id": "APC", "label": "APC"}, 
+                       { "id": "MUTYH", "label": "MUTYH"}, { "id": "POLE", "label": "POLE"}, { "id": "POLD1", "label": "POLD1"}, { "id": "SMAD4", "label": "SMAD4"}, { "id": "BMPR1A", "label": "BMPR1A"}, 
+                       { "id": "NTHL1", "label": "NTHL1"}, { "id": "VHL", "label": "VHL"}, { "id": "FH", "label": "FH"}, { "id": "FLCN", "label": "FLCN"}, { "id": "MET", "label": "MET"}, 
+                       { "id": "RET", "label": "RET"}, { "id": "MAX", "label": "MAX"}, { "id": "TSC1", "label": "TSC1"}, { "id": "TSC2", "label": "TSC2"}, { "id": "CDKN2A", "label": "CDKN2A"}, 
+                       { "id": "CDK4", "label": "CDK4"}, { "id": "MITF", "label": "MITF"}, { "id": "PRSS1", "label": "PRSS1"}, { "id": "DICER1", "label": "DICER1"}, { "id": "PTCH1", "label": "PTCH1"},
+                       { "id": "SUFU", "label": "SUFU"}, { "id": "SDHB", "label": "SDHB"}, { "id": "SDHC", "label": "SDHC"}, { "id": "SDHD", "label": "SDHD"}, { "id": "BAP1", "label": "BAP1"},
+                       { "id": "MEN1", "label": "MEN1"}, { "id": "MITF_E318K", "label": "MITF E318K"}
+                   ], "dependsOn": { "questionId": "gen.path_variant_self", "value": "yes"} },
                    { "id": "genetic_variants_hgvs", "text": { "en": "Variant(s) (HGVS, optional)", "pl": "Wariant(y) (HGVS, opcjonalnie)" }, "type": "text_input", "dependsOn": { "questionId": "gen.path_variant_self", "value": "yes"}, "tooltip": {"en": "HGVS is a standard format for reporting genetic variants, e.g., c.123A>G. Provide if known.", "pl": "HGVS to standardowy format raportowania wariantów genetycznych, np. c.123A>G. Podaj, jeśli jest znany."}},
                    { "id": "genetic_report_upload", "text": { "en": "Upload genetic report (optional)", "pl": "Prześlij raport genetyczny (opcjonalnie)" }, "type": "file_upload", "dependsOn": { "questionId": "gen.testing_ever", "value": "Yes"} },
                    
@@ -837,7 +855,7 @@
                     { "value": "7", "label": { "en": "7 - Excellent", "pl": "7 - Doskonałe" } },
                     { "value": "6", "label": "6" }, { "value": "5", "label": "5" },
                     { "value": "4", "label": { "en": "4 - Average", "pl": "4 - Przeciętne" } },
-                    { "value": "3", "label": "3" }, { "value": "2", "label": "2" },
+                    { "value": "3", "label": { "en": "3" } }, { "value": "2", "label": "2" },
                     { "value": "1", "label": { "en": "1 - Very poor", "pl": "1 - Bardzo złe" } }
                   ]
                 },

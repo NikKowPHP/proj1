@@ -20,7 +20,7 @@
       "category": "screenings",
       "conditions": [
         { "questionId": "age", "operator": "in", "value": ["50-59", "60+"] },
-        { "questionId": "occupational_exposures", "operator": "array_contains", "value": "asbestos" }
+        { "questionId": "occ.lung_highrisk", "operator": "equals", "value": true }
       ]
     },
     {
@@ -56,7 +56,7 @@
       "actionId": "GENETIC_COUNSELING_REFERRAL",
       "category": "topicsForDoctor",
       "conditions": [
-        { "questionId": "genetic_genes", "operator": "array_contains_any", "value": ["BRCA1", "BRCA2", "MLH1", "MSH2", "MSH6", "PMS2"] }
+        { "questionId": "gen.high_penetrance_carrier", "operator": "equals", "value": true }
       ]
     },
     {
@@ -81,6 +81,13 @@
       ]
     },
     {
+      "actionId": "HPV_VACCINATION_DISCUSSION",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "sex.hpv_exposure_band", "operator": "in", "value": ["Medium", "Higher"] }
+      ]
+    },
+    {
       "actionId": "GENETIC_COUNSELING_REFERRAL_LYNCH",
       "category": "topicsForDoctor",
       "conditions": [
@@ -94,15 +101,6 @@
         { "questionId": "pattern_breast_ovarian_cluster", "operator": "equals", "value": true }
       ]
     },
-    {
-      "actionId": "LUNG_CANCER_SCREENING_OCCUPATIONAL",
-      "category": "screenings",
-      "conditions": [
-        { "questionId": "occ.lung_highrisk", "operator": "equals", "value": true },
-        { "questionId": "age", "operator": "in", "value": ["50-59", "60+"] }
-      ]
-    },
-
     {
       "actionId": "DISCUSS_LIFESTYLE_IMPROVEMENT_WCRF",
       "category": "lifestyle",

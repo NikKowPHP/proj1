@@ -344,7 +344,8 @@ export const StandardizationService = {
           pattern: answers['smoking.pattern'],
           start_age: Number(answers['smoking.start_age']) || undefined,
           cigs_per_day: Number(answers['smoking.intensity']) || undefined,
-          years: Number(answers.smoking_years) || undefined,
+          intensity_unit: answers['smoking.intensity_unit'],
+          years: Number(answers['smoking.years_smoked']) || undefined,
           quit_date: answers['smoking.quit_date'], // Updated key
           other_tobacco: answers['smoking.other_tobacco_smoked'],
           cigars_week: Number(answers['smoking.other_cigar_per_week']) || undefined,
@@ -509,3 +510,4 @@ export const StandardizationService = {
       return bundle;
   }
 };
+      

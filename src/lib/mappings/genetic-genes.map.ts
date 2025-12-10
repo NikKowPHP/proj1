@@ -39,5 +39,16 @@ export const geneticGenesMap: Record<string, string> = {
   'TSC2': 'TSC2',
   'CDKN2A': 'CDKN2A',
   'CDK4': 'CDK4',
-  'MITF': 'MITF'
+  'MITF': 'MITF',
+  'PRSS1': 'PRSS1',
+  'DICER1': 'DICER1',
+  'PTCH1': 'PTCH1',
+  'SUFU': 'SUFU',
+  'SDHB': 'SDHB',
+  'SDHC': 'SDHC',
+  'SDHD': 'SDHD',
+  'BAP1': 'BAP1',
+  'MEN1': 'MEN1',
+  'MITF_E318K': 'MITF' // Variant specific
 };
+      

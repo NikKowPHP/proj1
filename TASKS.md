@@ -1,3 +1,4 @@
 - [x] Update the text of the occupational hazards question to clarify when it will be asked.
 - [x] Fix `next-intl` configuration and runtime error in `OccupationalHazards` component.
+- [x] Align codebase with PDF spec (Assessment Questions, Derived Variables, Standardization, UI Components, Config, PDF Generator).
       

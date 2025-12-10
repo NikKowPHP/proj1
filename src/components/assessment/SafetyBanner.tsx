@@ -16,15 +16,20 @@ export const SafetyBanner = ({ answers }: SafetyBannerProps) => {
     // Postmenopausal bleeding: HP:0000868
     // Breast lump: HP:0003002
     // Dysphagia: HP:0002015
-    // Unexplained weight loss: HP:0004355
+    // Unexplained weight loss: HP:0001824 (Corrected from previous HP:0004355)
     // Hoarseness: HP:0001609
     // Persistent cough: HP:0002118
     // Skin changes (mole): HP:0000989
+    // Night sweats: HP:0030166
+    // Bone pain: HP:0002653
+    // New seizures: HP:0001250
+    // Back pain with nerve symptoms: HP:0003418
     
     const redFlags = [
         'HP:0002860', 'HP:0002027', 'HP:0000132', 'HP:0000868', 
-        'HP:0003002', 'HP:0002015', 'HP:0004355', 'HP:0001609', 
-        'HP:0002118', 'HP:0000989'
+        'HP:0003002', 'HP:0002015', 'HP:0001824', 'HP:0001609', 
+        'HP:0002118', 'HP:0000989', 'HP:0030166', 'HP:0002653',
+        'HP:0001250', 'HP:0003418'
     ];
 
     // Check if any red flag is present in 'symptoms' array
@@ -57,3 +62,4 @@ export const SafetyBanner = ({ answers }: SafetyBannerProps) => {
         </div>
     );
 };
+      

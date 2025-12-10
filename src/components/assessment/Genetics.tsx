@@ -94,6 +94,37 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
             );
           case 'checkbox_group': // for genes or others
             const isLongList = (q.options?.length > 15) || key === 'genetic_genes';
+            
+            // Group genes if it's the gene list
+            if (key === 'genetic_genes') {
+                const groupedOptions = [
+                    { category: 'Breast/Ovarian', genes: ['BRCA1', 'BRCA2', 'PALB2', 'TP53', 'PTEN', 'STK11', 'CDH1', 'ATM', 'CHEK2', 'BARD1', 'BRIP1', 'RAD51C', 'RAD51D'] },
+                    { category: 'Lynch/GI', genes: ['MLH1', 'MSH2', 'MSH6', 'PMS2', 'EPCAM', 'APC', 'MUTYH', 'POLE', 'POLD1', 'SMAD4', 'BMPR1A', 'NTHL1'] },
+                    { category: 'Endocrine/Other', genes: ['MEN1', 'RET', 'VHL', 'FH', 'FLCN', 'MET', 'MAX', 'TSC1', 'TSC2', 'CDKN2A', 'CDK4', 'MITF', 'PRSS1', 'DICER1', 'PTCH1', 'SUFU', 'SDHB', 'SDHC', 'SDHD', 'BAP1'] }
+                ];
+                
+                // Flatten options with category for CheckboxGroup component which handles grouping
+                const groupedFlatOptions = groupedOptions.flatMap(group => 
+                    group.genes.map(geneId => {
+                        const opt = q.options.find((o: any) => o.id === geneId);
+                        return opt ? { ...opt, category: group.category } : null;
+                    }).filter(Boolean)
+                );
+
+                return (
+                  <div key={key} className="space-y-2">
+                    <Label>{q.text}</Label>
+                    <div className={cn("max-h-[400px] overflow-y-auto border rounded-md p-4")}>
+                        <CheckboxGroup
+                        options={groupedFlatOptions as any}
+                        value={answers[key] ? JSON.parse(answers[key]) : []}
+                        onChange={(val) => onAnswer(key, JSON.stringify(val))}
+                        />
+                    </div>
+                  </div>
+                );
+            }
+
             return (
               <div key={key} className="space-y-2">
                 <Label>{q.text}</Label>
@@ -138,3 +169,4 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
     </div>
   );
 };
+      

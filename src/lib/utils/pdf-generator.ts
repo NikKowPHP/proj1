@@ -296,9 +296,18 @@ export const generateAssessmentPdf = (
   if (Object.keys(answers).length > 0) {
     startY = checkPageBreak(startY);
     startY = drawSectionHeader(doc, t.yourAnswers, startY);
+    
+    // Filter out internal derived scores or flags that shouldn't be shown to the user
+    // This ensures no "risk scores" are printed in the PDF
+    const filteredAnswers = Object.entries(answers).filter(([key]) => {
+        return !key.startsWith('derived.') && 
+               !key.includes('_score') && 
+               !key.includes('brinkman_index');
+    });
+
     doc.autoTable({
       startY,
-      body: Object.entries(answers).map(([key, value]) => [
+      body: filteredAnswers.map(([key, value]) => [
         formatQuestionKey(key, t),
         formatAnswerValue(value, key),
       ]),
@@ -310,3 +319,4 @@ export const generateAssessmentPdf = (
     `${t.filename}_${new Date().toLocaleDateString().replace(/\//g, "-")}.pdf`,
   );
 };
+      

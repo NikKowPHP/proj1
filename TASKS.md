@@ -4,4 +4,5 @@
 - [x] Implement missing derived variables from PDF Page 22 (Chronic Conditions) and Page 32 (Family History Counts).
 - [x] Final UI/UX Polish: Soft warnings for biometrics, Smoking intensity badge, HBV helper text.
 - [x] Implement missing questions (HBV antiviral, HCV SVR, IBD extent) and derived variables (WHO2020 PA, Oral/Cervix HPV risk).
+- [x] Refactor WCRF logic, add detailed Environmental/Genetics/Screening flags, and update HPV Precancer question type.
       

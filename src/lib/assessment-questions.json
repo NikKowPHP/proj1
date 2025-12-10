@@ -720,7 +720,7 @@
                 
                 {"id": "sexhx.sti_treated_12m", "text": {"en": "Were you treated for an STI in the last 12 months?", "pl": "Czy byłeś/aś leczony/a na STI w ciągu ostatnich 12 miesięcy?"}, "type": "select", "options": ["Yes", "No"], "dependsOn": {"questionId": "sexhx.sti_history_other", "value": "Yes"}},
                 
-                {"id": "sexhx.hpv_precancer_history", "text": {"en": "History of HPV-related precancer (CIN2/3, HSIL)?", "pl": "Historia zmian przedrakowych HPV (CIN2/3, HSIL)?"}, "type": "select", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "sex_at_birth", "value": "Female"}},
+                {"id": "sexhx.hpv_precancer_history", "text": {"en": "History of HPV-related precancer?", "pl": "Historia zmian przedrakowych HPV?"}, "type": "checkbox_group", "options": [{"id": "cervix", "label": "Cervix"}, {"id": "vulva", "label": "Vulva"}, {"id": "vagina", "label": "Vagina"}, {"id": "anus", "label": "Anus"}, {"id": "penis", "label": "Penis"}, {"id": "mouth_throat", "label": "Mouth/Throat"}, {"id": "not_sure", "label": "Not sure"}, {"id": "prefer_not_to_say", "label": "Prefer not to say"}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
 
                 {"id": "sex_anal", "text": {"en": "Anal intercourse?", "pl": "Stosunek analny?"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["Yes", "No", "Prefer not to say"]},
                 {"id": "sex_oral", "text": {"en": "Oral sex?", "pl": "Seks oralny?"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["Yes", "No", "Prefer not to say"]},

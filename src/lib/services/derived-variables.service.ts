@@ -224,10 +224,10 @@ function calculateWcrf(
     if (!diet) return null;
     
     // Components
-    let compA = 0; // Plant Foods
-    let compB = 0; // Animal Foods
-    let compC = 0; // Energy Dense
-    let compD = 0; // Body Composition
+    let compA = 0; // Plant Foods (FV, WG, Legumes)
+    let compB = 0; // Fast Foods (Energy Dense)
+    let compC = 0; // Animal Foods (Meat)
+    let compD = 0; // Sugary Drinks
 
     // --- Component A: Plant Foods (Max 1.0) ---
     // Rule: FV >= 5 AND (WholeGrains >= 3 OR Legumes >= 1.5) -> 1.0
@@ -237,40 +237,32 @@ function calculateWcrf(
     const wg = diet.whole_grains || 0; // servings/day
     const legumes = diet.legumes || 0; // servings/week
     
-    // Legumes >= 3/week is approx 0.4/day.
-    // PDF Logic: 1.0 if FV>=5 & WG>=3; 0.5 if FV>=4 OR WG>=1.5 OR legumes>=3/wk
-    
     if (fv >= 5 && wg >= 3) {
         compA = 1.0;
     } else if (fv >= 4 || wg >= 1.5 || legumes >= 3) {
         compA = 0.5;
     }
 
-    // --- Component B: Animal Foods (Max 1.0) ---
+    // --- Component B: Fast Foods (Max 1.0) ---
+    // PDF Logic: 1.0 if fastfoods<=1/wk; 0.5 if fastfoods in [2,3]; else 0.
+    const fastFoodFreq = diet.fast_food || 0;
+    if (fastFoodFreq <= 1) compB = 1.0;
+    else if (fastFoodFreq <= 3) compB = 0.5;
+
+    // --- Component C: Animal Foods (Max 1.0) ---
     // Rule: Red Meat <= 350g/week AND Processed Meat == 0 -> 1.0
-    // Rule: Red Meat <= 500g/week AND Processed Meat <= 50g/week -> 0.5 (Relaxed)
-    // PDF Logic: 1.0 if red<=350 g/wk AND proc=0; 0.5 if red<=500 g/wk AND proc<=50 g/wk; else 0.
-    
-    // Inputs are servings/week.
-    // Conversions: Red ~ 100g/serving, Proc ~ 50g/serving
+    // Rule: Red Meat <= 500g/week AND Processed Meat <= 50g/week -> 0.5
     const redMeatGwk = (diet.red_meat || 0) * 100;
     const procMeatGwk = (diet.processed_meat || 0) * 50;
 
     if (redMeatGwk <= 350 && procMeatGwk === 0) {
-        compB = 1.0;
+        compC = 1.0;
     } else if (redMeatGwk <= 500 && procMeatGwk <= 50) {
-        compB = 0.5;
+        compC = 0.5;
     }
 
-    // --- Component C: Energy Dense & Sugary Drinks (Max 1.0) ---
-    // PDF Logic: 
-    // compB (Limit "fast foods"): 1.0 if fastfoods<=1/wk; 0.5 if fastfoods in [2,3] OR (fastfoods in [2,3] AND UPF%<10%); else 0.
-    // compD (Limit SSB): 1.0 if SSB=0; 0.5 if <=250 mL/wk; else 0.
-    // The PDF splits these. My function signature returns a composite score, but I can calculate them separately.
-    // Let's stick to the 4 components structure but adapt logic.
-    // Let's redefine C as "Unhealthy Foods & Drinks"
-    
-    const fastFoodFreq = diet.fast_food || 0;
+    // --- Component D: Sugary Drinks (Max 1.0) ---
+    // PDF Logic: 1.0 if SSB=0; 0.5 if <=250 mL/wk; else 0.
     const ssbFreq = diet.sugary_drinks || 0;
     const ssbSize = diet.ssb_container || 'Medium (330ml)';
     let mlPerServing = 330;
@@ -279,33 +271,10 @@ function calculateWcrf(
     if (ssbSize.includes('750')) mlPerServing = 750;
     const ssbMlwk = ssbFreq * mlPerServing;
 
-    // Fast Food Score
-    let scoreFastFood = 0;
-    if (fastFoodFreq <= 1) scoreFastFood = 1.0;
-    else if (fastFoodFreq <= 3) scoreFastFood = 0.5;
-
-    // SSB Score
-    let scoreSSB = 0;
-    if (ssbFreq === 0) scoreSSB = 1.0;
-    else if (ssbMlwk <= 250) scoreSSB = 0.5;
-
-    // Average them for Component C? Or just sum them up?
-    // The PDF has compB (fast food) and compD (SSB) as separate.
-    // Let's average them for this component C to keep 4-part structure or just sum.
-    // Let's make C = (FastFood + SSB) / 2
-    compC = (scoreFastFood + scoreSSB) / 2;
-
-
-    // --- Component D: Body Composition (Max 1.0) ---
-    // PDF doesn't explicitly score BMI in the WCRF section but uses it for rules.
-    // Standard WCRF: Be a healthy weight.
-    // 1.0 if BMI 18.5-24.9. 0.5 if 25-29.9. 0 else.
-    if (bmi && bmi >= 18.5 && bmi < 25) compD = 1.0;
-    else if (bmi && bmi >= 25 && bmi < 30) compD = 0.5;
-
+    if (ssbFreq === 0) compD = 1.0;
+    else if (ssbMlwk <= 250) compD = 0.5;
 
     // --- Total ---
-    // Total max is 4.0 if we treat C as 1.0 max.
     const totalScore = compA + compB + compC + compD;
     const maxScore = 4.0;
 
@@ -477,19 +446,46 @@ function calculateHpvExposureBand(sexualHealth: any): string {
  * Calculates Genetics Flags (High/Moderate Penetrance).
  */
 function calculateGeneticsFlags(genetics: any): Record<string, boolean> {
-    if (!genetics || !genetics.genes) return { 'gen.high_penetrance_carrier': false, 'gen.moderate_penetrance_only': false };
+    if (!genetics || !genetics.genes) return { 
+        'gen.high_penetrance_carrier': false, 
+        'gen.moderate_penetrance_only': false,
+        'gen.lynch_syndrome': false,
+        'gen.polyposis_syndrome': false,
+        'gen.prs_elevated': false
+    };
 
     const highPenetranceGenes = ['BRCA1', 'BRCA2', 'PALB2', 'TP53', 'PTEN', 'CDH1', 'STK11', 'MLH1', 'MSH2', 'MSH6', 'PMS2', 'EPCAM', 'APC', 'MUTYH', 'POLE', 'POLD1', 'SMAD4', 'BMPR1A', 'VHL', 'MEN1', 'RET'];
     const moderatePenetranceGenes = ['ATM', 'CHEK2', 'BARD1', 'BRIP1', 'RAD51C', 'RAD51D', 'NTHL1', 'MITF', 'CDKN2A'];
+    
+    // Lynch Genes
+    const lynchGenes = ['MLH1', 'MSH2', 'MSH6', 'PMS2', 'EPCAM'];
+    
+    // Polyposis Genes
+    const polyposisGenes = ['APC', 'MUTYH', 'POLE', 'POLD1', 'SMAD4', 'BMPR1A', 'NTHL1'];
 
     const userGenes = Array.isArray(genetics.genes) ? genetics.genes : [];
     
     const hasHigh = userGenes.some((g: string) => highPenetranceGenes.includes(g));
     const hasModerate = userGenes.some((g: string) => moderatePenetranceGenes.includes(g));
+    
+    const hasLynch = userGenes.some((g: string) => lynchGenes.includes(g));
+    const hasPolyposis = userGenes.some((g: string) => polyposisGenes.includes(g));
+    
+    // PRS Elevated
+    // Logic: true if gen.prs_done=Yes AND (any cancer flagged OR band in {higher, mixed})
+    let prsElevated = false;
+    if (genetics.prs && genetics.prs.done) {
+        const hasRedFlags = genetics.prs.red_flags && genetics.prs.red_flags.length > 0;
+        const isHighBand = ['higher', 'mixed'].includes(genetics.prs.risk_band);
+        if (hasRedFlags || isHighBand) prsElevated = true;
+    }
 
     return {
         'gen.high_penetrance_carrier': hasHigh,
-        'gen.moderate_penetrance_only': !hasHigh && hasModerate
+        'gen.moderate_penetrance_only': !hasHigh && hasModerate,
+        'gen.lynch_syndrome': hasLynch,
+        'gen.polyposis_syndrome': hasPolyposis,
+        'gen.prs_elevated': prsElevated
     };
 }
 
@@ -656,12 +652,12 @@ export const DerivedVariablesService = {
       derived['sex.msm_behavior'] = msmBehavior;
 
       // High Risk Anal Cancer Group
-      // Rule: HIV OR Transplant OR (Male AND MSM)
+      // Rule: HIV OR Transplant OR (Male AND MSM AND Age >= 35)
       const conditions = standardizedData.core?.conditions || []; 
       const hasHiv = conditions.includes('hiv');
       const hasTransplant = conditions.includes('transplant');
       
-      if (hasHiv || hasTransplant || msmBehavior) {
+      if (hasHiv || hasTransplant || (msmBehavior && derived.age_years >= 35)) {
           derived['sex.highrisk_anal_cancer_group'] = true;
       } else {
           derived['sex.highrisk_anal_cancer_group'] = false;
@@ -684,15 +680,15 @@ export const DerivedVariablesService = {
       }
       
       // Cervix HPV Persistent Pattern (PDF Page 14)
-      // Rule: derived.sex.hpv_exposure_band = Higher AND (sexhx.hpv_precancer_history = Yes OR cond.hpv.status ∈ {Past, Current})
-      // Note: `has_cervix` is implicitly checked by sex_at_birth for now, but should be explicit if hysterectomy data existed.
-      // Assuming Female for now as per PDF context.
-      const hpvPrecancer = sexHistory['sexhx.hpv_precancer_history'] === 'Yes';
+      // Rule: derived.sex.hpv_exposure_band = Higher AND (sexhx.hpv_precancer_history includes "Cervix" OR cond.hpv.status ∈ {Past, Current})
+      const hpvPrecancerHistory = sexHistory['sexhx.hpv_precancer_history'] || [];
+      const hpvPrecancerCervix = Array.isArray(hpvPrecancerHistory) && hpvPrecancerHistory.includes('cervix');
+      
       const illnesses = advanced.illnesses || [];
       const hpvStatus = illnesses.find((i: any) => i.id === 'hpv');
       const hpvPersistent = hpvStatus && (hpvStatus.status === 'Past' || hpvStatus.status === 'Current');
       
-      if (core.sex_at_birth === 'Female' && derived['sex.hpv_exposure_band'] === 'Higher' && (hpvPrecancer || hpvPersistent)) {
+      if (core.sex_at_birth === 'Female' && derived['sex.hpv_exposure_band'] === 'Higher' && (hpvPrecancerCervix || hpvPersistent)) {
           derived['sex.cervix_hpv_persistent_pattern'] = true;
       } else {
           derived['sex.cervix_hpv_persistent_pattern'] = false;
@@ -722,6 +718,35 @@ export const DerivedVariablesService = {
       derived['skin.lymphoma_highrisk'] = hasImmunosuppression;
       derived['hpv_related.vigilance'] = hasHiv || hasImmunosuppression; // Simplified vigilance flag
 
+      // --- Environmental Flags (PDF Page 57) ---
+      const env = advanced.environment || {};
+      const envSummary = env['env.summary'] ? JSON.parse(env['env.summary']) : [];
+      
+      derived['env.radon_high'] = (env['env.radon.result'] && ['Moderately elevated', 'Clearly above'].includes(env['env.radon.result'])) || (envSummary.includes('radon') && env['env.radon.tested'] !== 'No');
+      derived['env.asbestos_unprotected'] = env['env.asbestos.disturbance'] === 'Yes';
+      derived['env.well_contam_flag'] = env['env.water.well_tested'] === 'Yes' && env['env.water.arsenic'] === true; // Assuming arsenic check means contamination found
+      derived['env.pesticide_intensive'] = env['env.pesticide.type'] === 'Occupational' || env['env.pesticide.type'] === 'Home/Garden (Heavy)';
+      derived['env.uv_high'] = env['env.uv.sunbed_freq'] === 'Very Often' || envSummary.includes('sunbed');
+      
+      // --- Screening Candidate Flags ---
+      // Lung: Smoking >= 20 pack years (example threshold) AND Age 50-80
+      derived['screen.lung_candidate'] = (derived.pack_years >= 20 && derived.age_years >= 50 && derived.age_years <= 80 && (core.smoking_status === 'Current' || (core.smoking_status === 'Former' && advanced.smoking_detail?.quit_date && (new Date().getFullYear() - advanced.smoking_detail.quit_date <= 15))));
+      
+      // Prostate: Age 50+ Male
+      derived['screen.prostate_discuss'] = (core.sex_at_birth === 'Male' && derived.age_years >= 50);
+      
+      // Skin: High risk factors
+      derived['screen.skin_check_recommended'] = derived['skin.lymphoma_highrisk'] || derived['env.uv_high'] || derived['occ.skin_uv_highrisk'];
+
+      // --- Immunization Status Flags ---
+      const imm = advanced.screening_immunization || {};
+      derived['imm.hpv_complete'] = imm['imm.hpv'] === 'Yes';
+      derived['imm.hbv_complete'] = imm['imm.hbv'] === 'Yes';
+      derived['imm.flu_due'] = imm['imm.flu.last_season'] !== 'Yes';
+      derived['imm.covid_booster_due'] = imm['imm.covid.doses'] !== '4+'; // Simplified logic
+      derived['imm.pneumo_candidate'] = derived.age_years >= 65 || core.smoking_status === 'Current'; // Example criteria
+      derived['imm.zoster_candidate'] = derived.age_years >= 50;
+
       // --- New Logic ---
 
       // AUDIT-C
@@ -733,6 +758,7 @@ export const DerivedVariablesService = {
       if (ipaq) {
           derived.physical_activity_ipaq = ipaq;
           derived['pa.who2020_meets'] = ipaq.who2020_meets;
+          derived['pa.sedentary_minutes'] = core.physical_activity?.sitting_min;
       }
 
       // WCRF

@@ -276,7 +276,7 @@ export const StandardizationService = {
       ];
       sexualHealthKeys.forEach(key => {
         if (answers[key]) {
-             if (['sexhx.partner_genders', 'sexhx.sex_sites_ever', 'sexhx.sex_sites_12m', 'sexhx.sex_work_role', 'sexhx.sex_work_ever'].includes(key) && answers[key].startsWith('[')) {
+             if (['sexhx.partner_genders', 'sexhx.sex_sites_ever', 'sexhx.sex_sites_12m', 'sexhx.sex_work_role', 'sexhx.sex_work_ever', 'sexhx.hpv_precancer_history'].includes(key) && answers[key].startsWith('[')) {
                  sexualHealth[key] = safeJsonParse(answers[key]);
              } else {
                  sexualHealth[key] = answers[key];

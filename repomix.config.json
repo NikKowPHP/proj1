@@ -1,6 +1,6 @@
 {
 
    "ignore": {
-    "customPatterns": ["*base64.ts", "src/lib/assets/onkono-logo-base64.ts", "src/lib/assets/open-sans-bold-base64.ts", "src/lib/assets/open-sans-regular-base64.ts"]
+    "customPatterns": ["*base64.ts", "src/lib/assets/onkono-logo-base64.ts", "src/lib/assets/open-sans-bold-base64.ts", "src/lib/assets/open-sans-regular-base64.ts", "TASKS.md", "a.md"]
   }
 }

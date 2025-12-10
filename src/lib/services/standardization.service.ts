@@ -153,10 +153,25 @@ export const StandardizationService = {
               // New Logic: specific fields per illness
               const details: any = {};
               
-              if (illnessId === 'hbv') details.status = answers['cond.hbv.status'];
-              if (illnessId === 'hcv') details.status = answers['cond.hcv.status'];
+              if (illnessId === 'hbv') {
+                  details.status = answers['cond.hbv.status'];
+                  details.antiviral = answers['cond.hbv.antiviral_now'];
+              }
+              if (illnessId === 'hcv') {
+                  details.status = answers['cond.hcv.status'];
+                  details.svr12 = answers['cond.hcv.svr12'];
+              }
               if (illnessId === 'cirrhosis') details.etiology = answers['cond.cirrhosis.etiology'];
-              if (illnessId === 'ibd') details.type = answers['cond.ibd.type'];
+              if (illnessId === 'ibd') {
+                  details.type = answers['cond.ibd.type'];
+                  details.extent = answers['cond.ibd.extent'];
+                  // Need year of diagnosis for duration calculation
+                  // Assuming 'illness_details_ibd' might store year if collected via GenericModule or similar
+                  // But current JSON uses specific questions.
+                  // If year is not collected, duration logic will fail gracefully.
+                  // Let's check if we can add year collection for IBD.
+                  // For now, mapping what we have.
+              }
               if (illnessId === 'diabetes') details.type = answers['cond.diabetes.type'];
               if (illnessId === 'hypertension') details.controlled = answers['cond.hypertension.controlled'];
 

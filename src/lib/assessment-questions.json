@@ -466,6 +466,13 @@
                   }
                 },
                 {
+                   "id": "cond.hbv.antiviral_now",
+                   "text": {"en": "On antiviral therapy now?", "pl": "Czy aktualnie leczony/a lekami przeciwwirusowymi?"},
+                   "type": "radio",
+                   "options": ["Yes", "No", "Unsure"],
+                   "dependsOn": { "questionId": "cond.hbv.status", "value": "Chronic/Active"}
+                },
+                {
                   "id": "cond.hcv.status",
                   "text": { "en": "Hepatitis C Status", "pl": "Status WZW C" },
                   "type": "radio",
@@ -475,6 +482,13 @@
                       "id": "cond.hcv.helper",
                       "text": { "en": "Past (SVR) = treatment confirmed sustained viral clearance.", "pl": "Past (SVR) = wynik po leczeniu wskazał trwałą eliminację wirusa." }
                   }
+                },
+                {
+                    "id": "cond.hcv.svr12",
+                    "text": {"en": "If treated: cured (SVR) confirmed?", "pl": "Jeśli leczony/a: potwierdzone wyleczenie (SVR)?"},
+                    "type": "radio",
+                    "options": ["Yes", "No", "Unsure"],
+                    "dependsOn": { "questionId": "cond.hcv.status", "value": "Cured (SVR)"}
                 },
                 {
                   "id": "cond.h_pylori.status",
@@ -496,6 +510,13 @@
                   "type": "radio",
                   "options": ["Ulcerative Colitis", "Crohn's Disease", "Unsure"],
                   "dependsOn": { "questionId": "cond.summary", "value": "ibd" }
+                },
+                {
+                    "id": "cond.ibd.extent",
+                    "text": {"en": "Extent (UC)", "pl": "Zasięg (WZJG)"},
+                    "type": "select",
+                    "options": ["Proctitis", "Left-sided", "Pancolitis", "Unsure"],
+                    "dependsOn": { "questionId": "cond.ibd.type", "value": "Ulcerative Colitis"}
                 },
                 {
                   "id": "cond.diabetes.type",
@@ -887,4 +908,4 @@
     }
   ]
 }
-        
+      

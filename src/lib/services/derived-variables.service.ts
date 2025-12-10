@@ -167,7 +167,7 @@ function calculateAuditC(answers?: { q1?: number, q2?: number, q3?: number }, se
  * @param data - Object with days/minutes for vigorous, moderate, walking.
  * @returns Object with MET-minutes and Category (Low, Moderate, High).
  */
-function calculateIpaq(data?: any): { metMinutes: number, category: string } | null {
+function calculateIpaq(data?: any): { metMinutes: number, category: string, who2020_meets: boolean } | null {
     if (!data) return null;
     
     // Ensure all inputs are numbers, default to 0 if missing/NaN
@@ -201,7 +201,13 @@ function calculateIpaq(data?: any): { metMinutes: number, category: string } | n
         category = 'Moderate';
     }
 
-    return { metMinutes: Math.round(totalMetMinutes), category };
+    // WHO 2020 Guidelines: 150-300 min moderate OR 75-150 min vigorous per week
+    const totalVigMinutes = vigDays * vigMin;
+    const totalModMinutes = modDays * modMin + (walkDays * walkMin); // Walking counts as moderate if brisk
+    
+    const who2020_meets = (totalVigMinutes >= 75) || (totalModMinutes >= 150) || ((totalVigMinutes * 2 + totalModMinutes) >= 150);
+
+    return { metMinutes: Math.round(totalMetMinutes), category, who2020_meets };
 }
 
 /**
@@ -663,9 +669,36 @@ export const DerivedVariablesService = {
 
       // HPV Exposure Band
       derived['sex.hpv_exposure_band'] = calculateHpvExposureBand(sexHistory);
+      
+      // Oral HPV Cancer Exposure (PDF Page 14)
+      const sexOral = sexHistory['sex_oral'];
+      const lifetimePartners = sexHistory['sexhx.lifetime_partners_cat'];
+      const recentPartners = sexHistory['sexhx.partners_12m_cat'];
+      if (sexOral === 'Yes' && (
+          ['10-19', '20+'].includes(lifetimePartners) || 
+          ['6+'].includes(recentPartners)
+      )) {
+          derived['sex.oral_hpvcancer_exposure'] = true;
+      } else {
+          derived['sex.oral_hpvcancer_exposure'] = false;
+      }
+      
+      // Cervix HPV Persistent Pattern (PDF Page 14)
+      // Rule: derived.sex.hpv_exposure_band = Higher AND (sexhx.hpv_precancer_history = Yes OR cond.hpv.status ∈ {Past, Current})
+      // Note: `has_cervix` is implicitly checked by sex_at_birth for now, but should be explicit if hysterectomy data existed.
+      // Assuming Female for now as per PDF context.
+      const hpvPrecancer = sexHistory['sexhx.hpv_precancer_history'] === 'Yes';
+      const illnesses = advanced.illnesses || [];
+      const hpvStatus = illnesses.find((i: any) => i.id === 'hpv');
+      const hpvPersistent = hpvStatus && (hpvStatus.status === 'Past' || hpvStatus.status === 'Current');
+      
+      if (core.sex_at_birth === 'Female' && derived['sex.hpv_exposure_band'] === 'Higher' && (hpvPrecancer || hpvPersistent)) {
+          derived['sex.cervix_hpv_persistent_pattern'] = true;
+      } else {
+          derived['sex.cervix_hpv_persistent_pattern'] = false;
+      }
 
       // --- Chronic Condition Surveillance Flags (PDF Page 22) ---
-      const illnesses = advanced.illnesses || [];
       const hasCirrhosis = illnesses.some((i: any) => i.id === 'cirrhosis');
       const hasActiveHbv = illnesses.some((i: any) => i.id === 'hbv' && i.status === 'Chronic/Active');
       const hasIbd = illnesses.some((i: any) => i.id === 'ibd');
@@ -697,7 +730,10 @@ export const DerivedVariablesService = {
 
       // IPAQ
       const ipaq = calculateIpaq(core.physical_activity);
-      if (ipaq) derived.physical_activity_ipaq = ipaq;
+      if (ipaq) {
+          derived.physical_activity_ipaq = ipaq;
+          derived['pa.who2020_meets'] = ipaq.who2020_meets;
+      }
 
       // WCRF
       const wcrf = calculateWcrf(core.diet, audit?.score, bmi || null, ipaq?.category);

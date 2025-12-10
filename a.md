@@ -1,477 +1,20 @@
-<reasoning>
-I have identified a few final UI/UX refinements to fully align with the "soft warning" and specific helper text requirements in the PDF:
+<response>
+  <reasoning>
+    I have identified missing components from the PDF specification after a deep dive analysis:
+    1.  **Missing Questions in `assessment-questions.json`**:
+        *   `cond.hbv.antiviral_now` (Hepatitis B antiviral therapy status).
+        *   `cond.hcv.svr12` (Hepatitis C cure confirmation).
+        *   `cond.ibd.extent` (Ulcerative Colitis extent).
+    2.  **Missing Derived Variables in `DerivedVariablesService.ts`**:
+        *   `pa.who2020_meets` (Physical activity guidelines).
+        *   `sex.oral_hpvcancer_exposure` (Risk factor for oral cancer).
+        *   `sex.cervix_hpv_persistent_pattern` (Risk factor for cervical cancer).
 
-1.  **Soft Warnings for Biometrics:** The PDF requests "soft warnings" for height (<120 or >220) and weight (<40 or >220), while keeping hard limits (50-250, 30-300). I need to update `AssessmentPage.tsx` to support non-blocking warnings.
-2.  **Smoking Helper:** The PDF requests a badge/explanation "20 cig = 1 pack" for smoking intensity. I will add this to `SmokingDetails.tsx`.
-3.  **HBV Helper:** The PDF specifies a helper text for Hepatitis B status ("Past = lekarz potwierdził..."). I will add this to `assessment-questions.json`.
-
-I will now apply these changes.
-</reasoning>
-<modifications>
-    <file path="src/app/[locale]/assessment/page.tsx">
-        <![CDATA[
-'use client'
-import React, { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/services/api-client.service";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useAssessmentStore } from "@/lib/stores/assessment.store";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Link, useRouter } from "@/i18n/navigation";
-import { useParams } from "next/navigation";
-import { Progress } from "@/components/ui/progress";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { useTranslations } from "next-intl";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { AppHeaderContent } from "@/components/AppHeaderContent";
-import { DisclaimerFooterContent } from "@/components/DisclaimerFooterContent";
-import { DisclaimerFooterContentMobile } from "@/components/DisclaimerFooterContentMobile";
-import { Checkbox } from "@/components/ui/checkbox";
-import { CheckboxGroup, CheckboxOption } from "@/components/ui/CheckboxGroup";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { SymptomDetails } from "@/components/assessment/SymptomDetails";
-import { FamilyCancerHistory } from "@/components/assessment/FamilyCancerHistory";
-import { Genetics } from "@/components/assessment/Genetics";
-import { FemaleHealth } from "@/components/assessment/FemaleHealth";
-import { GenericModule } from "@/components/assessment/GenericModule";
-import { PersonalCancerHistory } from "@/components/assessment/PersonalCancerHistory";
-import { ScreeningHistory } from "@/components/assessment/ScreeningHistory";
-import { SexualHealth } from "@/components/assessment/SexualHealth";
-import { OccupationalHazards } from "@/components/assessment/OccupationalHazards";
-import { EnvironmentalExposures } from "@/components/assessment/EnvironmentalExposures";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Info, AlertCircle } from "lucide-react";
-import { SafetyBanner } from "@/components/assessment/SafetyBanner";
-import { LabsAndImaging } from "@/components/assessment/LabsAndImaging";
-import { FunctionalStatus } from "@/components/assessment/FunctionalStatus";
-import { SmokingDetails } from "@/components/assessment/SmokingDetails";
-import { Medications } from "@/components/assessment/Medications";
-import { StandardizationService } from "@/lib/services/standardization.service";
-import { DerivedVariablesService } from "@/lib/services/derived-variables.service";
-import { Card, CardContent } from "@/components/ui/card";
-
-interface Question {
-  id: string;
-  text?: string;
-  type: "select" | "number_input" | "date_input" | "consent_checkbox" | "checkbox_group" | "advanced_modules" | "radio" | "year_input";
-  options?: any; // Can be string[], CheckboxOption[], or complex objects for modules
-  dependsOn?: {
-    questionId: string;
-    value: string | boolean | string[];
-  };
-  exclusiveOptionId?: string;
-  modules?: any[];
-  tooltip?: string;
-  infoCard?: {
-      id: string;
-      text: string | { en: string; pl: string };
-  };
-}
-
-interface Step {
-  title: string;
-  description?: string;
-  questions: Question[];
-}
-
-export default function AssessmentPage() {
-  const t = useTranslations("AssessmentPage");
-  const router = useRouter();
-  const params = useParams();
-  const locale = typeof params.locale === "string" ? params.locale : "en";
-
-  const {
-    currentStep,
-    answers,
-    setAnswer,
-    nextStep,
-    prevStep,
-    totalSteps,
-    setTotalSteps,
-    reset,
-  } = useAssessmentStore();
-
-  const [isClient, setIsClient] = useState(false);
-  const [showResumeDialog, setShowResumeDialog] = useState(false);
-  const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
-  const [localWarnings, setLocalWarnings] = useState<Record<string, string>>({});
-  const [showSafetyBanner, setShowSafetyBanner] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (
-      isClient &&
-      Object.keys(useAssessmentStore.getState().answers).length > 0
-    ) {
-      setShowResumeDialog(true);
-    }
-  }, [isClient]);
-
-  const {
-    data: questionnaire,
-    isLoading,
-    error,
-  } = useQuery<{ steps: Step[] }>({
-    queryKey: ["questionnaire", locale],
-    queryFn: () => apiClient.questionnaire.getActive(locale),
-  });
-
-  useEffect(() => {
-    if (questionnaire) {
-      setTotalSteps(questionnaire.steps.length);
-    }
-  }, [questionnaire, setTotalSteps]);
-
-  useEffect(() => {
-    if (!questionnaire) return;
-    const symptomsAnswer = answers.symptoms;
-    if (symptomsAnswer) {
-      try {
-        const selectedIds = JSON.parse(symptomsAnswer);
-        const symptomOptions = questionnaire.steps
-          .flatMap(s => s.questions)
-          .find(q => q.id === 'symptoms')?.options || [];
-        
-        const hasRedFlag = selectedIds.some((id: string) => {
-          const option = symptomOptions.find((opt: any) => opt.id === id);
-          return option?.red_flag;
-        });
-        setShowSafetyBanner(hasRedFlag);
-      } catch (e) {
-        setShowSafetyBanner(false);
-      }
-    } else {
-       setShowSafetyBanner(false);
-    }
-  }, [answers.symptoms, questionnaire]);
-
-  const handleNext = () => {
-    // Adult Gate Logic
-    if (answers.dob) { 
-        try {
-             const standardized = StandardizationService.standardize(answers);
-             const derived = DerivedVariablesService.calculateAll(standardized);
-             if (derived.adult_gate_ok === false) {
-                 setLocalErrors(prev => ({ ...prev, dob: "This tool is for adults." }));
-                 return;
-             } else {
-                 setLocalErrors(prev => {
-                     const newErrors = {...prev};
-                     delete newErrors.dob;
-                     return newErrors;
-                 });
-             }
-        } catch (e) {
-            console.error("Gate check failed", e);
-        }
-    }
-
-    if (currentStep < totalSteps - 1) {
-      nextStep();
-    } else {
-      router.push("/results");
-    }
-  };
-
-  const handleStartNew = () => {
-    reset();
-    setShowResumeDialog(false);
-  };
-
-  const validateInput = (id: string, value: string, type: Question['type']): { error: string | null, warning: string | null } => {
-    let error = null;
-    let warning = null;
-
-    if (type === 'date_input' && id === 'dob') {
-        if (!value) error = "This field is required.";
-        else if (new Date(value) > new Date()) error = "Date of birth cannot be in the future.";
-    }
-    if (type === 'number_input') {
-        if (!value.trim()) return { error: null, warning: null }; // Allow empty optional fields
-        const num = Number(value);
-        if (isNaN(num)) error = t('validNumber');
-        else if (num <= 0) error = t('positiveValue');
-        
-        // Height validation (PDF Page 2)
-        if (id === 'height_cm') {
-            if (num < 50 || num > 250) error = "Height must be between 50 and 250 cm.";
-            else if (num < 120 || num > 220) warning = "Please check if this height is correct.";
-        }
-        // Weight validation (PDF Page 2)
-        if (id === 'weight_kg') {
-            if (num < 30 || num > 300) error = "Weight must be between 30 and 300 kg.";
-            else if (num < 40 || num > 220) warning = "Please check if this weight is correct.";
-        }
-    }
-    return { error, warning };
-  };
-
-  const handleInputChange = (id: string, value: string, type: Question['type']) => {
-      const { error, warning } = validateInput(id, value, type);
-      setLocalErrors(prev => ({ ...prev, [id]: error || '' }));
-      setLocalWarnings(prev => ({ ...prev, [id]: warning || '' }));
-      setAnswer(id, value);
-  };
-
-  const isQuestionVisible = (question: Question) => {
-    if (!question.dependsOn) return true;
-    const dependencyAnswer = answers[question.dependsOn.questionId];
-    if (typeof question.dependsOn.value === 'boolean') {
-      if (question.dependsOn.value) {
-        return !!dependencyAnswer && dependencyAnswer !== '[]' && dependencyAnswer !== 'false' && dependencyAnswer !== '["HP:0000000"]';
-      } else {
-        return !dependencyAnswer || dependencyAnswer === '[]' || dependencyAnswer === 'false' || dependencyAnswer === '["HP:0000000"]';
-      }
-    }
-    if(Array.isArray(question.dependsOn.value)){
-      // If dependencyAnswer is a JSON array string (from checkbox), parse it
-      try {
-        const parsedAnswer = JSON.parse(dependencyAnswer);
-        if(Array.isArray(parsedAnswer)) {
-           return parsedAnswer.some(val => (question.dependsOn?.value as string[]).includes(val));
-        }
-      } catch {
-        // Not a JSON array
-      }
-      return question.dependsOn.value.includes(dependencyAnswer);
-    }
-    return dependencyAnswer === question.dependsOn.value;
-  };
-
-  const stepData = questionnaire?.steps[currentStep];
-  const visibleQuestions = stepData?.questions.filter(isQuestionVisible) || [];
-
-  const isStepComplete = () => {
-    if (!questionnaire) return false;
-    const allAnswered = visibleQuestions.every((q) => {
-      if (q.type === "consent_checkbox") return answers[q.id] === "true";
-      if (q.type === "checkbox_group") {
-        const value = answers[q.id];
-        if (!value) return false;
-        try { return JSON.parse(value).length > 0; } catch { return false; }
-      }
-      if (q.type === "advanced_modules") return true;
-      // Make non-required fields optional for completion check
-      if (['gender_identity', 'height_cm', 'weight_kg', 'diet_pattern', 'activity_level'].includes(q.id)) return true;
-      return answers[q.id] && answers[q.id].trim() !== "";
-    });
-    const noErrors = visibleQuestions.every((q) => !localErrors[q.id]);
-    return allAnswered && noErrors;
-  };
-  
-  const progressPercentage = ((currentStep + 1) / totalSteps) * 100;
-
-  if (isLoading || !isClient) {
-    return (
-      <div className="container mx-auto p-4 max-w-2xl space-y-4">
-        <Skeleton className="h-8 w-1/4" />
-        <Skeleton className="h-64 w-full" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto p-4 max-w-2xl text-center">
-        <p className="text-destructive">{t("loadingError", { error: (error as Error).message })}</p>
-      </div>
-    );
-  }
-
-  const advancedModules = questionnaire?.steps.flatMap(step => step.questions).find((q: Question) => q.id === 'advanced_modules')?.modules || [];
-  const symptomDetailsOptions = advancedModules.find((m: { id: string; options?: any }) => m.id === 'symptom_details')?.options;
-
-
-  return (
-    <div className="flex flex-col min-h-screen">
-      <header className="p-4 bg-white text-black md:hidden"><AppHeaderContent /></header>
-      <Dialog open={showResumeDialog} onOpenChange={setShowResumeDialog}>
-        <DialogContent showCloseButton={false} onEscapeKeyDown={(e) => e.preventDefault()} onPointerDownOutside={(e) => e.preventDefault()}>
-          <DialogHeader><DialogTitle>{t("resumeDialogTitle")}</DialogTitle><DialogDescription>{t("resumeDialogDescription")}</DialogDescription></DialogHeader>
-          <DialogFooter><Button variant="outline" onClick={handleStartNew}>{t("resumeDialogStartNew")}</Button><Button onClick={() => setShowResumeDialog(false)}>{t("resumeDialogResume")}</Button></DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <div className="flex flex-grow md:grid md:grid-cols-2">
-        <div className="hidden md:flex flex-col justify-between p-12 bg-white text-black"><AppHeaderContent /><DisclaimerFooterContent /></div>
-        <main className="bg-black text-white w-full flex flex-col flex-grow sm:items-center sm:justify-center p-4 pb-24 md:pb-4">
-          <div className="w-full max-w-md space-y-8">
-            <div className=" justify-center w-full hidden sm:flex"><LanguageSwitcher /></div>
-            <div>
-              <Progress value={progressPercentage} className="mb-4 h-3" indicatorClassName="bg-primary" />
-              <h1 className="text-2xl font-bold">{stepData?.title}</h1>
-              {stepData?.description && <p className="text-gray-400 mt-2">{stepData.description}</p>}
-            </div>
-            {showSafetyBanner && <SafetyBanner answers={answers} />}
-            <section className="space-y-6">
-              {visibleQuestions.map((q) => (
-                <div key={q.id} className="space-y-2">
-                  {q.text && (
-                     <div className="flex items-center gap-2">
-                        <Label htmlFor={q.id}>{q.text}</Label>
-                        {q.tooltip && (
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Info className="h-4 w-4 text-muted-foreground" />
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{q.tooltip}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        )}
-                     </div>
-                  )}
-                  {q.type === "select" && <Select onValueChange={(v) => setAnswer(q.id, v)} value={answers[q.id] || ""}><SelectTrigger id={q.id}><SelectValue placeholder={t("selectOption")} /></SelectTrigger><SelectContent>{q.options.map((o: any) => {
-                    if (typeof o === 'object' && o.value && o.label) {
-                      return <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>;
-                    }
-                    return <SelectItem key={o} value={o}>{o}</SelectItem>;
-                  })}</SelectContent></Select>}
-                  {q.type === "radio" && <Select onValueChange={(v) => setAnswer(q.id, v)} value={answers[q.id] || ""}><SelectTrigger id={q.id}><SelectValue placeholder={t("selectOption")} /></SelectTrigger><SelectContent>{q.options.map((o: any) => {
-                    if (typeof o === 'object' && o.value && o.label) {
-                      return <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>;
-                    }
-                    return <SelectItem key={o} value={o}>{o}</SelectItem>;
-                  })}</SelectContent></Select>}
-                  {q.type === "number_input" && (
-                    <>
-                        <Input id={q.id} type="number" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} />
-                        {localErrors[q.id] && <p className="text-sm text-destructive">{localErrors[q.id]}</p>}
-                        {localWarnings[q.id] && !localErrors[q.id] && (
-                            <p className="text-sm text-yellow-500 flex items-center gap-1">
-                                <AlertCircle className="h-3 w-3" /> {localWarnings[q.id]}
-                            </p>
-                        )}
-                    </>
-                  )}
-                  {q.type === "year_input" && <><Input id={q.id} type="number" inputMode="numeric" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} placeholder="YYYY" /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
-                  {q.type === "date_input" && <><Input id={q.id} type="date" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
-                  {q.type === "consent_checkbox" && <div className="flex items-start space-x-3 rounded-md border p-4"><Checkbox id={q.id} checked={answers[q.id] === "true"} onCheckedChange={(c) => setAnswer(q.id, c ? "true" : "false")} /><div className="grid gap-1.5"><label htmlFor={q.id} className="text-sm leading-snug text-muted-foreground">{t.rich("consentHealth", { privacyLink: (chunks) => <Link href="/privacy" className="font-semibold text-primary hover:underline" target="_blank" rel="noopener noreferrer">{chunks}</Link> })}</label></div></div>}
-                  {q.type === "checkbox_group" && <CheckboxGroup options={q.options as CheckboxOption[]} value={answers[q.id] ? JSON.parse(answers[q.id]) : []} onChange={(s) => setAnswer(q.id, JSON.stringify(s))} exclusiveOption={q.exclusiveOptionId} />}
-                  {q.type === 'advanced_modules' && <Accordion type="multiple" className="w-full">{q.modules?.filter(isQuestionVisible).map(m => <AccordionItem value={m.id} key={m.id}><AccordionTrigger>{m.title}</AccordionTrigger><AccordionContent>
-                    {m.id === 'symptom_details' && <SymptomDetails selectedSymptoms={answers.symptoms ? questionnaire?.steps.flatMap(s => s.questions).find(q => q.id === 'symptoms')?.options?.filter((o: any) => JSON.parse(answers.symptoms).includes(o.id)) || [] : []} value={Object.keys(answers).reduce((acc, k) => { if(k.startsWith('symptom_details_')) { const sId=k.replace('symptom_details_',''); acc[sId]=JSON.parse(answers[k]);} return acc;}, {} as Record<string,any>)} onChange={(sId, d) => setAnswer(`symptom_details_${sId}`, JSON.stringify(d))} symptomOptions={symptomDetailsOptions?.symptomList || []} featureOptions={symptomDetailsOptions?.associatedFeatures || []} />}
-                    {m.id === 'family_cancer_history' && <FamilyCancerHistory value={answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : []} onChange={(v) => setAnswer('family_cancer_history', JSON.stringify(v))} options={m.options} />}
-                    {m.id === 'genetics' && <Genetics answers={answers} onAnswer={setAnswer} questions={m.questions} />}
-                    {m.id === 'female_health' && <FemaleHealth answers={answers} onAnswer={setAnswer} questions={m.questions} />}
-                    {m.id === 'chronic_condition_details' && <GenericModule answers={answers} onAnswer={setAnswer} questions={m.questions} />}
-                    {m.id === 'personal_cancer_history' && <PersonalCancerHistory value={answers.personal_cancer_history ? JSON.parse(answers.personal_cancer_history) : []} onChange={(v) => setAnswer('personal_cancer_history', JSON.stringify(v))} options={m.options} />}
-                    {m.id === 'screening_immunization' && <ScreeningHistory answers={answers} onAnswer={setAnswer} screeningGroups={m.screenings} immunizationQuestions={m.immunizations}/>}
-                    {m.id === 'medications_iatrogenic' && <Medications answers={answers} onAnswer={setAnswer} questions={m.questions} />}
-                    {m.id === 'sexual_health' && <SexualHealth answers={answers} onAnswer={setAnswer} questions={m.questions} />}
-                    {m.id === 'occupational_hazards' && <OccupationalHazards value={answers.occupational_hazards ? JSON.parse(answers.occupational_hazards) : []} onChange={(v) => setAnswer('occupational_hazards', JSON.stringify(v))} options={m.options} questions={m.questions} answers={answers} onAnswer={setAnswer}/>}
-                    {m.id === 'environmental_exposures' && <EnvironmentalExposures answers={answers} onAnswer={setAnswer} questions={m.questions} />}
-                    {m.id === 'labs_and_imaging' && <LabsAndImaging value={answers.labs_and_imaging ? JSON.parse(answers.labs_and_imaging) : []} onChange={(v) => setAnswer('labs_and_imaging', JSON.stringify(v))} options={m.options} />}
-                    {m.id === 'functional_status' && <FunctionalStatus answers={answers} onAnswer={setAnswer} questions={m.questions} />}
-                    {m.id === 'smoking_details' && <SmokingDetails answers={answers} onAnswer={setAnswer} questions={m.questions} />}
-                  </AccordionContent></AccordionItem>)}</Accordion>}
-                  
-                  {q.infoCard && (
-                    <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 mt-2">
-                        <CardContent className="p-3 flex items-start gap-3">
-                            <Info className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-                            <p className="text-sm text-blue-700 dark:text-blue-300">
-                                {typeof q.infoCard.text === 'object' ? (q.infoCard.text as any)[locale] : q.infoCard.text}
-                            </p>
-                        </CardContent>
-                    </Card>
-                  )}
-                </div>
-              ))}
-            </section>
-            <footer className="flex justify-between">
-              <Button variant="outline" onClick={prevStep} disabled={currentStep === 0} className="rounded-none">{t("back")}</Button>
-              <Button variant="default" onClick={handleNext} disabled={!isStepComplete()} className="rounded-none disabled:opacity-50">{currentStep === totalSteps - 1 ? t("viewResults") : t("next")}</Button>
-            </footer>
-          </div>
-        </main>
-      </div>
-      <footer className="fixed bottom-0 left-0 right-0 z-10 p-4 bg-white text-black md:hidden border-t"><DisclaimerFooterContentMobile /></footer>
-    </div>
-  );
-}
-        ]]>
-    </file>
-    <file path="src/components/assessment/SmokingDetails.tsx">
-        <![CDATA[
-import React from 'react';
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
-import { YearInput } from '../ui/YearInput';
-import { Badge } from '../ui/badge';
-
-interface SmokingDetailsProps {
-  answers: Record<string, string>;
-  onAnswer: (id: string, value: string) => void;
-  questions: any[];
-}
-
-export const SmokingDetails = ({ answers, onAnswer, questions }: SmokingDetailsProps) => {
-  return (
-    <div className="space-y-6">
-      {questions.map(q => (
-        <div key={q.id} className="space-y-2">
-          <Label htmlFor={q.id}>{q.text}</Label>
-          {q.id === 'smoking.intensity' && (
-             <div className="mb-2">
-                <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
-                    20 cigarettes = 1 pack
-                </span>
-             </div>
-          )}
-          {q.type === 'year_input' ? (
-             <YearInput
-              id={q.id}
-              value={answers[q.id]}
-              onChange={(val) => onAnswer(q.id, val ? String(val) : '')}
-              placeholder={q.placeholder}
-            />
-          ) : q.type === 'date_input' ? (
-            <Input
-              id={q.id}
-              type="date"
-              value={answers[q.id] || ""}
-              onChange={(e) => onAnswer(q.id, e.target.value)}
-              placeholder={q.placeholder}
-            />
-          ) : (
-            <Input
-              id={q.id}
-              type="number"
-              value={answers[q.id] || ""}
-              onChange={(e) => onAnswer(q.id, e.target.value)}
-              placeholder={q.placeholder}
-              min="0"
-            />
-          )}
-        </div>
-      ))}
-    </div>
-  );
-};
-        ]]>
-    </file>
+    I will now update `assessment-questions.json` to include the missing questions and `DerivedVariablesService.ts` to calculate the missing flags. I will also update `StandardizationService.ts` to ensure these new fields are correctly processed.
+  </reasoning>
+  <modifications>
     <file path="src/lib/assessment-questions.json">
-        <![CDATA[
+      <![CDATA[
 {
   "steps": [
     {
@@ -940,6 +483,13 @@ export const SmokingDetails = ({ answers, onAnswer, questions }: SmokingDetailsP
                   }
                 },
                 {
+                   "id": "cond.hbv.antiviral_now",
+                   "text": {"en": "On antiviral therapy now?", "pl": "Czy aktualnie leczony/a lekami przeciwwirusowymi?"},
+                   "type": "radio",
+                   "options": ["Yes", "No", "Unsure"],
+                   "dependsOn": { "questionId": "cond.hbv.status", "value": "Chronic/Active"}
+                },
+                {
                   "id": "cond.hcv.status",
                   "text": { "en": "Hepatitis C Status", "pl": "Status WZW C" },
                   "type": "radio",
@@ -949,6 +499,13 @@ export const SmokingDetails = ({ answers, onAnswer, questions }: SmokingDetailsP
                       "id": "cond.hcv.helper",
                       "text": { "en": "Past (SVR) = treatment confirmed sustained viral clearance.", "pl": "Past (SVR) = wynik po leczeniu wskazał trwałą eliminację wirusa." }
                   }
+                },
+                {
+                    "id": "cond.hcv.svr12",
+                    "text": {"en": "If treated: cured (SVR) confirmed?", "pl": "Jeśli leczony/a: potwierdzone wyleczenie (SVR)?"},
+                    "type": "radio",
+                    "options": ["Yes", "No", "Unsure"],
+                    "dependsOn": { "questionId": "cond.hcv.status", "value": "Cured (SVR)"}
                 },
                 {
                   "id": "cond.h_pylori.status",
@@ -970,6 +527,13 @@ export const SmokingDetails = ({ answers, onAnswer, questions }: SmokingDetailsP
                   "type": "radio",
                   "options": ["Ulcerative Colitis", "Crohn's Disease", "Unsure"],
                   "dependsOn": { "questionId": "cond.summary", "value": "ibd" }
+                },
+                {
+                    "id": "cond.ibd.extent",
+                    "text": {"en": "Extent (UC)", "pl": "Zasięg (WZJG)"},
+                    "type": "select",
+                    "options": ["Proctitis", "Left-sided", "Pancolitis", "Unsure"],
+                    "dependsOn": { "questionId": "cond.ibd.type", "value": "Ulcerative Colitis"}
                 },
                 {
                   "id": "cond.diabetes.type",
@@ -1361,15 +925,1311 @@ export const SmokingDetails = ({ answers, onAnswer, questions }: SmokingDetailsP
     }
   ]
 }
-        ]]>
+      ]]>
+    </file>
+    <file path="src/lib/services/derived-variables.service.ts">
+      <![CDATA[
+import { logger } from "@/lib/logger";
+import { differenceInYears } from 'date-fns';
+
+/**
+ * Calculates Body Mass Index (BMI).
+ * @param height - Height in cm.
+ * @param weight - Weight in kg.
+ * @returns The calculated BMI, or null if inputs are invalid.
+ */
+function calculateBmi(height?: number, weight?: number): number | null {
+  if (!height || !weight || height <= 0 || weight <= 0) {
+    return null;
+  }
+  const heightInMeters = height / 100;
+  return parseFloat((weight / (heightInMeters * heightInMeters)).toFixed(2));
+}
+
+/**
+ * Calculates age from a date of birth string.
+ * @param dob - Date of birth in "YYYY-MM-DD" format.
+ * @returns The calculated age in years, or null if the input is invalid.
+ */
+function calculateAge(dob?: string): number | null {
+    if (!dob) return null;
+    try {
+        const birthDate = new Date(dob);
+        if (isNaN(birthDate.getTime())) return null;
+        return differenceInYears(new Date(), birthDate);
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Calculates smoking pack-years and Brinkman Index.
+ * @param smokingDetails - Object with cigs_per_day, intensity_unit and years.
+ * @returns Object containing pack-years and brinkman_index.
+ */
+function calculateSmokingMetrics(smokingDetails?: { cigs_per_day?: number; intensity_unit?: string; years?: number }): { pack_years: number | null, brinkman_index: number | null } {
+    if (!smokingDetails || !smokingDetails.cigs_per_day || !smokingDetails.years) {
+        return { pack_years: null, brinkman_index: null };
+    }
+    const { cigs_per_day, intensity_unit, years } = smokingDetails;
+    if (cigs_per_day <= 0 || years <= 0) return { pack_years: null, brinkman_index: null };
+    
+    let packsPerDay = 0;
+    let cigarettesPerDay = 0;
+
+    if (intensity_unit === 'Packs per day') {
+        packsPerDay = cigs_per_day;
+        cigarettesPerDay = cigs_per_day * 20;
+    } else {
+        packsPerDay = cigs_per_day / 20;
+        cigarettesPerDay = cigs_per_day;
+    }
+
+    const pack_years = parseFloat((packsPerDay * years).toFixed(1));
+    const brinkman_index = parseFloat((cigarettesPerDay * years).toFixed(1));
+
+    return { pack_years, brinkman_index };
+}
+
+/**
+ * Checks for early-age cancer diagnosis in first-degree relatives.
+ * @param familyHistory - Array of family member health history.
+ * @returns `true` if an early diagnosis is found, `false` otherwise, or `null` if no relevant data.
+ */
+function calculateEarlyAgeFamilyDx(familyHistory?: { relation?: string; age_dx?: number }[]): boolean | null {
+    if (!familyHistory || !Array.isArray(familyHistory) || familyHistory.length === 0) {
+        return null;
+    }
+
+    const firstDegreeRelatives = ['Parent', 'Sibling', 'Child', 'Mother', 'Father', 'Sister', 'Brother', 'Daughter', 'Son'];
+
+    const hasEarlyDx = familyHistory.some(
+        (relative) =>
+            relative.relation &&
+            firstDegreeRelatives.includes(relative.relation) &&
+            relative.age_dx &&
+            relative.age_dx < 50
+    );
+    
+    return hasEarlyDx;
+}
+
+/**
+ * Calculates granular family history metrics per cancer site.
+ * PDF Page 32: derived.famhx.[site].fdr_count, sdr_third_count, youngest_dx_age_any
+ */
+function calculateFamilySiteMetrics(familyHistory?: any[]): Record<string, any> {
+    if (!familyHistory || !Array.isArray(familyHistory)) return {};
+
+    const sites = ['breast', 'ovarian', 'colorectal', 'prostate', 'lung', 'melanoma', 'pancreas', 'gastric'];
+    const metrics: Record<string, any> = {};
+
+    const firstDegree = ['Mother', 'Father', 'Sister', 'Brother', 'Daughter', 'Son'];
+    const secondDegree = ['Maternal Grandmother', 'Maternal Grandfather', 'Paternal Grandmother', 'Paternal Grandfather', 'Aunt', 'Uncle', 'Niece', 'Nephew'];
+    
+    sites.forEach(site => {
+        let fdrCount = 0;
+        let sdrCount = 0;
+        let youngestAge: number | null = null;
+
+        familyHistory.forEach(member => {
+            // Check if member has this cancer (cancers array or single cancer_type)
+            const memberCancers = member.cancers || (member.cancer_type ? [{cancer_type: member.cancer_type, age_dx: member.age_dx}] : []);
+            
+            memberCancers.forEach((c: any) => {
+                if (c.cancer_type && c.cancer_type.toLowerCase().includes(site)) {
+                    // Increment counts
+                    if (firstDegree.includes(member.relation)) fdrCount++;
+                    else if (secondDegree.includes(member.relation)) sdrCount++; // Treating 2nd and 3rd degree (cousin) as non-FDR group for now
+
+                    // Track youngest age
+                    const dxAge = c.age_dx;
+                    if (dxAge !== undefined && dxAge !== null) {
+                        if (youngestAge === null || dxAge < youngestAge) {
+                            youngestAge = dxAge;
+                        }
+                    }
+                }
+            });
+        });
+
+        metrics[`famhx.${site}.fdr_count`] = fdrCount;
+        metrics[`famhx.${site}.sdr_third_count`] = sdrCount;
+        metrics[`famhx.${site}.youngest_dx_age_any`] = youngestAge;
+    });
+
+    return metrics;
+}
+
+/**
+ * Calculates composite flags for occupational exposures.
+ * @param occupationalHistory - Array of jobs with exposures.
+ * @returns An object with exposure flags, or null if no data.
+ */
+function calculateExposureComposites(occupationalHistory?: { occ_exposures?: string[] }[]): { has_known_carcinogen_exposure: boolean } | null {
+    if (!occupationalHistory || !Array.isArray(occupationalHistory) || occupationalHistory.length === 0) {
+        return null;
+    }
+
+    const highRiskExposures = ['asbestos', 'benzene'];
+    const allExposures = new Set(occupationalHistory.flatMap(job => job.occ_exposures || []));
+
+    const hasExposure = highRiskExposures.some(risk => allExposures.has(risk));
+    
+    return { has_known_carcinogen_exposure: hasExposure };
+}
+
+
+/**
+ * Calculates AUDIT-C Score (Alcohol).
+ * @param answers - Object with q1, q2, q3 values (0-4).
+ * @returns Object with score and risk category.
+ */
+function calculateAuditC(answers?: { q1?: number, q2?: number, q3?: number }, sex?: string): { score: number, risk: string } | null {
+    if (!answers || answers.q1 === undefined || answers.q2 === undefined || answers.q3 === undefined) return null;
+    const score = (answers.q1 || 0) + (answers.q2 || 0) + (answers.q3 || 0);
+    const threshold = sex === 'Female' ? 3 : 4;
+    const risk = score >= threshold ? 'Hazardous' : 'Low Risk';
+    return { score, risk };
+}
+
+/**
+ * Calculates IPAQ Physical Activity Score.
+ * @param data - Object with days/minutes for vigorous, moderate, walking.
+ * @returns Object with MET-minutes and Category (Low, Moderate, High).
+ */
+function calculateIpaq(data?: any): { metMinutes: number, category: string, who2020_meets: boolean } | null {
+    if (!data) return null;
+    
+    // Ensure all inputs are numbers, default to 0 if missing/NaN
+    const vigDays = Number(data.vigorous_days) || 0;
+    const vigMin = Number(data.vigorous_min) || 0;
+    const modDays = Number(data.moderate_days) || 0;
+    const modMin = Number(data.moderate_min) || 0;
+    const walkDays = Number(data.walking_days) || 0;
+    const walkMin = Number(data.walking_min) || 0;
+
+    const vigMets = 8.0 * vigMin * vigDays;
+    const modMets = 4.0 * modMin * modDays;
+    const walkMets = 3.3 * walkMin * walkDays;
+    
+    const totalMetMinutes = vigMets + modMets + walkMets;
+    const totalDays = vigDays + modDays + walkDays;
+
+    let category = 'Low';
+
+    // Criteria for High
+    if ((vigDays >= 3 && totalMetMinutes >= 1500) || (totalDays >= 7 && totalMetMinutes >= 3000)) {
+        category = 'High';
+    } 
+    // Criteria for Moderate
+    else if (
+        (vigDays >= 3 && vigMin >= 20) || 
+        (modDays >= 5 && modMin >= 30) || 
+        (walkDays >= 5 && walkMin >= 30) || // Walking is usually included in moderate 5 days rule if duration is sufficient (~30min)
+        (totalDays >= 5 && totalMetMinutes >= 600)
+    ) {
+        category = 'Moderate';
+    }
+
+    // WHO 2020 Guidelines: 150-300 min moderate OR 75-150 min vigorous per week
+    const totalVigMinutes = vigDays * vigMin;
+    const totalModMinutes = modDays * modMin + (walkDays * walkMin); // Walking counts as moderate if brisk
+    
+    const who2020_meets = (totalVigMinutes >= 75) || (totalModMinutes >= 150) || ((totalVigMinutes * 2 + totalModMinutes) >= 150);
+
+    return { metMinutes: Math.round(totalMetMinutes), category, who2020_meets };
+}
+
+/**
+ * Calculates WCRF Dietary/Lifestyle Compliance Score (Detailed).
+ * strict thresholds based on PDF requirements.
+ * 0 / 0.5 / 1.0 logic.
+ */
+function calculateWcrf(
+    diet: any, 
+    alcoholScore: number | undefined, 
+    bmi: number | null, 
+    ipaqCategory: string | undefined
+): { score: number, max: number, compliance: string, components: any } | null {
+    if (!diet) return null;
+    
+    // Components
+    let compA = 0; // Plant Foods
+    let compB = 0; // Animal Foods
+    let compC = 0; // Energy Dense
+    let compD = 0; // Body Composition
+
+    // --- Component A: Plant Foods (Max 1.0) ---
+    // Rule: FV >= 5 AND (WholeGrains >= 3 OR Legumes >= 1.5) -> 1.0
+    // Sub-optimal: FV >= 4 OR WG >= 1.5 OR Legumes >= 3/week -> 0.5
+    // Else 0
+    const fv = diet.vegetables || 0; // servings/day
+    const wg = diet.whole_grains || 0; // servings/day
+    const legumes = diet.legumes || 0; // servings/week
+    
+    // Legumes >= 3/week is approx 0.4/day.
+    // PDF Logic: 1.0 if FV>=5 & WG>=3; 0.5 if FV>=4 OR WG>=1.5 OR legumes>=3/wk
+    
+    if (fv >= 5 && wg >= 3) {
+        compA = 1.0;
+    } else if (fv >= 4 || wg >= 1.5 || legumes >= 3) {
+        compA = 0.5;
+    }
+
+    // --- Component B: Animal Foods (Max 1.0) ---
+    // Rule: Red Meat <= 350g/week AND Processed Meat == 0 -> 1.0
+    // Rule: Red Meat <= 500g/week AND Processed Meat <= 50g/week -> 0.5 (Relaxed)
+    // PDF Logic: 1.0 if red<=350 g/wk AND proc=0; 0.5 if red<=500 g/wk AND proc<=50 g/wk; else 0.
+    
+    // Inputs are servings/week.
+    // Conversions: Red ~ 100g/serving, Proc ~ 50g/serving
+    const redMeatGwk = (diet.red_meat || 0) * 100;
+    const procMeatGwk = (diet.processed_meat || 0) * 50;
+
+    if (redMeatGwk <= 350 && procMeatGwk === 0) {
+        compB = 1.0;
+    } else if (redMeatGwk <= 500 && procMeatGwk <= 50) {
+        compB = 0.5;
+    }
+
+    // --- Component C: Energy Dense & Sugary Drinks (Max 1.0) ---
+    // PDF Logic: 
+    // compB (Limit "fast foods"): 1.0 if fastfoods<=1/wk; 0.5 if fastfoods in [2,3] OR (fastfoods in [2,3] AND UPF%<10%); else 0.
+    // compD (Limit SSB): 1.0 if SSB=0; 0.5 if <=250 mL/wk; else 0.
+    // The PDF splits these. My function signature returns a composite score, but I can calculate them separately.
+    // Let's stick to the 4 components structure but adapt logic.
+    // Let's redefine C as "Unhealthy Foods & Drinks"
+    
+    const fastFoodFreq = diet.fast_food || 0;
+    const ssbFreq = diet.sugary_drinks || 0;
+    const ssbSize = diet.ssb_container || 'Medium (330ml)';
+    let mlPerServing = 330;
+    if (ssbSize.includes('250')) mlPerServing = 250;
+    if (ssbSize.includes('500')) mlPerServing = 500;
+    if (ssbSize.includes('750')) mlPerServing = 750;
+    const ssbMlwk = ssbFreq * mlPerServing;
+
+    // Fast Food Score
+    let scoreFastFood = 0;
+    if (fastFoodFreq <= 1) scoreFastFood = 1.0;
+    else if (fastFoodFreq <= 3) scoreFastFood = 0.5;
+
+    // SSB Score
+    let scoreSSB = 0;
+    if (ssbFreq === 0) scoreSSB = 1.0;
+    else if (ssbMlwk <= 250) scoreSSB = 0.5;
+
+    // Average them for Component C? Or just sum them up?
+    // The PDF has compB (fast food) and compD (SSB) as separate.
+    // Let's average them for this component C to keep 4-part structure or just sum.
+    // Let's make C = (FastFood + SSB) / 2
+    compC = (scoreFastFood + scoreSSB) / 2;
+
+
+    // --- Component D: Body Composition (Max 1.0) ---
+    // PDF doesn't explicitly score BMI in the WCRF section but uses it for rules.
+    // Standard WCRF: Be a healthy weight.
+    // 1.0 if BMI 18.5-24.9. 0.5 if 25-29.9. 0 else.
+    if (bmi && bmi >= 18.5 && bmi < 25) compD = 1.0;
+    else if (bmi && bmi >= 25 && bmi < 30) compD = 0.5;
+
+
+    // --- Total ---
+    // Total max is 4.0 if we treat C as 1.0 max.
+    const totalScore = compA + compB + compC + compD;
+    const maxScore = 4.0;
+
+    let compliance = 'Low';
+    if (totalScore >= 3.0) compliance = 'High';
+    else if (totalScore >= 2.0) compliance = 'Moderate';
+
+    return { 
+        score: totalScore, 
+        max: maxScore, 
+        compliance,
+        components: { compA, compB, compC, compD }
+    };
+}
+
+/**
+ * Checks for specific Family History clusters.
+ */
+function calculateFamilyClusters(familyHistory?: any[]): Record<string, boolean> {
+    if (!familyHistory || !Array.isArray(familyHistory)) return {};
+
+    const relatives = familyHistory.map(f => ({
+        relation: f.relation,
+        cancer: f.cancer_type ? f.cancer_type.toLowerCase() : '',
+        age: f.age_dx
+    }));
+
+    // 1. Breast/Ovarian Cluster
+    // Rule: >= 2 blood relatives (1st/2nd degree) with Breast or Ovarian
+    // Note: Assuming all entered relatives are blood relatives (usually the case in these forms)
+    const breastOvarianCount = relatives.filter(r => 
+        r.cancer.includes('breast') || r.cancer.includes('ovarian')
+    ).length;
+
+    // 2. Colorectal Cluster
+    // Rule: >= 2 relatives with Colorectal
+    const colorectalCount = relatives.filter(r => 
+        r.cancer.includes('colon') || r.cancer.includes('rectal') || r.cancer.includes('colorectal')
+    ).length;
+
+    // 3. Childhood or Rare Cluster
+    // Rule: Any diagnosis < 20y OR rare type (Sarcoma, etc.)
+    const rareTypes = ['sarcoma', 'glioblastoma', 'adrenocortical', 'retinoblastoma', 'wilms'];
+    const childhoodOrRare = relatives.some(r => 
+        (r.age !== undefined && r.age < 20) || 
+        rareTypes.some(t => r.cancer.includes(t))
+    );
+
+    return {
+        pattern_breast_ovarian_cluster: breastOvarianCount >= 2,
+        pattern_colorectal_cluster: colorectalCount >= 2,
+        pattern_childhood_or_rare_cluster: childhoodOrRare
+    };
+}
+        
+/**
+ * Checks for hereditary cancer syndromes (Lynch, HBOC) - Flags
+ */
+function calculateSyndromeFlags(familyHistory?: any[]): Record<string, boolean> {
+    if (!familyHistory || !Array.isArray(familyHistory)) return {};
+    
+    const relatives = familyHistory.map(f => ({
+        cancer: f.cancer_type ? f.cancer_type.toLowerCase() : '',
+        age: f.age_dx,
+        side: f.side_of_family
+    }));
+    
+    // Lynch: Amsterdam II criteria simplified for screening (3-2-1 rule approx)
+    // 3 relatives with Lynch-associated cancer on SAME side of family
+    const lynchCancers = ['colorectal', 'endometrial', 'ovarian', 'stomach', 'pancreatic', 'biliary', 'urinary', 'brain', 'skin', 'small intestine'];
+    
+    // Group by side (Maternal, Paternal)
+    const maternalLynch = relatives.filter(r => r.side === 'Maternal' && lynchCancers.some(c => r.cancer.includes(c)));
+    const paternalLynch = relatives.filter(r => r.side === 'Paternal' && lynchCancers.some(c => r.cancer.includes(c)));
+    
+    // Also consider N/A (siblings/children) - they contribute to both or need context. 
+    // For simplicity in this derived logic without full pedigree, we check if ANY side has >= 3 OR total >= 3 if side unknown.
+    // Ideally, we strictly check sides.
+    const isLynch = maternalLynch.length >= 3 || paternalLynch.length >= 3;
+    
+    return {
+        pattern_lynch_syndrome: isLynch
+    };
+}
+
+/**
+ * Checks for Occupational Risk flags.
+ */
+function calculateOccupationalFlags(history?: any[]): Record<string, boolean> {
+    if (!history || !Array.isArray(history)) return {};
+
+    // Lung High Risk Carcinogens (PDF Spec)
+    // Asbestos, Silica, Diesel, Welding, Painting, Radon, Arsenic, Cadmium, Chromium, Nickel, Beryllium, Soot
+    const lungCarcinogens = [
+        'asbestos', 'silica', 'diesel', 'welding', 'painting', 'painter', 'radon__occ', 
+        'arsenic', 'cadmium', 'chromium', 'nickel', 'beryllium', 'soot', 'metal_fluids'
+    ]; 
+    
+    // Mesothelioma Flag: Asbestos AND Years >= 1
+    
+    let lungRisk = false;
+    let mesoFlag = false;
+
+    history.forEach(job => {
+        // Handle both flattened hazards array (if simple list) or structured job object
+        const possibleHazards = [...(job.occ_exposures || []), ...(job.hazards || [])];
+        if (job.hazard) possibleHazards.push(job.hazard); // legacy single
+        if (job.job_title && lungCarcinogens.includes(job.job_title.toLowerCase())) possibleHazards.push(job.job_title.toLowerCase());
+
+        const years = job.years || 0;
+        
+        // Check for any lung carcinogen overlap
+        const hasCarcinogen = lungCarcinogens.some(c => possibleHazards.includes(c));
+        
+        if (hasCarcinogen && years >= 10) {
+            lungRisk = true;
+        }
+        
+        if (possibleHazards.includes('asbestos') && years >= 1) {
+            mesoFlag = true;
+        }
+    });
+
+    return {
+        'occ.lung_highrisk': lungRisk,
+        'occ.mesothelioma_flag': mesoFlag
+    };
+}
+
+/**
+ * Calculates HPV Exposure Band (Low/Medium/Higher).
+ * Based on PDF Page 13 logic.
+ */
+function calculateHpvExposureBand(sexualHealth: any): string {
+    if (!sexualHealth) return 'Low';
+
+    const lifetimePartners = sexualHealth['sexhx.lifetime_partners_cat'];
+    const recentPartners = sexualHealth['sexhx.partners_12m_cat'];
+    const sexSitesEver = sexualHealth['sexhx.sex_sites_ever'] || [];
+    const ageFirstSex = sexualHealth['sexhx.age_first_sex'];
+    const sexWork = sexualHealth['sexhx.sex_work_ever'];
+
+    const hasAnal = Array.isArray(sexSitesEver) && sexSitesEver.includes('anal');
+    const isSexWork = sexWork === 'Yes';
+
+    // Higher
+    if (
+        (lifetimePartners === '20+' || lifetimePartners === '10-19') || 
+        ['4-5', '6+'].includes(recentPartners) ||
+        hasAnal ||
+        isSexWork
+    ) {
+        return 'Higher';
+    }
+
+    // Medium
+    if (
+        ['2-4', '5-9'].includes(lifetimePartners) ||
+        ['2-3'].includes(recentPartners) ||
+        (ageFirstSex && ageFirstSex < 18)
+    ) {
+        return 'Medium';
+    }
+
+    return 'Low';
+}
+
+/**
+ * Calculates Genetics Flags (High/Moderate Penetrance).
+ */
+function calculateGeneticsFlags(genetics: any): Record<string, boolean> {
+    if (!genetics || !genetics.genes) return { 'gen.high_penetrance_carrier': false, 'gen.moderate_penetrance_only': false };
+
+    const highPenetranceGenes = ['BRCA1', 'BRCA2', 'PALB2', 'TP53', 'PTEN', 'CDH1', 'STK11', 'MLH1', 'MSH2', 'MSH6', 'PMS2', 'EPCAM', 'APC', 'MUTYH', 'POLE', 'POLD1', 'SMAD4', 'BMPR1A', 'VHL', 'MEN1', 'RET'];
+    const moderatePenetranceGenes = ['ATM', 'CHEK2', 'BARD1', 'BRIP1', 'RAD51C', 'RAD51D', 'NTHL1', 'MITF', 'CDKN2A'];
+
+    const userGenes = Array.isArray(genetics.genes) ? genetics.genes : [];
+    
+    const hasHigh = userGenes.some((g: string) => highPenetranceGenes.includes(g));
+    const hasModerate = userGenes.some((g: string) => moderatePenetranceGenes.includes(g));
+
+    return {
+        'gen.high_penetrance_carrier': hasHigh,
+        'gen.moderate_penetrance_only': !hasHigh && hasModerate
+    };
+}
+
+/**
+ * Checks for hereditary cancer syndromes (Lynch, HBOC) - Legacy/Simple version
+ * Keeping for backward compatibility or merging?
+ * The new 'calculateFamilyClusters' provides distinct flags. 
+ * We can keep this for the specific 'syndromes' output or deprecate.
+ * We will return an array of strings as before.
+ */
+function calculateFamilySyndromes(familyHistory?: any[]): string[] {
+    const syndromes: string[] = [];
+    const clusters = calculateFamilyClusters(familyHistory);
+
+    if (clusters.pattern_breast_ovarian_cluster) syndromes.push('Cluster: Breast/Ovarian');
+    if (clusters.pattern_colorectal_cluster) syndromes.push('Cluster: Colorectal');
+    
+    const relatives = familyHistory?.map(f => ({
+        cancer: f.cancer_type ? f.cancer_type.toLowerCase() : '',
+        age: f.age_dx
+    })) || [];
+
+    // Lynch: 3+ colorectal/endo/etc + young
+    const lynchCancers = ['colorectal', 'endometrial', 'ovarian', 'stomach', 'pancreatic', 'biliary', 'urinary', 'brain', 'skin'];
+    const lynchMatches = relatives.filter(r => lynchCancers.some(c => r.cancer.includes(c)));
+    if (lynchMatches.length >= 3 && lynchMatches.some(r => r.age && r.age < 50)) {
+        syndromes.push('Potential Lynch Syndrome');
+    }
+
+    return syndromes;
+}
+
+/**
+ * A service to calculate derived health variables from standardized user data.
+ */
+export const DerivedVariablesService = {
+  /**
+   * Calculates all derivable variables from a standardized data object.
+   * @param standardizedData - A structured object from the StandardizationService.
+   * @returns An object containing the derived variables.
+   */
+  calculateAll: (standardizedData: Record<string, any>): Record<string, any> => {
+    const derived: Record<string, any> = {};
+
+    try {
+      const core = standardizedData.core || {};
+      const advanced = standardizedData.advanced || {};
+
+      // Calculate Age
+      const age = calculateAge(core.dob);
+      if (age !== null) {
+          derived.age_years = age;
+          // Adult Gate
+          derived.adult_gate_ok = age >= 18;
+          
+          // Age Map
+          if (age >= 18 && age <= 39) derived.age_band = "18-39";
+          else if (age >= 40 && age <= 49) derived.age_band = "40-49";
+          else if (age >= 50 && age <= 59) derived.age_band = "50-59";
+          else if (age >= 60 && age <= 69) derived.age_band = "60-69";
+          else if (age >= 70) derived.age_band = "70+";
+      } else {
+          derived.adult_gate_ok = false; // Block if age calculation fails
+      }
+
+      // Calculate BMI
+      const bmi = calculateBmi(core.height_cm, core.weight_kg);
+      if (bmi) {
+        derived.bmi = {
+          value: bmi,
+          unit: "kg/m2",
+          code: "39156-5", // LOINC code for BMI
+        };
+        derived.flags = derived.flags || {};
+        derived.flags.bmi_obesity = bmi >= 30;
+      }
+      
+      // Diet Calcs
+      if (typeof core.diet?.red_meat === 'number') {
+          derived.red_meat_gwk = core.diet.red_meat * 100;
+      }
+      if (typeof core.diet?.processed_meat === 'number') {
+          derived.proc_meat_gwk = core.diet.processed_meat * 50;
+      }
+
+      // SSB Calculation (mL/week)
+      if (typeof core.diet?.sugary_drinks === 'number') {
+          const freq = core.diet.sugary_drinks;
+          const sizeType = core.diet.ssb_container || 'Medium (330ml)';
+          let mlPerServing = 330;
+          if (sizeType.includes('250')) mlPerServing = 250;
+          if (sizeType.includes('500')) mlPerServing = 500;
+          if (sizeType.includes('750')) mlPerServing = 750;
+          
+          derived.ssb_mLwk = freq * mlPerServing;
+      }
+
+      // Calculate pack-years and Brinkman Index
+      if (core.smoking_status === 'Never') {
+          derived.pack_years = 0;
+          derived.brinkman_index = 0;
+      } else if (core.smoking_status === 'Former' || core.smoking_status === 'Current') {
+        const { pack_years, brinkman_index } = calculateSmokingMetrics(advanced.smoking_detail);
+        if (pack_years !== null) derived.pack_years = pack_years;
+        if (brinkman_index !== null) derived.brinkman_index = brinkman_index;
+      }
+      
+      // Determine organ inventory based on sex at birth.
+      if(core.sex_at_birth === 'Female') {
+          derived.organ_inventory = {
+              has_cervix: true,
+              has_uterus: true,
+              has_ovaries: true,
+              has_breasts: true
+          }
+      } else if (core.sex_at_birth === 'Male') {
+          derived.organ_inventory = {
+              has_prostate: true,
+              has_breasts: true // Men can also get breast cancer
+          }
+      }
+
+      // Check for early-age family cancer diagnosis
+      const earlyDx = calculateEarlyAgeFamilyDx(advanced.family);
+      if (earlyDx !== null) {
+          derived.early_age_family_dx = earlyDx;
+      }
+      
+      // Family History Clusters
+      const famClusters = calculateFamilyClusters(advanced.family);
+      const syndromeFlags = calculateSyndromeFlags(advanced.family);
+      Object.assign(derived, famClusters, syndromeFlags);
+
+      // Granular Family Site Metrics (PDF Page 32)
+      const siteMetrics = calculateFamilySiteMetrics(advanced.family);
+      Object.assign(derived, siteMetrics);
+
+      // Check for high-risk occupational exposures (Composite + Specific Flags)
+      const exposures = calculateExposureComposites(advanced.occupational);
+      if (exposures !== null) {
+          derived.exposure_composites = exposures;
+      }
+      const occFlags = calculateOccupationalFlags(advanced.occupational);
+      Object.assign(derived, occFlags); // Merges occ.lung_highrisk, etc into derived root
+
+      // --- Sexual Health Flags ---
+      const sexHistory = advanced.sexual_health || {};
+      const sexAtBirth = core.sex_at_birth;
+      // MSM Behavior: Male AND (Partner=Male or Both)
+      let msmBehavior = false;
+      const partnerGenders = sexHistory['sexhx.partner_genders'];
+      
+      if (sexAtBirth === 'Male') {
+          if (Array.isArray(partnerGenders)) {
+             if (partnerGenders.some((g: string) => g.toLowerCase() === 'male' || g.toLowerCase() === 'same sex')) {
+                msmBehavior = true;
+             }
+          } else if (typeof partnerGenders === 'string') {
+             if (partnerGenders.toLowerCase() === 'male' || partnerGenders.toLowerCase() === 'both' || partnerGenders.toLowerCase() === 'same sex') {
+                 msmBehavior = true;
+             }
+          }
+      }
+      derived['sex.msm_behavior'] = msmBehavior;
+
+      // High Risk Anal Cancer Group
+      // Rule: HIV OR Transplant OR (Male AND MSM)
+      const conditions = standardizedData.core?.conditions || []; 
+      const hasHiv = conditions.includes('hiv');
+      const hasTransplant = conditions.includes('transplant');
+      
+      if (hasHiv || hasTransplant || msmBehavior) {
+          derived['sex.highrisk_anal_cancer_group'] = true;
+      } else {
+          derived['sex.highrisk_anal_cancer_group'] = false;
+      }
+
+      // HPV Exposure Band
+      derived['sex.hpv_exposure_band'] = calculateHpvExposureBand(sexHistory);
+      
+      // Oral HPV Cancer Exposure (PDF Page 14)
+      const sexOral = sexHistory['sex_oral'];
+      const lifetimePartners = sexHistory['sexhx.lifetime_partners_cat'];
+      const recentPartners = sexHistory['sexhx.partners_12m_cat'];
+      if (sexOral === 'Yes' && (
+          ['10-19', '20+'].includes(lifetimePartners) || 
+          ['6+'].includes(recentPartners)
+      )) {
+          derived['sex.oral_hpvcancer_exposure'] = true;
+      } else {
+          derived['sex.oral_hpvcancer_exposure'] = false;
+      }
+      
+      // Cervix HPV Persistent Pattern (PDF Page 14)
+      // Rule: derived.sex.hpv_exposure_band = Higher AND (sexhx.hpv_precancer_history = Yes OR cond.hpv.status ∈ {Past, Current})
+      // Note: `has_cervix` is implicitly checked by sex_at_birth for now, but should be explicit if hysterectomy data existed.
+      // Assuming Female for now as per PDF context.
+      const hpvPrecancer = sexHistory['sexhx.hpv_precancer_history'] === 'Yes';
+      const illnesses = advanced.illnesses || [];
+      const hpvStatus = illnesses.find((i: any) => i.id === 'hpv');
+      const hpvPersistent = hpvStatus && (hpvStatus.status === 'Past' || hpvStatus.status === 'Current');
+      
+      if (core.sex_at_birth === 'Female' && derived['sex.hpv_exposure_band'] === 'Higher' && (hpvPrecancer || hpvPersistent)) {
+          derived['sex.cervix_hpv_persistent_pattern'] = true;
+      } else {
+          derived['sex.cervix_hpv_persistent_pattern'] = false;
+      }
+
+      // --- Chronic Condition Surveillance Flags (PDF Page 22) ---
+      const hasCirrhosis = illnesses.some((i: any) => i.id === 'cirrhosis');
+      const hasActiveHbv = illnesses.some((i: any) => i.id === 'hbv' && i.status === 'Chronic/Active');
+      const hasIbd = illnesses.some((i: any) => i.id === 'ibd');
+      const hasPsc = illnesses.some((i: any) => i.id === 'psc');
+      const hasBarretts = illnesses.some((i: any) => i.id === 'barretts'); // Assuming ID 'barretts' if added to list
+      const hasImmunosuppression = illnesses.some((i: any) => i.id === 'immunosuppression' || i.id === 'transplant');
+      
+      // IBD Duration check (need onset year)
+      let ibdLongDuration = false;
+      if (hasIbd) {
+          const ibdEntry = illnesses.find((i: any) => i.id === 'ibd');
+          if (ibdEntry && ibdEntry.year && derived.age_years) {
+              const currentYear = new Date().getFullYear();
+              if ((currentYear - ibdEntry.year) >= 8) ibdLongDuration = true;
+          }
+      }
+
+      derived['hcc.surveillance_candidate'] = hasCirrhosis || hasActiveHbv;
+      derived['crc.ibd_surveillance'] = (hasIbd && ibdLongDuration) || hasPsc;
+      derived['barrett.surveillance'] = hasBarretts;
+      derived['skin.lymphoma_highrisk'] = hasImmunosuppression;
+      derived['hpv_related.vigilance'] = hasHiv || hasImmunosuppression; // Simplified vigilance flag
+
+      // --- New Logic ---
+
+      // AUDIT-C
+      const audit = calculateAuditC(core.alcohol_audit, core.sex_at_birth);
+      if (audit) derived.alcohol_audit = audit;
+
+      // IPAQ
+      const ipaq = calculateIpaq(core.physical_activity);
+      if (ipaq) {
+          derived.physical_activity_ipaq = ipaq;
+          derived['pa.who2020_meets'] = ipaq.who2020_meets;
+      }
+
+      // WCRF
+      const wcrf = calculateWcrf(core.diet, audit?.score, bmi || null, ipaq?.category);
+      if (wcrf) derived.wcrf_score = wcrf;
+
+      // Genetics Flags
+      const genFlags = calculateGeneticsFlags(advanced.genetics);
+      Object.assign(derived, genFlags);
+
+      // Family Syndromes (Legacy List)
+      const syndromes = calculateFamilySyndromes(advanced.family);
+      if (syndromes.length > 0) derived.hereditary_syndromes = syndromes;
+
+    } catch (error) {
+      logger.error("Failed to calculate derived variables", {
+          error,
+          standardizedData
+      });
+    }
+
+    return derived;
+  },
+};
+      ]]>
+    </file>
+    <file path="src/lib/services/standardization.service.ts">
+      <![CDATA[
+import { logger } from "@/lib/logger";
+import { cancerTypesMap } from "@/lib/mappings/cancer-types.map";
+import { jobTitlesMap } from "@/lib/mappings/job-titles.map";
+import { medicalConditionsMap } from "@/lib/mappings/medical-conditions.map";
+import { occupationalExposuresMap } from "@/lib/mappings/occupational-exposures.map";
+import { environmentalExposuresMap } from "@/lib/mappings/environmental-exposures.map";
+
+/**
+ * Safely parses a JSON string from an answers object.
+ * @param value The value to parse, which might be a JSON string.
+ * @returns The parsed object/array, or an empty array if parsing fails.
+ */
+const safeJsonParse = (value: any): any[] => {
+  if (typeof value !== 'string' || !value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    // Allow parsing objects as well for single entries, but always return array for consistency if it's not one
+    if (Array.isArray(parsed)) return parsed;
+    if (typeof parsed === 'object' && parsed !== null) return [parsed];
+    return [];
+  } catch (e) {
+    return [];
+  }
+};
+
+/**
+ * A service to standardize raw form answers into a structured, coded format
+ * as specified in new_requirements.md.
+ */
+export const StandardizationService = {
+  /**
+   * Processes the flat answer object from the form into a structured payload.
+   * @param answers - The raw answers from the Zustand store.
+   * @returns A structured object with core and advanced sections.
+   */
+  standardize: (answers: Record<string, any>): Record<string, any> => {
+    const standardized: { core: Record<string, any>, advanced: Record<string, any> } = {
+      core: {},
+      advanced: {},
+    };
+
+    try {
+      // --- CORE SECTION ---
+      standardized.core = {
+        dob: answers.dob,
+        sex_at_birth: answers.sex_at_birth,
+        height_cm: Number(answers.height_cm) || undefined,
+        weight_kg: Number(answers.weight_kg) || undefined,
+        smoking_status: answers.smoking_status,
+        alcohol_status: answers['alcohol.status'],
+        alcohol_former_since: Number(answers['alcohol.former_since']) || undefined,
+        // Alcohol (AUDIT-C)
+        alcohol_audit: {
+            q1: Number(answers['auditc.q1_freq']),
+            q2: Number(answers['auditc.q2_typical']),
+            q3: Number(answers['auditc.q3_6plus']),
+        },
+        symptoms: safeJsonParse(answers.symptoms),
+        family_cancer_any: answers.family_cancer_any,
+        // Optional core fields
+        intent: answers.intent,
+        source: answers.source,
+        language: answers.language,
+        gender_identity: answers.gender_identity,
+        // Diet (WCRF FFQ)
+        diet: {
+            vegetables: Number(answers['diet.fv_portions_day']),
+            red_meat: Number(answers['diet.red_meat_servings_week']), // Old: diet_red_meat
+            processed_meat: Number(answers['diet.processed_meat_servings_week']), // Old: diet_processed_meat
+            sugary_drinks: Number(answers['diet.ssb_servings_week']),
+            whole_grains: Number(answers['diet.whole_grains_servings_day']),
+            fast_food: Number(answers['diet.fastfoods_freq_week']),
+            legumes: Number(answers['diet.legumes_freq_week']),
+            upf_share: answers['diet.upf_share_pct'],
+            ssb_container: answers['diet.ssb_container'],
+        },
+        // Physical Activity (IPAQ)
+        physical_activity: {
+            vigorous_days: Number(answers['pa.vig.days7']),
+            vigorous_min: Number(answers['pa.vig.minperday']),
+            moderate_days: Number(answers['pa.mod.days7']),
+            moderate_min: Number(answers['pa.mod.minperday']),
+            walking_days: Number(answers['pa.walk.days7']),
+            walking_min: Number(answers['pa.walk.minperday']), // Old: ipaq_walking_min
+            sitting_min: Number(answers['pa.sit.min_day']),
+        },
+      };
+
+      // --- ADVANCED SECTION ---
+      
+      // Symptom Details
+      const symptomDetails: Record<string, any> = {};
+      standardized.core.symptoms.forEach((symptomId: string) => {
+        const detailKey = `symptom_details_${symptomId}`;
+        if (answers[detailKey]) {
+          symptomDetails[symptomId] = safeJsonParse(answers[detailKey]); // Changed to safeJsonParse
+        }
+      });
+      if (Object.keys(symptomDetails).length > 0) {
+        standardized.advanced.symptom_details = symptomDetails;
+      }
+      
+      // Family History
+      if (answers.family_cancer_history) {
+        const familyHistory = safeJsonParse(answers.family_cancer_history);
+        standardized.advanced.family = familyHistory.map((member: any) => ({
+          ...member,
+          cancer_code: cancerTypesMap[member.cancer_type] || undefined,
+          // New fields are passed through automatically via spread, but explicitly listed for clarity if needed
+        }));
+      }
+      
+      // Genetics
+      if (['yes_report', 'yes_no_details'].includes(answers['gen.testing_ever'])) {
+        standardized.advanced.genetics = {
+          tested: true,
+          type: answers.genetic_test_type,
+          year: answers.genetic_test_year,
+          lab: answers.genetic_lab,
+          findings_present: answers['gen.path_variant_self'] === 'yes', // Old logic mapped
+          variant_self_status: answers['gen.path_variant_self'],
+          genes: answers.genetic_genes ? JSON.parse(answers.genetic_genes) : [],
+          variants_hgvs: answers.genetic_variants_hgvs,
+          vus_present: answers.genetic_vus_present,
+        };
+      }
+      // PRS
+      if (answers['gen.prs_done'] === 'Yes') {
+          standardized.advanced.genetics = {
+              ...standardized.advanced.genetics,
+              prs: {
+                  done: true,
+                  red_flags: answers['gen.prs_cancers_flagged'] ? (Array.isArray(answers['gen.prs_cancers_flagged']) ? answers['gen.prs_cancers_flagged'] : [answers['gen.prs_cancers_flagged']]) : [],
+                  risk_band: answers['gen.prs_overall_band']
+              }
+          }
+      }
+
+      // Illnesses (Mapped from Core cond.summary)
+      // cond.summary is likely an array of strings (e.g. ["hbv", "diabetes"]) or a JSON string depending on storage.
+      // Usually checkbox groups store as array or stringified array. safeJsonParse handles stringified.
+      // If it's already an array, safeJsonParse returns it? safeJsonParse expects string.
+      // Let's handle both.
+      let illnessList = answers['cond.summary'];
+      if (typeof illnessList === 'string') {
+          illnessList = safeJsonParse(illnessList);
+      } else if (!Array.isArray(illnessList)) {
+          illnessList = [];
+      }
+
+      if (illnessList.length > 0) {
+          standardized.advanced.illnesses = illnessList.map((illnessId: string) => {
+              // New Logic: specific fields per illness
+              const details: any = {};
+              
+              if (illnessId === 'hbv') {
+                  details.status = answers['cond.hbv.status'];
+                  details.antiviral = answers['cond.hbv.antiviral_now'];
+              }
+              if (illnessId === 'hcv') {
+                  details.status = answers['cond.hcv.status'];
+                  details.svr12 = answers['cond.hcv.svr12'];
+              }
+              if (illnessId === 'cirrhosis') details.etiology = answers['cond.cirrhosis.etiology'];
+              if (illnessId === 'ibd') {
+                  details.type = answers['cond.ibd.type'];
+                  details.extent = answers['cond.ibd.extent'];
+                  // Need year of diagnosis for duration calculation
+                  // Assuming 'illness_details_ibd' might store year if collected via GenericModule or similar
+                  // But current JSON uses specific questions.
+                  // If year is not collected, duration logic will fail gracefully.
+                  // Let's check if we can add year collection for IBD.
+                  // For now, mapping what we have.
+              }
+              if (illnessId === 'diabetes') details.type = answers['cond.diabetes.type'];
+              if (illnessId === 'hypertension') details.controlled = answers['cond.hypertension.controlled'];
+
+              return {
+                  id: illnessId,
+                  code: medicalConditionsMap[illnessId] || undefined,
+                  ...details
+              };
+          });
+      }
+
+      // Personal Cancer History
+      if (answers.personal_cancer_history) {
+        const personalCancerHistory = safeJsonParse(answers.personal_cancer_history);
+        standardized.advanced.personal_cancer_history = personalCancerHistory.map((cancer: any) => ({
+          ...cancer,
+          type_code: cancerTypesMap[cancer.type] || undefined,
+        }));
+      }
+
+       // Occupational History (Hazard Centric)
+      if (answers.occupational_hazards) {
+        const occupationalHistory = safeJsonParse(answers.occupational_hazards);
+        // Map hazard-centric entries
+        standardized.advanced.occupational = occupationalHistory.map((entry: any) => {
+          return {
+             hazard: entry.hazardId,
+             hazard_code: occupationalExposuresMap[entry.hazardId] || undefined,
+             job_title: entry.main_job_title,
+             isco: jobTitlesMap[entry.main_job_title] || undefined,
+             years: entry.years_total,
+             hours_week: entry.hours_per_week,
+             year_first: entry.year_first_exposed,
+             current: entry.current_exposure,
+             ppe: entry.ppe_use
+          };
+        });
+      }
+      
+      // Screening and Immunization
+      const screeningImmunization: Record<string, any> = {};
+      const screeningKeys = [
+          'screen.colonoscopy.done', 'screen.colonoscopy.date', 
+          'screen.mammo.done', 'screen.mammo.date', 
+          'screen.pap.done', 'screen.pap.date', 
+          'screen.psa.done', 'screen.psa.date', 
+          'imm.hpv', 'imm.hbv',
+          // New Screening
+          'screen.lung.ldct_ever', 'screen.lung.ldct_last_year',
+          'screen.skin.full_exam_ever', 'screen.skin.last_year',
+          'screen.hcc.us_ever', 'screen.hcc.us_last_year',
+          'screen.upper_endo.ever', 'screen.upper_endo.last_year',
+          'screen.cervix.last_type', 'screen.cervix.last_result', // Added
+          // New Immunization
+          'imm.hav.any', 'imm.flu.last_season', 'imm.covid.doses',
+          'imm.td_tdap.year_last', 'imm.pneumo.ever', 'imm.zoster.ever'
+      ];
+      screeningKeys.forEach(key => {
+        if (answers[key]) {
+          screeningImmunization[key] = answers[key];
+        }
+      });
+      if (Object.keys(screeningImmunization).length > 0) {
+        standardized.advanced.screening_immunization = screeningImmunization;
+      }
+
+      // Medications / Iatrogenic
+      const medications: Record<string, any> = {};
+      const medicationKeys = ['immunosuppression_now', 'immunosuppression_cause'];
+      medicationKeys.forEach(key => {
+          if (answers[key]) {
+              medications[key] = answers[key];
+          }
+      });
+        if (Object.keys(medications).length > 0) {
+        standardized.advanced.medications_iatrogenic = medications;
+      }
+
+
+      // Sexual Health
+      const sexualHealth: Record<string, any> = {};
+      const sexualHealthKeys = [
+          'sexhx.section_opt_in',
+          'sex_active', 
+          'sexhx.partner_genders', 
+          'sexhx.lifetime_partners_cat', // Old: sex_lifetime_partners
+          'sexhx.partners_12m_cat', 
+          'sexhx.condom_use_12m', // Old: sex_barrier_freq
+          'sexhx.sti_history_other', 
+          'sex_anal', 
+          'sex_oral', 
+          'sex_barriers_practices',
+          // New
+          'sexhx.new_partner_12m',
+          'sexhx.age_first_sex',
+          'sexhx.sex_sites_ever',
+          'sexhx.sex_sites_12m',
+          'sexhx.sex_work_ever',
+          'sexhx.sex_work_role',
+          'sexhx.sti_treated_12m',
+          'sexhx.hpv_precancer_history' // Female only
+      ];
+      sexualHealthKeys.forEach(key => {
+        if (answers[key]) {
+             if (['sexhx.partner_genders', 'sexhx.sex_sites_ever', 'sexhx.sex_sites_12m', 'sexhx.sex_work_role', 'sexhx.sex_work_ever'].includes(key) && answers[key].startsWith('[')) {
+                 sexualHealth[key] = safeJsonParse(answers[key]);
+             } else {
+                 sexualHealth[key] = answers[key];
+             }
+        }
+      });
+      if (Object.keys(sexualHealth).length > 0) {
+        standardized.advanced.sexual_health = sexualHealth;
+      }
+
+      // Environmental Exposures
+      const environmental: Record<string, any> = {};
+      const envKeys = [
+          'env.summary',
+          // Detail fields
+          'env.air.high_pollution_years', 'env.industry.type',
+          'env.indoor.solidfuel_years', 'env.indoor.ventilation',
+          'env.radon.tested', 'env.radon.result', 'env.radon.mitigation_done',
+          'env.asbestos.disturbance',
+          'env.water.well_tested', 'env.water.arsenic',
+          'env.pesticide.type',
+          'env.uv.sunbed_freq',
+          // Retained/Common fields
+          'home_years_here', 'home_postal_coarse', 'home_year_built', 'home_basement',
+          'home_shs_home', 'env_outdoor_uv', 'env.uv.sunburn_child', 'env.uv.sunburn_adult'
+      ];
+      
+      envKeys.forEach(key => {
+          if (answers[key]) {
+              environmental[key] = answers[key];
+          }
+      });
+
+      // Map environmental summary to codes
+      if (answers['env.summary']) {
+          const envList = safeJsonParse(answers['env.summary']);
+          environmental.coded_exposures = envList.map((id: string) => ({
+              id: id,
+              code: environmentalExposuresMap[id] || undefined
+          })).filter((item: any) => item.id !== 'none');
+      }
+
+      if (Object.keys(environmental).length > 0) {
+        standardized.advanced.environmental = environmental;
+      }
+      envKeys.forEach(key => {
+         if (answers[key]) {
+           environmental[key] = answers[key];
+        }
+      });
+       if (Object.keys(environmental).length > 0) {
+        standardized.advanced.environment = environmental;
+      }
+
+      // Labs & Imaging
+      if (answers.labs_and_imaging) {
+        standardized.advanced.labs_imaging = safeJsonParse(answers.labs_and_imaging);
+      }
+      
+      // Functional Status
+      const functionalStatus: Record<string, any> = {};
+      if (answers.ecog) {
+        functionalStatus.ecog = answers.ecog;
+      }
+      if (answers.qlq_c30_consent === 'true') {
+        functionalStatus.qlq_c30_consent = true;
+      }
+      for (const key in answers) {
+        if (key.startsWith('qlq_c30_item_')) {
+          functionalStatus[key] = answers[key];
+        }
+      }
+      if (Object.keys(functionalStatus).length > 0) {
+        standardized.advanced.functional_status = functionalStatus;
+      }
+
+      // Smoking Details
+      // Consolidating new logic
+      const smokingDetails: any = {
+          pattern: answers['smoking.pattern'],
+          start_age: Number(answers['smoking.start_age']) || undefined,
+          cigs_per_day: Number(answers['smoking.intensity']) || undefined,
+          intensity_unit: answers['smoking.intensity_unit'],
+          years: Number(answers['smoking.years_smoked']) || undefined,
+          quit_date: answers['smoking.quit_date'], // Updated key
+          other_tobacco: answers['smoking.other_tobacco_smoked'],
+          cigars_week: Number(answers['smoking.other_cigar_per_week']) || undefined,
+          pipe_week: Number(answers['smoking.pipe_per_week']) || undefined,
+          shisha_week: Number(answers['smoking.shisha_per_week']) || undefined,
+          vape: {
+              status: answers['vape.status'],
+              days_30d: Number(answers['vape.days_30d']) || undefined,
+              device: answers['vape.device_type'],
+              nicotine: answers['vape.nicotine'],
+          },
+          htp: {
+              status: answers['htp.status'],
+              days_30d: Number(answers['htp.days_30d']) || undefined,
+              sticks_day: Number(answers['htp.sticks_per_day']) || undefined,
+          },
+          shs: {
+              home_freq: answers['shs.home_freq'],
+              work_freq: answers['shs.work_freq'],
+              public_30d: answers['shs.public_30d_bars'],
+              hours_7d: Number(answers['shs.hours_7d']) || undefined,
+          }
+      };
+
+      // Clean undefined
+      const cleanObject = (obj: any): any => {
+         Object.keys(obj).forEach(key => {
+             if (obj[key] && typeof obj[key] === 'object') cleanObject(obj[key]);
+             else if (obj[key] === undefined) delete obj[key];
+         });
+         return obj;
+      };
+      
+      // Update alcohol with beverage mix
+      if (answers['alcohol.beverage_mix']) {
+          standardized.core.alcohol_beverage_mix = answers['alcohol.beverage_mix'];
+      }
+
+      standardized.advanced.smoking_detail = cleanObject(smokingDetails);
+
+    } catch (error) {
+      logger.error("Failed to standardize answers", {
+        error,
+        answers,
+      });
+    }
+
+    return standardized;
+  },
+
+  /**
+   * Converts the standardized data into a FHIR Bundle.
+   * @param standardizedData - The output from standardize().
+   * @returns A FHIR Bundle resource.
+   */
+  toFhir: (standardizedData: Record<string, any>): Record<string, any> => {
+      const bundle: Record<string, any> = {
+          resourceType: "Bundle",
+          type: "collection",
+          entry: []
+      };
+
+      try {
+          const core = standardizedData.core || {};
+          const advanced = standardizedData.advanced || {};
+          const patientId = "patient-001"; // Placeholder
+
+          // 1. Patient Resource
+          bundle.entry.push({
+              resource: {
+                  resourceType: "Patient",
+                  id: patientId,
+                  birthDate: core.dob,
+                  gender: core.sex_at_birth === 'Male' ? 'male' : (core.sex_at_birth === 'Female' ? 'female' : 'other'),
+                  ...(core.height_cm && core.weight_kg ? {
+                      // Extensions could go here
+                  } : {})
+              }
+          });
+
+          // 2. Observations (Vital Signs / Biometrics)
+          if (core.height_cm) {
+              bundle.entry.push({
+                  resource: {
+                      resourceType: "Observation",
+                      status: "final",
+                      code: { coding: [{ system: "http://loinc.org", code: "8302-2", display: "Body height" }] },
+                      subject: { reference: `Patient/${patientId}` },
+                      valueQuantity: { value: core.height_cm, unit: "cm", system: "http://unitsofmeasure.org", code: "cm" }
+                  }
+              });
+          }
+           if (core.weight_kg) {
+              bundle.entry.push({
+                  resource: {
+                      resourceType: "Observation",
+                      status: "final",
+                      code: { coding: [{ system: "http://loinc.org", code: "29463-7", display: "Body weight" }] },
+                      subject: { reference: `Patient/${patientId}` },
+                      valueQuantity: { value: core.weight_kg, unit: "kg", system: "http://unitsofmeasure.org", code: "kg" }
+                  }
+              });
+          }
+
+          // 3. Observations (Social History)
+          if (core.smoking_status) {
+              bundle.entry.push({
+                  resource: {
+                      resourceType: "Observation",
+                      status: "final",
+                      code: { coding: [{ system: "http://loinc.org", code: "72166-2", display: "Tobacco smoking status" }] },
+                      subject: { reference: `Patient/${patientId}` },
+                      valueCodeableConcept: { text: core.smoking_status }
+                  }
+              });
+          }
+          
+          // 4. Family Member History
+           if (advanced.family && Array.isArray(advanced.family)) {
+               advanced.family.forEach((member: any, index: number) => {
+                   bundle.entry.push({
+                       resource: {
+                           resourceType: "FamilyMemberHistory",
+                           id: `family-${index}`,
+                           status: "completed",
+                           patient: { reference: `Patient/${patientId}` },
+                           relationship: { text: member.relation },
+                           condition: [
+                               {
+                                   code: { text: member.cancer_type },
+                                   onsetAge: { value: member.age_dx, unit: "a", system: "http://unitsofmeasure.org", code: "a" }
+                               }
+                           ]
+                       }
+                   });
+               });
+           }
+
+          // 5. Conditions (Personal History)
+          if (advanced.personal_cancer_history && Array.isArray(advanced.personal_cancer_history)) {
+              advanced.personal_cancer_history.forEach((cancer: any, index: number) => {
+                   bundle.entry.push({
+                       resource: {
+                           resourceType: "Condition",
+                           id: `history-cancer-${index}`,
+                           clinicalStatus: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-clinical", code: "active" }] }, // Assuming active history
+                           verificationStatus: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-ver-status", code: "confirmed" }] },
+                           category: [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-category", code: "problem-list-item" }] }],
+                           code: { text: cancer.type },
+                           subject: { reference: `Patient/${patientId}` },
+                           onsetDateTime: cancer.year_dx ? `${cancer.year_dx}` : undefined
+                       }
+                   });
+              });
+          }
+
+
+      } catch (error) {
+           logger.error("Failed to map to FHIR", { error });
+      }
+
+      return bundle;
+  }
+};
+      ]]>
     </file>
     <file path="TASKS.md">
-        <![CDATA[
+      <![CDATA[
 - [x] Update the text of the occupational hazards question to clarify when it will be asked.
 - [x] Fix `next-intl` configuration and runtime error in `OccupationalHazards` component.
 - [x] Align codebase with PDF spec (Assessment Questions, Derived Variables, Standardization, UI Components, Config, PDF Generator).
 - [x] Implement missing derived variables from PDF Page 22 (Chronic Conditions) and Page 32 (Family History Counts).
 - [x] Final UI/UX Polish: Soft warnings for biometrics, Smoking intensity badge, HBV helper text.
-        ]]>
+- [x] Implement missing questions (HBV antiviral, HCV SVR, IBD extent) and derived variables (WHO2020 PA, Oral/Cervix HPV risk).
+      ]]>
     </file>
-</modifications>
+  </modifications>
+</response>

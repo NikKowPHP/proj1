@@ -53,16 +53,14 @@ import { Medications } from "@/components/assessment/Medications";
 import { StandardizationService } from "@/lib/services/standardization.service";
 import { DerivedVariablesService } from "@/lib/services/derived-variables.service";
 import { Card, CardContent } from "@/components/ui/card";
+import { isQuestionVisible } from "@/lib/utils/question-visibility";
 
 interface Question {
   id: string;
   text?: string;
   type: "select" | "number_input" | "date_input" | "consent_checkbox" | "checkbox_group" | "advanced_modules" | "radio" | "year_input";
   options?: any; // Can be string[], CheckboxOption[], or complex objects for modules
-  dependsOn?: {
-    questionId: string;
-    value: string | boolean | string[];
-  };
+  dependsOn?: any;
   exclusiveOptionId?: string;
   modules?: any[];
   tooltip?: string;
@@ -159,7 +157,7 @@ export default function AssessmentPage() {
              const standardized = StandardizationService.standardize(answers);
              const derived = DerivedVariablesService.calculateAll(standardized);
              if (derived.adult_gate_ok === false) {
-                 setLocalErrors(prev => ({ ...prev, dob: "This tool is for adults." }));
+                 setLocalErrors(prev => ({ ...prev, dob: t('adultGateError') }));
                  return;
              } else {
                  setLocalErrors(prev => {
@@ -190,24 +188,34 @@ export default function AssessmentPage() {
     let warning = null;
 
     if (type === 'date_input' && id === 'dob') {
-        if (!value) error = "This field is required.";
+        if (!value) error = t('requiredField');
         else if (new Date(value) > new Date()) error = "Date of birth cannot be in the future.";
     }
+    if (type === 'year_input' && id === 'dob') {
+       if (!value) error = t('requiredField');
+       else {
+         const year = parseInt(value);
+         const currentYear = new Date().getFullYear();
+         if (isNaN(year)) error = t('validNumber');
+         else if (year < 1900 || year > currentYear) error = `Year must be between 1900 and ${currentYear}`;
+       }
+    }
+
     if (type === 'number_input') {
         if (!value.trim()) return { error: null, warning: null }; // Allow empty optional fields
         const num = Number(value);
         if (isNaN(num)) error = t('validNumber');
-        else if (num <= 0) error = t('positiveValue');
+        else if (num < 0) error = t('positiveValue');
         
         // Height validation (PDF Page 2)
         if (id === 'height_cm') {
-            if (num < 50 || num > 250) error = "Height must be between 50 and 250 cm.";
-            else if (num < 120 || num > 220) warning = "Please check if this height is correct.";
+            if (num < 50 || num > 250) error = t('heightMetricRange');
+            else if (num < 120 || num > 220) warning = t('heightWarningMetric');
         }
         // Weight validation (PDF Page 2)
         if (id === 'weight_kg') {
-            if (num < 30 || num > 300) error = "Weight must be between 30 and 300 kg.";
-            else if (num < 40 || num > 220) warning = "Please check if this weight is correct.";
+            if (num < 30 || num > 300) error = t('weightMetricRange');
+            else if (num < 40 || num > 220) warning = t('weightWarningMetric');
         }
     }
     return { error, warning };
@@ -220,33 +228,8 @@ export default function AssessmentPage() {
       setAnswer(id, value);
   };
 
-  const isQuestionVisible = (question: Question) => {
-    if (!question.dependsOn) return true;
-    const dependencyAnswer = answers[question.dependsOn.questionId];
-    if (typeof question.dependsOn.value === 'boolean') {
-      if (question.dependsOn.value) {
-        return !!dependencyAnswer && dependencyAnswer !== '[]' && dependencyAnswer !== 'false' && dependencyAnswer !== '["HP:0000000"]';
-      } else {
-        return !dependencyAnswer || dependencyAnswer === '[]' || dependencyAnswer === 'false' || dependencyAnswer === '["HP:0000000"]';
-      }
-    }
-    if(Array.isArray(question.dependsOn.value)){
-      // If dependencyAnswer is a JSON array string (from checkbox), parse it
-      try {
-        const parsedAnswer = JSON.parse(dependencyAnswer);
-        if(Array.isArray(parsedAnswer)) {
-           return parsedAnswer.some(val => (question.dependsOn?.value as string[]).includes(val));
-        }
-      } catch {
-        // Not a JSON array
-      }
-      return question.dependsOn.value.includes(dependencyAnswer);
-    }
-    return dependencyAnswer === question.dependsOn.value;
-  };
-
   const stepData = questionnaire?.steps[currentStep];
-  const visibleQuestions = stepData?.questions.filter(isQuestionVisible) || [];
+  const visibleQuestions = stepData?.questions.filter(q => isQuestionVisible(q, answers)) || [];
 
   const isStepComplete = () => {
     if (!questionnaire) return false;
@@ -331,13 +314,13 @@ export default function AssessmentPage() {
                   )}
                   {q.type === "select" && <Select onValueChange={(v) => setAnswer(q.id, v)} value={answers[q.id] || ""}><SelectTrigger id={q.id}><SelectValue placeholder={t("selectOption")} /></SelectTrigger><SelectContent>{q.options.map((o: any) => {
                     if (typeof o === 'object' && o.value && o.label) {
-                      return <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>;
+                      return <SelectItem key={o.value} value={o.value}>{typeof o.label === 'object' ? (o.label as any)[locale] : o.label}</SelectItem>;
                     }
                     return <SelectItem key={o} value={o}>{o}</SelectItem>;
                   })}</SelectContent></Select>}
                   {q.type === "radio" && <Select onValueChange={(v) => setAnswer(q.id, v)} value={answers[q.id] || ""}><SelectTrigger id={q.id}><SelectValue placeholder={t("selectOption")} /></SelectTrigger><SelectContent>{q.options.map((o: any) => {
                     if (typeof o === 'object' && o.value && o.label) {
-                      return <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>;
+                      return <SelectItem key={o.value} value={o.value}>{typeof o.label === 'object' ? (o.label as any)[locale] : o.label}</SelectItem>;
                     }
                     return <SelectItem key={o} value={o}>{o}</SelectItem>;
                   })}</SelectContent></Select>}
@@ -356,14 +339,14 @@ export default function AssessmentPage() {
                   {q.type === "date_input" && <><Input id={q.id} type="date" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
                   {q.type === "consent_checkbox" && <div className="flex items-start space-x-3 rounded-md border p-4"><Checkbox id={q.id} checked={answers[q.id] === "true"} onCheckedChange={(c) => setAnswer(q.id, c ? "true" : "false")} /><div className="grid gap-1.5"><label htmlFor={q.id} className="text-sm leading-snug text-muted-foreground">{t.rich("consentHealth", { privacyLink: (chunks) => <Link href="/privacy" className="font-semibold text-primary hover:underline" target="_blank" rel="noopener noreferrer">{chunks}</Link> })}</label></div></div>}
                   {q.type === "checkbox_group" && <CheckboxGroup options={q.options as CheckboxOption[]} value={answers[q.id] ? JSON.parse(answers[q.id]) : []} onChange={(s) => setAnswer(q.id, JSON.stringify(s))} exclusiveOption={q.exclusiveOptionId} />}
-                  {q.type === 'advanced_modules' && <Accordion type="multiple" className="w-full">{q.modules?.filter(isQuestionVisible).map(m => <AccordionItem value={m.id} key={m.id}><AccordionTrigger>{m.title}</AccordionTrigger><AccordionContent>
+                  {q.type === 'advanced_modules' && <Accordion type="multiple" className="w-full">{q.modules?.filter(m => isQuestionVisible(m, answers)).map(m => <AccordionItem value={m.id} key={m.id}><AccordionTrigger>{m.title[locale] || m.title.en}</AccordionTrigger><AccordionContent>
                     {m.id === 'symptom_details' && <SymptomDetails selectedSymptoms={answers.symptoms ? questionnaire?.steps.flatMap(s => s.questions).find(q => q.id === 'symptoms')?.options?.filter((o: any) => JSON.parse(answers.symptoms).includes(o.id)) || [] : []} value={Object.keys(answers).reduce((acc, k) => { if(k.startsWith('symptom_details_')) { const sId=k.replace('symptom_details_',''); acc[sId]=JSON.parse(answers[k]);} return acc;}, {} as Record<string,any>)} onChange={(sId, d) => setAnswer(`symptom_details_${sId}`, JSON.stringify(d))} symptomOptions={symptomDetailsOptions?.symptomList || []} featureOptions={symptomDetailsOptions?.associatedFeatures || []} />}
                     {m.id === 'family_cancer_history' && <FamilyCancerHistory value={answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : []} onChange={(v) => setAnswer('family_cancer_history', JSON.stringify(v))} options={m.options} />}
                     {m.id === 'genetics' && <Genetics answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'female_health' && <FemaleHealth answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'chronic_condition_details' && <GenericModule answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'personal_cancer_history' && <PersonalCancerHistory value={answers.personal_cancer_history ? JSON.parse(answers.personal_cancer_history) : []} onChange={(v) => setAnswer('personal_cancer_history', JSON.stringify(v))} options={m.options} />}
-                    {m.id === 'screening_immunization' && <ScreeningHistory answers={answers} onAnswer={setAnswer} screeningGroups={m.screenings} immunizationQuestions={m.immunizations}/>}
+                    {m.id === 'screening_immunization' && <ScreeningHistory answers={answers} onAnswer={setAnswer} screeningGroups={m.screenings} immunizationQuestions={m.immunizations} questions={m.questions} />}
                     {m.id === 'medications_iatrogenic' && <Medications answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'sexual_health' && <SexualHealth answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'occupational_hazards' && <OccupationalHazards value={answers.occupational_hazards ? JSON.parse(answers.occupational_hazards) : []} onChange={(v) => setAnswer('occupational_hazards', JSON.stringify(v))} options={m.options} questions={m.questions} answers={answers} onAnswer={setAnswer}/>}
@@ -397,4 +380,3 @@ export default function AssessmentPage() {
     </div>
   );
 }
-        

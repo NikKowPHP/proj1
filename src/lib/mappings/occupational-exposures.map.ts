@@ -20,4 +20,7 @@ export const occupationalExposuresMap: Record<string, string> = {
   'shift_night': '406505007', // Night shift worker (finding)
   'firefighter': '413348003', // Exposure to fire smoke (event) - proxy for firefighter hazard
   'uv_sunlight': '69930006', // Exposure to UV radiation (event)
+  // Aliases or grouped items from PDF
+  'pahs': '419799009', // Exposure to soot (event) - Mapping PAHs to Soot/Coal Tar code
+  'rubber_chem': '419137000' // Mapping rubber chemicals to rubber fume
 };

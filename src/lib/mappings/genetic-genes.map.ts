@@ -49,6 +49,9 @@ export const geneticGenesMap: Record<string, string> = {
   'SDHD': 'SDHD',
   'BAP1': 'BAP1',
   'MEN1': 'MEN1',
-  'MITF_E318K': 'MITF' // Variant specific
+  'MITF_E318K': 'MITF', // Variant specific, maps to gene symbol
+  'RECQL': 'RECQL',
+  'GREM1': 'GREM1',
+  'PALLD': 'PALLD',
+  'HOXB13': 'HOXB13'
 };
-      

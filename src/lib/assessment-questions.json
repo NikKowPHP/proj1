@@ -364,12 +364,15 @@
                 "relations": [ "Mother", "Father", "Sister", "Brother", "Daughter", "Son", "Maternal Grandmother", "Maternal Grandfather", "Paternal Grandmother", "Paternal Grandfather", "Aunt", "Uncle", "Niece", "Nephew", "Cousin" ],
                 "cancerTypes": [
                   { "value": "breast", "label": "Breast" },
-                  { "value": "lung", "label": "Lung" },
+                  { "value": "ovarian", "label": "Ovarian" },
                   { "value": "colorectal", "label": "Colorectal" },
                   { "value": "prostate", "label": "Prostate" },
+                  { "value": "lung", "label": "Lung" },
+                  { "value": "melanoma", "label": "Melanoma" },
+                  { "value": "pancreas", "label": "Pancreas" },
+                  { "value": "gastric", "label": "Stomach (Gastric)" },
                   { "value": "endometrium", "label": "Endometrium" },
                   { "value": "oesophagus", "label": "Oesophagus" },
-                  { "value": "pancreas", "label": "Pancreas" },
                   { "value": "liver", "label": "Liver" },
                   { "value": "bladder", "label": "Bladder" },
                   { "value": "brain", "label": "Brain" },
@@ -379,9 +382,6 @@
                   { "value": "leukemia", "label": "Leukemia" },
                   { "value": "myeloma", "label": "Myeloma" },
                   { "value": "kidney", "label": "Kidney" },
-                  { "value": "melanoma", "label": "Melanoma" },
-                  { "value": "gastric", "label": "Stomach (Gastric)" },
-                  { "value": "ovarian", "label": "Ovarian" },
                   { "value": "other", "label": "Other" }
                 ]
               }
@@ -758,11 +758,23 @@
                 "exposures": [
                   { "value": "asbestos", "label": "Asbestos" },
                   { "value": "benzene", "label": "Benzene" },
-                  { "value": "diesel_exhaust", "label": "Diesel exhaust" },
+                  { "value": "diesel", "label": "Diesel exhaust" },
                   { "value": "formaldehyde", "label": "Formaldehyde" },
                   { "value": "silica", "label": "Silica" },
-                  { "value": "welding_fumes", "label": "Welding fumes" },
-                  { "value": "wood_dust", "label": "Wood dust" }
+                  { "value": "welding", "label": "Welding fumes" },
+                  { "value": "wood_dust", "label": "Wood dust" },
+                  { "value": "rubber", "label": "Rubber production" },
+                  { "value": "radiation", "label": "Ionizing Radiation" },
+                  { "value": "pesticides", "label": "Pesticides" },
+                  { "value": "solvents", "label": "Solvents" },
+                  { "value": "leather_dust", "label": "Leather dust" },
+                  { "value": "metal_fluids", "label": "Metalworking fluids" },
+                  { "value": "soot", "label": "Soot/coal tar" },
+                  { "value": "uv_sunlight", "label": "Sunlight (UV)" },
+                  { "value": "shift_night", "label": "Night shift work" },
+                  { "value": "firefighter", "label": "Firefighter" },
+                  { "value": "hairdresser", "label": "Hairdresser/Barber" },
+                  { "value": "painter", "label": "Painter" }
                 ],
                 "ppe": [
                   {"value": "respirator", "label": "Respirator"}, 
@@ -816,7 +828,9 @@
                 
                 { "id": "env.pesticide.type", "text": {"en": "Type/Frequency", "pl": "Rodzaj/Częstotliwość"}, "type": "select", "options": ["Occupational", "Home/Garden (Heavy)", "Occasional"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
                 
-                { "id": "env.uv.sunbed_freq", "text": {"en": "Frequency", "pl": "Częstotliwość"}, "type": "select", "options": ["Rarely", "Often", "Very Often"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "sunbed"} }
+                { "id": "env.uv.sunbed_use", "text": {"en": "How would you describe your use of indoor tanning beds (sunbed/solarium)?", "pl": "Jak opisał(a)by Pan/Pani korzystanie z solarium (łóżka opalającego)?"}, "type": "select", "options": ["Never", "Few times (<10 sessions)", "Occasionally (10-50 sessions)", "Frequently (>50 sessions)", "Not sure"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "sunbed"} },
+                { "id": "env.uv.sunburn_child", "text": {"en": "Before age 18, about how many times did you have a sunburn with redness and soreness lasting more than one day?", "pl": "Przed 18 r.ż., ile razy mniej więcej miał(a) Pan/Pani oparzenie słoneczne z zaczerwienieniem i bolesnością skóry trwającą ponad 1 dzień?"}, "type": "number_input", "min": 0, "max": 50 },
+                { "id": "env.uv.sunburn_adult", "text": {"en": "After age 18, about how many such sunburns have you had?", "pl": "Po 18 r.ż., ile razy miał(a) Pan/Pani takie oparzenie słoneczne?"}, "type": "number_input", "min": 0, "max": 100 }
               ]
 
             },
@@ -908,4 +922,3 @@
     }
   ]
 }
-      

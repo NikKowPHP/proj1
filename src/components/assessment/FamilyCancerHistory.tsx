@@ -8,6 +8,8 @@ import { SearchableSelect, SearchableSelectOption } from "../ui/SearchableSelect
 import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
 import { useTranslations } from 'next-intl';
+import { Card, CardContent } from "../ui/card";
+import { Info } from "lucide-react";
 
 interface CancerDiagnosis {
   cancer_type?: string;
@@ -17,7 +19,7 @@ interface CancerDiagnosis {
 
 interface FamilyMember {
   relation?: string;
-  side_of_family?: string; // Maternal, Paternal
+  side_of_family?: string; // Maternal, Paternal, Both parents, N/A, Not sure
   vital_status?: string; // Alive, Deceased
   age_now_death?: number; // Age now or at death
   cancers?: CancerDiagnosis[]; // Array of cancers instead of single cancer
@@ -44,7 +46,8 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
     let side = undefined;
     if (relation === 'Mother' || relation === 'Maternal Grandmother' || relation === 'Maternal Grandfather') side = 'Maternal';
     if (relation === 'Father' || relation === 'Paternal Grandmother' || relation === 'Paternal Grandfather') side = 'Paternal';
-    if (relation === 'Sister' || relation === 'Brother' || relation === 'Daughter' || relation === 'Son') side = 'N/A';
+    if (relation === 'Sister' || relation === 'Brother') side = 'N/A'; // Siblings
+    if (relation === 'Daughter' || relation === 'Son') side = 'Both parents'; // Children
 
     onChange([...value, { cancers: [], relation: relation || '', side_of_family: side }]);
   };
@@ -74,7 +77,9 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
         const rel = fieldValue as string;
         if (rel.includes('Maternal') || rel === 'Mother') side = 'Maternal';
         else if (rel.includes('Paternal') || rel === 'Father') side = 'Paternal';
-        else if (['Sister', 'Brother', 'Daughter', 'Son'].includes(rel)) side = 'N/A';
+        else if (['Sister', 'Brother'].includes(rel)) side = 'N/A';
+        else if (['Daughter', 'Son'].includes(rel)) side = 'Both parents';
+        else side = undefined; // Force user to pick for cousins etc.
         newValues[index].side_of_family = side;
     }
 
@@ -111,7 +116,15 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
 
   return (
     <div className="space-y-4">
-    <div className="flex flex-wrap gap-2 mb-4">
+      <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 mb-4">
+        <CardContent className="p-3 flex items-start gap-3">
+            <Info className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+                {t('biologicalFamilyHelper')}
+            </p>
+        </CardContent>
+      </Card>
+      <div className="flex flex-wrap gap-2 mb-4">
         {["Mother", "Father", "Sister", "Brother", "Daughter", "Son"].map(rel => (
             <button
                 key={rel}
@@ -169,7 +182,9 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
                 <SelectContent>
                   <SelectItem value="Maternal">Maternal</SelectItem>
                   <SelectItem value="Paternal">Paternal</SelectItem>
+                  <SelectItem value="Both parents">Both parents</SelectItem>
                   <SelectItem value="N/A">N/A (e.g. Sibling)</SelectItem>
+                  <SelectItem value="Not sure">Not sure</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -319,4 +334,3 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
     </div>
   );
 };
-      

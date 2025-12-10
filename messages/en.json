@@ -96,10 +96,12 @@
     "requiredField": "This field is required.",
     "validNumber": "Please enter a valid number.",
     "positiveValue": "Value must be positive.",
-    "heightMetricRange": "Please enter a height between 50 and 300 cm.",
+    "heightMetricRange": "Height must be between 50 and 250 cm.",
     "heightImperialRange": "Please enter a height between 20 and 120 inches.",
-    "weightMetricRange": "Please enter a weight between 30 and 300 kg.",
+    "weightMetricRange": "Weight must be between 30 and 300 kg.",
     "weightImperialRange": "Please enter a weight between 40 and 660 lbs.",
+    "heightWarningMetric": "Please check if this height is correct.",
+    "weightWarningMetric": "Please check if this weight is correct.",
     "heightPlaceholderMetric": "e.g., 175",
     "heightPlaceholderImperial": "e.g., 69",
     "weightPlaceholderMetric": "e.g., 70",
@@ -107,7 +109,6 @@
     "consentHealth": "I consent to the processing of my health data for the purpose of generating this one-time preventive plan. I understand this data is not stored and I have read the <privacyLink>Privacy Policy</privacyLink>.",
     "consentGenetics": "I give specific consent to process my genetic data for this assessment. I understand this information is sensitive and is covered by the <privacyLink>Privacy Policy</privacyLink>.",
     "safetyBannerTitle": "Important Note",
-
     "safetyBannerContent": "The symptom you selected can have many causes, but it is important to discuss with a healthcare provider promptly. This tool is not for diagnosis.",
     "addMother": "+ Add Mother",
     "addFather": "+ Add Father",
@@ -118,7 +119,8 @@
     "addOther": "+ Other",
     "remove": "Remove",
     "addCancer": "+ Add Cancer",
-    "addCustomRelative": "Add Custom Relative"
+    "addCustomRelative": "Add Custom Relative",
+    "adultGateError": "This version of the tool is designed for adults. Please discuss any concerns with a paediatrician / family doctor."
   },
   "ResultsPage": {
     "noDataTitle": "No Plan Data",

@@ -12,36 +12,13 @@ import { CheckboxGroup } from '../ui/CheckboxGroup';
 import { FileUploadComponent } from './FileUpload';
 import { Info } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
+import { isQuestionVisible } from '@/lib/utils/question-visibility';
 
 interface GenericModuleProps {
   answers: Record<string, any>;
   onAnswer: (id: string, value: any) => void;
   questions: any[];
 }
-
-const isVisible = (question: any, answers: Record<string, string>): boolean => {
-  if (!question.dependsOn) return true;
-  const dependencyAnswer = answers[question.dependsOn.questionId];
-
-  // Handle checking for checking if array includes value
-  if (Array.isArray(question.dependsOn.value)) {
-     // If dependency answer is an array string (e.g. from checkbox_group)
-     try {
-         const parsedDep = JSON.parse(dependencyAnswer);
-         if (Array.isArray(parsedDep)) {
-             // If any of the dependent required values is in the answer array
-             return parsedDep.some(v => question.dependsOn.value.includes(v));
-         }
-     } catch (e) {
-         // Not a JSON array, treat as simple string
-         return question.dependsOn.value.includes(dependencyAnswer);
-     }
-      return question.dependsOn.value.includes(dependencyAnswer);
-  }
-  
-  // Handle simple dependency match
-  return dependencyAnswer === question.dependsOn.value;
-};
 
 export const GenericModule = ({ answers, onAnswer, questions }: GenericModuleProps) => {
   const t = useTranslations("AssessmentPage");
@@ -59,7 +36,7 @@ export const GenericModule = ({ answers, onAnswer, questions }: GenericModulePro
     onAnswer(id, value);
   };
 
-  const visibleQuestions = questions.filter(q => isVisible(q, answers));
+  const visibleQuestions = questions.filter(q => isQuestionVisible(q, answers));
 
   if (visibleQuestions.length === 0) {
       return <div className="text-muted-foreground text-sm italic">No details required based on your clear selection.</div>
@@ -73,14 +50,9 @@ export const GenericModule = ({ answers, onAnswer, questions }: GenericModulePro
         
         const renderInfoCard = () => {
             if (!q.infoCard) return null;
-            const infoText = typeof q.infoCard.text === 'object' ? q.infoCard.text.en : q.infoCard.text; // Default to EN if no locale context passed, or handle in parent
-            // Ideally we pass locale to GenericModule or use useTranslations if keys are there.
-            // Assuming the JSON structure has localized strings directly for now or we rely on parent to pass localized.
-            // The current JSON structure has {en: "...", pl: "..."}. 
-            // We need to pick the right one. But GenericModule doesn't know locale easily without props.
-            // Let's assume the passed 'questions' prop already has the correct localized string if processed by API,
-            // OR we handle the object here.
-            // The API /api/questionnaire handles localization. So q.infoCard.text should be a string.
+            const infoText = typeof q.infoCard.text === 'object' ? q.infoCard.text.en : q.infoCard.text; // Locale handled by parent logic usually or handled here if locale prop available. 
+            // NOTE: GenericModule currently lacks locale prop, defaulting to EN property or raw string.
+            // For now assuming the 'questions' prop is already localized or we handle raw objects.
             
             return (
                 <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 mt-2">
@@ -215,4 +187,3 @@ export const GenericModule = ({ answers, onAnswer, questions }: GenericModulePro
     </div>
   );
 };
-      

@@ -34,7 +34,7 @@ const translations: Record<string, any> = {
   en: {
     title: "Doctor's Discussion Guide",
     disclaimer:
-      "This is a guide for discussion with a healthcare professional and is not medical advice.",
+      "information to support discussion with a doctor / not a diagnosis",
     overallSummary: "Overall Summary",
     recommendedScreenings: "Recommended Screenings",
     lifestyleGuidelines: "Lifestyle Guidelines",
@@ -77,7 +77,7 @@ const translations: Record<string, any> = {
   pl: {
     title: "Przewodnik do Dyskusji z Lekarzem",
     disclaimer:
-      "To jest przewodnik do dyskusji z pracownikiem służby zdrowia i nie stanowi porady medycznej.",
+      "informacje wspierające rozmowę z lekarzem / nie diagnoza",
     overallSummary: "Ogólne Podsumowanie",
     recommendedScreenings: "Zalecane Badania Przesiewowe",
     lifestyleGuidelines: "Wskazówki Dotyczące Stylu Życia",
@@ -319,4 +319,3 @@ export const generateAssessmentPdf = (
     `${t.filename}_${new Date().toLocaleDateString().replace(/\//g, "-")}.pdf`,
   );
 };
-      

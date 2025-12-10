@@ -153,7 +153,7 @@ export default function AssessmentPage() {
              const standardized = StandardizationService.standardize(answers);
              const derived = DerivedVariablesService.calculateAll(standardized);
              if (derived.adult_gate_ok === false) {
-                 setLocalErrors(prev => ({ ...prev, dob: "You must be 18 or older to proceed." }));
+                 setLocalErrors(prev => ({ ...prev, dob: "This tool is for adults." }));
                  return;
              } else {
                  setLocalErrors(prev => {

@@ -39,7 +39,8 @@
         {
           "id": "dob",
           "text": { "en": "Date of birth (Year only)", "pl": "Rok urodzenia" },
-          "type": "year_input"
+          "type": "year_input",
+          "validation": { "min": 1900, "maxCurrentYear": true, "softMin": 1920 }
         },
         {
           "id": "sex_at_birth",
@@ -91,7 +92,11 @@
             { "value": "Lifetime abstainer", "label": { "en": "Lifetime abstainer", "pl": "Abstynent całe życie" } },
             { "value": "Former", "label": { "en": "Former drinker", "pl": "Były pijący" } },
             { "value": "Current", "label": { "en": "Current drinker", "pl": "Obecnie pijący" } }
-          ]
+          ],
+          "infoCard": {
+             "id": "alcohol.std_unit_info",
+             "text": { "en": "Standard Drink: 10g pure alcohol (approx 250ml beer, 100ml wine, 30ml spirits)", "pl": "Standardowa porcja: 10g czystego alkoholu (ok. 250ml piwa, 100ml wina, 30ml wódki)" }
+          }
         },
         {
             "id": "alcohol.former_since",
@@ -120,7 +125,12 @@
           },
           {
             "id": "auditc.q2_typical",
-            "dependsOn": { "questionId": "alcohol.status", "value": ["Current", "Former"] },
+            "dependsOn": { 
+                "and": [
+                    { "questionId": "alcohol.status", "value": ["Current", "Former"] },
+                    { "questionId": "auditc.q1_freq", "operator": "!=", "value": "0" }
+                ]
+            },
             "text": { "en": "How many standard drinks do you have on a typical day when you are drinking?", "pl": "Ile standardowych porcji alkoholu wypijasz w typowym dniu, w którym pijesz?" },
             "type": "select",
             "options": [
@@ -133,7 +143,12 @@
           },
           {
             "id": "auditc.q3_6plus",
-            "dependsOn": { "questionId": "alcohol.status", "value": ["Current", "Former"] },
+             "dependsOn": { 
+                "and": [
+                    { "questionId": "alcohol.status", "value": ["Current", "Former"] },
+                    { "questionId": "auditc.q1_freq", "operator": "!=", "value": "0" }
+                ]
+            },
             "text": { "en": "How often do you have 6 or more drinks on one occasion?", "pl": "Jak często wypijasz 6 lub więcej drinków przy jednej okazji?" },
             "type": "select",
             "options": [
@@ -231,7 +246,7 @@
           "exclusiveOptionId": "HP:0000000",
           "options": [
             { "id": "HP:0012378", "category": "A. Weight/Appetite", "label": { "en": "Fatigue", "pl": "Zmęczenie" } },
-            { "id": "HP:0004355", "category": "A. Weight/Appetite", "label": { "en": "Unexplained weight loss", "pl": "Niewyjaśniona utrata wagi" }, "red_flag": true },
+            { "id": "HP:0001824", "category": "A. Weight/Appetite", "label": { "en": "Unexplained weight loss", "pl": "Niewyjaśniona utrata wagi" }, "red_flag": true },
             { "id": "HP:0030082", "category": "A. Weight/Appetite", "label": { "en": "Night sweats", "pl": "Nocne poty" }, "red_flag": true },
             { "id": "HP:0002239", "category": "G. GI", "label": { "en": "Abdominal pain", "pl": "Ból brzucha" } },
             { "id": "HP:0002014", "category": "G. GI", "label": { "en": "Diarrhea", "pl": "Biegunka" } },
@@ -284,7 +299,7 @@
               "options": {
                 "symptomList": [
                   { "value": "HP:0012378", "label": "Fatigue" },
-                  { "value": "HP:0004355", "label": "Weight loss" },
+                  { "value": "HP:0001824", "label": "Weight loss" },
                   { "value": "HP:0001945", "label": "Fever" },
                   { "value": "HP:0000989", "label": "Skin changes" },
                   { "value": "HP:0002239", "label": "Abdominal pain" },
@@ -601,8 +616,8 @@
                 {"id": "sexhx.sex_work_role", "text": {"en": "Role in sex work", "pl": "Rola w pracy seksualnej"}, "type": "text_input", "dependsOn": {"questionId": "sexhx.sex_work_ever", "value": "Yes"}},
                 
                 {"id": "sexhx.age_first_sex", "text": {"en": "Age at first sexual intercourse", "pl": "Wiek inicjacji seksualnej"}, "type": "number_input"},
-                {"id": "sexhx.sex_sites_ever", "text": {"en": "Number of sexual partners (Lifetime)", "pl": "Liczba partnerów seksualnych (Całe życie)"}, "type": "select", "options": ["1-5", "6-10", "10+", "Prefer not to say"]},
-                {"id": "sexhx.sex_sites_12m", "text": {"en": "Number of sexual partners (Last 12m)", "pl": "Liczba partnerów seksualnych (Ost. 12 mies.)"}, "type": "select", "options": ["0", "1", "2+", "Prefer not to say"]},
+                {"id": "sexhx.sex_sites_ever", "text": {"en": "Sexual practices (Lifetime)", "pl": "Praktyki seksualne (Całe życie)"}, "type": "checkbox_group", "options": [{"id": "vaginal", "label": "Vaginal"}, {"id": "anal", "label": "Anal"}, {"id": "oral", "label": "Oral"}, {"id": "prefer_not_to_say", "label": "Prefer not to say"}]},
+                {"id": "sexhx.sex_sites_12m", "text": {"en": "Sexual practices (Last 12m)", "pl": "Praktyki seksualne (Ost. 12 mies.)"}, "type": "checkbox_group", "options": [{"id": "vaginal", "label": "Vaginal"}, {"id": "anal", "label": "Anal"}, {"id": "oral", "label": "Oral"}, {"id": "prefer_not_to_say", "label": "Prefer not to say"}]},
                 
                 {"id": "sexhx.condom_use_12m", "text": {"en": "Condom/barrier use frequency", "pl": "Częstotliwość używania prezerwatyw/barier"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["Always", "Sometimes", "Never", "Prefer not to say"]},
                 

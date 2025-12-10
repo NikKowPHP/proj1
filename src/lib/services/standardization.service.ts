@@ -93,7 +93,7 @@ export const StandardizationService = {
       standardized.core.symptoms.forEach((symptomId: string) => {
         const detailKey = `symptom_details_${symptomId}`;
         if (answers[detailKey]) {
-          symptomDetails[symptomId] = JSON.parse(answers[detailKey]);
+          symptomDetails[symptomId] = safeJsonParse(answers[detailKey]); // Changed to safeJsonParse
         }
       });
       if (Object.keys(symptomDetails).length > 0) {
@@ -261,7 +261,11 @@ export const StandardizationService = {
       ];
       sexualHealthKeys.forEach(key => {
         if (answers[key]) {
-             sexualHealth[key] = answers[key];
+             if (['sexhx.partner_genders', 'sexhx.sex_sites_ever', 'sexhx.sex_sites_12m', 'sexhx.sex_work_role', 'sexhx.sex_work_ever'].includes(key) && answers[key].startsWith('[')) {
+                 sexualHealth[key] = safeJsonParse(answers[key]);
+             } else {
+                 sexualHealth[key] = answers[key];
+             }
         }
       });
       if (Object.keys(sexualHealth).length > 0) {

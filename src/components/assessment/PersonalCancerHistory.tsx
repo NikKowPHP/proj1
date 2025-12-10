@@ -22,6 +22,7 @@ interface CancerDiagnosis {
   metastatic_ever?: boolean;
   genetic_flag?: boolean;
   status_current?: string; // No evidence of disease, In remission, Active treatment, Stable
+  surgery_type?: string; // Mastectomy, Lumpectomy
 }
 
 interface PersonalCancerHistoryProps {
@@ -199,13 +200,27 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
           </div>
 
           <div className="space-y-2">
-            <Label>Treatments Received</Label>
             <CheckboxGroup
               options={options.treatmentTypes}
               value={item.treatments || []}
               onChange={(val) => handleFieldChange(index, 'treatments', val)}
             />
           </div>
+
+          {/* Granular Surgery Details (Example for Breast Cancer) */}
+          {(item.treatments || []).includes('surgery') && (item.type?.toLowerCase().includes('breast')) && (
+            <div className="space-y-2">
+               <Label>Surgery Type</Label>
+               <Select value={item.surgery_type} onValueChange={(val) => handleFieldChange(index, 'surgery_type', val)}>
+                 <SelectTrigger><SelectValue placeholder="Select surgery type" /></SelectTrigger>
+                 <SelectContent>
+                   <SelectItem value="mastectomy">Mastectomy</SelectItem>
+                   <SelectItem value="lumpectomy">Lumpectomy</SelectItem>
+                   <SelectItem value="other">Other</SelectItem>
+                 </SelectContent>
+               </Select>
+            </div>
+          )}
         </div>
       )}
     </RepeatingGroup>

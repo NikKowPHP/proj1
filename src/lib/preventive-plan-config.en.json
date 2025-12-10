@@ -72,6 +72,43 @@
       "conditions": [
         { "questionId": "occupational_exposures", "operator": "array_contains", "value": "benzene" }
       ]
+    },
+    {
+      "actionId": "ANAL_CANCER_SCREENING_DISCUSSION",
+      "category": "screenings",
+      "conditions": [
+        { "questionId": "sex.highrisk_anal_cancer_group", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "GENETIC_COUNSELING_REFERRAL_LYNCH",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "pattern_lynch_syndrome", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "GENETIC_COUNSELING_REFERRAL_HBOC",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "pattern_breast_ovarian_cluster", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "LUNG_CANCER_SCREENING_OCCUPATIONAL",
+      "category": "screenings",
+      "conditions": [
+        { "questionId": "occ.lung_highrisk", "operator": "equals", "value": true },
+        { "questionId": "age", "operator": "in", "value": ["50-59", "60+"] }
+      ]
+    },
+
+    {
+      "actionId": "DISCUSS_LIFESTYLE_IMPROVEMENT_WCRF",
+      "category": "lifestyle",
+      "conditions": [
+        { "questionId": "wcrf_score.compliance", "operator": "equals", "value": "Low" }
+      ]
     }
   ]
 }

@@ -279,6 +279,31 @@ function calculateFamilyClusters(familyHistory?: any[]): Record<string, boolean>
         pattern_childhood_or_rare_cluster: childhoodOrRare
     };
 }
+        
+/**
+ * Checks for hereditary cancer syndromes (Lynch, HBOC) - Flags
+ */
+function calculateSyndromeFlags(familyHistory?: any[]): Record<string, boolean> {
+    if (!familyHistory || !Array.isArray(familyHistory)) return {};
+    
+    const relatives = familyHistory.map(f => ({
+        cancer: f.cancer_type ? f.cancer_type.toLowerCase() : '',
+        age: f.age_dx
+    }));
+    
+    // Lynch: Amsterdam II criteria simplified for screening (3-2-1 rule approx)
+    // 3 relatives with Lynch-associated cancer
+    const lynchCancers = ['colorectal', 'endometrial', 'ovarian', 'stomach', 'pancreatic', 'biliary', 'urinary', 'brain', 'skin', 'small intestine'];
+    const lynchMatches = relatives.filter(r => lynchCancers.some(c => r.cancer.includes(c)));
+    
+    // We strictly need >= 3 relatives to flag "pattern_lynch_syndrome" as high suspicion?
+    // PDF usually implies a flag if criteria met.
+    const isLynch = lynchMatches.length >= 3;
+    
+    return {
+        pattern_lynch_syndrome: isLynch
+    };
+}
 
 /**
  * Checks for Occupational Risk flags.
@@ -456,7 +481,8 @@ export const DerivedVariablesService = {
       
       // Family History Clusters
       const famClusters = calculateFamilyClusters(advanced.family);
-      Object.assign(derived, famClusters);
+      const syndromeFlags = calculateSyndromeFlags(advanced.family);
+      Object.assign(derived, famClusters, syndromeFlags);
 
       // Check for high-risk occupational exposures (Composite + Specific Flags)
       const exposures = calculateExposureComposites(advanced.occupational);
@@ -465,6 +491,37 @@ export const DerivedVariablesService = {
       }
       const occFlags = calculateOccupationalFlags(advanced.occupational);
       Object.assign(derived, occFlags); // Merges occ.lung_highrisk, etc into derived root
+
+      // --- Sexual Health Flags ---
+      const sexHistory = advanced.sexual_health || {};
+      const sexAtBirth = core.sex_at_birth;
+      // MSM Behavior: Male AND (Partner=Male or Both)
+      let msmBehavior = false;
+      const partnerGenders = sexHistory['sexhx.partner_genders'];
+      if (sexAtBirth === 'Male' && (partnerGenders === 'Male' || partnerGenders === 'Both' || partnerGenders === 'Same sex' || (Array.isArray(partnerGenders) && (partnerGenders.includes('Male') || partnerGenders.includes('Same sex'))))) {
+          msmBehavior = true;
+      }
+      derived['sex.msm_behavior'] = msmBehavior;
+
+      // High Risk Anal Cancer Group
+      // Rule: HIV OR Transplant OR MSM (if Male) OR History of Anal Cancer (handled in personal cancer?)
+      // We check conditions and MSM
+      const conditions = advanced.chronic_condition_details?.conditions || []; // Standardization puts cond.summary here?
+      // Wait, standardization maps 'cond.summary' to core or advanced?
+      // Need to check where 'cond.summary' lands. Standardized core? Or advanced?
+      // Standardized usually keeps answers flat in advanced if not core.
+      // Let's check standardization.service.ts from read.
+      
+      const hasHiv = (core.conditions || []).includes('hiv');
+      const hasTransplant = (core.conditions || []).includes('transplant');
+      // Also check granular conditions if any
+      
+      if (hasHiv || hasTransplant || msmBehavior) {
+          derived['sex.highrisk_anal_cancer_group'] = true;
+      } else {
+          derived['sex.highrisk_anal_cancer_group'] = false;
+      }
+
 
       // --- New Logic ---
 

@@ -38,8 +38,8 @@ interface FamilyCancerHistoryProps {
 export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHistoryProps) => {
   const [errors, setErrors] = useState<Record<number, { age_now_death?: string }>>({});
 
-  const handleAdd = () => {
-    onChange([...value, { cancers: [] }]);
+  const handleAdd = (relation?: string) => {
+    onChange([...value, { cancers: [], relation: relation || '' }]);
   };
 
   const handleRemove = (index: number) => {
@@ -92,11 +92,31 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
   };
 
   return (
+    <div className="space-y-4">
+    <div className="flex flex-wrap gap-2 mb-4">
+        {["Mother", "Father", "Sister", "Brother", "Daughter", "Son"].map(rel => (
+            <button
+                key={rel}
+                type="button"
+                onClick={() => handleAdd(rel)}
+                className="px-3 py-1 bg-primary/10 hover:bg-primary/20 text-primary rounded-full text-sm font-medium transition-colors"
+            >
+                + Add {rel}
+            </button>
+        ))}
+         <button
+            type="button"
+            onClick={() => handleAdd()}
+            className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors"
+        >
+            + Other
+        </button>
+    </div>
     <RepeatingGroup
       values={value}
-      onAdd={handleAdd}
+      onAdd={() => handleAdd()}
       onRemove={handleRemove}
-      addLabel="Add Relative"
+      addLabel="Add Custom Relative"
     >
       {(item, index) => (
         <div className="space-y-4 border-b pb-4 mb-4 last:border-0 last:pb-0 last:mb-0">
@@ -278,5 +298,6 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
         </div>
       )}
     </RepeatingGroup>
+    </div>
   );
 };

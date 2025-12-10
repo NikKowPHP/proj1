@@ -118,6 +118,8 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
                   <SelectValue placeholder="Select frequency" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
                   <SelectItem value="constant">Constant</SelectItem>
                   <SelectItem value="intermittent">Intermittent (comes and goes)</SelectItem>
                   <SelectItem value="worsening">Getting progressively worse</SelectItem>

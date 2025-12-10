@@ -44,7 +44,7 @@ import { SexualHealth } from "@/components/assessment/SexualHealth";
 import { OccupationalHazards } from "@/components/assessment/OccupationalHazards";
 import { EnvironmentalExposures } from "@/components/assessment/EnvironmentalExposures";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Info } from "lucide-react";
+import { Info, AlertCircle } from "lucide-react";
 import { SafetyBanner } from "@/components/assessment/SafetyBanner";
 import { LabsAndImaging } from "@/components/assessment/LabsAndImaging";
 import { FunctionalStatus } from "@/components/assessment/FunctionalStatus";
@@ -98,6 +98,7 @@ export default function AssessmentPage() {
   const [isClient, setIsClient] = useState(false);
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+  const [localWarnings, setLocalWarnings] = useState<Record<string, string>>({});
   const [showSafetyBanner, setShowSafetyBanner] = useState(false);
 
   useEffect(() => {
@@ -184,25 +185,38 @@ export default function AssessmentPage() {
     setShowResumeDialog(false);
   };
 
-  const validateInput = (id: string, value: string, type: Question['type']): string | null => {
+  const validateInput = (id: string, value: string, type: Question['type']): { error: string | null, warning: string | null } => {
+    let error = null;
+    let warning = null;
+
     if (type === 'date_input' && id === 'dob') {
-        if (!value) return "This field is required.";
-        if (new Date(value) > new Date()) return "Date of birth cannot be in the future.";
+        if (!value) error = "This field is required.";
+        else if (new Date(value) > new Date()) error = "Date of birth cannot be in the future.";
     }
     if (type === 'number_input') {
-        if (!value.trim()) return null; // Allow empty optional fields
+        if (!value.trim()) return { error: null, warning: null }; // Allow empty optional fields
         const num = Number(value);
-        if (isNaN(num)) return t('validNumber');
-        if (num <= 0) return t('positiveValue');
-        if (id === 'height_cm' && (num < 50 || num > 250)) return "Height must be between 50 and 250 cm.";
-        if (id === 'weight_kg' && (num < 30 || num > 300)) return "Weight must be between 30 and 300 kg.";
+        if (isNaN(num)) error = t('validNumber');
+        else if (num <= 0) error = t('positiveValue');
+        
+        // Height validation (PDF Page 2)
+        if (id === 'height_cm') {
+            if (num < 50 || num > 250) error = "Height must be between 50 and 250 cm.";
+            else if (num < 120 || num > 220) warning = "Please check if this height is correct.";
+        }
+        // Weight validation (PDF Page 2)
+        if (id === 'weight_kg') {
+            if (num < 30 || num > 300) error = "Weight must be between 30 and 300 kg.";
+            else if (num < 40 || num > 220) warning = "Please check if this weight is correct.";
+        }
     }
-    return null;
+    return { error, warning };
   };
 
   const handleInputChange = (id: string, value: string, type: Question['type']) => {
-      const error = validateInput(id, value, type);
+      const { error, warning } = validateInput(id, value, type);
       setLocalErrors(prev => ({ ...prev, [id]: error || '' }));
+      setLocalWarnings(prev => ({ ...prev, [id]: warning || '' }));
       setAnswer(id, value);
   };
 
@@ -327,7 +341,17 @@ export default function AssessmentPage() {
                     }
                     return <SelectItem key={o} value={o}>{o}</SelectItem>;
                   })}</SelectContent></Select>}
-                  {q.type === "number_input" && <><Input id={q.id} type="number" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
+                  {q.type === "number_input" && (
+                    <>
+                        <Input id={q.id} type="number" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} />
+                        {localErrors[q.id] && <p className="text-sm text-destructive">{localErrors[q.id]}</p>}
+                        {localWarnings[q.id] && !localErrors[q.id] && (
+                            <p className="text-sm text-yellow-500 flex items-center gap-1">
+                                <AlertCircle className="h-3 w-3" /> {localWarnings[q.id]}
+                            </p>
+                        )}
+                    </>
+                  )}
                   {q.type === "year_input" && <><Input id={q.id} type="number" inputMode="numeric" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} placeholder="YYYY" /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
                   {q.type === "date_input" && <><Input id={q.id} type="date" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
                   {q.type === "consent_checkbox" && <div className="flex items-start space-x-3 rounded-md border p-4"><Checkbox id={q.id} checked={answers[q.id] === "true"} onCheckedChange={(c) => setAnswer(q.id, c ? "true" : "false")} /><div className="grid gap-1.5"><label htmlFor={q.id} className="text-sm leading-snug text-muted-foreground">{t.rich("consentHealth", { privacyLink: (chunks) => <Link href="/privacy" className="font-semibold text-primary hover:underline" target="_blank" rel="noopener noreferrer">{chunks}</Link> })}</label></div></div>}
@@ -373,4 +397,4 @@ export default function AssessmentPage() {
     </div>
   );
 }
-      
+        

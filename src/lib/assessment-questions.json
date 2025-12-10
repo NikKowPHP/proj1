@@ -459,14 +459,22 @@
                   "text": { "en": "Hepatitis B Status", "pl": "Status WZW B" },
                   "type": "radio",
                   "options": ["Chronic/Active", "Cured/Cleared", "Unsure"],
-                  "dependsOn": { "questionId": "cond.summary", "value": "hbv" }
+                  "dependsOn": { "questionId": "cond.summary", "value": "hbv" },
+                  "infoCard": {
+                      "id": "cond.hbv.helper",
+                      "text": { "en": "Past = doctor confirmed clearance/seroconversion.", "pl": "Past = lekarz potwierdził wyleczenie/serokonwersję." }
+                  }
                 },
                 {
                   "id": "cond.hcv.status",
                   "text": { "en": "Hepatitis C Status", "pl": "Status WZW C" },
                   "type": "radio",
                   "options": ["Chronic/Active", "Cured (SVR)", "Unsure"],
-                  "dependsOn": { "questionId": "cond.summary", "value": "hcv" }
+                  "dependsOn": { "questionId": "cond.summary", "value": "hcv" },
+                  "infoCard": {
+                      "id": "cond.hcv.helper",
+                      "text": { "en": "Past (SVR) = treatment confirmed sustained viral clearance.", "pl": "Past (SVR) = wynik po leczeniu wskazał trwałą eliminację wirusa." }
+                  }
                 },
                 {
                   "id": "cond.h_pylori.status",
@@ -879,4 +887,4 @@
     }
   ]
 }
-      
+        

@@ -15,6 +15,13 @@ export const SmokingDetails = ({ answers, onAnswer, questions }: SmokingDetailsP
       {questions.map(q => (
         <div key={q.id} className="space-y-2">
           <Label htmlFor={q.id}>{q.text}</Label>
+          {q.id === 'smoking.intensity' && (
+             <div className="mb-2">
+                <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                    20 cigarettes = 1 pack
+                </span>
+             </div>
+          )}
           {q.type === 'year_input' ? (
              <YearInput
               id={q.id}
@@ -45,4 +52,4 @@ export const SmokingDetails = ({ answers, onAnswer, questions }: SmokingDetailsP
     </div>
   );
 };
-      
+        

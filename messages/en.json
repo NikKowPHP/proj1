@@ -107,7 +107,18 @@
     "consentHealth": "I consent to the processing of my health data for the purpose of generating this one-time preventive plan. I understand this data is not stored and I have read the <privacyLink>Privacy Policy</privacyLink>.",
     "consentGenetics": "I give specific consent to process my genetic data for this assessment. I understand this information is sensitive and is covered by the <privacyLink>Privacy Policy</privacyLink>.",
     "safetyBannerTitle": "Important Note",
-    "safetyBannerContent": "The symptom you selected can have many causes, but it is important to discuss with a healthcare provider promptly. This tool is not for diagnosis."
+
+    "safetyBannerContent": "The symptom you selected can have many causes, but it is important to discuss with a healthcare provider promptly. This tool is not for diagnosis.",
+    "addMother": "+ Add Mother",
+    "addFather": "+ Add Father",
+    "addSister": "+ Add Sister",
+    "addBrother": "+ Add Brother",
+    "addDaughter": "+ Add Daughter",
+    "addSon": "+ Add Son",
+    "addOther": "+ Other",
+    "remove": "Remove",
+    "addCancer": "+ Add Cancer",
+    "addCustomRelative": "Add Custom Relative"
   },
   "ResultsPage": {
     "noDataTitle": "No Plan Data",

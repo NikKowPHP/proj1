@@ -185,6 +185,79 @@ describe("DerivedVariablesService", () => {
         const derived = DerivedVariablesService.calculateAll(standardizedData);
         expect(derived.exposure_composites.has_known_carcinogen_exposure).toBe(false);
     });
+
+    it("should set highrisk_anal_cancer_group to true if user has HIV", () => {
+        // HIV is passed as a condition ID in core.conditions
+        const standardizedData = {
+          core: { conditions: ['hiv'] }
+        };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived['sex.highrisk_anal_cancer_group']).toBe(true);
+    });
+
+    it("should set highrisk_anal_cancer_group to true for Male MSM", () => {
+      const standardizedData = {
+        core: { sex_at_birth: 'Male' },
+        advanced: { sexual_health: { 'sexhx.partner_genders': 'Male' } }
+      };
+      const derived = DerivedVariablesService.calculateAll(standardizedData);
+      expect(derived['sex.msm_behavior']).toBe(true);
+      expect(derived['sex.highrisk_anal_cancer_group']).toBe(true);
+    });
+
+    it("should set highrisk_anal_cancer_group to false for Female with 'Male' partners", () => {
+      const standardizedData = {
+        core: { sex_at_birth: 'Female' },
+        advanced: { sexual_health: { 'sexhx.partner_genders': 'Male' } }
+      };
+      const derived = DerivedVariablesService.calculateAll(standardizedData);
+      expect(derived['sex.msm_behavior']).toBe(false);
+      expect(derived['sex.highrisk_anal_cancer_group']).toBe(false);
+    });
+
+    it("should set highrisk_anal_cancer_group to false for Male Heterosexual", () => {
+        const standardizedData = {
+          core: { sex_at_birth: 'Male' },
+          advanced: { sexual_health: { 'sexhx.partner_genders': 'Female' } }
+        };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived['sex.msm_behavior']).toBe(false);
+        expect(derived['sex.highrisk_anal_cancer_group']).toBe(false);
+    });
+    
+    // Testing specific family relations update
+    it("should set early_age_family_dx to true for Mother < 50", () => {
+        const standardizedData = {
+            advanced: {
+                family: [{ relation: 'Mother', age_dx: 45 }]
+            }
+        };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived.early_age_family_dx).toBe(true);
+    });
+
+    // Occupational Risk (Soot)
+    it("should set lung_highrisk for Soot exposure > 10 years", () => {
+        const standardizedData = {
+            advanced: {
+                occupational: [{ job_title: 'sweeper', occ_exposures: ['soot'], years: 12 }]
+            }
+        };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived['occ.lung_highrisk']).toBe(true);
+    });
+    
+     // Occupational Risk (Painter job title)
+     it("should set lung_highrisk for Painter job title > 10 years", () => {
+        const standardizedData = {
+            advanced: {
+                occupational: [{ job_title: 'Painter', years: 15 }]
+            }
+        };
+        const derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived['occ.lung_highrisk']).toBe(true);
+    });
+
   });
 });
       

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { SearchableSelect, SearchableSelectOption } from "../ui/SearchableSelect";
 import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
+import { useTranslations } from 'next-intl';
 
 interface CancerDiagnosis {
   cancer_type?: string;
@@ -36,10 +37,16 @@ interface FamilyCancerHistoryProps {
 }
 
 export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHistoryProps) => {
+  const t = useTranslations("AssessmentPage");
   const [errors, setErrors] = useState<Record<number, { age_now_death?: string }>>({});
 
   const handleAdd = (relation?: string) => {
-    onChange([...value, { cancers: [], relation: relation || '' }]);
+    let side = undefined;
+    if (relation === 'Mother' || relation === 'Maternal Grandmother' || relation === 'Maternal Grandfather') side = 'Maternal';
+    if (relation === 'Father' || relation === 'Paternal Grandmother' || relation === 'Paternal Grandfather') side = 'Paternal';
+    if (relation === 'Sister' || relation === 'Brother' || relation === 'Daughter' || relation === 'Son') side = 'N/A';
+
+    onChange([...value, { cancers: [], relation: relation || '', side_of_family: side }]);
   };
 
   const handleRemove = (index: number) => {
@@ -60,6 +67,17 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
 
     const newValues = [...value];
     newValues[index] = { ...newValues[index], [field]: fieldValue };
+
+    // Auto-infer side if relation changes
+    if (field === 'relation') {
+        let side = newValues[index].side_of_family;
+        const rel = fieldValue as string;
+        if (rel.includes('Maternal') || rel === 'Mother') side = 'Maternal';
+        else if (rel.includes('Paternal') || rel === 'Father') side = 'Paternal';
+        else if (['Sister', 'Brother', 'Daughter', 'Son'].includes(rel)) side = 'N/A';
+        newValues[index].side_of_family = side;
+    }
+
     onChange(newValues);
   };
 
@@ -101,7 +119,7 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
                 onClick={() => handleAdd(rel)}
                 className="px-3 py-1 bg-primary/10 hover:bg-primary/20 text-primary rounded-full text-sm font-medium transition-colors"
             >
-                + Add {rel}
+                {t(`add${rel}`)}
             </button>
         ))}
          <button
@@ -109,7 +127,7 @@ export const FamilyCancerHistory = ({ value, onChange, options }: FamilyCancerHi
             onClick={() => handleAdd()}
             className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors"
         >
-            + Other
+            {t('addOther')}
         </button>
     </div>
     <RepeatingGroup

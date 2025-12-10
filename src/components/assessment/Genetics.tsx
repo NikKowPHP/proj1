@@ -92,15 +92,18 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
                 {error && <p className="text-sm text-destructive">{error}</p>}
               </div>
             );
-          case 'checkbox_group': // for genes
+          case 'checkbox_group': // for genes or others
+            const isLongList = (q.options?.length > 15) || key === 'genetic_genes';
             return (
               <div key={key} className="space-y-2">
                 <Label>{q.text}</Label>
-                <CheckboxGroup
-                  options={q.options}
-                  value={answers[key] ? JSON.parse(answers[key]) : []}
-                  onChange={(val) => onAnswer(key, JSON.stringify(val))}
-                />
+                <div className={cn(isLongList && "max-h-[400px] overflow-y-auto border rounded-md p-4")}>
+                    <CheckboxGroup
+                    options={q.options}
+                    value={answers[key] ? JSON.parse(answers[key]) : []}
+                    onChange={(val) => onAnswer(key, JSON.stringify(val))}
+                    />
+                </div>
               </div>
             );
           case 'file_upload':

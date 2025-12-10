@@ -38,7 +38,7 @@
         },
         {
           "id": "dob",
-          "text": { "en": "Date of birth (Year only)", "pl": "Rok urodzenia" },
+          "text": { "en": "Date of birth (Year only)", "pl": "Rok urodzenia (RRRR)" },
           "type": "year_input",
           "validation": { "min": 1900, "maxCurrentYear": true, "softMin": 1920 }
         },
@@ -106,7 +106,7 @@
         },
         {
           "id": "alcohol.beverage_mix",
-          "text": { "en": "Typical beverage types (Beer/Wine/Spirits %)", "pl": "Typowe rodzaje napojów (Piwo/Wino/Wódka %)" },
+          "text": { "en": "Typical beverage types (e.g. Beer 50%, Wine 30%, Spirits 20%)", "pl": "Typowe rodzaje napojów (np. Piwo 50%, Wino 30%, Wódka 20%)" },
           "type": "text_input",
           "dependsOn": { "questionId": "alcohol.status", "value": ["Current", "Former"] }
         },
@@ -226,7 +226,7 @@
             "id": "diet.ssb_container",
             "text": { "en": "Typical sugary drink container size", "pl": "Typowy rozmiar napoju słodzonego" },
             "type": "select",
-            "options": ["Small (250ml)", "Medium (330ml)", "Large (500ml+)", "None"],
+            "options": ["Small (250ml)", "Medium (330ml)", "Large (500ml)", "Extra Large (750ml)", "None"],
             "dependsOn": { "questionId": "diet.ssb_servings_week", "operator": ">", "value": 0 }
         },
         {
@@ -247,7 +247,7 @@
           "options": [
             { "id": "HP:0012378", "category": "A. Weight/Appetite", "label": { "en": "Fatigue", "pl": "Zmęczenie" } },
             { "id": "HP:0001824", "category": "A. Weight/Appetite", "label": { "en": "Unexplained weight loss", "pl": "Niewyjaśniona utrata wagi" }, "red_flag": true },
-            { "id": "HP:0030082", "category": "A. Weight/Appetite", "label": { "en": "Night sweats", "pl": "Nocne poty" }, "red_flag": true },
+            { "id": "HP:0030166", "category": "A. Weight/Appetite", "label": { "en": "Night sweats", "pl": "Nocne poty" }, "red_flag": true },
             { "id": "HP:0002239", "category": "G. GI", "label": { "en": "Abdominal pain", "pl": "Ból brzucha" } },
             { "id": "HP:0002014", "category": "G. GI", "label": { "en": "Diarrhea", "pl": "Biegunka" } },
             { "id": "HP:0012532", "category": "G. GI", "label": { "en": "Constipation", "pl": "Zaparcie" } },
@@ -266,6 +266,9 @@
             { "id": "HP:0001250", "category": "K. Neurologic", "label": { "en": "Seizures (new onset)", "pl": "Napady padaczkowe (nowe)" }, "red_flag": true },
             { "id": "HP:0003002", "category": "I. Breast/Testicular", "label": { "en": "Breast lump", "pl": "Guzek piersi" }, "red_flag": true },
             { "id": "HP:0002716", "category": "B. Systemic", "label": { "en": "Lymphadenopathy (Swollen nodes)", "pl": "Powiększone węzły chłonne" } },
+            { "id": "HP:0002653", "category": "C. Musculoskeletal", "label": { "en": "Bone pain", "pl": "Ból kości" }, "red_flag": true },
+            { "id": "HP:0003418", "category": "C. Musculoskeletal", "label": { "en": "Back pain", "pl": "Ból pleców" }, "red_flag": true },
+            { "id": "HP:0002315", "category": "K. Neurologic", "label": { "en": "Headache (Scale 1-10)", "pl": "Ból głowy" }, "red_flag": true },
             { "id": "HP:0000000", "label": { "en": "None", "pl": "Brak" } }
           ]
         },
@@ -276,7 +279,7 @@
           "options": [ { "value": "Yes", "label": "Yes" }, { "value": "No", "label": "No" }, { "value": "Unsure", "label": "Unsure" } ]
         },
         { "id": "cond.summary", "text": {"en": "Summary of Chronic Conditions (Select all that apply)", "pl": "Podsumowanie chorób przewlekłych"}, "type": "checkbox_group", "options": [
-            {"id": "diabetes", "label": "Diabetes"}, {"id": "hypertension", "label": "Hypertension"}, {"id": "ibd", "label": "IBD"}, {"id": "hbv", "label": "Hepatitis B"}, {"id": "hcv", "label": "Hepatitis C"}, {"id": "cirrhosis", "label": "Cirrhosis"}, {"id": "hpv", "label": "HPV Infection"}, {"id": "hiv", "label": "HIV"}, {"id": "transplant", "label": "Organ Transplant"}, {"id": "immunosuppression", "label": "Immunosuppression"}, {"id": "psc", "label": "PSC (Primary Sclerosing Cholangitis)"}, {"id": "pancreatitis", "label": "Chronic Pancreatitis"}, {"id": "copd", "label": "COPD"}, {"id": "other", "label": "Other"}
+            {"id": "diabetes", "label": "Diabetes"}, {"id": "hypertension", "label": "Hypertension"}, {"id": "ibd", "label": "IBD"}, {"id": "hbv", "label": "Hepatitis B"}, {"id": "hcv", "label": "Hepatitis C"}, {"id": "cirrhosis", "label": "Cirrhosis"}, {"id": "hpv", "label": "HPV Infection"}, {"id": "h_pylori", "label": "H. pylori"}, {"id": "hiv", "label": "HIV"}, {"id": "transplant", "label": "Organ Transplant"}, {"id": "immunosuppression", "label": "Immunosuppression"}, {"id": "psc", "label": "PSC (Primary Sclerosing Cholangitis)"}, {"id": "pancreatitis", "label": "Chronic Pancreatitis"}, {"id": "copd", "label": "COPD"}, {"id": "other", "label": "Other"}
         ] },
         { "id": "ca.any_history", "text": {"en": "Ever diagnosed with cancer?", "pl": "Czy kiedykolwiek zdiagnozowano u Ciebie raka?"}, "type": "radio", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}, {"value": "Unsure", "label": "Unsure"}] },
         { "id": "ca.active_treatment_now", "text": {"en": "Are you currently receiving aggressive cancer treatment (e.g., Chemo/Radiation)?", "pl": "Czy obecnie otrzymujesz agresywne leczenie przeciwnowotworowe (np. chemioterapia/radioterapia)?"}, "type": "radio", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}], "dependsOn": {"questionId": "ca.any_history", "value": "Yes"} },
@@ -325,7 +328,7 @@
                 { "id": "smoking.start_age", "text": { "en": "Age you started smoking?", "pl": "Wiek rozpoczęcia palenia?"}, "type": "number_input", "placeholder": "e.g., 18" },
                 { "id": "smoking.years_smoked", "text": { "en": "Number of years smoked (excluding breaks)?", "pl": "Liczba lat palenia (bez przerw)?"}, "type": "number_input", "placeholder": "e.g., 10" },
                 { "id": "smoking.quit_date", "text": { "en": "Year you quit smoking (ISO-8601)", "pl": "Rok rzucenia palenia"}, "type": "year_input", "dependsOn": {"questionId": "smoking_status", "value": "Former"}},
-                { "id": "smoking.other_tobacco_smoked", "text": {"en": "Other tobacco products used?", "pl": "Inne wyroby tytoniowe?"}, "type": "checkbox_group", "options": [{"id": "cigars", "label": "Cigars/Cigarillos"}, {"id": "pipe", "label": "Pipe"}, {"id": "shisha", "label": "Waterpipe"}, {"id": "none", "label": "None"}] },
+                { "id": "smoking.other_tobacco_smoked", "text": {"en": "Other tobacco products used?", "pl": "Inne wyroby tytoniowe?"}, "type": "checkbox_group", "options": [{"id": "cigars", "label": "Cigars"}, {"id": "cigarillos", "label": "Cigarillos"}, {"id": "pipe", "label": "Pipe"}, {"id": "roll_your_own", "label": "Roll-your-own"}, {"id": "shisha", "label": "Waterpipe"}, {"id": "none", "label": "None"}] },
                 { "id": "smoking.other_cigar_per_week", "text": {"en": "Cigars/Cigarillos per week", "pl": "Cygara/Cygaretki na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "value": true} },
                 { "id": "smoking.pipe_per_week", "text": {"en": "Pipe bowls per week", "pl": "Fajki na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "value": true} },
                 { "id": "smoking.shisha_per_week", "text": {"en": "Waterpipe sessions per week", "pl": "Sesje fajki wodnej na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "value": true} },
@@ -351,12 +354,28 @@
               "title": { "en": "Family Cancer History", "pl": "Rodzinna Historia Nowotworów" },
               "dependsOn": { "questionId": "family_cancer_any", "value": "Yes" },
               "options": {
-                "relations": [ "Parent", "Sibling", "Child", "Grandparent", "Other" ],
+                "relations": [ "Mother", "Father", "Sister", "Brother", "Daughter", "Son", "Maternal Grandmother", "Maternal Grandfather", "Paternal Grandmother", "Paternal Grandfather", "Aunt", "Uncle", "Niece", "Nephew", "Cousin" ],
                 "cancerTypes": [
-                  { "value": "breast", "label": "Breast Cancer" },
-                  { "value": "lung", "label": "Lung Cancer" },
-                  { "value": "prostate", "label": "Prostate Cancer" },
-                  { "value": "colorectal", "label": "Colorectal Cancer" }
+                  { "value": "breast", "label": "Breast" },
+                  { "value": "lung", "label": "Lung" },
+                  { "value": "colorectal", "label": "Colorectal" },
+                  { "value": "prostate", "label": "Prostate" },
+                  { "value": "endometrium", "label": "Endometrium" },
+                  { "value": "oesophagus", "label": "Oesophagus" },
+                  { "value": "pancreas", "label": "Pancreas" },
+                  { "value": "liver", "label": "Liver" },
+                  { "value": "bladder", "label": "Bladder" },
+                  { "value": "brain", "label": "Brain" },
+                  { "value": "thyroid", "label": "Thyroid" },
+                  { "value": "sarcoma", "label": "Sarcoma" },
+                  { "value": "lymphoma", "label": "Lymphoma" },
+                  { "value": "leukemia", "label": "Leukemia" },
+                  { "value": "myeloma", "label": "Myeloma" },
+                  { "value": "kidney", "label": "Kidney" },
+                  { "value": "melanoma", "label": "Melanoma" },
+                  { "value": "gastric", "label": "Stomach (Gastric)" },
+                  { "value": "ovarian", "label": "Ovarian" },
+                  { "value": "other", "label": "Other" }
                 ]
               }
             },
@@ -369,7 +388,7 @@
                    { "id": "genetic_test_type", "text": { "en": "What type of genetic test was it?", "pl": "Jaki to był rodzaj badania genetycznego?" }, "type": "select", "options": ["Multigene panel", "Single gene", "Exome (WES)", "Genome (WGS)", "Other"], "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"]} },
                    { "id": "genetic_test_year", "text": { "en": "In what year was the test performed?", "pl": "W którym roku wykonano badanie?" }, "type": "year_input", "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"]} },
                    { "id": "genetic_lab", "text": { "en": "Testing laboratory (if known)", "pl": "Laboratorium wykonujące test (jeśli znane)" }, "type": "text_input", "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"]} },
-                   { "id": "genetic_genes", "text": { "en": "If yes: which genes?", "pl": "Jeśli tak: które geny?" }, "type": "checkbox_group", "options": [{ "id": "BRCA1", "label": "BRCA1"}, { "id": "BRCA2", "label": "BRCA2"}, { "id": "MLH1", "label": "MLH1"}, { "id": "MSH2", "label": "MSH2"}, { "id": "MSH6", "label": "MSH6"}, { "id": "PMS2", "label": "PMS2"}, { "id": "APC", "label": "APC"}, { "id": "TP53", "label": "TP53"}, { "id": "PTEN", "label": "PTEN"}, { "id": "STK11", "label": "STK11"}, { "id": "PALB2", "label": "PALB2"}, { "id": "CDH1", "label": "CDH1"}], "dependsOn": { "questionId": "gen.path_variant_self", "value": "yes"} },
+                   { "id": "genetic_genes", "text": { "en": "If yes: which genes?", "pl": "Jeśli tak: które geny?" }, "type": "checkbox_group", "options": [{ "id": "BRCA1", "label": "BRCA1"}, { "id": "BRCA2", "label": "BRCA2"}, { "id": "PALB2", "label": "PALB2"}, { "id": "TP53", "label": "TP53"}, { "id": "PTEN", "label": "PTEN"}, { "id": "CDH1", "label": "CDH1"}, { "id": "STK11", "label": "STK11"}, { "id": "NF1", "label": "NF1"}, { "id": "ATM", "label": "ATM"}, { "id": "CHEK2", "label": "CHEK2"}, { "id": "BARD1", "label": "BARD1"}, { "id": "BRIP1", "label": "BRIP1"}, { "id": "RAD51C", "label": "RAD51C"}, { "id": "RAD51D", "label": "RAD51D"}, { "id": "MLH1", "label": "MLH1"}, { "id": "MSH2", "label": "MSH2"}, { "id": "MSH6", "label": "MSH6"}, { "id": "PMS2", "label": "PMS2"}, { "id": "EPCAM", "label": "EPCAM"}, { "id": "APC", "label": "APC"}, { "id": "MUTYH", "label": "MUTYH"}, { "id": "POLE", "label": "POLE"}, { "id": "POLD1", "label": "POLD1"}, { "id": "SMAD4", "label": "SMAD4"}, { "id": "BMPR1A", "label": "BMPR1A"}, { "id": "NTHL1", "label": "NTHL1"}, { "id": "VHL", "label": "VHL"}, { "id": "FH", "label": "FH"}, { "id": "FLCN", "label": "FLCN"}, { "id": "MET", "label": "MET"}, { "id": "RET", "label": "RET"}, { "id": "MAX", "label": "MAX"}, { "id": "TSC1", "label": "TSC1"}, { "id": "TSC2", "label": "TSC2"}, { "id": "CDKN2A", "label": "CDKN2A"}, { "id": "CDK4", "label": "CDK4"}, { "id": "MITF", "label": "MITF"}], "dependsOn": { "questionId": "gen.path_variant_self", "value": "yes"} },
                    { "id": "genetic_variants_hgvs", "text": { "en": "Variant(s) (HGVS, optional)", "pl": "Wariant(y) (HGVS, opcjonalnie)" }, "type": "text_input", "dependsOn": { "questionId": "gen.path_variant_self", "value": "yes"}, "tooltip": {"en": "HGVS is a standard format for reporting genetic variants, e.g., c.123A>G. Provide if known.", "pl": "HGVS to standardowy format raportowania wariantów genetycznych, np. c.123A>G. Podaj, jeśli jest znany."}},
                    { "id": "genetic_report_upload", "text": { "en": "Upload genetic report (optional)", "pl": "Prześlij raport genetyczny (opcjonalnie)" }, "type": "file_upload", "dependsOn": { "questionId": "gen.testing_ever", "value": "Yes"} },
                    
@@ -415,7 +434,7 @@
             {
               "id": "chronic_condition_details",
               "title": { "en": "Condition Details", "pl": "Szczegóły Chorób" },
-              "dependsOn": { "questionId": "cond.summary", "value": ["hbv", "hcv", "cirrhosis", "ibd", "diabetes", "hypertension"] },
+              "dependsOn": { "questionId": "cond.summary", "value": ["hbv", "hcv", "cirrhosis", "ibd", "diabetes", "hypertension", "h_pylori"] },
               "questions": [
                 {
                   "id": "cond.hbv.status",
@@ -430,6 +449,13 @@
                   "type": "radio",
                   "options": ["Chronic/Active", "Cured (SVR)", "Unsure"],
                   "dependsOn": { "questionId": "cond.summary", "value": "hcv" }
+                },
+                {
+                  "id": "cond.h_pylori.status",
+                  "text": { "en": "H. pylori Status", "pl": "Status H. pylori" },
+                  "type": "radio",
+                  "options": ["Treated/Eradicated", "Untreated/Active", "Unsure"],
+                  "dependsOn": { "questionId": "cond.summary", "value": "h_pylori" }
                 },
                 {
                   "id": "cond.cirrhosis.etiology",
@@ -466,7 +492,28 @@
               "title": { "en": "Personal Cancer History", "pl": "Osobista Historia Nowotworów" },
               "dependsOn": { "questionId": "ca.any_history", "value": "Yes" },
               "options": {
-                "cancerTypes": [ { "value": "breast", "label": "Breast Cancer" }, { "value": "lung", "label": "Lung Cancer" } ],
+                "cancerTypes": [ 
+                  { "value": "breast", "label": "Breast" },
+                  { "value": "lung", "label": "Lung" },
+                  { "value": "colorectal", "label": "Colorectal" },
+                  { "value": "prostate", "label": "Prostate" },
+                  { "value": "endometrium", "label": "Endometrium" },
+                  { "value": "oesophagus", "label": "Oesophagus" },
+                  { "value": "pancreas", "label": "Pancreas" },
+                  { "value": "liver", "label": "Liver" },
+                  { "value": "bladder", "label": "Bladder" },
+                  { "value": "brain", "label": "Brain" },
+                  { "value": "thyroid", "label": "Thyroid" },
+                  { "value": "sarcoma", "label": "Sarcoma" },
+                  { "value": "lymphoma", "label": "Lymphoma" },
+                  { "value": "leukemia", "label": "Leukemia" },
+                  { "value": "myeloma", "label": "Myeloma" },
+                  { "value": "kidney", "label": "Kidney" },
+                  { "value": "melanoma", "label": "Melanoma" },
+                  { "value": "gastric", "label": "Stomach (Gastric)" },
+                  { "value": "ovarian", "label": "Ovarian" },
+                  { "value": "other", "label": "Other" }
+                ],
                 "treatmentTypes": [ { "id": "surgery", "label": "Surgery"}, { "id": "chemo", "label": "Chemotherapy"}, {"id": "radio", "label": "Radiotherapy"}, {"id": "endo", "label": "Endocrine Therapy"}, {"id": "immuno", "label": "Immunotherapy"}, {"id": "hsct", "label": "Stem-cell Transplant"} ],
                 "stageOptions": [{"value": "I", "label": "Stage I"}, {"value": "II", "label": "Stage II"}, {"value": "III", "label": "Stage III"}, {"value": "IV", "label": "Stage IV"}, {"value": "0", "label": "Stage 0 (in situ)"}],
                 "lateralityOptions": [{"value": "Left", "label": "Left"}, {"value": "Right", "label": "Right"}, {"value": "Bilateral", "label": "Bilateral"}, {"value": "Midline", "label": "Midline/Central"}]
@@ -609,13 +656,13 @@
                 {"id": "sexhx.new_partner_12m", "text": {"en": "New partner in last 12 months?", "pl": "Nowy partner w ciągu ostatnich 12 miesięcy?"}, "type": "select", "options": ["Yes", "No"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
                 {"id": "sexhx.partner_genders", "text": {"en": "Gender of partners", "pl": "Płeć partnerów/partnerek"}, "type": "checkbox_group", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": [{"id": "male", "label": {"en":"Male", "pl": "Mężczyźni"}}, {"id": "female", "label": {"en":"Female", "pl": "Kobiety"}}, {"id": "other", "label": {"en":"Other", "pl": "Inne"}}, {"id": "prefer_not_to_say", "label": {"en":"Prefer not to say", "pl": "Wolę nie odpowiadać"}}]},
-                {"id": "sexhx.lifetime_partners_cat", "text": {"en": "Lifetime sexual partners", "pl": "Liczba partnerów/partnerek seksualnych w ciągu całego życia"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["1", "2-4", "5-9", "10+", "Prefer not to say"]},
-                {"id": "sexhx.partners_12m_cat", "text": {"en": "Partners in last 12 months", "pl": "Liczba partnerów/partnerek w ciągu ostatnich 12 miesięcy"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["0", "1", "2-4", "5+", "Prefer not to say"]},
+                {"id": "sexhx.lifetime_partners_cat", "text": {"en": "Lifetime sexual partners", "pl": "Liczba partnerów/partnerek seksualnych w ciągu całego życia"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["0-1", "2-4", "5-9", "10-19", "20+", "Prefer not to say"]},
+                {"id": "sexhx.partners_12m_cat", "text": {"en": "Partners in last 12 months", "pl": "Liczba partnerów/partnerek w ciągu ostatnich 12 miesięcy"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["0", "1", "2-3", "4-5", "6+", "Prefer not to say"]},
                 
                 {"id": "sexhx.sex_work_ever", "text": {"en": "Ever engaged in sex work?", "pl": "Praca seksualna kiedykolwiek?"}, "type": "radio", "options": ["Yes", "No", "Prefer not to say"]},
                 {"id": "sexhx.sex_work_role", "text": {"en": "Role in sex work", "pl": "Rola w pracy seksualnej"}, "type": "text_input", "dependsOn": {"questionId": "sexhx.sex_work_ever", "value": "Yes"}},
                 
-                {"id": "sexhx.age_first_sex", "text": {"en": "Age at first sexual intercourse", "pl": "Wiek inicjacji seksualnej"}, "type": "number_input"},
+                {"id": "sexhx.age_first_sex", "text": {"en": "Age at first sexual intercourse", "pl": "Wiek inicjacji seksualnej"}, "type": "number_input", "validation": { "min": 8, "max": 80 }},
                 {"id": "sexhx.sex_sites_ever", "text": {"en": "Sexual practices (Lifetime)", "pl": "Praktyki seksualne (Całe życie)"}, "type": "checkbox_group", "options": [{"id": "vaginal", "label": "Vaginal"}, {"id": "anal", "label": "Anal"}, {"id": "oral", "label": "Oral"}, {"id": "prefer_not_to_say", "label": "Prefer not to say"}]},
                 {"id": "sexhx.sex_sites_12m", "text": {"en": "Sexual practices (Last 12m)", "pl": "Praktyki seksualne (Ost. 12 mies.)"}, "type": "checkbox_group", "options": [{"id": "vaginal", "label": "Vaginal"}, {"id": "anal", "label": "Anal"}, {"id": "oral", "label": "Oral"}, {"id": "prefer_not_to_say", "label": "Prefer not to say"}]},
                 

@@ -106,8 +106,18 @@
     "weightPlaceholderImperial": "np. 154",
     "consentHealth": "Wyrażam zgodę na przetwarzanie moich danych o stanie zdrowia w celu wygenerowania tego jednorazowego planu profilaktycznego. Rozumiem, że te dane nie są przechowywane i zapoznałem/am się z <privacyLink>Polityką Prywatności</privacyLink>.",
     "consentGenetics": "Wyrażam szczególną zgodę na przetwarzanie moich danych genetycznych w celu tej oceny. Rozumiem, że te informacje są wrażliwe i objęte <privacyLink>Polityką Prywatności</privacyLink>.",
-    "safetyBannerTitle": "Ważna uwaga",
-    "safetyBannerContent": "Wybrany objaw może mieć wiele przyczyn, ale ważne jest, aby niezwłocznie omówić go z lekarzem. To narzędzie nie służy do diagnozy."
+    "safetyBannerTitle": "Ważna Uwaga",
+    "safetyBannerContent": "Wybrany objaw może mieć wiele przyczyn, ale ważne jest, aby niezwłocznie skonsultować się z lekarzem. To narzędzie nie służy do diagnozowania.",
+    "addMother": "+ Dodaj Matkę",
+    "addFather": "+ Dodaj Ojca",
+    "addSister": "+ Dodaj Siostrę",
+    "addBrother": "+ Dodaj Brata",
+    "addDaughter": "+ Dodaj Córkę",
+    "addSon": "+ Dodaj Syna",
+    "addOther": "+ Inne",
+    "remove": "Usuń",
+    "addCancer": "+ Dodaj Nowotwór",
+    "addCustomRelative": "Dodaj Innego Krewnego"
   },
   "ResultsPage": {
     "noDataTitle": "Brak Danych Planu",

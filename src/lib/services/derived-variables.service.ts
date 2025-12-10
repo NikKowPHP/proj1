@@ -56,7 +56,7 @@ function calculateEarlyAgeFamilyDx(familyHistory?: { relation?: string; age_dx?:
         return null;
     }
 
-    const firstDegreeRelatives = ['Parent', 'Sibling', 'Child'];
+    const firstDegreeRelatives = ['Parent', 'Sibling', 'Child', 'Mother', 'Father', 'Sister', 'Brother', 'Daughter', 'Son'];
 
     const hasEarlyDx = familyHistory.some(
         (relative) =>
@@ -311,26 +311,37 @@ function calculateSyndromeFlags(familyHistory?: any[]): Record<string, boolean> 
 function calculateOccupationalFlags(history?: any[]): Record<string, boolean> {
     if (!history || !Array.isArray(history)) return {};
 
-    // Flatten history if it comes in complex chunks, but standardized is usually flattened per job
-    // The previous implementation mapped it to: hazard, year_first, years, etc.
+    // Lung High Risk Carcinogens (PDF Spec)
+    // Asbestos, Silica, Diesel, Welding, Painting, Radon, Arsenic, Cadmium, Chromium, Nickel, Beryllium, Soot
+    const lungCarcinogens = [
+        'asbestos', 'silica', 'diesel', 'welding', 'painting', 'painter', 'radon__occ', 
+        'arsenic', 'cadmium', 'chromium', 'nickel', 'beryllium', 'soot', 'metal_fluids'
+    ]; 
     
-    // Lung High Risk: Asbestos, Silica, Diesel, Welding, Painting... AND Years >= 10
-    const lungCarcinogens = ['asbestos', 'silica', 'diesel', 'welding', 'painting', 'radon__occ']; // add others as needed
-    
-    // Mesothelioma Flag: Asbestos AND Years >= 1 (low threshold for meso)
+    // Mesothelioma Flag: Asbestos AND Years >= 1
     
     let lungRisk = false;
     let mesoFlag = false;
 
     history.forEach(job => {
-        const hazard = job.hazard || '';
+        // Handle both flattened hazards array (if simple list) or structured job object
+        // Assuming structure: { job_title?: string, hazards?: string[], years?: number, occ_exposures?: string[] }
+        // Standardization might map checkbox values to 'occ_exposures' array in a single 'job' entry for simpler forms.
+        
+        const possibleHazards = [...(job.occ_exposures || []), ...(job.hazards || [])];
+        if (job.hazard) possibleHazards.push(job.hazard); // legacy single
+        if (job.job_title && lungCarcinogens.includes(job.job_title.toLowerCase())) possibleHazards.push(job.job_title.toLowerCase());
+
         const years = job.years || 0;
         
-        if (lungCarcinogens.includes(hazard) && years >= 10) {
+        // Check for any lung carcinogen overlap
+        const hasCarcinogen = lungCarcinogens.some(c => possibleHazards.includes(c));
+        
+        if (hasCarcinogen && years >= 10) {
             lungRisk = true;
         }
         
-        if (hazard === 'asbestos' && years >= 1) {
+        if (possibleHazards.includes('asbestos') && years >= 1) {
             mesoFlag = true;
         }
     });
@@ -497,24 +508,29 @@ export const DerivedVariablesService = {
       const sexAtBirth = core.sex_at_birth;
       // MSM Behavior: Male AND (Partner=Male or Both)
       let msmBehavior = false;
+      // sexhx.partner_genders can be an array in standardizedData if checkbox_group, or single string if select/radio
       const partnerGenders = sexHistory['sexhx.partner_genders'];
-      if (sexAtBirth === 'Male' && (partnerGenders === 'Male' || partnerGenders === 'Both' || partnerGenders === 'Same sex' || (Array.isArray(partnerGenders) && (partnerGenders.includes('Male') || partnerGenders.includes('Same sex'))))) {
-          msmBehavior = true;
+      
+      if (sexAtBirth === 'Male') {
+          if (Array.isArray(partnerGenders)) {
+             if (partnerGenders.some((g: string) => g.toLowerCase() === 'male' || g.toLowerCase() === 'same sex')) {
+                msmBehavior = true;
+             }
+          } else if (typeof partnerGenders === 'string') {
+             if (partnerGenders.toLowerCase() === 'male' || partnerGenders.toLowerCase() === 'both' || partnerGenders.toLowerCase() === 'same sex') {
+                 msmBehavior = true;
+             }
+          }
       }
       derived['sex.msm_behavior'] = msmBehavior;
 
       // High Risk Anal Cancer Group
-      // Rule: HIV OR Transplant OR MSM (if Male) OR History of Anal Cancer (handled in personal cancer?)
-      // We check conditions and MSM
-      const conditions = advanced.chronic_condition_details?.conditions || []; // Standardization puts cond.summary here?
-      // Wait, standardization maps 'cond.summary' to core or advanced?
-      // Need to check where 'cond.summary' lands. Standardized core? Or advanced?
-      // Standardized usually keeps answers flat in advanced if not core.
-      // Let's check standardization.service.ts from read.
+      // Rule: HIV OR Transplant OR (Male AND MSM)
+      const conditions = standardizedData.core?.conditions || []; 
+      // Assuming 'conditions' is an array of IDs like ['hiv', 'transplant', 'diabetes'...]
       
-      const hasHiv = (core.conditions || []).includes('hiv');
-      const hasTransplant = (core.conditions || []).includes('transplant');
-      // Also check granular conditions if any
+      const hasHiv = conditions.includes('hiv');
+      const hasTransplant = conditions.includes('transplant');
       
       if (hasHiv || hasTransplant || msmBehavior) {
           derived['sex.highrisk_anal_cancer_group'] = true;

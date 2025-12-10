@@ -52,11 +52,12 @@ import { SmokingDetails } from "@/components/assessment/SmokingDetails";
 import { Medications } from "@/components/assessment/Medications";
 import { StandardizationService } from "@/lib/services/standardization.service";
 import { DerivedVariablesService } from "@/lib/services/derived-variables.service";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface Question {
   id: string;
   text?: string;
-  type: "select" | "number_input" | "date_input" | "consent_checkbox" | "checkbox_group" | "advanced_modules";
+  type: "select" | "number_input" | "date_input" | "consent_checkbox" | "checkbox_group" | "advanced_modules" | "radio" | "year_input";
   options?: any; // Can be string[], CheckboxOption[], or complex objects for modules
   dependsOn?: {
     questionId: string;
@@ -65,6 +66,10 @@ interface Question {
   exclusiveOptionId?: string;
   modules?: any[];
   tooltip?: string;
+  infoCard?: {
+      id: string;
+      text: string | { en: string; pl: string };
+  };
 }
 
 interface Step {
@@ -316,7 +321,14 @@ export default function AssessmentPage() {
                     }
                     return <SelectItem key={o} value={o}>{o}</SelectItem>;
                   })}</SelectContent></Select>}
+                  {q.type === "radio" && <Select onValueChange={(v) => setAnswer(q.id, v)} value={answers[q.id] || ""}><SelectTrigger id={q.id}><SelectValue placeholder={t("selectOption")} /></SelectTrigger><SelectContent>{q.options.map((o: any) => {
+                    if (typeof o === 'object' && o.value && o.label) {
+                      return <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>;
+                    }
+                    return <SelectItem key={o} value={o}>{o}</SelectItem>;
+                  })}</SelectContent></Select>}
                   {q.type === "number_input" && <><Input id={q.id} type="number" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
+                  {q.type === "year_input" && <><Input id={q.id} type="number" inputMode="numeric" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} placeholder="YYYY" /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
                   {q.type === "date_input" && <><Input id={q.id} type="date" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
                   {q.type === "consent_checkbox" && <div className="flex items-start space-x-3 rounded-md border p-4"><Checkbox id={q.id} checked={answers[q.id] === "true"} onCheckedChange={(c) => setAnswer(q.id, c ? "true" : "false")} /><div className="grid gap-1.5"><label htmlFor={q.id} className="text-sm leading-snug text-muted-foreground">{t.rich("consentHealth", { privacyLink: (chunks) => <Link href="/privacy" className="font-semibold text-primary hover:underline" target="_blank" rel="noopener noreferrer">{chunks}</Link> })}</label></div></div>}
                   {q.type === "checkbox_group" && <CheckboxGroup options={q.options as CheckboxOption[]} value={answers[q.id] ? JSON.parse(answers[q.id]) : []} onChange={(s) => setAnswer(q.id, JSON.stringify(s))} exclusiveOption={q.exclusiveOptionId} />}
@@ -336,6 +348,17 @@ export default function AssessmentPage() {
                     {m.id === 'functional_status' && <FunctionalStatus answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'smoking_details' && <SmokingDetails answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                   </AccordionContent></AccordionItem>)}</Accordion>}
+                  
+                  {q.infoCard && (
+                    <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 mt-2">
+                        <CardContent className="p-3 flex items-start gap-3">
+                            <Info className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+                            <p className="text-sm text-blue-700 dark:text-blue-300">
+                                {typeof q.infoCard.text === 'object' ? (q.infoCard.text as any)[locale] : q.infoCard.text}
+                            </p>
+                        </CardContent>
+                    </Card>
+                  )}
                 </div>
               ))}
             </section>
@@ -350,3 +373,4 @@ export default function AssessmentPage() {
     </div>
   );
 }
+      

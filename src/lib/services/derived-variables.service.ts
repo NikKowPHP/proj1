@@ -32,28 +32,32 @@ function calculateAge(dob?: string): number | null {
 }
 
 /**
- * Calculates smoking pack-years.
+ * Calculates smoking pack-years and Brinkman Index.
  * @param smokingDetails - Object with cigs_per_day, intensity_unit and years.
- * @returns The calculated pack-years, or null if inputs are invalid.
+ * @returns Object containing pack-years and brinkman_index.
  */
-function calculatePackYears(smokingDetails?: { cigs_per_day?: number; intensity_unit?: string; years?: number }): number | null {
+function calculateSmokingMetrics(smokingDetails?: { cigs_per_day?: number; intensity_unit?: string; years?: number }): { pack_years: number | null, brinkman_index: number | null } {
     if (!smokingDetails || !smokingDetails.cigs_per_day || !smokingDetails.years) {
-        return null;
+        return { pack_years: null, brinkman_index: null };
     }
     const { cigs_per_day, intensity_unit, years } = smokingDetails;
-    if (cigs_per_day <= 0 || years <= 0) return null;
-    
-    // If unit is "Packs per day", cigs_per_day is actually packs.
-    // Formula: ((cigs_per_day/20) OR packs_per_day) × years_smoked
+    if (cigs_per_day <= 0 || years <= 0) return { pack_years: null, brinkman_index: null };
     
     let packsPerDay = 0;
+    let cigarettesPerDay = 0;
+
     if (intensity_unit === 'Packs per day') {
         packsPerDay = cigs_per_day;
+        cigarettesPerDay = cigs_per_day * 20;
     } else {
         packsPerDay = cigs_per_day / 20;
+        cigarettesPerDay = cigs_per_day;
     }
 
-    return parseFloat((packsPerDay * years).toFixed(1));
+    const pack_years = parseFloat((packsPerDay * years).toFixed(1));
+    const brinkman_index = parseFloat((cigarettesPerDay * years).toFixed(1));
+
+    return { pack_years, brinkman_index };
 }
 
 /**
@@ -77,6 +81,53 @@ function calculateEarlyAgeFamilyDx(familyHistory?: { relation?: string; age_dx?:
     );
     
     return hasEarlyDx;
+}
+
+/**
+ * Calculates granular family history metrics per cancer site.
+ * PDF Page 32: derived.famhx.[site].fdr_count, sdr_third_count, youngest_dx_age_any
+ */
+function calculateFamilySiteMetrics(familyHistory?: any[]): Record<string, any> {
+    if (!familyHistory || !Array.isArray(familyHistory)) return {};
+
+    const sites = ['breast', 'ovarian', 'colorectal', 'prostate', 'lung', 'melanoma', 'pancreas', 'gastric'];
+    const metrics: Record<string, any> = {};
+
+    const firstDegree = ['Mother', 'Father', 'Sister', 'Brother', 'Daughter', 'Son'];
+    const secondDegree = ['Maternal Grandmother', 'Maternal Grandfather', 'Paternal Grandmother', 'Paternal Grandfather', 'Aunt', 'Uncle', 'Niece', 'Nephew'];
+    
+    sites.forEach(site => {
+        let fdrCount = 0;
+        let sdrCount = 0;
+        let youngestAge: number | null = null;
+
+        familyHistory.forEach(member => {
+            // Check if member has this cancer (cancers array or single cancer_type)
+            const memberCancers = member.cancers || (member.cancer_type ? [{cancer_type: member.cancer_type, age_dx: member.age_dx}] : []);
+            
+            memberCancers.forEach((c: any) => {
+                if (c.cancer_type && c.cancer_type.toLowerCase().includes(site)) {
+                    // Increment counts
+                    if (firstDegree.includes(member.relation)) fdrCount++;
+                    else if (secondDegree.includes(member.relation)) sdrCount++; // Treating 2nd and 3rd degree (cousin) as non-FDR group for now
+
+                    // Track youngest age
+                    const dxAge = c.age_dx;
+                    if (dxAge !== undefined && dxAge !== null) {
+                        if (youngestAge === null || dxAge < youngestAge) {
+                            youngestAge = dxAge;
+                        }
+                    }
+                }
+            });
+        });
+
+        metrics[`famhx.${site}.fdr_count`] = fdrCount;
+        metrics[`famhx.${site}.sdr_third_count`] = sdrCount;
+        metrics[`famhx.${site}.youngest_dx_age_any`] = youngestAge;
+    });
+
+    return metrics;
 }
 
 /**
@@ -396,16 +447,7 @@ function calculateHpvExposureBand(sexualHealth: any): string {
 
     // Higher
     if (
-        (lifetimePartners === '20+' || lifetimePartners === '10-19') || // PDF says >=20 for Higher, but let's be conservative or strict? PDF: "10-19, >=20" -> Higher if any of... wait.
-        // PDF Table: Higher if lifetime in {10-19, >=20} OR recent in {4-5, >=6} OR anal sex OR sex work.
-        // Actually PDF says:
-        // Higher if any of: lifetime >= 20 OR recent >= 6 OR anal sex OR sex work.
-        // Medium if not Higher and: lifetime 10-19 OR recent 2-5 OR (age < 18).
-        // Let's re-read carefully.
-        // PDF Page 13: 
-        // Higher if any of: lifetime_partners_cat ∈ {10–19, ≥20} ... Wait, the text says "Higher if any of: ... {10-19, >=20}".
-        // So 10+ is Higher.
-        ['10-19', '20+'].includes(lifetimePartners) ||
+        (lifetimePartners === '20+' || lifetimePartners === '10-19') || 
         ['4-5', '6+'].includes(recentPartners) ||
         hasAnal ||
         isSexWork
@@ -539,14 +581,14 @@ export const DerivedVariablesService = {
           derived.ssb_mLwk = freq * mlPerServing;
       }
 
-      // Calculate pack-years
+      // Calculate pack-years and Brinkman Index
       if (core.smoking_status === 'Never') {
           derived.pack_years = 0;
+          derived.brinkman_index = 0;
       } else if (core.smoking_status === 'Former' || core.smoking_status === 'Current') {
-        const packYears = calculatePackYears(advanced.smoking_detail);
-        if (packYears !== null) {
-            derived.pack_years = packYears;
-        }
+        const { pack_years, brinkman_index } = calculateSmokingMetrics(advanced.smoking_detail);
+        if (pack_years !== null) derived.pack_years = pack_years;
+        if (brinkman_index !== null) derived.brinkman_index = brinkman_index;
       }
       
       // Determine organ inventory based on sex at birth.
@@ -574,6 +616,10 @@ export const DerivedVariablesService = {
       const famClusters = calculateFamilyClusters(advanced.family);
       const syndromeFlags = calculateSyndromeFlags(advanced.family);
       Object.assign(derived, famClusters, syndromeFlags);
+
+      // Granular Family Site Metrics (PDF Page 32)
+      const siteMetrics = calculateFamilySiteMetrics(advanced.family);
+      Object.assign(derived, siteMetrics);
 
       // Check for high-risk occupational exposures (Composite + Specific Flags)
       const exposures = calculateExposureComposites(advanced.occupational);
@@ -617,6 +663,31 @@ export const DerivedVariablesService = {
 
       // HPV Exposure Band
       derived['sex.hpv_exposure_band'] = calculateHpvExposureBand(sexHistory);
+
+      // --- Chronic Condition Surveillance Flags (PDF Page 22) ---
+      const illnesses = advanced.illnesses || [];
+      const hasCirrhosis = illnesses.some((i: any) => i.id === 'cirrhosis');
+      const hasActiveHbv = illnesses.some((i: any) => i.id === 'hbv' && i.status === 'Chronic/Active');
+      const hasIbd = illnesses.some((i: any) => i.id === 'ibd');
+      const hasPsc = illnesses.some((i: any) => i.id === 'psc');
+      const hasBarretts = illnesses.some((i: any) => i.id === 'barretts'); // Assuming ID 'barretts' if added to list
+      const hasImmunosuppression = illnesses.some((i: any) => i.id === 'immunosuppression' || i.id === 'transplant');
+      
+      // IBD Duration check (need onset year)
+      let ibdLongDuration = false;
+      if (hasIbd) {
+          const ibdEntry = illnesses.find((i: any) => i.id === 'ibd');
+          if (ibdEntry && ibdEntry.year && derived.age_years) {
+              const currentYear = new Date().getFullYear();
+              if ((currentYear - ibdEntry.year) >= 8) ibdLongDuration = true;
+          }
+      }
+
+      derived['hcc.surveillance_candidate'] = hasCirrhosis || hasActiveHbv;
+      derived['crc.ibd_surveillance'] = (hasIbd && ibdLongDuration) || hasPsc;
+      derived['barrett.surveillance'] = hasBarretts;
+      derived['skin.lymphoma_highrisk'] = hasImmunosuppression;
+      derived['hpv_related.vigilance'] = hasHiv || hasImmunosuppression; // Simplified vigilance flag
 
       // --- New Logic ---
 

@@ -28,7 +28,7 @@ const chipVariants = cva(
 
 export interface ChipProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof chipVariants> {
+  VariantProps<typeof chipVariants> {
   onRemove?: () => void;
   selected?: boolean;
 }
@@ -42,7 +42,7 @@ const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
       <Component
         className={cn(chipVariants({ variant, size, className }))}
         ref={ref as any}
-        data-selected={selected}
+        data-selected={selected ? "true" : undefined}
         {...(isSelectable
           ? ({ ...props, type: "button" } as any)
           : (props as React.HTMLAttributes<HTMLDivElement>))}
@@ -67,4 +67,3 @@ const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
 Chip.displayName = "Chip";
 
 export { Chip, chipVariants };
-      

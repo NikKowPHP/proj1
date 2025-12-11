@@ -757,13 +757,23 @@
           "id": "imm.hpv.doses",
           "type": "select",
           "text": { "en": "HPV Doses received", "pl": "Otrzymane dawki HPV" },
-          "options": ["0", "1", "2", "3", "Not sure"]
+          "options": [
+            { "value": "0", "label": { "en": "0", "pl": "0" } },
+            { "value": "1", "label": { "en": "1", "pl": "1" } },
+            { "value": "2", "label": { "en": "2", "pl": "2" } },
+            { "value": "3", "label": { "en": "3", "pl": "3" } },
+            { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+          ]
         },
         {
           "id": "imm.hbv.completed",
           "type": "radio",
           "text": { "en": "Hepatitis B series completed?", "pl": "Seria WZW B zakończona?" },
-          "options": ["Yes", "No", "Not sure"]
+          "options": [
+            { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+            { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+            { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+          ]
         },
         {
           "id": "advanced_modules_screen",

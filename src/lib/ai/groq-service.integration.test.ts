@@ -20,7 +20,7 @@ describeIfApiKey("GroqService Integration Tests", () => {
     const prompt = "Translate the word 'Hello' into Spanish.";
     const model = process.env.GROQ_SMALL_MODEL || "gemma2-9b-it";
     try {
-      const translatedText = await service.generateText(prompt, model);
+      const translatedText = await service.generateText(prompt, model as any);
       expect(translatedText.toLowerCase()).toContain("hola");
     } catch (error: any) {
       // Gracefully handle the case where a dummy/invalid API key is provided

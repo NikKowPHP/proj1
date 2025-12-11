@@ -31,7 +31,7 @@ const emailExportSchema = z.object({
     lifestyleGuidelines: z.array(lifestyleGuidelineSchema),
     topicsForDoctor: z.array(topicForDoctorSchema),
   }),
-  answers: z.record(z.string()),
+  answers: z.record(z.string(), z.string()),
   locale: z.string().optional().default("en"),
 });
 

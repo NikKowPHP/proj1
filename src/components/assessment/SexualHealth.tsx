@@ -7,6 +7,7 @@ interface SexualHealthProps {
   answers: Record<string, any>;
   onAnswer: (id: string, value: any) => void;
   questions: any[];
+  errors?: Record<string, string | undefined>;
 }
 
 const isVisible = (question: any, answers: Record<string, string>): boolean => {
@@ -16,7 +17,7 @@ const isVisible = (question: any, answers: Record<string, string>): boolean => {
 };
 
 
-export const SexualHealth = ({ answers, onAnswer, questions }: SexualHealthProps) => {
+export const SexualHealth = ({ answers, onAnswer, questions, errors }: SexualHealthProps) => {
   const visibleQuestions = questions.filter(q => isVisible(q, answers));
 
   // Opt-in Logic
@@ -25,10 +26,10 @@ export const SexualHealth = ({ answers, onAnswer, questions }: SexualHealthProps
   // The JSON update made 'sex_active' depend on 'sexhx.section_opt_in' = 'Yes'.
   // So 'visibleQuestions' already filters correctly!
   // However, we need to ensure the opt-in question itself is visible and works.
-  
+
   // If the user answered "No" to opt-in, we just show that one question.
   // This is handled by 'visibleQuestions'.
-  
+
   return (
     <div className="space-y-6">
       {visibleQuestions.map(q => (
@@ -36,20 +37,23 @@ export const SexualHealth = ({ answers, onAnswer, questions }: SexualHealthProps
           {/* Label handling for opt-in question which might be longer */}
           <Label htmlFor={q.id} className={q.id === 'sexhx.section_opt_in' ? "text-base font-semibold" : ""}>{q.text}</Label>
           {q.type === 'select' && (
-             <Select onValueChange={(value) => onAnswer(q.id, value)} value={answers[q.id] || ""}>
-              <SelectTrigger id={q.id}>
-                <SelectValue placeholder="Select an option" />
-              </SelectTrigger>
-              <SelectContent>
-                {q.options.map((opt: string | { value: string; label: string }) => {
-                  const value = typeof opt === 'object' ? opt.value : opt;
-                  const label = typeof opt === 'object' ? opt.label : opt;
-                  return <SelectItem key={value} value={value}>{label}</SelectItem>;
-                })}
-              </SelectContent>
-            </Select>
+            <>
+              <Select onValueChange={(value) => onAnswer(q.id, value)} value={answers[q.id] || ""}>
+                <SelectTrigger id={q.id} className={errors?.[q.id] ? "border-destructive" : ""}>
+                  <SelectValue placeholder="Select an option" />
+                </SelectTrigger>
+                <SelectContent>
+                  {q.options.map((opt: string | { value: string; label: string }) => {
+                    const value = typeof opt === 'object' ? opt.value : opt;
+                    const label = typeof opt === 'object' ? opt.label : opt;
+                    return <SelectItem key={value} value={value}>{label}</SelectItem>;
+                  })}
+                </SelectContent>
+              </Select>
+              {errors?.[q.id] && <p className="text-sm text-destructive">{errors[q.id]}</p>}
+            </>
           )}
-           {q.type === 'checkbox_group' && (
+          {q.type === 'checkbox_group' && (
             <CheckboxGroup
               options={q.options}
               value={answers[q.id] ? JSON.parse(answers[q.id]) : []}
@@ -58,9 +62,9 @@ export const SexualHealth = ({ answers, onAnswer, questions }: SexualHealthProps
               idPrefix={q.id}
             />
           )}
-           {q.type === 'radio' && (
-             // Fallback for radio if passed (though JSON mostly uses select for these)
-             <Select onValueChange={(value) => onAnswer(q.id, value)} value={answers[q.id] || ""}>
+          {q.type === 'radio' && (
+            // Fallback for radio if passed (though JSON mostly uses select for these)
+            <Select onValueChange={(value) => onAnswer(q.id, value)} value={answers[q.id] || ""}>
               <SelectTrigger id={q.id}>
                 <SelectValue placeholder="Select an option" />
               </SelectTrigger>
@@ -73,27 +77,26 @@ export const SexualHealth = ({ answers, onAnswer, questions }: SexualHealthProps
               </SelectContent>
             </Select>
           )}
-           {q.type === 'number_input' && (
-              <input
-                type="number"
-                id={q.id}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                value={answers[q.id] || ""}
-                onChange={(e) => onAnswer(q.id, e.target.value)}
-              />
-           )}
-            {q.type === 'text_input' && (
-              <input
-                type="text"
-                id={q.id}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                value={answers[q.id] || ""}
-                onChange={(e) => onAnswer(q.id, e.target.value)}
-              />
-           )}
+          {q.type === 'number_input' && (
+            <input
+              type="number"
+              id={q.id}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={answers[q.id] || ""}
+              onChange={(e) => onAnswer(q.id, e.target.value)}
+            />
+          )}
+          {q.type === 'text_input' && (
+            <input
+              type="text"
+              id={q.id}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={answers[q.id] || ""}
+              onChange={(e) => onAnswer(q.id, e.target.value)}
+            />
+          )}
         </div>
       ))}
     </div>
   );
 };
-      

@@ -28,6 +28,7 @@ interface SymptomDetailsProps {
   onChange: (symptomId: string, details: SymptomDetailsValue) => void;
   symptomOptions: SearchableSelectOption[];
   featureOptions: { id: string, label: string }[];
+  errors?: Record<string, string | undefined>;
 }
 
 const months = [
@@ -35,7 +36,7 @@ const months = [
   "July", "August", "September", "October", "November", "December"
 ];
 
-export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptions, featureOptions }: SymptomDetailsProps) => {
+export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptions, featureOptions, errors }: SymptomDetailsProps) => {
 
   const handleDetailChange = (symptomId: string, field: keyof SymptomDetailsValue, fieldValue: any) => {
     const currentDetails = value[symptomId] || {};
@@ -50,7 +51,7 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
       : [...currentFeatures, featureId];
     onChange(symptomId, { ...currentDetails, associated_features: newFeatures });
   };
-  
+
   if (selectedSymptoms.length === 0) {
     return (
       <p className="text-muted-foreground text-sm">
@@ -64,7 +65,7 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
       {selectedSymptoms.map(symptom => (
         <Card key={symptom.id}>
           <CardHeader>
-             <SearchableSelect
+            <SearchableSelect
               value={value[symptom.id]?.code || symptom.id}
               onChange={(val) => handleDetailChange(symptom.id, 'code', val)}
               options={symptomOptions}
@@ -95,7 +96,7 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
                 />
               </div>
             </div>
-             <div className="space-y-2">
+            <div className="space-y-2">
               <Label>Severity (0-10)</Label>
               <div className="flex items-center gap-4">
                 <Slider
@@ -110,10 +111,10 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
             </div>
             <div className="space-y-2">
               <Label>Frequency</Label>
-               <Select
+              <Select
                 value={value[symptom.id]?.frequency}
                 onValueChange={(val) => handleDetailChange(symptom.id, 'frequency', val)}
-               >
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select frequency" />
                 </SelectTrigger>
@@ -126,7 +127,7 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
                 </SelectContent>
               </Select>
             </div>
-             <div className="space-y-2">
+            <div className="space-y-2">
               <Label>Associated Features</Label>
               <div className="flex flex-wrap gap-2">
                 {featureOptions.map(feature => (
@@ -143,7 +144,7 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
             </div>
             <div className="space-y-2">
               <Label>Notes (optional)</Label>
-               <textarea
+              <textarea
                 className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 value={value[symptom.id]?.notes || ""}
                 onChange={(e) => handleDetailChange(symptom.id, 'notes', e.target.value)}

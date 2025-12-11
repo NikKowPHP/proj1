@@ -318,8 +318,8 @@
           "type": "checkbox_group",
           "text": { "en": "Current Symptoms", "pl": "Obecne Objawy" },
           "options": [
-            { "id": "HP:0001824", "label": { "en": "Unintentional weight loss", "pl": "Niewyjaśniona utrata wagi" }, "red_flag": true, "category": "Weight" },
-            { "id": "HP:0004396", "label": { "en": "Loss of appetite", "pl": "Utrata apetytu" }, "category": "Weight" },
+            { "id": "HP:0001824", "label": { "en": "Unintentional weight loss", "pl": "Niewyjaśniona utrata wagi" }, "red_flag": true, "category": "Weight & appetite" },
+            { "id": "HP:0004396", "label": { "en": "Loss of appetite", "pl": "Utrata apetytu" }, "category": "Weight & appetite" },
             { "id": "HP:0001945", "label": { "en": "Unexplained fever", "pl": "Niewyjaśniona gorączka" }, "category": "Systemic" },
             { "id": "HP:0030166", "label": { "en": "Night sweats", "pl": "Nocne poty" }, "red_flag": true, "category": "Systemic" },
             { "id": "HP:0012378", "label": { "en": "Severe fatigue", "pl": "Znaczne zmęczenie" }, "category": "Systemic" },
@@ -327,25 +327,33 @@
             { "id": "HP:0002653", "label": { "en": "Bone pain", "pl": "Ból kości" }, "red_flag": true, "category": "Pain" },
             { "id": "HP:0003418", "label": { "en": "Back pain (nerve)", "pl": "Ból pleców (nerwowy)" }, "red_flag": true, "category": "Pain" },
             { "id": "HP:0002315", "label": { "en": "New headache pattern", "pl": "Nowy wzorzec bólu głowy" }, "red_flag": true, "category": "Pain" },
-            { "id": "HP:0002716", "label": { "en": "Lump / Lymph nodes", "pl": "Guzek / Węzły chłonne" }, "category": "Lumps" },
-            { "id": "HP:0002105", "label": { "en": "Coughing blood", "pl": "Krwioplucie" }, "red_flag": true, "category": "Bleeding" },
-            { "id": "HP:0002573", "label": { "en": "Rectal bleeding", "pl": "Krwawienie z odbytu" }, "red_flag": true, "category": "Bleeding" },
-            { "id": "HP:0002249", "label": { "en": "Black tarry stools", "pl": "Smoliste stolce" }, "red_flag": true, "category": "Bleeding" },
-            { "id": "HP:0033840", "label": { "en": "Postmenopausal bleeding", "pl": "Krwawienie pomenopauzalne" }, "red_flag": true, "category": "Bleeding" },
-            { "id": "HP:0000790", "label": { "en": "Blood in urine", "pl": "Krew w moczu" }, "red_flag": true, "category": "Bleeding" },
-            { "id": "HP:0012735", "label": { "en": "Persistent cough", "pl": "Uporczywy kaszel" }, "red_flag": true, "category": "Resp" },
-            { "id": "HP:0002094", "label": { "en": "Shortness of breath", "pl": "Duszność" }, "category": "Resp" },
-            { "id": "HP:0001609", "label": { "en": "Hoarseness", "pl": "Chrypka" }, "category": "Resp" },
-            { "id": "HP:0002014", "label": { "en": "Change in bowel habit", "pl": "Zmiana rytmu wypróżnień" }, "category": "GI" },
-            { "id": "HP:0002019", "label": { "en": "Constipation", "pl": "Zaparcie" }, "category": "GI" },
-            { "id": "HP:0002027", "label": { "en": "Abdominal pain/bloating", "pl": "Ból brzucha/Wzdęcia" }, "category": "GI" },
-            { "id": "HP:0002015", "label": { "en": "Difficulty swallowing", "pl": "Trudności w połykaniu" }, "red_flag": true, "category": "GI" },
-            { "id": "HP:0001031", "label": { "en": "Changing mole / skin", "pl": "Zmiana znamienia / skóry" }, "red_flag": true, "category": "Skin" },
-            { "id": "HP:0000155", "label": { "en": "Mouth ulcer >3 weeks", "pl": "Owrzodzenie jamy ustnej" }, "category": "Skin" },
-            { "id": "HP:0032408", "label": { "en": "Breast lump/change", "pl": "Guzek/zmiana piersi" }, "red_flag": true, "category": "Breast" },
-            { "id": "HP:0032404", "label": { "en": "Testicular lump/change", "pl": "Guzek/zmiana jądra" }, "category": "Breast" },
-            { "id": "HP:0001250", "label": { "en": "Seizures", "pl": "Napady drgawkowe" }, "red_flag": true, "category": "Neuro" },
-            { "id": "HP:0001324", "label": { "en": "Focal weakness/numbness", "pl": "Ogniskowe osłabienie" }, "red_flag": true, "category": "Neuro" },
+            { "id": "onkn.symptom.lump_any", "label": { "en": "New or enlarging lump (any site)", "pl": "Nowy lub rosnący guzek (dowolna lokalizacja)" }, "category": "Lumps / lymph nodes" },
+            { "id": "HP:0002716", "label": { "en": "Swollen lymph nodes", "pl": "Powiększone węzły chłonne" }, "category": "Lumps / lymph nodes" },
+            { "id": "HP:0002105", "label": { "en": "Coughing blood (hemoptysis)", "pl": "Krwioplucie" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0002573", "label": { "en": "Rectal bleeding (bright red)", "pl": "Krwawienie z odbytu (świeża krew)" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0002249", "label": { "en": "Black, tarry stools (melena)", "pl": "Czarne, smoliste stolce (melena)" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0033840", "label": { "en": "Postmenopausal vaginal bleeding", "pl": "Krwawienie po menopauzie" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0012735", "label": { "en": "Persistent cough (>3 weeks)", "pl": "Kaszel utrzymujący się (>3 tyg.)" }, "red_flag": true, "category": "Breathing / ENT" },
+            { "id": "HP:0002094", "label": { "en": "Shortness of breath", "pl": "Duszność" }, "category": "Breathing / ENT" },
+            { "id": "HP:0001609", "label": { "en": "Hoarseness/voice change (>3 weeks)", "pl": "Chrypka/zmiana głosu (>3 tyg.)" }, "red_flag": true, "category": "Breathing / ENT" },
+            { "id": "onkn.symptom.sore_throat", "label": { "en": "Persistent sore throat", "pl": "Utrzymujący się ból gardła" }, "category": "Breathing / ENT" },
+            { "id": "HP:0002014", "label": { "en": "Change in bowel habit (looser)", "pl": "Zmiana rytmu wypróżnień (luźniejsze)" }, "category": "Gastrointestinal (GI)" },
+            { "id": "HP:0002019", "label": { "en": "Constipation", "pl": "Zaparcie" }, "category": "Gastrointestinal (GI)" },
+            { "id": "HP:0002027", "label": { "en": "Abdominal pain/bloating", "pl": "Ból brzucha/Wzdęcia" }, "category": "Gastrointestinal (GI)" },
+            { "id": "HP:0002015", "label": { "en": "Difficulty swallowing (dysphagia)", "pl": "Trudności w połykaniu (dysfagia)" }, "red_flag": true, "category": "Gastrointestinal (GI)" },
+            { "id": "onkn.symptom.indigestion_alarm", "label": { "en": "Indigestion with alarm features", "pl": "Niestrawność z objawami alarmowymi" }, "red_flag": true, "category": "Gastrointestinal (GI)" },
+            { "id": "HP:0001031", "label": { "en": "Changing mole", "pl": "Zmieniające się znamię" }, "red_flag": true, "category": "Skin / mouth" },
+            { "id": "onkn.symptom.skin_ulcer", "label": { "en": "Non-healing skin ulcer/lesion", "pl": "Niegojące się owrzodzenie/zmiana skórna" }, "category": "Skin / mouth" },
+            { "id": "HP:0000155", "label": { "en": "Persistent mouth ulcer", "pl": "Przewlekłe owrzodzenie jamy ustnej" }, "category": "Skin / mouth" },
+            { "id": "HP:0011107", "label": { "en": "Oral white patch (leukoplakia)", "pl": "Biała plama w jamie ustnej (leukoplakia)" }, "category": "Skin / mouth" },
+            { "id": "HP:0032408", "label": { "en": "New breast lump or change", "pl": "Nowy guzek w piersi lub zmiana" }, "red_flag": true, "category": "Breast or testicular changes" },
+            { "id": "HP:0032404", "label": { "en": "Testicular lump or change", "pl": "Guzek jądra lub zmiana" }, "category": "Breast or testicular changes" },
+            { "id": "HP:0000790", "label": { "en": "Visible blood in urine", "pl": "Krew w moczu (widoczna)" }, "red_flag": true, "category": "Urinary" },
+            { "id": "HP:0002907", "label": { "en": "Microscopic blood in urine", "pl": "Krew mikroskopowa w moczu" }, "category": "Urinary" },
+            { "id": "onkn.symptom.urinary_obstructive", "label": { "en": "Obstructive urinary symptoms", "pl": "Objawy przeszkodowe (mocz)" }, "category": "Urinary" },
+            { "id": "HP:0001250", "label": { "en": "Seizures (new onset)", "pl": "Napady drgawkowe (nowe)" }, "red_flag": true, "category": "Neurologic" },
+            { "id": "HP:0001324", "label": { "en": "Focal weakness/numbness", "pl": "Ogniskowe osłabienie/drętwienie" }, "red_flag": true, "category": "Neurologic" },
+            { "id": "onkn.symptom.neuro_other", "label": { "en": "Speech/vision/balance changes", "pl": "Zaburzenia mowy/widzenia/równowagi" }, "red_flag": true, "category": "Neurologic" },
             { "id": "HP:0000000", "label": { "en": "None", "pl": "Brak" } }
           ],
           "exclusiveOptionId": "HP:0000000"
@@ -410,8 +418,52 @@
               "title": { "en": "Symptom Details", "pl": "Szczegóły Objawów" },
               "dependsOn": { "questionId": "symptoms", "value": true },
               "options": {
-                "symptomList": [], 
-                "associatedFeatures": []
+                "symptomList": [
+            { "id": "HP:0001824", "label": { "en": "Unintentional weight loss", "pl": "Niewyjaśniona utrata wagi" }, "red_flag": true, "category": "Weight & appetite" },
+            { "id": "HP:0004396", "label": { "en": "Loss of appetite", "pl": "Utrata apetytu" }, "category": "Weight & appetite" },
+            { "id": "HP:0001945", "label": { "en": "Unexplained fever", "pl": "Niewyjaśniona gorączka" }, "category": "Systemic" },
+            { "id": "HP:0030166", "label": { "en": "Night sweats", "pl": "Nocne poty" }, "red_flag": true, "category": "Systemic" },
+            { "id": "HP:0012378", "label": { "en": "Severe fatigue", "pl": "Znaczne zmęczenie" }, "category": "Systemic" },
+            { "id": "HP:0000989", "label": { "en": "Generalized itching", "pl": "Uogólniony świąd" }, "category": "Systemic" },
+            { "id": "HP:0002653", "label": { "en": "Bone pain", "pl": "Ból kości" }, "red_flag": true, "category": "Pain" },
+            { "id": "HP:0003418", "label": { "en": "Back pain (nerve)", "pl": "Ból pleców (nerwowy)" }, "red_flag": true, "category": "Pain" },
+            { "id": "HP:0002315", "label": { "en": "New headache pattern", "pl": "Nowy wzorzec bólu głowy" }, "red_flag": true, "category": "Pain" },
+            { "id": "onkn.symptom.lump_any", "label": { "en": "New or enlarging lump (any site)", "pl": "Nowy lub rosnący guzek (dowolna lokalizacja)" }, "category": "Lumps / lymph nodes" },
+            { "id": "HP:0002716", "label": { "en": "Swollen lymph nodes", "pl": "Powiększone węzły chłonne" }, "category": "Lumps / lymph nodes" },
+            { "id": "HP:0002105", "label": { "en": "Coughing blood (hemoptysis)", "pl": "Krwioplucie" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0002573", "label": { "en": "Rectal bleeding (bright red)", "pl": "Krwawienie z odbytu (świeża krew)" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0002249", "label": { "en": "Black, tarry stools (melena)", "pl": "Czarne, smoliste stolce (melena)" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0033840", "label": { "en": "Postmenopausal vaginal bleeding", "pl": "Krwawienie po menopauzie" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0012735", "label": { "en": "Persistent cough (>3 weeks)", "pl": "Kaszel utrzymujący się (>3 tyg.)" }, "red_flag": true, "category": "Breathing / ENT" },
+            { "id": "HP:0002094", "label": { "en": "Shortness of breath", "pl": "Duszność" }, "category": "Breathing / ENT" },
+            { "id": "HP:0001609", "label": { "en": "Hoarseness/voice change (>3 weeks)", "pl": "Chrypka/zmiana głosu (>3 tyg.)" }, "red_flag": true, "category": "Breathing / ENT" },
+            { "id": "onkn.symptom.sore_throat", "label": { "en": "Persistent sore throat", "pl": "Utrzymujący się ból gardła" }, "category": "Breathing / ENT" },
+            { "id": "HP:0002014", "label": { "en": "Change in bowel habit (looser)", "pl": "Zmiana rytmu wypróżnień (luźniejsze)" }, "category": "Gastrointestinal (GI)" },
+            { "id": "HP:0002019", "label": { "en": "Constipation", "pl": "Zaparcie" }, "category": "Gastrointestinal (GI)" },
+            { "id": "HP:0002027", "label": { "en": "Abdominal pain/bloating", "pl": "Ból brzucha/Wzdęcia" }, "category": "Gastrointestinal (GI)" },
+            { "id": "HP:0002015", "label": { "en": "Difficulty swallowing (dysphagia)", "pl": "Trudności w połykaniu (dysfagia)" }, "red_flag": true, "category": "Gastrointestinal (GI)" },
+            { "id": "onkn.symptom.indigestion_alarm", "label": { "en": "Indigestion with alarm features", "pl": "Niestrawność z objawami alarmowymi" }, "red_flag": true, "category": "Gastrointestinal (GI)" },
+            { "id": "HP:0001031", "label": { "en": "Changing mole", "pl": "Zmieniające się znamię" }, "red_flag": true, "category": "Skin / mouth" },
+            { "id": "onkn.symptom.skin_ulcer", "label": { "en": "Non-healing skin ulcer/lesion", "pl": "Niegojące się owrzodzenie/zmiana skórna" }, "category": "Skin / mouth" },
+            { "id": "HP:0000155", "label": { "en": "Persistent mouth ulcer", "pl": "Przewlekłe owrzodzenie jamy ustnej" }, "category": "Skin / mouth" },
+            { "id": "HP:0011107", "label": { "en": "Oral white patch (leukoplakia)", "pl": "Biała plama w jamie ustnej (leukoplakia)" }, "category": "Skin / mouth" },
+            { "id": "HP:0032408", "label": { "en": "New breast lump or change", "pl": "Nowy guzek w piersi lub zmiana" }, "red_flag": true, "category": "Breast or testicular changes" },
+            { "id": "HP:0032404", "label": { "en": "Testicular lump or change", "pl": "Guzek jądra lub zmiana" }, "category": "Breast or testicular changes" },
+            { "id": "HP:0000790", "label": { "en": "Visible blood in urine", "pl": "Krew w moczu (widoczna)" }, "red_flag": true, "category": "Urinary" },
+            { "id": "HP:0002907", "label": { "en": "Microscopic blood in urine", "pl": "Krew mikroskopowa w moczu" }, "category": "Urinary" },
+            { "id": "onkn.symptom.urinary_obstructive", "label": { "en": "Obstructive urinary symptoms", "pl": "Objawy przeszkodowe (mocz)" }, "category": "Urinary" },
+            { "id": "HP:0001250", "label": { "en": "Seizures (new onset)", "pl": "Napady drgawkowe (nowe)" }, "red_flag": true, "category": "Neurologic" },
+            { "id": "HP:0001324", "label": { "en": "Focal weakness/numbness", "pl": "Ogniskowe osłabienie/drętwienie" }, "red_flag": true, "category": "Neurologic" },
+            { "id": "onkn.symptom.neuro_other", "label": { "en": "Speech/vision/balance changes", "pl": "Zaburzenia mowy/widzenia/równowagi" }, "red_flag": true, "category": "Neurologic" },
+            { "id": "HP:0000000", "label": { "en": "None", "pl": "Brak" } }
+          ], 
+                "associatedFeatures": [
+                  { "id": "fever", "label": { "en": "Fever", "pl": "Gorączka" } },
+                  { "id": "pain", "label": { "en": "Pain", "pl": "Ból" } },
+                  { "id": "rash", "label": { "en": "Rash", "pl": "Wysypka" } },
+                  { "id": "fatigue", "label": { "en": "Fatigue", "pl": "Zmęczenie" } },
+                  { "id": "weight_loss", "label": { "en": "Weight Loss", "pl": "Utrata wagi" } }
+                ]
               }
             },
             {
@@ -771,12 +823,34 @@
                 }
               ],
               "immunizations": [
-                { "id": "imm.hav.any", "text": {"en": "Hep A Vaccine?", "pl": "Szczepienie WZW A?"}, "type": "select", "options": ["Yes", "No", "Unsure"] },
-                { "id": "imm.flu.last_season", "text": {"en": "Flu shot last season?", "pl": "Grypa w ost. sezonie?"}, "type": "select", "options": ["Yes", "No"] },
-                { "id": "imm.covid.doses", "text": {"en": "COVID doses", "pl": "Dawki COVID"}, "type": "select", "options": ["0", "1", "2", "3", "4+"] },
+                { "id": "imm.hav.any", "text": {"en": "Hep A Vaccine?", "pl": "Szczepienie WZW A?"}, "type": "select", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ] },
+                { "id": "imm.flu.last_season", "text": {"en": "Flu shot last season?", "pl": "Grypa w ost. sezonie?"}, "type": "select", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ] },
+                { "id": "imm.covid.doses", "text": {"en": "COVID doses", "pl": "Dawki COVID"}, "type": "select", "options": [
+                  { "value": "0", "label": { "en": "0", "pl": "0" } },
+                  { "value": "1", "label": { "en": "1", "pl": "1" } },
+                  { "value": "2", "label": { "en": "2", "pl": "2" } },
+                  { "value": "3", "label": { "en": "3", "pl": "3" } },
+                  { "value": "4+", "label": { "en": "4+", "pl": "4+" } }
+                ] },
                 { "id": "imm.td_tdap.year_last", "text": {"en": "Last Tetanus year", "pl": "Ost. Tężec rok"}, "type": "year_input" },
-                { "id": "imm.pneumo.ever", "text": {"en": "Pneumococcal ever?", "pl": "Pneumokoki?"}, "type": "select", "options": ["Yes", "No"] },
-                { "id": "imm.zoster.ever", "text": {"en": "Shingles ever?", "pl": "Półpasiec?"}, "type": "select", "options": ["Yes", "No"] }
+                { "id": "imm.pneumo.ever", "text": {"en": "Pneumococcal ever?", "pl": "Pneumokoki?"}, "type": "select", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ] },
+                { "id": "imm.zoster.ever", "text": {"en": "Shingles ever?", "pl": "Półpasiec?"}, "type": "select", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ] }
               ]
             }
           ]

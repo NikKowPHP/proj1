@@ -10,7 +10,7 @@ import { del } from '@vercel/blob';
 
 // A flexible schema to accept the complex, potentially nested data from the new form.
 // Detailed validation is handled by the standardization and derived variable services.
-const answersSchema = z.record(z.any());
+const answersSchema = z.record(z.string(), z.any());
 
 const assessRequestSchema = z.object({
   answers: answersSchema,
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     }
     
     const { answers, locale } = parsedRequest.data;
-    reportUrlToDelete = answers.genetic_report_upload;
+    reportUrlToDelete = answers.genetic_report_upload as string | undefined;
     logger.info("[API:assess] Raw answers successfully parsed.");
 
     // 1. Standardize the raw answers into a structured payload

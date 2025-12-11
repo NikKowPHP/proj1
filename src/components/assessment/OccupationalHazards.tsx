@@ -15,7 +15,7 @@ export interface HazardExposure {
   main_job_title?: string;
   years_total?: number;
   hours_per_week?: number;
-  current_exposure?: string; 
+  current_exposure?: string;
   ppe_use?: string[];
   year_first_exposed?: number;
 }
@@ -31,6 +31,7 @@ interface OccupationalHazardsProps {
     exposures: SearchableSelectOption[];
     ppe: SearchableSelectOption[];
   };
+  errors?: Record<string, string | undefined>;
 }
 
 const HazardDetailItem = ({
@@ -65,91 +66,91 @@ const HazardDetailItem = ({
         <div className="space-y-2">
           <Label>Job Title</Label>
           <SearchableSelect
-             value={item.main_job_title}
-             onChange={(val) => handleFieldChange("main_job_title", val)}
-             options={options.jobTitles}
-             placeholder="Select job title..."
+            value={item.main_job_title}
+            onChange={(val) => handleFieldChange("main_job_title", val)}
+            options={options.jobTitles}
+            placeholder="Select job title..."
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-             <Label>Years Exposed</Label>
-             <Input 
-                type="number" 
-                value={item.years_total ?? ""} 
-                onChange={(e) => handleFieldChange("years_total", e.target.value ? Number(e.target.value) : undefined)} 
-                placeholder="e.g. 10"
-             />
+            <Label>Years Exposed</Label>
+            <Input
+              type="number"
+              value={item.years_total ?? ""}
+              onChange={(e) => handleFieldChange("years_total", e.target.value ? Number(e.target.value) : undefined)}
+              placeholder="e.g. 10"
+            />
           </div>
           <div className="space-y-2">
-             <Label>Year First Exposed</Label>
-             <Input 
-                type="number"
-                value={item.year_first_exposed ?? ""}
-                onChange={(e) => handleFieldChange("year_first_exposed", e.target.value ? Number(e.target.value) : undefined)}
-                placeholder="e.g. 1990"
-             />
+            <Label>Year First Exposed</Label>
+            <Input
+              type="number"
+              value={item.year_first_exposed ?? ""}
+              onChange={(e) => handleFieldChange("year_first_exposed", e.target.value ? Number(e.target.value) : undefined)}
+              placeholder="e.g. 1990"
+            />
           </div>
         </div>
         <div className="space-y-2">
-            <Label>Protective Equipment (PPE)</Label>
-             <div className="flex flex-wrap gap-2">
-                {options.ppe.map(ppe => (
-                    <Chip key={ppe.value} variant="selectable" selected={(item.ppe_use || []).includes(ppe.value)} onClick={() => togglePPE(ppe.value)}>
-                        {ppe.label}
-                    </Chip>
-                ))}
-             </div>
+          <Label>Protective Equipment (PPE)</Label>
+          <div className="flex flex-wrap gap-2">
+            {options.ppe.map(ppe => (
+              <Chip key={ppe.value} variant="selectable" selected={(item.ppe_use || []).includes(ppe.value)} onClick={() => togglePPE(ppe.value)}>
+                {ppe.label}
+              </Chip>
+            ))}
+          </div>
         </div>
       </CardContent>
     </Card>
   );
 };
 
-export const OccupationalHazards = ({ value, onChange, questions, answers, onAnswer, options }: OccupationalHazardsProps) => {
+export const OccupationalHazards = ({ value, onChange, questions, answers, onAnswer, options, errors }: OccupationalHazardsProps) => {
   // Sync selected hazards from the new ID
   const selectedHazards: string[] = answers['occ.hazards.subs'] ? JSON.parse(answers['occ.hazards.subs']) : [];
 
   useEffect(() => {
-     const currentHazardsInValue = value.map(v => v.hazardId);
-     const missingHazards = selectedHazards.filter(h => !currentHazardsInValue.includes(h) && h !== 'none');
-     const extraHazards = currentHazardsInValue.filter(h => !selectedHazards.includes(h));
+    const currentHazardsInValue = value.map(v => v.hazardId);
+    const missingHazards = selectedHazards.filter(h => !currentHazardsInValue.includes(h) && h !== 'none');
+    const extraHazards = currentHazardsInValue.filter(h => !selectedHazards.includes(h));
 
-     if (missingHazards.length === 0 && extraHazards.length === 0) return;
+    if (missingHazards.length === 0 && extraHazards.length === 0) return;
 
-     let newValue = [...value];
-     if (extraHazards.length > 0) {
-        newValue = newValue.filter(v => selectedHazards.includes(v.hazardId));
-     }
-     missingHazards.forEach(h => {
-        newValue.push({
-            hazardId: h,
-            hazardLabel: options.exposures.find(e => e.value === h)?.label
-        });
-     });
-     onChange(newValue);
+    let newValue = [...value];
+    if (extraHazards.length > 0) {
+      newValue = newValue.filter(v => selectedHazards.includes(v.hazardId));
+    }
+    missingHazards.forEach(h => {
+      newValue.push({
+        hazardId: h,
+        hazardLabel: options.exposures.find(e => e.value === h)?.label
+      });
+    });
+    onChange(newValue);
   }, [selectedHazards, value, onChange, options.exposures]);
 
   const handleItemChange = (newItem: HazardExposure) => {
-      const newValue = value.map(v => v.hazardId === newItem.hazardId ? newItem : v);
-      onChange(newValue);
+    const newValue = value.map(v => v.hazardId === newItem.hazardId ? newItem : v);
+    onChange(newValue);
   };
 
   return (
     <div className="space-y-6">
       {/* Detail Rows */}
       {selectedHazards.length > 0 && !selectedHazards.includes('none') && (
-          <div className="space-y-4">
-              {value.map(item => (
-                  <HazardDetailItem 
-                    key={item.hazardId} 
-                    hazardId={item.hazardId} 
-                    item={item} 
-                    onChange={handleItemChange} 
-                    options={options} 
-                  />
-              ))}
-          </div>
+        <div className="space-y-4">
+          {value.map(item => (
+            <HazardDetailItem
+              key={item.hazardId}
+              hazardId={item.hazardId}
+              item={item}
+              onChange={handleItemChange}
+              options={options}
+            />
+          ))}
+        </div>
       )}
     </div>
   );

@@ -25,9 +25,10 @@ interface LabsAndImagingProps {
     resultSummaries: SearchableSelectOption[];
     commonUnits: string[];
   };
+  errors?: Record<string, string | undefined>;
 }
 
-export const LabsAndImaging = ({ value, onChange, options }: LabsAndImagingProps) => {
+export const LabsAndImaging = ({ value, onChange, options, errors: externalErrors }: LabsAndImagingProps) => {
 
   const handleAdd = () => {
     onChange([...value, {}]);
@@ -41,7 +42,7 @@ export const LabsAndImaging = ({ value, onChange, options }: LabsAndImagingProps
     const newValues = [...value];
     const oldCategory = newValues[index].study_category;
     newValues[index] = { ...newValues[index], [field]: fieldValue };
-    
+
     // If category changes, reset dependent fields
     if (field === 'study_category' && fieldValue !== oldCategory) {
       delete newValues[index].study_type;
@@ -65,10 +66,10 @@ export const LabsAndImaging = ({ value, onChange, options }: LabsAndImagingProps
           <div className="space-y-2">
             <Label>Study Category</Label>
             <Select value={item.study_category} onValueChange={(val) => handleFieldChange(index, "study_category", val)}>
-                <SelectTrigger><SelectValue placeholder="Select category..." /></SelectTrigger>
-                <SelectContent>
-                    {options.studyCategories.map(cat => <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>)}
-                </SelectContent>
+              <SelectTrigger><SelectValue placeholder="Select category..." /></SelectTrigger>
+              <SelectContent>
+                {options.studyCategories.map(cat => <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>)}
+              </SelectContent>
             </Select>
           </div>
 
@@ -76,41 +77,41 @@ export const LabsAndImaging = ({ value, onChange, options }: LabsAndImagingProps
             <>
               <div className="space-y-2">
                 <Label>Lab Test Type</Label>
-                <SearchableSelect options={options.labTypes} value={item.study_type} onChange={(val) => handleFieldChange(index, "study_type", val)} placeholder="Search lab test..."/>
+                <SearchableSelect options={options.labTypes} value={item.study_type} onChange={(val) => handleFieldChange(index, "study_type", val)} placeholder="Search lab test..." />
               </div>
-               <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-2">
-                    <Label>Result Value</Label>
-                    <Input value={item.result_value || ""} onChange={(e) => handleFieldChange(index, "result_value", e.target.value)} placeholder="e.g., 12.5"/>
+                  <Label>Result Value</Label>
+                  <Input value={item.result_value || ""} onChange={(e) => handleFieldChange(index, "result_value", e.target.value)} placeholder="e.g., 12.5" />
                 </div>
                 <div className="space-y-2">
-                    <Label>Units</Label>
-                    <Select value={item.result_unit} onValueChange={(val) => handleFieldChange(index, "result_unit", val)}>
-                        <SelectTrigger><SelectValue placeholder="Unit" /></SelectTrigger>
-                        <SelectContent>
-                            {options.commonUnits.map(unit => <SelectItem key={unit} value={unit}>{unit}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
+                  <Label>Units</Label>
+                  <Select value={item.result_unit} onValueChange={(val) => handleFieldChange(index, "result_unit", val)}>
+                    <SelectTrigger><SelectValue placeholder="Unit" /></SelectTrigger>
+                    <SelectContent>
+                      {options.commonUnits.map(unit => <SelectItem key={unit} value={unit}>{unit}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
-               </div>
+              </div>
             </>
           )}
 
           {item.study_category === 'imaging' && (
-             <>
-                <div className="space-y-2">
-                    <Label>Imaging Study Type</Label>
-                    <SearchableSelect options={options.imagingTypes} value={item.study_type} onChange={(val) => handleFieldChange(index, "study_type", val)} placeholder="Search imaging study..."/>
-                </div>
-                 <div className="space-y-2">
-                    <Label>Result Summary</Label>
-                    <Select value={item.study_result} onValueChange={(val) => handleFieldChange(index, "study_result", val)}>
-                        <SelectTrigger><SelectValue placeholder="Select result status" /></SelectTrigger>
-                        <SelectContent>
-                            {options.resultSummaries.map(res => <SelectItem key={res.value} value={res.value}>{res.label}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
-                </div>
+            <>
+              <div className="space-y-2">
+                <Label>Imaging Study Type</Label>
+                <SearchableSelect options={options.imagingTypes} value={item.study_type} onChange={(val) => handleFieldChange(index, "study_type", val)} placeholder="Search imaging study..." />
+              </div>
+              <div className="space-y-2">
+                <Label>Result Summary</Label>
+                <Select value={item.study_result} onValueChange={(val) => handleFieldChange(index, "study_result", val)}>
+                  <SelectTrigger><SelectValue placeholder="Select result status" /></SelectTrigger>
+                  <SelectContent>
+                    {options.resultSummaries.map(res => <SelectItem key={res.value} value={res.value}>{res.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
             </>
           )}
 

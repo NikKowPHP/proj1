@@ -45,7 +45,7 @@ describe("CompositeAIService", () => {
     service = new CompositeAIService();
   });
 
-  describe("getRiskAssessmentExplanation", () => {
+  describe("getPlanExplanation", () => {
     it("should use the fallback executor", async () => {
       mockedExecutor.executeWithFallbacks.mockResolvedValue({
         result: {
@@ -54,7 +54,7 @@ describe("CompositeAIService", () => {
         serviceUsed: "mock",
       } as any);
 
-      await service.getRiskAssessmentExplanation({} as any);
+      await service.getPlanExplanation({} as any);
 
       expect(mockedExecutor.executeWithFallbacks).toHaveBeenCalledTimes(1);
     });

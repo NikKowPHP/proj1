@@ -70,12 +70,12 @@ export const CheckboxGroup = ({
   const getUniqueId = (optionId: string) => idPrefix ? `${idPrefix}-${optionId}` : optionId;
 
   if (!hasCategories) {
-      return (
-        <div className={cn("flex flex-wrap gap-2", className)}>
-          {options.map((option) => {
-            const isSelected = value.includes(option.id);
-            const uniqueId = getUniqueId(option.id);
-            return (
+    return (
+      <div className={cn("flex flex-wrap gap-2", className)}>
+        {options.map((option) => {
+          const isSelected = value.includes(option.id);
+          const uniqueId = getUniqueId(option.id);
+          return (
             <div key={option.id}>
               <Checkbox
                 id={uniqueId}
@@ -83,56 +83,57 @@ export const CheckboxGroup = ({
                 onCheckedChange={(checked) => handleCheckedChange(!!checked, option.id)}
                 className="sr-only"
               />
-              <Label 
-                htmlFor={uniqueId} 
+              <Label
+                htmlFor={uniqueId}
                 className={cn(
-                    "flex items-center justify-center px-4 py-2 rounded-full border cursor-pointer transition-colors text-sm font-medium",
-                    isSelected 
-                        ? "bg-primary text-primary-foreground border-primary" 
-                        : "bg-background hover:bg-accent hover:text-accent-foreground border-input"
+                  "flex items-center justify-center px-4 py-2 rounded-full border cursor-pointer transition-colors text-sm font-medium",
+                  isSelected
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background hover:bg-accent hover:text-accent-foreground border-input"
                 )}
               >
                 {option.label}
               </Label>
             </div>
-          )})}
-        </div>
-      );
+          )
+        })}
+      </div>
+    );
   }
 
   return (
     <div className={cn("space-y-4", className)}>
       {categories.map(category => (
-          <div key={category} className="space-y-2">
-              <h4 className="font-semibold text-sm text-gray-700">{category}</h4>
-              <div className="flex flex-wrap gap-2">
-                {groupedOptions[category].map((option) => {
-                    const isSelected = value.includes(option.id);
-                    const uniqueId = getUniqueId(option.id);
-                    return (
-                        <div key={option.id}>
-                            <Checkbox
-                                id={uniqueId}
-                                checked={isSelected}
-                                onCheckedChange={(checked) => handleCheckedChange(!!checked, option.id)}
-                                className="sr-only" // Hide default checkbox
-                            />
-                            <Label 
-                                htmlFor={uniqueId} 
-                                className={cn(
-                                    "flex items-center justify-center px-4 py-2 rounded-full border cursor-pointer transition-colors text-sm font-medium",
-                                    isSelected 
-                                        ? "bg-primary text-primary-foreground border-primary" 
-                                        : "bg-background hover:bg-accent hover:text-accent-foreground border-input"
-                                )}
-                            >
-                                {option.label}
-                            </Label>
-                        </div>
-                    );
-                })}
-              </div>
+        <div key={category} className="space-y-2">
+          <h4 className="font-semibold text-sm text-foreground">{category}</h4>
+          <div className="flex flex-wrap gap-2">
+            {groupedOptions[category].map((option) => {
+              const isSelected = value.includes(option.id);
+              const uniqueId = getUniqueId(option.id);
+              return (
+                <div key={option.id}>
+                  <Checkbox
+                    id={uniqueId}
+                    checked={isSelected}
+                    onCheckedChange={(checked) => handleCheckedChange(!!checked, option.id)}
+                    className="sr-only" // Hide default checkbox
+                  />
+                  <Label
+                    htmlFor={uniqueId}
+                    className={cn(
+                      "flex items-center justify-center px-4 py-2 rounded-full border cursor-pointer transition-colors text-sm font-medium",
+                      isSelected
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background hover:bg-accent hover:text-accent-foreground border-input"
+                    )}
+                  >
+                    {option.label}
+                  </Label>
+                </div>
+              );
+            })}
           </div>
+        </div>
       ))}
     </div>
   );

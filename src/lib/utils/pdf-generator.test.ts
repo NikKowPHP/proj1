@@ -21,7 +21,7 @@ jest.mock('jspdf', () => {
   return jest.fn().mockImplementation(() => implementation);
 });
 
-const MockedJsPDF = jsPDF as jest.Mock;
+const MockedJsPDF = jsPDF as unknown as jest.Mock;
 const mockAutoTable = new MockedJsPDF().autoTable;
 
 describe('generateAssessmentPdf (ActionPlan)', () => {

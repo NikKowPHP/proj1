@@ -100,6 +100,7 @@ export const EnvironmentalExposures = ({ answers, onAnswer, questions }: Environ
               value={answers[q.id] ? JSON.parse(answers[q.id]) : []}
               onChange={(selected) => onAnswer(q.id, JSON.stringify(selected))}
               exclusiveOption={q.exclusiveOptionId}
+              idPrefix={q.id}
             />
           )}
            {q.type === 'grouped_input' && (

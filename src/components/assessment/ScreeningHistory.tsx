@@ -107,6 +107,7 @@ export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizat
                                 options={q.options}
                                 value={answers[q.id] || []}
                                 onChange={(val) => onAnswer(q.id, val)}
+                                idPrefix={q.id}
                              />
                         )}
                     </div>

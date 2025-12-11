@@ -59,6 +59,10 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
 export default async function RootLayout({
   children,
   params,
@@ -68,8 +72,12 @@ export default async function RootLayout({
 }>) {
   const { locale } = await params;
 
+  console.log('DEBUG: RootLayout locale:', locale);
+  console.log('DEBUG: routing.locales:', routing.locales);
+  
   // Validate that the incoming `locale` parameter is valid
   if (!routing.locales.includes(locale as any)) {
+    console.log('DEBUG: Locale invalid, triggering notFound()');
     notFound();
   }
 

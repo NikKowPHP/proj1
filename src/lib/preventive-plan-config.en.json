@@ -4,7 +4,7 @@
       "actionId": "COLORECTAL_CANCER_SCREENING",
       "category": "screenings",
       "conditions": [
-        { "questionId": "age", "operator": "in", "value": ["40-49", "50-59", "60+"] }
+        { "questionId": "age", "operator": "in", "value": ["45-49", "50-59", "60+"] }
       ]
     },
     {
@@ -12,7 +12,7 @@
       "category": "screenings",
       "conditions": [
         { "questionId": "age", "operator": "in", "value": ["50-59", "60+"] },
-        { "questionId": "smoking_status", "operator": "equals", "value": "Current smoker" }
+        { "questionId": "smoking_status", "operator": "equals", "value": "Current" }
       ]
     },
     {
@@ -27,7 +27,7 @@
       "actionId": "DISCUSS_SMOKING_CESSATION",
       "category": "topicsForDoctor",
       "conditions": [
-        { "questionId": "smoking_status", "operator": "equals", "value": "Current smoker" }
+        { "questionId": "smoking_status", "operator": "equals", "value": "Current" }
       ]
     },
     {

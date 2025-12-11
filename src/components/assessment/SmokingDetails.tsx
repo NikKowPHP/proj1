@@ -147,6 +147,7 @@ export const SmokingDetails = ({ answers, onAnswer, questions }: SmokingDetailsP
                 value={value ? JSON.parse(value) : []}
                 onChange={(val) => onAnswer(q.id, JSON.stringify(val))}
                 exclusiveOption={q.exclusiveOptionId}
+                idPrefix={q.id}
              />
           ) : (
             <>

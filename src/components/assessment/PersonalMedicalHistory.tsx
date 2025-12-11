@@ -44,6 +44,7 @@ export const PersonalMedicalHistory = ({ answers, onAnswer, options }: PersonalM
           options={options.illnesses.map(option => ({ id: option.value, label: option.label }))}
           value={selectedIllnesses}
           onChange={handleIllnessSelect}
+          idPrefix="illness_list"
         />
       </div>
 

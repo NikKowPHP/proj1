@@ -204,6 +204,7 @@ export const PersonalCancerHistory = ({ value, onChange, options }: PersonalCanc
               options={options.treatmentTypes}
               value={item.treatments || []}
               onChange={(val) => handleFieldChange(index, 'treatments', val)}
+              idPrefix={`treatment_${index}`}
             />
           </div>
 

@@ -1,84 +1,63 @@
 {
   "steps": [
     {
-      "title": { "en": "Core Questions", "pl": "Podstawowe Pytania" },
+      "id": "basic_info",
+      "title": { "en": "Basic Information", "pl": "Informacje Podstawowe" },
       "questions": [
         {
           "id": "consent.health",
-          "type": "consent_checkbox"
-        },
-        {
-          "id": "intent",
-          "text": { "en": "What’s your goal today?", "pl": "Jaki jest cel dzisiejszego wypełnienia?" },
-          "type": "select",
-          "options": [
-            { "value": "Prevention", "label": { "en": "Prevention", "pl": "Profilaktyka" } },
-            { "value": "I have symptoms", "label": { "en": "I have symptoms", "pl": "Mam objawy" } },
-            { "value": "Follow-up", "label": { "en": "Follow-up", "pl": "Wizyta kontrolna" } }
-          ]
-        },
-        {
-          "id": "source",
-          "text": { "en": "Who is filling this form?", "pl": "Kto wypełnia formularz?" },
-          "type": "select",
-          "options": [
-            { "value": "Self", "label": { "en": "Self", "pl": "Osobiście" } },
-            { "value": "Caregiver", "label": { "en": "Caregiver", "pl": "Opiekun" } },
-            { "value": "Imported", "label": { "en": "Imported", "pl": "Zaimportowane" } }
-          ]
-        },
-        {
-          "id": "language",
-          "text": { "en": "Preferred language", "pl": "Preferowany język" },
-          "type": "select",
-          "options": [
-            { "value": "English", "label": { "en": "English", "pl": "Angielski" } },
-            { "value": "Polski", "label": { "en": "Polski", "pl": "Polski" } }
-          ]
+          "type": "consent_checkbox",
+          "text": { 
+            "en": "I consent to processing of my health data for recommendations.", 
+            "pl": "Wyrażam zgodę na przetwarzanie danych zdrowotnych w celu przygotowania zaleceń." 
+          },
+          "validation": { "required": true }
         },
         {
           "id": "dob",
-          "text": { "en": "Date of birth (Year only)", "pl": "Rok urodzenia (RRRR)" },
           "type": "year_input",
-          "validation": { "min": 1900, "maxCurrentYear": true, "softMin": 1920, "message": { "en": "This tool is currently for adults.", "pl": "Ta wersja narzędzia jest przeznaczona dla osób dorosłych." } }
+          "text": { "en": "Date of birth", "pl": "Data urodzenia" },
+          "placeholder": "YYYY",
+          "validation": { "min": 1900, "maxCurrentYear": true, "message": { "en": "This tool is for adults.", "pl": "Narzędzie dla osób dorosłych." } }
         },
         {
           "id": "sex_at_birth",
-          "text": { "en": "Sex at birth", "pl": "Płeć przy urodzeniu" },
-          "helperText": { "en": "We need this information to recommend appropriate screenings (e.g. breast, ovarian, prostate). If you prefer not to say, select 'Prefer not to say'.", "pl": "Potrzebujemy tej informacji, aby dobrać właściwe badania (np. piersi, jajników, prostaty). Jeśli wolisz nie podawać, wybierz 'Wolę nie podawać'." },
           "type": "radio",
+          "text": { "en": "Sex at birth", "pl": "Płeć przy urodzeniu" },
+          "helperText": { "en": "We need this information to recommend appropriate screenings.", "pl": "Potrzebujemy tej informacji, aby dobrać właściwe badania." },
           "options": [
             { "value": "Female", "label": { "en": "Female", "pl": "Kobieta" } },
             { "value": "Male", "label": { "en": "Male", "pl": "Mężczyzna" } },
-            { "value": "Intersex", "label": { "en": "Intersex", "pl": "Interseksualna" } },
-            { "value": "Prefer not to say", "label": { "en": "Prefer not to say", "pl": "Wolę nie odpowiadać" } }
-          ]
-        },
-        {
-          "id": "gender_identity",
-          "text": { "en": "Gender identity (optional)", "pl": "Tożsamość płciowa (opcjonalnie)" },
-          "type": "select",
-          "options": [
-            { "value": "Female", "label": { "en": "Female", "pl": "Kobieta" } },
-            { "value": "Male", "label": { "en": "Male", "pl": "Mężczyzna" } },
-            { "value": "Non-binary", "label": { "en": "Non-binary", "pl": "Niebinarna" } },
-            { "value": "Other", "label": { "en": "Other", "pl": "Inna" } }
+            { "value": "Intersex", "label": { "en": "Intersex", "pl": "Interpłciowość" } },
+            { "value": "Prefer not to say", "label": { "en": "Prefer not to say", "pl": "Wolę nie podawać" } }
           ]
         },
         {
           "id": "height_cm",
+          "type": "number_input",
           "text": { "en": "Height (cm)", "pl": "Wzrost (cm)" },
-          "type": "number_input"
+          "min": 50,
+          "max": 250,
+          "placeholder": "e.g. 175"
         },
         {
           "id": "weight_kg",
+          "type": "number_input",
           "text": { "en": "Weight (kg)", "pl": "Waga (kg)" },
-          "type": "number_input"
-        },
+          "min": 30,
+          "max": 300,
+          "placeholder": "e.g. 70"
+        }
+      ]
+    },
+    {
+      "id": "lifestyle",
+      "title": { "en": "Lifestyle Habits", "pl": "Styl Życia" },
+      "questions": [
         {
           "id": "smoking_status",
-          "text": { "en": "Smoking status", "pl": "Status palenia" },
           "type": "radio",
+          "text": { "en": "Smoking status", "pl": "Status palenia" },
           "options": [
             { "value": "Never", "label": { "en": "Never", "pl": "Nigdy" } },
             { "value": "Former", "label": { "en": "Former", "pl": "W przeszłości" } },
@@ -86,53 +65,82 @@
           ]
         },
         {
+          "id": "advanced_modules_smoking",
+          "type": "advanced_modules",
+          "modules": [
+            {
+              "id": "smoking_details",
+              "title": { "en": "Smoking Details", "pl": "Szczegóły Palenia" },
+              "dependsOn": { "questionId": "smoking_status", "value": ["Current", "Former"] },
+              "questions": [
+                { "id": "smoking.pattern", "text": {"en": "On days you smoke, do you smoke every day or some days?", "pl": "W dni, w które palisz, czy palisz codziennie czy tylko w niektóre dni?"}, "type": "radio", "options": ["Every day", "Some days"], "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
+                { "id": "smoking.intensity", "text": { "en": "On average, how many cigarettes do you smoke per day?", "pl": "Średnio, ile papierosów palisz dziennie?"}, "type": "number_input", "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
+                { "id": "smoking.years_smoked", "text": { "en": "Total years you have smoked", "pl": "Łączna liczba lat palenia"}, "type": "number_input", "min": 0.5, "max": 80 },
+                { "id": "smoking.start_age", "text": { "en": "At what age did you start smoking regularly?", "pl": "W jakim wieku zacząłeś/zaczęłaś palić regularnie?"}, "type": "number_input", "min": 5, "max": 99 },
+                { "id": "smoking.quit_date", "text": { "en": "When did you completely quit? (Year)", "pl": "Kiedy całkowicie rzuciłeś/rzuciłaś palenie? (Rok)"}, "type": "year_input", "dependsOn": {"questionId": "smoking_status", "value": "Former"}},
+                
+                { "id": "smoking.other_tobacco_smoked", "text": {"en": "Do you also use other smoked tobacco products?", "pl": "Czy używasz też innych wyrobów tytoniowych do palenia?"}, "type": "checkbox_group", "options": [{"id": "Cigar", "label": "Cigar"}, {"id": "Cigarillos", "label": "Cigarillos"}, {"id": "Pipe", "label": "Pipe"}, {"id": "Roll-your-own", "label": "Roll-your-own"}, {"id": "Waterpipe", "label": "Waterpipe"}, {"id": "None", "label": "None"}], "exclusiveOptionId": "None", "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
+                
+                { "id": "smoking.other_cigar_per_week", "text": {"en": "Cigars per week", "pl": "Cygara na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "operator": "array_contains", "value": "Cigar"} },
+                { "id": "smoking.other_cigarillos_per_week", "text": {"en": "Cigarillos per week", "pl": "Cygaretki na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "operator": "array_contains", "value": "Cigarillos"} },
+                { "id": "smoking.other_pipe_bowls_per_week", "text": {"en": "Pipe bowls per week", "pl": "Nabitek fajki na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "operator": "array_contains", "value": "Pipe"} },
+                { "id": "smoking.other_hookah_sessions_per_week", "text": {"en": "Waterpipe sessions per week", "pl": "Sesje fajki wodnej na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "operator": "array_contains", "value": "Waterpipe"} },
+                { "id": "smoking.other_other_per_week", "text": {"en": "Other products per week", "pl": "Inne produkty na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "operator": "array_contains", "value": "Other"} },
+
+                { "id": "vape.status", "text": {"en": "Do you use e-cigarettes (vapes)?", "pl": "Czy używasz e-papierosów (vape)?"}, "type": "radio", "options": ["Lifetime never", "Former", "Current"] },
+                { "id": "vape.days_30d", "text": {"en": "In the past 30 days, on how many days did you use an e-cigarette?", "pl": "W ostatnich 30 dniach, w ile dni używałeś/aś e-papierosa?"}, "type": "number_input", "min": 0, "max": 30, "dependsOn": {"questionId": "vape.status", "value": "Current"} },
+                { "id": "vape.device_type", "text": {"en": "Which device type do you usually use?", "pl": "Jakiego typu urządzenia zwykle używasz?"}, "type": "select", "options": ["Disposable", "Prefilled pod or cartridge", "Refillable tank or mod", "Other"], "dependsOn": {"questionId": "vape.status", "value": "Current"} },
+                { "id": "vape.nicotine", "text": {"en": "Does your usual e-liquid contain nicotine?", "pl": "Czy zwykle używany płyn zawiera nikotynę?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "vape.status", "value": "Current"} },
+
+                { "id": "htp.status", "text": {"en": "Do you use heated-tobacco products (e.g., IQOS®)?", "pl": "Czy używasz wyrobów tytoniu podgrzewanego (np. IQOS®)?"}, "type": "radio", "options": ["Lifetime never", "Former", "Current"] },
+                { "id": "htp.days_30d", "text": {"en": "Days used in last 30 days", "pl": "Dni używania w ciągu ostatnich 30 dni"}, "type": "number_input", "min": 0, "max": 30, "dependsOn": {"questionId": "htp.status", "value": "Current"} },
+                { "id": "htp.sticks_per_day", "text": {"en": "Average tobacco sticks per day", "pl": "Średnia liczba wkładów dziennie"}, "type": "number_input", "dependsOn": {"questionId": "htp.status", "value": "Current"} },
+
+                { "id": "shs.home_freq", "text": {"en": "How often does anyone smoke inside your home?", "pl": "Jak często ktoś pali wewnątrz Twojego domu?"}, "type": "select", "options": ["Never", "Daily", "Weekly", "Monthly", "Less than monthly"] },
+                { "id": "shs.work_freq", "text": {"en": "How often does smoking occur indoors at work?", "pl": "Jak często pali się w pomieszczeniach w pracy?"}, "type": "select", "options": ["Never", "Daily", "Weekly", "Monthly", "Less than monthly"] },
+                { "id": "shs.public_30d_bars", "text": {"en": "In the past 30 days, were you in a café/bar where people smoked indoors?", "pl": "W ostatnich 30 dniach, czy byłeś/byłaś w kawiarni/barze, gdzie palono w środku?"}, "type": "radio", "options": ["Yes", "No"] },
+                { "id": "shs.hours_7d", "text": {"en": "Total hours exposed to smoke in last 7 days", "pl": "Całkowita liczba godzin narażenia na dym w ciągu ostatnich 7 dni"}, "type": "number_input", "min": 0, "max": 168 },
+                { "id": "shs.life_course", "text": {"en": "Where have you been exposed to smoke?", "pl": "Gdzie byłeś/byłaś narażony/a na dym?"}, "type": "checkbox_group", "options": [{"id": "Childhood home", "label": "Childhood home"}, {"id": "Adult home", "label": "Adult home"}, {"id": "Work", "label": "Work"}, {"id": "Social", "label": "Social venues"}] }
+              ]
+            }
+          ]
+        },
+        {
           "id": "alcohol.status",
-          "text": { "en": "Alcohol Use Status", "pl": "Status spożycia alkoholu" },
           "type": "radio",
+          "text": { "en": "Which statement best describes your alcohol use?", "pl": "Które stwierdzenie najlepiej opisuje Twoje spożycie alkoholu?" },
           "options": [
             { "value": "Lifetime abstainer", "label": { "en": "Lifetime abstainer", "pl": "Abstynent całe życie" } },
             { "value": "Former", "label": { "en": "Former drinker", "pl": "Były pijący" } },
             { "value": "Current", "label": { "en": "Current drinker", "pl": "Obecnie pijący" } }
           ],
           "infoCard": {
-             "id": "alcohol.std_unit_info",
-             "text": { "en": "Standard Drink: 10g pure alcohol (approx 250ml beer, 100ml wine, 30ml spirits)", "pl": "Standardowa porcja: 10g czystego alkoholu (ok. 250ml piwa, 100ml wina, 30ml wódki)" }
+            "id": "alcohol.std_unit_info",
+            "text": { "en": "Standard Drink = 10g pure ethanol", "pl": "Standardowa porcja = 10g czystego alkoholu" }
           }
         },
         {
             "id": "alcohol.former_since",
-            "text": { "en": "Year you stopped drinking", "pl": "Rok zaprzestania picia" },
+            "text": { "en": "If former: when did you last drink alcohol (year)?", "pl": "Jeśli „Wcześniej”: kiedy ostatnio piłeś/aś alkohol (rok)?" },
             "type": "year_input",
             "dependsOn": { "questionId": "alcohol.status", "value": "Former" }
         },
         {
-          "id": "alcohol.beverage_mix",
-          "text": { "en": "Typical beverage types (e.g. Beer 50%, Wine 30%, Spirits 20%)", "pl": "Typowe rodzaje napojów (np. Piwo 50%, Wino 30%, Wódka 20%)" },
-          "type": "text_input",
-          "dependsOn": { "questionId": "alcohol.status", "value": ["Current", "Former"] }
-        },
-          {
             "id": "auditc.q1_freq",
-            "dependsOn": { "questionId": "alcohol.status", "value": ["Current", "Former"] },
+            "dependsOn": { "questionId": "alcohol.status", "value": "Current" },
             "text": { "en": "How often do you have a drink containing alcohol?", "pl": "Jak często pijesz napoje zawierające alkohol?" },
             "type": "select",
             "options": [
-              { "value": "0", "label": { "en": "Never", "pl": "Nigdy" } },
-              { "value": "1", "label": { "en": "Monthly or less", "pl": "Raz w miesiącu lub rzadziej" } },
-              { "value": "2", "label": { "en": "2-4 times a month", "pl": "2-4 razy w miesiącu" } },
-              { "value": "3", "label": { "en": "2-3 times a week", "pl": "2-3 razy w tygodniu" } },
-              { "value": "4", "label": { "en": "4+ times a week", "pl": "4 razy w tygodniu lub częściej" } }
+              { "value": "0", "label": { "en": "Monthly or less", "pl": "Raz w miesiącu lub rzadziej" } },
+              { "value": "1", "label": { "en": "2-4 times a month", "pl": "2-4 razy w miesiącu" } },
+              { "value": "2", "label": { "en": "2-3 times a week", "pl": "2-3 razy w tygodniu" } },
+              { "value": "3", "label": { "en": "4+ times a week", "pl": "4 razy w tygodniu lub częściej" } }
             ]
-          },
-          {
+        },
+        {
             "id": "auditc.q2_typical",
-            "dependsOn": { 
-                "and": [
-                    { "questionId": "alcohol.status", "value": ["Current", "Former"] },
-                    { "questionId": "auditc.q1_freq", "operator": "!=", "value": "0" }
-                ]
-            },
-            "text": { "en": "How many standard drinks do you have on a typical day when you are drinking?", "pl": "Ile standardowych porcji alkoholu wypijasz w typowym dniu, w którym pijesz?" },
+            "dependsOn": { "questionId": "alcohol.status", "value": "Current" },
+            "text": { "en": "On a typical drinking day, how many standard drinks do you have?", "pl": "W typowy dzień picia, ile masz porcji standardowych?" },
             "type": "select",
             "options": [
               { "value": "0", "label": { "en": "1 or 2", "pl": "1 lub 2" } },
@@ -141,15 +149,10 @@
               { "value": "3", "label": { "en": "7 to 9", "pl": "7 do 9" } },
               { "value": "4", "label": { "en": "10 or more", "pl": "10 lub więcej" } }
             ]
-          },
-          {
+        },
+        {
             "id": "auditc.q3_6plus",
-             "dependsOn": { 
-                "and": [
-                    { "questionId": "alcohol.status", "value": ["Current", "Former"] },
-                    { "questionId": "auditc.q1_freq", "operator": "!=", "value": "0" }
-                ]
-            },
+             "dependsOn": { "questionId": "alcohol.status", "value": "Current" },
             "text": { "en": "How often do you have 6 or more drinks on one occasion?", "pl": "Jak często wypijasz 6 lub więcej drinków przy jednej okazji?" },
             "type": "select",
             "options": [
@@ -159,55 +162,70 @@
               { "value": "3", "label": { "en": "Weekly", "pl": "Raz w tygodniu" } },
               { "value": "4", "label": { "en": "Daily or almost daily", "pl": "Codziennie lub prawie codziennie" } }
             ]
-          },
+        },
+        {
+          "id": "alcohol.beverage_mix",
+          "text": { "en": "Typical weekly split (beer / wine / spirits %)", "pl": "Typowy tygodniowy podział (piwo / wino / mocne %)" },
+          "type": "text_input",
+          "dependsOn": { "questionId": "alcohol.status", "value": "Current" }
+        },
         {
           "id": "diet.fv_portions_day",
-          "text": { "en": "Vegetables and Fruit intake (servings per day)", "pl": "Spożycie warzyw i owoców (porcje dziennie)" },
+          "text": { "en": "Vegetables & Fruit (portions/day)", "pl": "Warzywa i owoce (porcje/dzień)" },
           "type": "number_input",
           "min": 0,
-          "max": 20
+          "max": 20,
+          "step": 0.5
+        },
+        {
+          "id": "diet.whole_grains_servings_day",
+          "text": { "en": "Whole grains servings per day", "pl": "Pełne ziarna (porcje/dzień)" },
+          "type": "number_input",
+          "min": 0,
+          "max": 10,
+          "step": 0.5
+        },
+        {
+          "id": "diet.fastfoods_freq_week",
+          "text": { "en": "Fast food frequency (times/week)", "pl": "Fast food (razy/tydzień)" },
+          "type": "number_input",
+          "min": 0,
+          "max": 30
         },
         {
           "id": "diet.red_meat_servings_week",
-          "text": { "en": "Red meat intake (servings per week)", "pl": "Spożycie czerwonego mięsa (porcje na tydzień)" },
+          "text": { "en": "Red meat (servings/week)", "pl": "Czerwone mięso (porcje/tydzień)" },
           "type": "number_input",
           "min": 0,
           "max": 20
         },
         {
           "id": "diet.processed_meat_servings_week",
-          "text": { "en": "Processed meat intake (servings per week)", "pl": "Spożycie przetworzonego mięsa (porcje na tydzień)" },
+          "text": { "en": "Processed meat (servings/week)", "pl": "Przetworzone mięso (porcje/tydzień)" },
           "type": "number_input",
           "min": 0,
           "max": 20
         },
         {
-           "id": "diet.ssb_servings_week",
-           "text": { "en": "Sugary drinks (servings per week)", "pl": "Słodkie napoje (porcje na tydzień)" },
-           "type": "number_input",
-           "min": 0,
-           "max": 70
+          "id": "diet.ssb_servings_week",
+          "text": { "en": "Sugar-sweetened drinks (per week)", "pl": "Słodzone napoje (na tydzień)" },
+          "type": "number_input",
+          "min": 0,
+          "max": 70
         },
         {
-           "id": "diet.whole_grains_servings_day",
-           "text": { "en": "Whole grains servings per day", "pl": "Porcje pełnoziarniste dziennie" },
-           "type": "number_input",
-           "min": 0,
-           "max": 20
-        },
-        {
-           "id": "diet.fastfoods_freq_week",
-           "text": { "en": "Fast food frequency (times/week)", "pl": "Częstość spożywania fast foodów (razy/tydzień)" },
-           "type": "number_input",
-           "min": 0,
-           "max": 20
+            "id": "diet.ssb_container",
+            "text": { "en": "Typical container size for SSB?", "pl": "Typowa wielkość porcji?" },
+            "type": "select",
+            "options": ["250 mL", "330 mL", "500 mL", "750 mL"],
+            "dependsOn": { "questionId": "diet.ssb_servings_week", "operator": ">", "value": 0 }
         },
         {
             "id": "diet.legumes_freq_week",
-            "text": { "en": "Legumes/beans frequency (times/week)", "pl": "Częstość spożywania roślin strączkowych (razy/tydzień)" },
+            "text": { "en": "Legumes/beans frequency (times/week)", "pl": "Rośliny strączkowe (razy/tydzień)" },
             "type": "number_input",
             "min": 0,
-            "max": 20,
+            "max": 21,
             "dependsOn": {
               "or": [
                 { "questionId": "diet.fv_portions_day", "operator": "<", "value": 4 },
@@ -217,83 +235,174 @@
         },
         {
            "id": "diet.upf_share_pct",
-           "text": { "en": "Estimated share of Ultra-Processed Foods (%)", "pl": "Szacowany udział żywności wysokoprzetworzonej (%)" },
+           "text": { "en": "Estimated % of ultra-processed food", "pl": "Szacowany % żywności wysokoprzetworzonej" },
            "type": "slider",
            "min": 0,
            "max": 100,
            "dependsOn": { "questionId": "diet.fastfoods_freq_week", "operator": ">=", "value": 2 }
         },
         {
-            "id": "diet.ssb_container",
-            "text": { "en": "Typical sugary drink container size", "pl": "Typowy rozmiar napoju słodzonego" },
-            "type": "select",
-            "options": ["Small (250ml)", "Medium (330ml)", "Large (500ml)", "Extra Large (750ml)", "None"],
-            "dependsOn": { "questionId": "diet.ssb_servings_week", "operator": ">", "value": 0 }
-        },
-        {
             "id": "pa.activity_level",
-            "text": { "en": "Physical Activity Level", "pl": "Poziom aktywności fizycznej" },
+            "text": { "en": "Usual physical activity level", "pl": "Typowy poziom aktywności fizycznej" },
             "type": "radio",
             "options": [
-              { "value": "Sedentary", "label": { "en": "Sedentary (little or no exercise)", "pl": "Siedzący (mało lub brak ćwiczeń)" } },
-              { "value": "Moderate", "label": { "en": "Moderate (exercise 1-3 days/week)", "pl": "Umiarkowany (ćwiczenia 1-3 dni/tydzień)" } },
-              { "value": "High", "label": { "en": "High (exercise 4+ days/week)", "pl": "Wysoki (ćwiczenia 4+ dni/tydzień)" } }
+              { "value": "Sedentary", "label": { "en": "Sedentary", "pl": "Siedzący" } },
+              { "value": "Moderate", "label": { "en": "Moderate", "pl": "Umiarkowany" } },
+              { "value": "High", "label": { "en": "High", "pl": "Wysoki" } }
             ]
         },
         {
-          "id": "symptoms",
-          "text": { "en": "Current symptoms (select all) or None", "pl": "Obecne objawy (wybierz) lub Brak" },
-          "type": "checkbox_group",
-          "exclusiveOptionId": "HP:0000000",
-          "options": [
-            { "id": "HP:0012378", "category": "A. Weight/Appetite", "label": { "en": "Fatigue", "pl": "Zmęczenie" } },
-            { "id": "HP:0001824", "category": "A. Weight/Appetite", "label": { "en": "Unexplained weight loss", "pl": "Niewyjaśniona utrata wagi" }, "red_flag": true },
-            { "id": "HP:0030166", "category": "A. Weight/Appetite", "label": { "en": "Night sweats", "pl": "Nocne poty" }, "red_flag": true },
-            { "id": "HP:0002239", "category": "G. GI", "label": { "en": "Abdominal pain", "pl": "Ból brzucha" } },
-            { "id": "HP:0002014", "category": "G. GI", "label": { "en": "Diarrhea", "pl": "Biegunka" } },
-            { "id": "HP:0012532", "category": "G. GI", "label": { "en": "Constipation", "pl": "Zaparcie" } },
-            { "id": "HP:0002028", "category": "G. GI", "label": { "en": "Abdominal bloating (persistent)", "pl": "Wzdęcia (uporczywe)" } },
-            { "id": "HP:0002015", "category": "G. GI", "label": { "en": "Dysphagia (Difficulty swallowing)", "pl": "Trudności w połykaniu" }, "red_flag": true },
-            { "id": "HP:0002027", "category": "G. GI", "label": { "en": "Melena (Black tarry stool)", "pl": "Smoliste stolce" }, "red_flag": true },
-            { "id": "HP:0001945", "category": "B. Systemic", "label": { "en": "Fever", "pl": "Gorączka" } },
-            { "id": "HP:0000989", "category": "H. Skin/Mouth", "label": { "en": "Skin changes (new mole, sore)", "pl": "Zmiany skórne (nowy pieprzyk, rana)" }, "red_flag": true },
-            { "id": "HP:0000952", "category": "H. Skin/Mouth", "label": { "en": "Jaundice (Yellow skin/eyes)", "pl": "Żółtaczka" }, "red_flag": true },
-            { "id": "HP:0002860", "category": "F. Breathing/ENT", "label": { "en": "Hemoptysis (Coughing blood)", "pl": "Krwioplucie" }, "red_flag": true },
-            { "id": "HP:0001609", "category": "F. Breathing/ENT", "label": { "en": "Hoarseness (Persistent)", "pl": "Chrypka (Utrzymująca się)" }, "red_flag": true },
-            { "id": "HP:0002118", "category": "F. Breathing/ENT", "label": { "en": "Persistent cough", "pl": "Uporczywy kaszel" }, "red_flag": true },
-            { "id": "HP:0000132", "category": "J. Urinary", "label": { "en": "Hematuria (Blood in urine)", "pl": "Krwiomocz" }, "red_flag": true },
-            { "id": "HP:0000868", "category": "E. Bleeding", "label": { "en": "Postmenopausal bleeding", "pl": "Krwawienie pomenopauzalne" }, "red_flag": true },
-            { "id": "HP:0012532", "category": "I. Reproductive", "label": { "en": "Post-coital bleeding", "pl": "Krwawienie po stosunku" }, "red_flag": true },
-            { "id": "HP:0001250", "category": "K. Neurologic", "label": { "en": "Seizures (new onset)", "pl": "Napady padaczkowe (nowe)" }, "red_flag": true },
-            { "id": "HP:0003002", "category": "I. Breast/Testicular", "label": { "en": "Breast lump", "pl": "Guzek piersi" }, "red_flag": true },
-            { "id": "HP:0002716", "category": "B. Systemic", "label": { "en": "Lymphadenopathy (Swollen nodes)", "pl": "Powiększone węzły chłonne" } },
-            { "id": "HP:0002653", "category": "C. Musculoskeletal", "label": { "en": "Bone pain", "pl": "Ból kości" }, "red_flag": true },
-            { "id": "HP:0003418", "category": "C. Musculoskeletal", "label": { "en": "Back pain", "pl": "Ból pleców" }, "red_flag": true },
-            { "id": "HP:0002315", "category": "K. Neurologic", "label": { "en": "Headache (Scale 1-10)", "pl": "Ból głowy" }, "red_flag": true },
-            { "id": "HP:0000000", "label": { "en": "None", "pl": "Brak" } }
+          "id": "advanced_modules_pa_sex",
+          "type": "advanced_modules",
+          "modules": [
+             {
+               "id": "physical_activity_details",
+               "title": { "en": "Detailed Activity (IPAQ)", "pl": "Szczegółowa Aktywność (IPAQ)" },
+               "dependsOn": { "questionId": "pa.activity_level", "value": true },
+               "questions": [
+                 { "id": "pa.walk.days7", "text": { "en": "Walking days/week (≥10 min)", "pl": "Dni spacerów/tydzień (≥10 min)" }, "type": "number_input", "min": 0, "max": 7 },
+                 { "id": "pa.walk.minperday", "text": { "en": "Minutes walking per day", "pl": "Minuty spaceru dziennie" }, "type": "number_input", "min": 0, "max": 600, "dependsOn": { "questionId": "pa.walk.days7", "operator": ">", "value": 0 } },
+                 { "id": "pa.mod.days7", "text": { "en": "Moderate activity days/week", "pl": "Dni umiarkowanej aktywności" }, "type": "number_input", "min": 0, "max": 7 },
+                 { "id": "pa.mod.minperday", "text": { "en": "Minutes moderate activity per day", "pl": "Minuty umiarkowanej aktywności dziennie" }, "type": "number_input", "min": 0, "max": 600, "dependsOn": { "questionId": "pa.mod.days7", "operator": ">", "value": 0 } },
+                 { "id": "pa.vig.days7", "text": { "en": "Vigorous activity days/week", "pl": "Dni intensywnej aktywności" }, "type": "number_input", "min": 0, "max": 7 },
+                 { "id": "pa.vig.minperday", "text": { "en": "Minutes vigorous activity per day", "pl": "Minuty intensywnej aktywności dziennie" }, "type": "number_input", "min": 0, "max": 600, "dependsOn": { "questionId": "pa.vig.days7", "operator": ">", "value": 0 } },
+                 { "id": "pa.sit.min_day", "text": { "en": "Minutes sitting per day", "pl": "Minuty siedzenia dziennie" }, "type": "number_input", "min": 0, "max": 1440 }
+               ]
+             },
+             {
+              "id": "sexual_health",
+              "title": {"en": "Sexual Health", "pl": "Zdrowie Seksualne"},
+              "questions": [
+                {"id": "sexhx.section_opt_in", "text": {"en": "Answer optional sexual health questions?", "pl": "Odpowiedzieć na pytania o zdrowie seksualne?"}, "type": "radio", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}, {"value":"Prefer not to say", "label":"Prefer not to say"}]},
+                {"id": "sexhx.ever_sexual_contact", "text": {"en": "Ever had sexual contact?", "pl": "Kontakt seksualny kiedykolwiek?"}, "type": "radio", "options": ["Yes", "No, never", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.section_opt_in", "value": "Yes"}},
+                
+                {"id": "sexhx.age_first_sex", "text": {"en": "Age at first sex", "pl": "Wiek inicjacji"}, "type": "number_input", "validation": { "min": 8, "max": 80 }, "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                
+                {"id": "sexhx.lifetime_partners_cat", "text": {"en": "Lifetime partners count", "pl": "Liczba partnerów (całe życie)"}, "type": "select", "options": ["0-1", "2-4", "5-9", "10-19", "20 or more", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                
+                {"id": "sexhx.partners_12m_cat", "text": {"en": "Partners in last 12 months", "pl": "Partnerzy w ost. 12 mies."}, "type": "select", "options": ["0", "1", "2-3", "4-5", "6 or more", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                
+                {"id": "sexhx.new_partner_12m", "text": {"en": "New partner in last 12m?", "pl": "Nowy partner w ost. 12 mies.?"}, "type": "radio", "options": ["Yes", "No", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                
+                {"id": "sexhx.partner_genders", "text": {"en": "Partners' gender", "pl": "Płeć partnerów"}, "type": "checkbox_group", "options": [{"id": "Only men", "label": "Only men"}, {"id": "Only women", "label": "Only women"}, {"id": "Men and women", "label": "Men and women"}, {"id": "Partners of other genders", "label": "Other genders"}, {"id": "Prefer not to say", "label": "Prefer not to say"}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                
+                {"id": "sexhx.sex_sites_ever", "text": {"en": "Sexual practices (Lifetime)", "pl": "Praktyki (Całe życie)"}, "type": "checkbox_group", "options": [{"id": "Vaginal sex", "label": "Vaginal"}, {"id": "Anal sex – receptive", "label": "Anal (receptive)"}, {"id": "Anal sex – insertive", "label": "Anal (insertive)"}, {"id": "Oral sex", "label": "Oral"}, {"id": "Prefer not to say", "label": "Prefer not to say"}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                
+                {"id": "sexhx.sex_sites_12m", "text": {"en": "Sexual practices (12m)", "pl": "Praktyki (12 mies.)"}, "type": "checkbox_group", "options": [{"id": "Vaginal sex", "label": "Vaginal"}, {"id": "Anal sex – receptive", "label": "Anal (receptive)"}, {"id": "Anal sex – insertive", "label": "Anal (insertive)"}, {"id": "Oral sex", "label": "Oral"}, {"id": "None in past 12 months", "label": "None"}, {"id": "Prefer not to say", "label": "Prefer not to say"}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                
+                {"id": "sexhx.condom_use_12m", "text": {"en": "Condom use frequency", "pl": "Częstotliwość prezerwatyw"}, "type": "select", "options": ["Always", "More than half the time", "Less than half the time", "Never", "No vaginal/anal sex in past 12 months", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                
+                {"id": "sexhx.sex_work_ever", "text": {"en": "Ever exchanged sex for money/goods?", "pl": "Seks za pieniądze/korzyści?"}, "type": "radio", "options": ["No", "Yes", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                
+                {"id": "sexhx.sex_work_role", "text": {"en": "Role in sex work", "pl": "Rola"}, "type": "checkbox_group", "options": [{"id": "Mainly provided", "label": "Provided"}, {"id": "Mainly received", "label": "Received"}, {"id": "Both", "label": "Both"}, {"id": "Prefer not to say", "label": "Prefer not to say"}], "dependsOn": {"questionId": "sexhx.sex_work_ever", "value": "Yes"}},
+                
+                {"id": "sexhx.sti_history_other", "text": {"en": "History of other STIs?", "pl": "Historia innych STI?"}, "type": "radio", "options": ["No", "Yes", "Not sure", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                
+                {"id": "sexhx.sti_types_other", "text": {"en": "Which STIs?", "pl": "Które STI?"}, "type": "checkbox_group", "options": [{"id": "Chlamydia", "label": "Chlamydia"}, {"id": "Gonorrhoea", "label": "Gonorrhoea"}, {"id": "Syphilis", "label": "Syphilis"}, {"id": "Genital herpes", "label": "Genital herpes"}, {"id": "Genital warts", "label": "Genital warts"}, {"id": "Other", "label": "Other"}, {"id": "Not sure", "label": "Not sure"}], "dependsOn": {"questionId": "sexhx.sti_history_other", "value": "Yes"}},
+                
+                {"id": "sexhx.sti_treated_12m", "text": {"en": "Treated for STI in last 12m?", "pl": "Leczenie STI w ost. 12 mies.?"}, "type": "radio", "options": ["Yes", "No", "Not sure", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                
+                {"id": "sexhx.hpv_precancer_history", "text": {"en": "History of HPV precancer?", "pl": "Historia zmian przedrakowych HPV?"}, "type": "checkbox_group", "options": [{"id": "Cervix", "label": "Cervix"}, {"id": "Vulva/vagina", "label": "Vulva/vagina"}, {"id": "Anus", "label": "Anus"}, {"id": "Penis", "label": "Penis"}, {"id": "Mouth/throat", "label": "Mouth/throat"}, {"id": "Not sure", "label": "Not sure"}, {"id": "Prefer not to say", "label": "Prefer not to say"}]}
+              ]
+            }
           ]
-        },
-        {
-          "id": "family_cancer_any",
-          "text": { "en": "First-degree relative with cancer?", "pl": "Czy bliscy chorowali na raka?" },
-          "type": "radio",
-          "options": [ { "value": "Yes", "label": "Yes" }, { "value": "No", "label": "No" }, { "value": "Unsure", "label": "Unsure" } ]
-        },
-        { "id": "cond.summary", "text": {"en": "Summary of Chronic Conditions (Select all that apply)", "pl": "Podsumowanie chorób przewlekłych"}, "type": "checkbox_group", "options": [
-            {"id": "diabetes", "label": "Diabetes"}, {"id": "hypertension", "label": "Hypertension"}, {"id": "ibd", "label": "IBD"}, {"id": "hbv", "label": "Hepatitis B"}, {"id": "hcv", "label": "Hepatitis C"}, {"id": "cirrhosis", "label": "Cirrhosis"}, {"id": "hpv", "label": "HPV Infection"}, {"id": "h_pylori", "label": "H. pylori"}, {"id": "hiv", "label": "HIV"}, {"id": "transplant", "label": "Organ Transplant"}, {"id": "immunosuppression", "label": "Immunosuppression"}, {"id": "psc", "label": "PSC (Primary Sclerosing Cholangitis)"}, {"id": "pancreatitis", "label": "Chronic Pancreatitis"}, {"id": "copd", "label": "COPD"}, {"id": "other", "label": "Other"}
-        ] },
-        { "id": "ca.any_history", "text": {"en": "Ever diagnosed with cancer?", "pl": "Czy kiedykolwiek zdiagnozowano u Ciebie raka?"}, "type": "radio", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}, {"value": "Unsure", "label": "Unsure"}] },
-        { "id": "ca.active_treatment_now", "text": {"en": "Are you currently receiving aggressive cancer treatment (e.g., Chemo/Radiation)?", "pl": "Czy obecnie otrzymujesz agresywne leczenie przeciwnowotworowe (np. chemioterapia/radioterapia)?"}, "type": "radio", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}], "dependsOn": {"questionId": "ca.any_history", "value": "Yes"} },
-
-        { "id": "occ.exposure_any", "text": {"en": "Any significant occupational exposure?", "pl": "Czy było jakiekolwiek istotne narażenie zawodowe?"}, "type": "radio", "options": [{"value": "Yes", "label": "Yes"}, {"value": "No", "label": "No"}, {"value": "Unsure", "label": "Unsure"}] }
+        }
       ]
     },
     {
-      "title": { "en": "Advanced Details", "pl": "Szczegóły Zaawansowane" },
-      "description": { "en": "Providing more details is optional but helps create a more personalized plan.", "pl": "Podanie dodatkowych szczegółów jest opcjonalne, ale pomaga stworzyć bardziej spersonalizowany plan." },
+      "id": "health_history",
+      "title": { "en": "Health History", "pl": "Historia Zdrowia" },
       "questions": [
         {
-          "id": "advanced_modules",
+          "id": "symptoms",
+          "type": "checkbox_group",
+          "text": { "en": "Current Symptoms", "pl": "Obecne Objawy" },
+          "options": [
+            { "id": "HP:0001824", "label": { "en": "Unintentional weight loss", "pl": "Niewyjaśniona utrata wagi" }, "red_flag": true, "category": "Weight" },
+            { "id": "HP:0004396", "label": { "en": "Loss of appetite", "pl": "Utrata apetytu" }, "category": "Weight" },
+            { "id": "HP:0001945", "label": { "en": "Unexplained fever", "pl": "Niewyjaśniona gorączka" }, "category": "Systemic" },
+            { "id": "HP:0030166", "label": { "en": "Night sweats", "pl": "Nocne poty" }, "red_flag": true, "category": "Systemic" },
+            { "id": "HP:0012378", "label": { "en": "Severe fatigue", "pl": "Znaczne zmęczenie" }, "category": "Systemic" },
+            { "id": "HP:0000989", "label": { "en": "Generalized itching", "pl": "Uogólniony świąd" }, "category": "Systemic" },
+            { "id": "HP:0002653", "label": { "en": "Bone pain", "pl": "Ból kości" }, "red_flag": true, "category": "Pain" },
+            { "id": "HP:0003418", "label": { "en": "Back pain (nerve)", "pl": "Ból pleców (nerwowy)" }, "red_flag": true, "category": "Pain" },
+            { "id": "HP:0002315", "label": { "en": "New headache pattern", "pl": "Nowy wzorzec bólu głowy" }, "red_flag": true, "category": "Pain" },
+            { "id": "HP:0002716", "label": { "en": "Lump / Lymph nodes", "pl": "Guzek / Węzły chłonne" }, "category": "Lumps" },
+            { "id": "HP:0002105", "label": { "en": "Coughing blood", "pl": "Krwioplucie" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0002573", "label": { "en": "Rectal bleeding", "pl": "Krwawienie z odbytu" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0002249", "label": { "en": "Black tarry stools", "pl": "Smoliste stolce" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0033840", "label": { "en": "Postmenopausal bleeding", "pl": "Krwawienie pomenopauzalne" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0000790", "label": { "en": "Blood in urine", "pl": "Krew w moczu" }, "red_flag": true, "category": "Bleeding" },
+            { "id": "HP:0012735", "label": { "en": "Persistent cough", "pl": "Uporczywy kaszel" }, "red_flag": true, "category": "Resp" },
+            { "id": "HP:0002094", "label": { "en": "Shortness of breath", "pl": "Duszność" }, "category": "Resp" },
+            { "id": "HP:0001609", "label": { "en": "Hoarseness", "pl": "Chrypka" }, "category": "Resp" },
+            { "id": "HP:0002014", "label": { "en": "Change in bowel habit", "pl": "Zmiana rytmu wypróżnień" }, "category": "GI" },
+            { "id": "HP:0002019", "label": { "en": "Constipation", "pl": "Zaparcie" }, "category": "GI" },
+            { "id": "HP:0002027", "label": { "en": "Abdominal pain/bloating", "pl": "Ból brzucha/Wzdęcia" }, "category": "GI" },
+            { "id": "HP:0002015", "label": { "en": "Difficulty swallowing", "pl": "Trudności w połykaniu" }, "red_flag": true, "category": "GI" },
+            { "id": "HP:0001031", "label": { "en": "Changing mole / skin", "pl": "Zmiana znamienia / skóry" }, "red_flag": true, "category": "Skin" },
+            { "id": "HP:0000155", "label": { "en": "Mouth ulcer >3 weeks", "pl": "Owrzodzenie jamy ustnej" }, "category": "Skin" },
+            { "id": "HP:0032408", "label": { "en": "Breast lump/change", "pl": "Guzek/zmiana piersi" }, "red_flag": true, "category": "Breast" },
+            { "id": "HP:0032404", "label": { "en": "Testicular lump/change", "pl": "Guzek/zmiana jądra" }, "category": "Breast" },
+            { "id": "HP:0001250", "label": { "en": "Seizures", "pl": "Napady drgawkowe" }, "red_flag": true, "category": "Neuro" },
+            { "id": "HP:0001324", "label": { "en": "Focal weakness/numbness", "pl": "Ogniskowe osłabienie" }, "red_flag": true, "category": "Neuro" },
+            { "id": "HP:0000000", "label": { "en": "None", "pl": "Brak" } }
+          ],
+          "exclusiveOptionId": "HP:0000000"
+        },
+        {
+          "id": "cond.summary",
+          "type": "checkbox_group",
+          "text": { "en": "Diagnosed Conditions", "pl": "Zdiagnozowane choroby" },
+          "options": [
+            { "id": "hbv", "label": "HBV" },
+            { "id": "hcv", "label": "HCV" },
+            { "id": "cirrhosis", "label": "Cirrhosis" },
+            { "id": "h_pylori", "label": "H. pylori" },
+            { "id": "hiv", "label": "HIV" },
+            { "id": "ibd", "label": "IBD" },
+            { "id": "psc", "label": "PSC" },
+            { "id": "barretts", "label": "Barrett's" },
+            { "id": "pancreatitis", "label": "Chronic Pancreatitis" },
+            { "id": "diabetes", "label": "Type 2 Diabetes" },
+            { "id": "transplant", "label": "Organ Transplant" },
+            { "id": "none", "label": { "en": "None", "pl": "Brak" } }
+          ],
+          "exclusiveOptionId": "none"
+        },
+        {
+          "id": "meds.immunosupp.current",
+          "type": "radio",
+          "text": { "en": "Long-term immunosuppressive therapy?", "pl": "Długotrwała immunosupresja?" },
+          "options": ["Yes", "No"]
+        },
+        {
+          "id": "meds.hrt.use",
+          "type": "radio",
+          "text": { "en": "Menopausal HRT?", "pl": "HTZ (menopauza)?" },
+          "options": ["Never", "Past", "Current"]
+        },
+        {
+          "id": "ca.any_history",
+          "type": "radio",
+          "text": { "en": "Personal history of cancer?", "pl": "Osobista historia raka?" },
+          "options": ["No", "Yes", "Not sure"]
+        },
+        {
+          "id": "ca.active_treatment_now",
+          "type": "radio",
+          "text": { "en": "Currently in cancer treatment?", "pl": "Obecnie w trakcie leczenia?" },
+          "options": ["No", "Yes", "Not sure"],
+          "dependsOn": { "questionId": "ca.any_history", "value": "Yes" }
+        },
+        {
+          "id": "famhx.any_family_cancer",
+          "type": "radio",
+          "text": { "en": "Family history of cancer?", "pl": "Rak w rodzinie?" },
+          "options": ["Yes", "No", "Adopted/Unknown", "Not sure"]
+        },
+        {
+          "id": "advanced_modules_symptoms_cond",
           "type": "advanced_modules",
           "modules": [
             {
@@ -301,619 +410,373 @@
               "title": { "en": "Symptom Details", "pl": "Szczegóły Objawów" },
               "dependsOn": { "questionId": "symptoms", "value": true },
               "options": {
-                "symptomList": [
-                  { "value": "HP:0012378", "label": "Fatigue" },
-                  { "value": "HP:0001824", "label": "Weight loss" },
-                  { "value": "HP:0001945", "label": "Fever" },
-                  { "value": "HP:0000989", "label": "Skin changes" },
-                  { "value": "HP:0002239", "label": "Abdominal pain" },
-                  { "value": "HP:0002014", "label": "Diarrhea" }
-                ],
-                "associatedFeatures": [
-                  { "id": "nausea", "label": "Nausea" },
-                  { "id": "dizziness", "label": "Dizziness" },
-                  { "id": "headache", "label": "Headache" },
-                  { "id": "bloating", "label": "Bloating" },
-                  { "id": "chills", "label": "Chills" }
-                ]
+                "symptomList": [], 
+                "associatedFeatures": []
               }
-            },
-            {
-              "id": "smoking_details",
-              "title": { "en": "Smoking Details", "pl": "Szczegóły Dotyczące Palenia" },
-              "dependsOn": { "questionId": "smoking_status", "value": ["Current", "Former"] },
-              "questions": [
-                { "id": "smoking.pattern", "text": {"en": "Smoking pattern", "pl": "Wzorzec palenia"}, "type": "radio", "options": ["Every day", "Some days"] },
-                { "id": "smoking.intensity_unit", "text": {"en": "Unit for smoking intensity", "pl": "Jednostka intensywności palenia"}, "type": "radio", "options": ["Cigarettes per day", "Packs per day"], "dependsOn": {"questionId": "smoking.pattern", "value": "Every day"} },
-                { "id": "smoking.intensity", "text": { "en": "Average smoking intensity?", "pl": "Średnia intensywność palenia?"}, "type": "number_input", "placeholder": "e.g., 20", "dependsOn": {"questionId": "smoking.pattern", "value": "Every day"} },
-                { "id": "smoking.start_age", "text": { "en": "Age you started smoking?", "pl": "Wiek rozpoczęcia palenia?"}, "type": "number_input", "placeholder": "e.g., 18" },
-                { "id": "smoking.years_smoked", "text": { "en": "Number of years smoked (excluding breaks)?", "pl": "Liczba lat palenia (bez przerw)?"}, "type": "number_input", "placeholder": "e.g., 10" },
-                { "id": "smoking.brinkman_index", "text": { "en": "Brinkman Index (Auto)", "pl": "Wskaźnik Brinkmana (Auto)"}, "type": "number_input", "dependsOn": {"questionId": "smoking_status", "value": "Hidden"} },
-                { "id": "smoking.quit_date", "text": { "en": "Year you quit smoking (ISO-8601)", "pl": "Rok rzucenia palenia"}, "type": "year_input", "dependsOn": {"questionId": "smoking_status", "value": "Former"}},
-                { "id": "smoking.other_tobacco_smoked", "text": {"en": "Other tobacco products used?", "pl": "Inne wyroby tytoniowe?"}, "type": "checkbox_group", "options": [{"id": "cigars", "label": "Cigars"}, {"id": "cigarillos", "label": "Cigarillos"}, {"id": "pipe", "label": "Pipe"}, {"id": "roll_your_own", "label": "Roll-your-own"}, {"id": "shisha", "label": "Waterpipe"}, {"id": "none", "label": "None"}] },
-                { "id": "smoking.other_cigar_per_week", "text": {"en": "Cigars/Cigarillos per week", "pl": "Cygara/Cygaretki na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "value": true} },
-                { "id": "smoking.pipe_per_week", "text": {"en": "Pipe bowls per week", "pl": "Fajki na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "value": true} },
-                { "id": "smoking.shisha_per_week", "text": {"en": "Waterpipe sessions per week", "pl": "Sesje fajki wodnej na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "value": true} },
-                
-                { "id": "vape.status", "text": {"en": "E-cigarette/Vaping status", "pl": "Status e-papierosów/wapowania"}, "type": "radio", "options": ["Never", "Former", "Current"] },
-                { "id": "vape.days_30d", "text": {"en": "Days vaped in last 30 days", "pl": "Dni wapowania w ciągu ostatnich 30 dni"}, "type": "number_input", "dependsOn": {"questionId": "vape.status", "value": "Current"} },
-                { "id": "vape.device_type", "text": {"en": "Device type", "pl": "Typ urządzenia"}, "type": "select", "options": [
-                    {"value": "Disposable", "label": {"en": "Disposable", "pl": "Jednorazowe"}}, 
-                    {"value": "Prefilled pod", "label": {"en": "Prefilled pod or cartridge", "pl": "Wymienne wkłady (pod/kartridż)"}}, 
-                    {"value": "Refillable tank", "label": {"en": "Refillable tank or mod", "pl": "Napełniany zbiornik lub mod"}}, 
-                    {"value": "Other", "label": {"en": "Other", "pl": "Inne"}}
-                ], "dependsOn": {"questionId": "vape.status", "value": ["Current", "Former"]} },
-                { "id": "vape.nicotine", "text": {"en": "Contains nicotine?", "pl": "Zawiera nikotynę?"}, "type": "radio", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "vape.status", "value": ["Current", "Former"]} },
-
-                { "id": "htp.status", "text": {"en": "Heated Tobacco Products (e.g., IQOS)", "pl": "Podgrzewacze tytoniu (np. IQOS)"}, "type": "radio", "options": ["Never", "Former", "Current"] },
-                { "id": "htp.days_30d", "text": {"en": "Days used in last 30 days", "pl": "Dni używania w ciągu ostatnich 30 dni"}, "type": "number_input", "dependsOn": {"questionId": "htp.status", "value": "Current"} },
-                { "id": "htp.sticks_per_day", "text": {"en": "Average sticks per day", "pl": "Średnia liczba wkładów dziennie"}, "type": "number_input", "dependsOn": {"questionId": "htp.status", "value": "Current"} },
-
-                { "id": "shs.home_freq", "text": {"en": "Secondhand smoke at home (days/week)", "pl": "Bierne palenie w domu (dni/tydzień)"}, "type": "select", "options": ["0", "1-2", "3-4", "Daily"] },
-                { "id": "shs.work_freq", "text": {"en": "Secondhand smoke at work (days/week)", "pl": "Bierne palenie w pracy (dni/tydzień)"}, "type": "select", "options": ["0", "1-2", "3-4", "Daily"] },
-                { "id": "shs.public_30d_bars", "text": {"en": "Exposed in bars/restaurants (last 30d)?", "pl": "Narażenie w barach/restauracjach (ost. 30 dni)?"}, "type": "radio", "options": ["Yes", "No"] },
-                { "id": "shs.hours_7d", "text": {"en": "Total hours exposed to SHS in last 7 days", "pl": "Całkowita liczba godzin narażenia na dym w ciągu ostatnich 7 dni"}, "type": "number_input" },
-                { "id": "shs.life_course", "text": {"en": "When were you exposed to secondhand smoke?", "pl": "Kiedy byłeś narażony na dym tytoniowy z drugiej ręki?"}, "type": "checkbox_group", "options": [{"id": "childhood", "label": "Childhood"}, {"id": "adult", "label": "Adult"}, {"id": "work", "label": "Work"}, {"id": "social", "label": "Social settings"}] }
-              ]
-            },
-            {
-              "id": "family_cancer_history",
-              "title": { "en": "Family Cancer History", "pl": "Rodzinna Historia Nowotworów" },
-              "dependsOn": { "questionId": "family_cancer_any", "value": "Yes" },
-              "options": {
-                "relations": [ "Mother", "Father", "Sister", "Brother", "Daughter", "Son", "Maternal Grandmother", "Maternal Grandfather", "Paternal Grandmother", "Paternal Grandfather", "Aunt", "Uncle", "Niece", "Nephew", "Cousin" ],
-                "cancerTypes": [
-                  { "value": "breast", "label": "Breast" },
-                  { "value": "ovarian", "label": "Ovarian" },
-                  { "value": "colorectal", "label": "Colorectal" },
-                  { "value": "prostate", "label": "Prostate" },
-                  { "value": "lung", "label": "Lung" },
-                  { "value": "melanoma", "label": "Melanoma" },
-                  { "value": "pancreas", "label": "Pancreas" },
-                  { "value": "gastric", "label": "Stomach (Gastric)" },
-                  { "value": "endometrium", "label": "Endometrium" },
-                  { "value": "oesophagus", "label": "Oesophagus" },
-                  { "value": "liver", "label": "Liver" },
-                  { "value": "bladder", "label": "Bladder" },
-                  { "value": "brain", "label": "Brain" },
-                  { "value": "thyroid", "label": "Thyroid" },
-                  { "value": "sarcoma", "label": "Sarcoma" },
-                  { "value": "lymphoma", "label": "Lymphoma" },
-                  { "value": "leukemia", "label": "Leukemia" },
-                  { "value": "myeloma", "label": "Myeloma" },
-                  { "value": "kidney", "label": "Kidney" },
-                  { "value": "other", "label": "Other" }
-                ]
-              }
-            },
-             {
-               "id": "genetics",
-               "title": { "en": "Genetics (Optional)", "pl": "Genetyka (Opcjonalne)" },
-               "questions": [
-                   { "id": "gen.testing_ever", "text": { "en": "Have you ever had genetic testing related to cancer risk?", "pl": "Czy kiedykolwiek wykonano u Pana/Pani badania genetyczne związane z ryzykiem nowotworów?" }, "type": "radio", "options": [{"value": "never", "label": {"en": "No", "pl": "Nie"}}, {"value": "yes_report", "label": {"en": "Yes, I have the report", "pl": "Tak, mam raport"}}, {"value": "yes_no_details", "label": {"en": "Yes, but I don't recall details", "pl": "Tak, ale nie pamiętam szczegółów"}}, {"value": "not_sure", "label": {"en": "Not sure", "pl": "Nie jestem pewien"}} ] },
-                   { "id": "gen.path_variant_self", "text": { "en": "Have you ever been told that you carry a genetic change (pathogenic variant) that increases cancer risk?", "pl": "Czy kiedykolwiek powiedziano Ci, że jesteś nosicielem zmiany genetycznej (wariantu patogennego) zwiększającej ryzyko raka?" }, "type": "radio", "options": [{"value": "no", "label": "No"}, {"value": "yes", "label": "Yes"}, {"value": "vus_only", "label": "Variant of Uncertain Significance (VUS) only"}, {"value": "not_sure", "label": "Not sure"}], "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"]} },
-                   { "id": "genetic_test_type", "text": { "en": "What type of genetic test was it?", "pl": "Jaki to był rodzaj badania genetycznego?" }, "type": "select", "options": ["Multigene panel", "Single gene", "Exome (WES)", "Genome (WGS)", "Other"], "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"]} },
-                   { "id": "genetic_test_year", "text": { "en": "In what year was the test performed?", "pl": "W którym roku wykonano badanie?" }, "type": "year_input", "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"]} },
-                   { "id": "genetic_lab", "text": { "en": "Testing laboratory (if known)", "pl": "Laboratorium wykonujące test (jeśli znane)" }, "type": "text_input", "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"]} },
-                   { "id": "genetic_genes", "text": { "en": "If yes: which genes?", "pl": "Jeśli tak: które geny?" }, "type": "checkbox_group", "options": [
-                       { "id": "BRCA1", "label": "BRCA1"}, { "id": "BRCA2", "label": "BRCA2"}, { "id": "PALB2", "label": "PALB2"}, { "id": "TP53", "label": "TP53"}, { "id": "PTEN", "label": "PTEN"}, 
-                       { "id": "CDH1", "label": "CDH1"}, { "id": "STK11", "label": "STK11"}, { "id": "NF1", "label": "NF1"}, { "id": "ATM", "label": "ATM"}, { "id": "CHEK2", "label": "CHEK2"}, 
-                       { "id": "BARD1", "label": "BARD1"}, { "id": "BRIP1", "label": "BRIP1"}, { "id": "RAD51C", "label": "RAD51C"}, { "id": "RAD51D", "label": "RAD51D"}, { "id": "MLH1", "label": "MLH1"}, 
-                       { "id": "MSH2", "label": "MSH2"}, { "id": "MSH6", "label": "MSH6"}, { "id": "PMS2", "label": "PMS2"}, { "id": "EPCAM", "label": "EPCAM"}, { "id": "APC", "label": "APC"}, 
-                       { "id": "MUTYH", "label": "MUTYH"}, { "id": "POLE", "label": "POLE"}, { "id": "POLD1", "label": "POLD1"}, { "id": "SMAD4", "label": "SMAD4"}, { "id": "BMPR1A", "label": "BMPR1A"}, 
-                       { "id": "NTHL1", "label": "NTHL1"}, { "id": "VHL", "label": "VHL"}, { "id": "FH", "label": "FH"}, { "id": "FLCN", "label": "FLCN"}, { "id": "MET", "label": "MET"}, 
-                       { "id": "RET", "label": "RET"}, { "id": "MAX", "label": "MAX"}, { "id": "TSC1", "label": "TSC1"}, { "id": "TSC2", "label": "TSC2"}, { "id": "CDKN2A", "label": "CDKN2A"}, 
-                       { "id": "CDK4", "label": "CDK4"}, { "id": "MITF", "label": "MITF"}, { "id": "PRSS1", "label": "PRSS1"}, { "id": "DICER1", "label": "DICER1"}, { "id": "PTCH1", "label": "PTCH1"},
-                       { "id": "SUFU", "label": "SUFU"}, { "id": "SDHB", "label": "SDHB"}, { "id": "SDHC", "label": "SDHC"}, { "id": "SDHD", "label": "SDHD"}, { "id": "BAP1", "label": "BAP1"},
-                       { "id": "MEN1", "label": "MEN1"}, { "id": "MITF_E318K", "label": "MITF E318K"}
-                   ], "dependsOn": { "questionId": "gen.path_variant_self", "value": "yes"} },
-                   { "id": "genetic_variants_hgvs", "text": { "en": "Variant(s) (HGVS, optional)", "pl": "Wariant(y) (HGVS, opcjonalnie)" }, "type": "text_input", "dependsOn": { "questionId": "gen.path_variant_self", "value": "yes"}, "tooltip": {"en": "HGVS is a standard format for reporting genetic variants, e.g., c.123A>G. Provide if known.", "pl": "HGVS to standardowy format raportowania wariantów genetycznych, np. c.123A>G. Podaj, jeśli jest znany."}},
-                   { "id": "genetic_report_upload", "text": { "en": "Upload genetic report (optional)", "pl": "Prześlij raport genetyczny (opcjonalnie)" }, "type": "file_upload", "dependsOn": { "questionId": "gen.testing_ever", "value": "Yes"} },
-                   
-                   { "id": "gen.mutyh_biallelic", "text": { "en": "MUTYH biallelic variant?", "pl": "Wariant bialleliczny MUTYH?" }, "type": "radio", "options": ["Yes", "No", "Unsure"], "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"]} },
-                   { "id": "gen.family_genes", "text": { "en": "Known pathogenic variant in family?", "pl": "Znany wariant patogenny w rodzinie?" }, "type": "radio", "options": ["Yes", "No", "Unsure"] },
-                   { "id": "gen.path_variant_family", "text": { "en": "If yes: which gene?", "pl": "Jeśli tak: który gen?" }, "type": "text_input", "dependsOn": { "questionId": "gen.family_genes", "value": "Yes"} },
-                   
-                   {"id": "gen.prs_done", "text": {"en": "Polygenic Risk Score (PRS) done?", "pl": "Badanie Polygenic Risk Score (PRS)?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
-                   {"id": "gen.prs_cancers_flagged", "text": {"en": "Cancers with increased risk in PRS", "pl": "Nowotwory o zwiększonym ryzyku w PRS"}, "type": "checkbox_group", "dependsOn": {"questionId": "gen.prs_done", "value": "Yes"}, "options": [{"id": "breast", "label": "Breast"}, {"id": "prostate", "label": "Prostate"}, {"id": "colorectal", "label": "Colorectal"}, {"id": "lung", "label": "Lung"}]},
-                   {"id": "gen.prs_overall_band", "text": {"en": "Overall PRS Risk Band", "pl": "Ogólna kategoria ryzyka PRS"}, "type": "select", "dependsOn": {"questionId": "gen.prs_done", "value": "Yes"}, "options": ["lower", "average", "higher", "mixed", "not_sure"]},
-
-                   { "id": "genetic_processing_consent", "type": "consent_checkbox", "dependsOn": { "questionId": "gen.testing_ever", "value": ["yes_report", "yes_no_details"] } }
-               ]
-             },
-             {
-               "id": "physical_activity_details",
-               "title": { "en": "Physical Activity Details (IPAQ)", "pl": "Szczegóły Aktywności Fizycznej (IPAQ)" },
-               "dependsOn": { "questionId": "pa.activity_level", "value": true },
-               "questions": [
-                 { "id": "pa.vig.days7", "text": { "en": "Vigorous physical activity (days/week)", "pl": "Intensywna aktywność fizyczna (dni/tydzień)" }, "type": "number_input", "min": 0, "max": 7 },
-                 { "id": "pa.vig.minperday", "text": { "en": "Average minutes of vigorous activity per day", "pl": "Średnia liczba minut intensywnej aktywności" }, "type": "number_input", "dependsOn": { "questionId": "pa.vig.days7", "operator": ">", "value": 0 } },
-                 { "id": "pa.mod.days7", "text": { "en": "Moderate physical activity (days/week)", "pl": "Umiarkowana aktywność fizyczna (dni/tydzień)" }, "type": "number_input", "min": 0, "max": 7 },
-                 { "id": "pa.mod.minperday", "text": { "en": "Average minutes of moderate activity per day", "pl": "Średnia liczba minut umiarkowanej aktywności" }, "type": "number_input", "dependsOn": { "questionId": "pa.mod.days7", "operator": ">", "value": 0 } },
-                 { "id": "pa.walk.days7", "text": { "en": "Walking (days/week)", "pl": "Spacerowanie (dni/tydzień)" }, "type": "number_input", "min": 0, "max": 7 },
-                 { "id": "pa.walk.minperday", "text": { "en": "Average minutes of walking per day", "pl": "Średnia liczba minut spaceru" }, "type": "number_input", "dependsOn": { "questionId": "pa.walk.days7", "operator": ">", "value": 0 } },
-                 { "id": "pa.sit.min_day", "text": { "en": "Hours spent sitting per day", "pl": "Godziny spędzane na siedząco dziennie" }, "type": "number_input" }
-               ]
-             },
-            {
-              "id": "female_health",
-              "title": { "en": "Female Health", "pl": "Zdrowie Kobiet" },
-              "dependsOn": { "questionId": "sex_at_birth", "value": "Female" },
-              "questions": [
-                { "id": "menopause_status", "text": {"en": "Have you undergone menopause?", "pl": "Czy jest Pani po menopauzie?"}, "type": "select", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}, {"value":"N/A", "label":"N/A"}] },
-                { "id": "menopause_age", "text": {"en": "If yes: at what age did menopause occur?", "pl": "Jeśli tak: w jakim wieku wystąpiła menopauza?"}, "type": "year_input", "dependsOn": { "questionId": "menopause_status", "value": "Yes"} },
-                { "id": "had_children", "text": {"en": "Have you given birth to any children?", "pl": "Czy urodziła Pani dziecko/dzieci?"}, "type": "select", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}] },
-                { "id": "first_child_age", "text": {"en": "If yes: age at birth of first child", "pl": "Jeśli tak: wiek przy urodzeniu pierwszego dziecka"}, "type": "year_input", "dependsOn": { "questionId": "had_children", "value": "Yes"} },
-                { "id": "hrt_use", "text": {"en": "Have you ever used hormone replacement therapy (HRT)?", "pl": "Czy stosowała Pani hormonalną terapię zastępczą (HTZ)?"}, "type": "select", "options": ["Never", "Previously", "Currently"] },
-                { "id": "meds.hrt.type", "text": {"en": "Type of HRT", "pl": "Rodzaj HTZ"}, "type": "select", "options": ["Estrogen only", "Combined (Estrogen + Progesterone)", "Unsure"], "dependsOn": { "questionId": "hrt_use", "value": ["Previously", "Currently"]} },
-                { "id": "meds.hrt.duration_yrs", "text": {"en": "Duration of use (years)", "pl": "Czas stosowania (lata)"}, "type": "number_input", "dependsOn": { "questionId": "hrt_use", "value": ["Previously", "Currently"]} }
-              ]
             },
             {
               "id": "chronic_condition_details",
               "title": { "en": "Condition Details", "pl": "Szczegóły Chorób" },
-              "dependsOn": { "questionId": "cond.summary", "value": ["hbv", "hcv", "cirrhosis", "ibd", "diabetes", "hypertension", "h_pylori"] },
+              "dependsOn": { "questionId": "cond.summary", "value": true },
               "questions": [
-                {
-                  "id": "cond.hbv.status",
-                  "text": { "en": "Hepatitis B Status", "pl": "Status WZW B" },
-                  "type": "radio",
-                  "options": ["Chronic/Active", "Cured/Cleared", "Unsure"],
-                  "dependsOn": { "questionId": "cond.summary", "value": "hbv" },
-                  "infoCard": {
-                      "id": "cond.hbv.helper",
-                      "text": { "en": "Past = doctor confirmed clearance/seroconversion.", "pl": "Past = lekarz potwierdził wyleczenie/serokonwersję." }
-                  }
-                },
-                {
-                   "id": "cond.hbv.antiviral_now",
-                   "text": {"en": "On antiviral therapy now?", "pl": "Czy aktualnie leczony/a lekami przeciwwirusowymi?"},
-                   "type": "radio",
-                   "options": ["Yes", "No", "Unsure"],
-                   "dependsOn": { "questionId": "cond.hbv.status", "value": "Chronic/Active"}
-                },
-                {
-                  "id": "cond.hcv.status",
-                  "text": { "en": "Hepatitis C Status", "pl": "Status WZW C" },
-                  "type": "radio",
-                  "options": ["Chronic/Active", "Cured (SVR)", "Unsure"],
-                  "dependsOn": { "questionId": "cond.summary", "value": "hcv" },
-                  "infoCard": {
-                      "id": "cond.hcv.helper",
-                      "text": { "en": "Past (SVR) = treatment confirmed sustained viral clearance.", "pl": "Past (SVR) = wynik po leczeniu wskazał trwałą eliminację wirusa." }
-                  }
-                },
-                {
-                    "id": "cond.hcv.svr12",
-                    "text": {"en": "If treated: cured (SVR) confirmed?", "pl": "Jeśli leczony/a: potwierdzone wyleczenie (SVR)?"},
-                    "type": "radio",
-                    "options": ["Yes", "No", "Unsure"],
-                    "dependsOn": { "questionId": "cond.hcv.status", "value": "Cured (SVR)"}
-                },
-                {
-                  "id": "cond.h_pylori.status",
-                  "text": { "en": "H. pylori Status", "pl": "Status H. pylori" },
-                  "type": "radio",
-                  "options": ["Treated/Eradicated", "Untreated/Active", "Unsure"],
-                  "dependsOn": { "questionId": "cond.summary", "value": "h_pylori" }
-                },
-                {
-                  "id": "cond.cirrhosis.etiology",
-                  "text": { "en": "Main cause of Cirrhosis", "pl": "Główna przyczyna marskości" },
-                  "type": "select",
-                  "options": ["Alcohol", "Viral (Hep B/C)", "Fatty Liver (NASH)", "Autoimmune", "Other"],
-                  "dependsOn": { "questionId": "cond.summary", "value": "cirrhosis" }
-                },
-                {
-                  "id": "cond.ibd.type",
-                  "text": { "en": "Type of IBD", "pl": "Typ IBD" },
-                  "type": "radio",
-                  "options": ["Ulcerative Colitis", "Crohn's Disease", "Unsure"],
-                  "dependsOn": { "questionId": "cond.summary", "value": "ibd" }
-                },
-                {
-                    "id": "cond.ibd.extent",
-                    "text": {"en": "Extent (UC)", "pl": "Zasięg (WZJG)"},
-                    "type": "select",
-                    "options": ["Proctitis", "Left-sided", "Pancolitis", "Unsure"],
-                    "dependsOn": { "questionId": "cond.ibd.type", "value": "Ulcerative Colitis"}
-                },
-                {
-                  "id": "cond.diabetes.type",
-                   "text": {"en": "Type of Diabetes", "pl": "Typ cukrzycy"},
-                   "type": "radio",
-                   "options": ["Type 1", "Type 2", "Gestational", "Unsure"],
-                   "dependsOn": { "questionId": "cond.summary", "value": "diabetes"}
-                },
-                {
-                   "id": "cond.hypertension.controlled",
-                   "text": {"en": "Is your hypertension controlled with medication?", "pl": "Czy nadciśnienie jest kontrolowane lekami?"},
-                   "type": "radio",
-                   "options": ["Yes", "No", "Unsure"],
-                   "dependsOn": { "questionId": "cond.summary", "value": "hypertension"}
-                }
+                { "id": "cond.hbv.status", "text": {"en": "HBV Status", "pl": "Status HBV"}, "type": "radio", "options": ["Never", "Past (resolved)", "Current", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "hbv"} },
+                { "id": "cond.hbv.year_dx", "text": {"en": "Year diagnosed", "pl": "Rok diagnozy"}, "type": "year_input", "dependsOn": {"questionId": "cond.hbv.status", "value": ["Past (resolved)", "Current"]} },
+                { "id": "cond.hbv.antiviral_now", "text": {"en": "On antiviral therapy?", "pl": "Leczenie przeciwwirusowe?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.hbv.status", "value": "Current"} },
+                
+                { "id": "cond.hcv.status", "text": {"en": "HCV Status", "pl": "Status HCV"}, "type": "radio", "options": ["Never", "Past (cured/SVR)", "Current", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "hcv"} },
+                { "id": "cond.hcv.year_dx", "text": {"en": "Year diagnosed", "pl": "Rok diagnozy"}, "type": "year_input", "dependsOn": {"questionId": "cond.summary", "value": "hcv"} },
+                { "id": "cond.hcv.svr12", "text": {"en": "Cured (SVR) confirmed?", "pl": "Wyleczenie potwierdzone?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.hcv.status", "value": ["Past (cured/SVR)", "Current"]} },
+                
+                { "id": "cond.cirrhosis.etiology", "text": {"en": "Main cause", "pl": "Główna przyczyna"}, "type": "select", "options": ["Alcohol", "Viral", "NASH", "Autoimmune", "Other"], "dependsOn": {"questionId": "cond.summary", "value": "cirrhosis"} },
+                
+                { "id": "cond.hpylori.status", "text": {"en": "H. pylori Status", "pl": "Status H. pylori"}, "type": "radio", "options": ["Never", "Past (treated)", "Current", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "h_pylori"} },
+                { "id": "cond.hpylori.year_tx", "text": {"en": "Year of eradication", "pl": "Rok eradykacji"}, "type": "year_input", "dependsOn": {"questionId": "cond.hpylori.status", "value": "Past (treated)"} },
+                
+                { "id": "cond.ibd.type", "text": {"en": "IBD Type", "pl": "Typ IBD"}, "type": "radio", "options": ["Ulcerative Colitis", "Crohn's", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "ibd"} },
+                { "id": "cond.ibd.year_dx", "text": {"en": "Year diagnosed", "pl": "Rok diagnozy"}, "type": "year_input", "dependsOn": {"questionId": "cond.summary", "value": "ibd"} },
+                { "id": "cond.ibd.extent", "text": {"en": "Extent (UC)", "pl": "Zasięg (WZJG)"}, "type": "select", "options": ["Proctitis", "Left-sided", "Pancolitis", "Not sure"], "dependsOn": {"questionId": "cond.ibd.type", "value": "Ulcerative Colitis"} },
+                { "id": "cond.ibd.psc", "text": {"en": "PSC also diagnosed?", "pl": "Współistniejące PSC?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "ibd"} },
+                
+                { "id": "cond.psc.status", "text": {"en": "PSC Status", "pl": "Status PSC"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "psc"} },
+                
+                { "id": "cond.barrett.status", "text": {"en": "Barrett's esophagus?", "pl": "Przełyk Barretta?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "barretts"} },
+                { "id": "cond.barrett.last_endo", "text": {"en": "Last endoscopy (year)", "pl": "Ostatnia endoskopia (rok)"}, "type": "year_input", "dependsOn": {"questionId": "cond.barrett.status", "value": "Yes"} },
+                
+                { "id": "cond.pancr.status", "text": {"en": "Chronic pancreatitis?", "pl": "Przewlekłe zapalenie trzustki?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "pancreatitis"} },
+                { "id": "cond.pancr.etiology", "text": {"en": "Main cause", "pl": "Główna przyczyna"}, "type": "select", "options": ["Alcohol", "Hereditary", "Obstructive", "Other", "Not sure"], "dependsOn": {"questionId": "cond.pancr.status", "value": "Yes"} },
+                
+                { "id": "cond.t2dm.status", "text": {"en": "Type 2 Diabetes?", "pl": "Cukrzyca typu 2?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "diabetes"} },
+                
+                { "id": "cond.hiv.status", "text": {"en": "HIV Infection?", "pl": "Zakażenie HIV?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "hiv"} },
+                { "id": "cond.hiv.on_art", "text": {"en": "On ART therapy?", "pl": "Leczenie ARV?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.hiv.status", "value": "Yes"} },
+                
+                { "id": "cond.tx.status", "text": {"en": "Solid organ transplant?", "pl": "Przeszczep narządu?"}, "type": "radio", "options": ["Yes", "No"], "dependsOn": {"questionId": "cond.summary", "value": "transplant"} },
+                { "id": "cond.tx.organ", "text": {"en": "Organ", "pl": "Narząd"}, "type": "select", "options": ["Kidney", "Liver", "Lung", "Heart", "Pancreas", "Other"], "dependsOn": {"questionId": "cond.tx.status", "value": "Yes"} },
+                { "id": "cond.tx.year", "text": {"en": "Year of transplant", "pl": "Rok przeszczepu"}, "type": "year_input", "dependsOn": {"questionId": "cond.tx.status", "value": "Yes"} },
+                
+                { "id": "meds.immunosupp.current", "text": {"en": "Long-term immunosuppression?", "pl": "Długotrwała immunosupresja?"}, "type": "radio", "options": ["Yes", "No"], "dependsOn": {"questionId": "cond.summary", "value": true} },
+                { "id": "meds.immunosupp.classes", "text": {"en": "Medication classes", "pl": "Klasy leków"}, "type": "checkbox_group", "options": [{"id": "Calcineurin", "label": "Calcineurin inhibitor"}, {"id": "mTOR", "label": "mTOR inhibitor"}, {"id": "Thiopurine", "label": "Thiopurine"}, {"id": "Anti-TNF", "label": "Anti-TNF"}, {"id": "Other biologic", "label": "Other biologic"}, {"id": "Steroid", "label": "Chronic steroid"}, {"id": "Other", "label": "Other"}], "dependsOn": {"questionId": "meds.immunosupp.current", "value": "Yes"} },
+                
+                { "id": "meds.hrt.use", "text": {"en": "Menopausal HRT use", "pl": "Stosowanie HTZ"}, "type": "radio", "options": ["Never", "Past", "Current"], "dependsOn": {"questionId": "sex_at_birth", "value": "Female"} },
+                { "id": "meds.hrt.type", "text": {"en": "HRT Type", "pl": "Typ HTZ"}, "type": "select", "options": ["Combined", "Estrogen-only", "Other"], "dependsOn": {"questionId": "meds.hrt.use", "value": ["Past", "Current"]} },
+                { "id": "meds.hrt.duration_yrs", "text": {"en": "Duration (years)", "pl": "Czas trwania (lata)"}, "type": "number_input", "dependsOn": {"questionId": "meds.hrt.use", "value": ["Past", "Current"]} }
               ]
             },
             {
               "id": "personal_cancer_history",
-              "title": { "en": "Personal Cancer History", "pl": "Osobista Historia Nowotworów" },
+              "title": { "en": "Personal Cancer Details", "pl": "Szczegóły Osobistej Historii" },
               "dependsOn": { "questionId": "ca.any_history", "value": "Yes" },
               "options": {
-                "cancerTypes": [ 
+                "cancerTypes": [
                   { "value": "breast", "label": "Breast" },
-                  { "value": "lung", "label": "Lung" },
-                  { "value": "colorectal", "label": "Colorectal" },
                   { "value": "prostate", "label": "Prostate" },
+                  { "value": "colorectal", "label": "Colorectal" },
+                  { "value": "lung", "label": "Lung" },
+                  { "value": "melanoma", "label": "Melanoma" },
                   { "value": "endometrium", "label": "Endometrium" },
-                  { "value": "oesophagus", "label": "Oesophagus" },
+                  { "value": "ovarian", "label": "Ovarian" },
                   { "value": "pancreas", "label": "Pancreas" },
-                  { "value": "liver", "label": "Liver" },
+                  { "value": "gastric", "label": "Gastric" },
                   { "value": "bladder", "label": "Bladder" },
-                  { "value": "brain", "label": "Brain" },
+                  { "value": "kidney", "label": "Kidney" },
                   { "value": "thyroid", "label": "Thyroid" },
-                  { "value": "sarcoma", "label": "Sarcoma" },
                   { "value": "lymphoma", "label": "Lymphoma" },
                   { "value": "leukemia", "label": "Leukemia" },
-                  { "value": "myeloma", "label": "Myeloma" },
-                  { "value": "kidney", "label": "Kidney" },
-                  { "value": "melanoma", "label": "Melanoma" },
-                  { "value": "gastric", "label": "Stomach (Gastric)" },
-                  { "value": "ovarian", "label": "Ovarian" },
                   { "value": "other", "label": "Other" }
                 ],
-                "treatmentTypes": [ { "id": "surgery", "label": "Surgery"}, { "id": "chemo", "label": "Chemotherapy"}, {"id": "radio", "label": "Radiotherapy"}, {"id": "endo", "label": "Endocrine Therapy"}, {"id": "immuno", "label": "Immunotherapy"}, {"id": "hsct", "label": "Stem-cell Transplant"} ],
-                "stageOptions": [{"value": "I", "label": "Stage I"}, {"value": "II", "label": "Stage II"}, {"value": "III", "label": "Stage III"}, {"value": "IV", "label": "Stage IV"}, {"value": "0", "label": "Stage 0 (in situ)"}],
-                "lateralityOptions": [{"value": "Left", "label": "Left"}, {"value": "Right", "label": "Right"}, {"value": "Bilateral", "label": "Bilateral"}, {"value": "Midline", "label": "Midline/Central"}]
+                "treatmentTypes": [ { "id": "surgery", "label": "Surgery" }, { "id": "chemo", "label": "Chemotherapy" }, { "id": "radio", "label": "Radiotherapy" }, { "id": "endo", "label": "Hormone Therapy" }, { "id": "immuno", "label": "Immunotherapy" }, { "id": "hsct", "label": "Stem-cell Transplant" } ]
               }
             },
             {
+              "id": "family_cancer_history",
+              "title": { "en": "Family Cancer Details", "pl": "Szczegóły Rodzinne" },
+              "dependsOn": { "questionId": "famhx.any_family_cancer", "value": "Yes" },
+              "options": {
+                "relations": ["Mother", "Father", "Sister", "Brother", "Daughter", "Son", "Maternal Grandmother", "Maternal Grandfather", "Paternal Grandmother", "Paternal Grandfather", "Aunt", "Uncle", "Niece", "Nephew", "Cousin"],
+                "cancerTypes": [
+                  { "value": "breast", "label": "Breast" },
+                  { "value": "prostate", "label": "Prostate" },
+                  { "value": "colorectal", "label": "Colorectal" },
+                  { "value": "ovarian", "label": "Ovarian" },
+                  { "value": "endometrium", "label": "Endometrium" },
+                  { "value": "pancreas", "label": "Pancreas" },
+                  { "value": "lung", "label": "Lung" },
+                  { "value": "melanoma", "label": "Melanoma" },
+                  { "value": "gastric", "label": "Gastric" },
+                  { "value": "other", "label": "Other" }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "genetics_exposures",
+      "title": { "en": "Genetics & Exposures", "pl": "Genetyka i Narażenia" },
+      "questions": [
+        {
+          "id": "gen.testing_ever",
+          "type": "radio",
+          "text": { "en": "Have you ever had a genetic test for cancer risk?", "pl": "Czy miałeś/aś badania genetyczne pod kątem raka?" },
+          "options": [
+            { "value": "never", "label": { "en": "Never", "pl": "Nigdy" } },
+            { "value": "yes_report", "label": { "en": "Yes, report available", "pl": "Tak, mam wynik" } },
+            { "value": "yes_no_details", "label": { "en": "Yes, no details", "pl": "Tak, brak szczegółów" } },
+            { "value": "not_sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+          ]
+        },
+        {
+          "id": "gen.path_variant_self",
+          "type": "radio",
+          "text": { "en": "Did the test find a pathogenic variant?", "pl": "Czy wykryto wariant patogenny?" },
+          "options": ["No", "Yes", "VUS only", "Not sure"],
+          "dependsOn": { "questionId": "gen.testing_ever", "operator": "!=", "value": "never" }
+        },
+        {
+          "id": "gen.self_genes",
+          "type": "checkbox_group",
+          "text": { "en": "Which genes were affected?", "pl": "Które geny?" },
+          "dependsOn": { "questionId": "gen.path_variant_self", "value": "Yes" },
+          "options": [
+            { "id": "BRCA1", "label": "BRCA1" }, { "id": "BRCA2", "label": "BRCA2" }, { "id": "PALB2", "label": "PALB2" },
+            { "id": "TP53", "label": "TP53" }, { "id": "PTEN", "label": "PTEN" }, { "id": "CDH1", "label": "CDH1" },
+            { "id": "STK11", "label": "STK11" }, { "id": "Lynch", "label": "Lynch (MLH1/MSH2/MSH6/PMS2/EPCAM)" },
+            { "id": "APC", "label": "APC" }, { "id": "MUTYH", "label": "MUTYH" },
+            { "id": "Other", "label": "Other" }
+          ]
+        },
+        {
+          "id": "gen.test_type",
+          "type": "checkbox_group",
+          "text": { "en": "What type of test?", "pl": "Jaki typ badania?" },
+          "dependsOn": { "questionId": "gen.testing_ever", "operator": "!=", "value": "never" },
+          "options": [
+            { "id": "single_brca", "label": "Single gene (BRCA)" },
+            { "id": "panel_breast_ovarian", "label": "Panel (Breast/Ovarian)" },
+            { "id": "panel_multicancer", "label": "Panel (Multicancer)" },
+            { "id": "panel_colorectal", "label": "Panel (Colorectal)" },
+            { "id": "exome_genome", "label": "Exome/Genome" },
+            { "id": "tumor_only", "label": "Tumor-only" },
+            { "id": "other", "label": "Other" }
+          ]
+        },
+        {
+          "id": "gen.test_year_first",
+          "type": "year_input",
+          "text": { "en": "Year of first test", "pl": "Rok pierwszego badania" },
+          "dependsOn": { "questionId": "gen.testing_ever", "operator": "!=", "value": "never" }
+        },
+        {
+          "id": "gen.prs_done",
+          "type": "radio",
+          "text": { "en": "Have you had a Polygenic Risk Score (PRS) test?", "pl": "Czy miałeś/aś test PRS (wielogenowy)?" },
+          "options": ["Never", "Yes - Clinical", "Yes - Consumer", "Not sure"]
+        },
+        
+        {
+          "id": "occ.exposure_any",
+          "type": "radio",
+          "text": { "en": "Any significant occupational exposures?", "pl": "Istotne narażenia zawodowe?" },
+          "options": ["No", "Yes", "Not sure"]
+        },
+        {
+          "id": "occ.hazards.subs",
+          "type": "checkbox_group",
+          "text": { "en": "Select specific hazards", "pl": "Wybierz czynniki" },
+          "dependsOn": { "questionId": "occ.exposure_any", "value": ["Yes", "Not sure"] },
+          "exclusiveOptionId": "none",
+          "options": [
+            { "id": "asbestos", "label": "Asbestos" },
+            { "id": "silica", "label": "Silica/Rock dust" },
+            { "id": "wood_dust", "label": "Wood dust" },
+            { "id": "leather_dust", "label": "Leather dust" },
+            { "id": "diesel", "label": "Diesel exhaust" },
+            { "id": "metal_fluids", "label": "Metalworking fluids" },
+            { "id": "welding", "label": "Welding fumes" },
+            { "id": "soot", "label": "Soot/Coal tar/Pitch" },
+            { "id": "rubber_chem", "label": "Rubber chemicals" },
+            { "id": "benzene", "label": "Benzene/Solvents" },
+            { "id": "formaldehyde", "label": "Formaldehyde" },
+            { "id": "pesticides", "label": "Pesticides" },
+            { "id": "radiation", "label": "Ionizing Radiation" },
+            { "id": "uv_sunlight", "label": "Outdoor work (UV)" },
+            { "id": "shift_night", "label": "Night shift work" },
+            { "id": "firefighter", "label": "Firefighter smoke" },
+            { "id": "hairdresser", "label": "Hairdresser chemicals" },
+            { "id": "painter", "label": "Paints/Solvents" },
+            { "id": "none", "label": "None" }
+          ]
+        },
+        {
+          "id": "advanced_modules_occ",
+          "type": "advanced_modules",
+          "modules": [
+            {
+              "id": "occupational_hazards",
+              "title": { "en": "Occupational Details", "pl": "Szczegóły Zawodowe" },
+              "dependsOn": { "questionId": "occ.exposure_any", "value": ["Yes", "Not sure"] },
+              "options": {
+                "jobTitles": [
+                  { "value": "Welder", "label": "Welder" }, { "value": "Miner", "label": "Miner" }, { "value": "Painter", "label": "Painter" }, 
+                  { "value": "Firefighter", "label": "Firefighter" }, { "value": "Farmer", "label": "Farmer" }, { "value": "Driver", "label": "Driver" }
+                ],
+                "exposures": [
+                  { "value": "asbestos", "label": "Asbestos" }, { "value": "silica", "label": "Silica" }, { "value": "diesel", "label": "Diesel" },
+                  { "value": "welding", "label": "Welding" }, { "value": "benzene", "label": "Benzene" }
+                ],
+                "ppe": [
+                  { "value": "Mask", "label": "Mask/Respirator" }, { "value": "Ventilation", "label": "Ventilation" }, { "value": "None", "label": "None" }
+                ]
+              }
+            }
+          ]
+        },
+        
+        {
+          "id": "env.summary",
+          "type": "checkbox_group",
+          "text": { "en": "Environmental History (Select all)", "pl": "Historia Środowiskowa (Zaznacz)" },
+          "exclusiveOptionId": "none",
+          "options": [
+            { "id": "traffic_air", "label": { "en": "Long-term heavy traffic / city air", "pl": "Długotrwały duży ruch / powietrze miejskie" } },
+            { "id": "industry", "label": { "en": "Near heavy industry/power plant", "pl": "Blisko przemysłu/elektrowni" } },
+            { "id": "solid_fuel", "label": { "en": "Solid fuel heating/cooking indoors", "pl": "Ogrzewanie/gotowanie paliwem stałym" } },
+            { "id": "radon", "label": { "en": "High radon area", "pl": "Obszar o wysokim radonie" } },
+            { "id": "asbestos", "label": { "en": "Home with asbestos", "pl": "Dom z azbestem" } },
+            { "id": "private_well", "label": { "en": "Long-term private well water", "pl": "Długotrwałe korzystanie ze studni" } },
+            { "id": "pesticides", "label": { "en": "Regular pesticide use at home", "pl": "Regularne pestycydy w domu" } },
+            { "id": "sunbed", "label": { "en": "Frequent indoor tanning", "pl": "Częste solarium" } },
+            { "id": "none", "label": { "en": "None", "pl": "Brak" } }
+          ]
+        },
+        { "id": "env.air.high_pollution_years", "type": "number_input", "text": {"en": "Years in high pollution?", "pl": "Lata w zanieczyszczeniu?"}, "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "traffic_air"} },
+        { "id": "env.air.current_high", "type": "radio", "text": {"en": "Currently living there?", "pl": "Mieszkasz tam obecnie?"}, "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "traffic_air"} },
+        
+        { "id": "env.indoor.solidfuel_ever", "type": "radio", "text": {"en": "Ever used solid fuel indoors?", "pl": "Używałeś paliw stałych w domu?"}, "options": ["Never", "Childhood", "Adulthood", "Both"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "solid_fuel"} },
+        { "id": "env.indoor.solidfuel_years", "type": "number_input", "text": {"en": "Total years used?", "pl": "Łącznie lat?"}, "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "solid_fuel"} },
+        { "id": "env.indoor.solidfuel_ventilation", "type": "select", "text": {"en": "Ventilation used?", "pl": "Wentylacja?"}, "options": ["Closed stove/Chimney", "Open fire", "No dedicated flue"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "solid_fuel"} },
+        
+        { "id": "env.radon.tested", "type": "radio", "text": {"en": "Has home been tested for radon?", "pl": "Czy dom był badany na radon?"}, "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "radon"} },
+        { "id": "env.radon.level_cat", "type": "select", "text": {"en": "Radon level found?", "pl": "Poziom radonu?"}, "options": ["Low", "Moderate (100-299)", "High (>=300)", "Don't know"], "dependsOn": {"questionId": "env.radon.tested", "value": "Yes"} },
+        { "id": "env.radon.mitigation", "type": "radio", "text": {"en": "Mitigation done?", "pl": "Wykonano naprawy?"}, "options": ["Yes", "No", "Not applicable"], "dependsOn": {"questionId": "env.radon.level_cat", "value": ["Moderate (100-299)", "High (>=300)"]} },
+        
+        { "id": "env.asbestos.home_status", "type": "radio", "text": {"en": "Asbestos status", "pl": "Status azbestu"}, "options": ["Still present", "Removed by pros", "Removed yourself"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "asbestos"} },
+        { "id": "env.asbestos.disturbance", "type": "radio", "text": {"en": "Was it disturbed/drilled?", "pl": "Czy był naruszany/wiercony?"}, "options": ["Yes - once", "Yes - multiple", "No"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "asbestos"} },
+        
+        { "id": "env.water.main_source_10y", "type": "select", "text": {"en": "Main water source >10y?", "pl": "Główne źródło wody >10 lat?"}, "options": ["Municipal", "Private well", "Bottled"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "private_well"} },
+        { "id": "env.water.well_contam_notice", "type": "radio", "text": {"en": "Ever told about contamination (arsenic/nitrates)?", "pl": "Informacja o skażeniu (arsen/azotany)?"}, "options": ["Yes", "No"], "dependsOn": {"questionId": "env.water.main_source_10y", "value": "Private well"} },
+        
+        { "id": "env.pesticide.use_freq_year", "type": "number_input", "text": {"en": "Times/year mixing pesticides?", "pl": "Ile razy w roku mieszasz pestycydy?"}, "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
+        { "id": "env.pesticide.years_use", "type": "number_input", "text": {"en": "Years used?", "pl": "Lata używania?"}, "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
+        { "id": "env.pesticide.protection", "type": "select", "text": {"en": "Protective gear used?", "pl": "Odzież ochronna?"}, "options": ["Always", "Sometimes", "Never"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
+        
+        { "id": "env.uv.sunbed_use", "type": "select", "text": {"en": "Lifetime sunbed use", "pl": "Użycie solarium w życiu"}, "options": ["Never", "Few (<10)", "Occasional (10-50)", "Frequent (>50)"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "sunbed"} },
+        { "id": "env.uv.sunburn_child", "type": "number_input", "text": {"en": "Blistering sunburns <18y", "pl": "Oparzenia z pęcherzami <18 lat"}, "min": 0, "max": 50 },
+        { "id": "env.uv.sunburn_adult", "type": "number_input", "text": {"en": "Blistering sunburns 18+y", "pl": "Oparzenia z pęcherzami 18+ lat"}, "min": 0, "max": 100 }
+      ]
+    },
+    {
+      "id": "screening_imm",
+      "title": { "en": "Screening & Immunization", "pl": "Badania i Szczepienia" },
+      "questions": [
+        {
+          "id": "screen.summary",
+          "type": "checkbox_group",
+          "text": { "en": "Which screenings have you EVER had?", "pl": "Które badania miałeś/aś kiedykolwiek?" },
+          "exclusiveOptionId": "none",
+          "options": [
+            { "id": "colonoscopy", "label": "Colonoscopy" },
+            { "id": "mammogram", "label": "Mammogram" },
+            { "id": "pap_test", "label": "Pap/HPV Test" },
+            { "id": "psa_test", "label": "PSA Test" },
+            { "id": "lung_scan", "label": "Lung CT" },
+            { "id": "skin_exam", "label": "Skin Exam" },
+            { "id": "none", "label": "None" }
+          ]
+        },
+        {
+          "id": "imm.card_available",
+          "type": "radio",
+          "text": { "en": "Vaccination card available?", "pl": "Masz książeczkę szczepień?" },
+          "options": ["Yes", "No"]
+        },
+        {
+          "id": "imm.hpv.doses",
+          "type": "select",
+          "text": { "en": "HPV Doses received", "pl": "Otrzymane dawki HPV" },
+          "options": ["0", "1", "2", "3", "Not sure"]
+        },
+        {
+          "id": "imm.hbv.completed",
+          "type": "radio",
+          "text": { "en": "Hepatitis B series completed?", "pl": "Seria WZW B zakończona?" },
+          "options": ["Yes", "No", "Not sure"]
+        },
+        {
+          "id": "advanced_modules_screen",
+          "type": "advanced_modules",
+          "modules": [
+            {
               "id": "screening_immunization",
-              "title": {"en": "Screening & Immunization", "pl": "Badania Przesiewowe i Szczepienia"},
-              "questions": [
-                  {
-                      "id": "screen.summary",
-                      "text": {"en": "Which of the following screening tests have you EVER had?", "pl": "Które z poniższych badań przesiewowych kiedykolwiek wykonałeś/aś?"},
-                      "type": "checkbox_group",
-                      "options": [
-                          {"id": "colonoscopy", "label": {"en": "Colonoscopy", "pl": "Kolonoskopia"}},
-                          {"id": "mammogram", "label": {"en": "Mammogram", "pl": "Mammografia"}},
-                          {"id": "pap_test", "label": {"en": "Pap/HPV Test", "pl": "Badanie Pap/HPV"}},
-                          {"id": "psa_test", "label": {"en": "PSA Test", "pl": "Badanie PSA"}},
-                          {"id": "lung_scan", "label": {"en": "Lung Cancer Screening (CT)", "pl": "Tomografia płuc (CT)"}},
-                          {"id": "skin_exam", "label": {"en": "Full Body Skin Exam", "pl": "Pełne badanie skóry"}},
-                          {"id": "liver_us", "label": {"en": "Liver Ultrasound", "pl": "USG Wątroby"}},
-                          {"id": "gastroscopy", "label": {"en": "Gastroscopy", "pl": "Gastroskopia"}},
-                          {"id": "none", "label": {"en": "None of the above", "pl": "Żadne z powyższych"}}
-                      ],
-                      "exclusiveOptionId": "none"
-                  }
-              ],
+              "title": { "en": "Screening Details", "pl": "Szczegóły Badań" },
+              "dependsOn": { "questionId": "screen.summary", "value": true },
               "screenings": [
                 {
-                  "id": "colonoscopy", 
-                  "text": {"en": "Colonoscopy", "pl":"Kolonoskopia"}, 
-                  "dependsOn": {"questionId": "screen.summary", "value": "colonoscopy"},
+                  "id": "colonoscopy",
+                  "text": { "en": "Colonoscopy", "pl": "Kolonoskopia" },
+                  "dependsOn": { "questionId": "screen.summary", "value": "colonoscopy" },
                   "questions": [
-                    {"id": "screen.colonoscopy.date", "text": {"en":"Year of last colonoscopy", "pl":"Rok ostatniej kolonoskopii"}, "type": "year_input"},
-                    {"id": "screen.colonoscopy.finding", "text": {"en":"Result/Finding", "pl":"Wynik"}, "type": "select", "options": ["Normal", "Polyp(s)", "Cancer", "Other", "Unsure"]}
+                    { "id": "screen.colonoscopy.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
+                    { "id": "screen.crc.last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Polyps", "Cancer", "Unsure"] },
+                    { "id": "screen.crc.followup_interval", "text": {"en": "Recommended interval?", "pl": "Zalecony odstęp?"}, "type": "select", "options": ["10y", "5y", "3y", "1y", "Unsure"] }
                   ]
                 },
                 {
-                  "id": "mammogram", 
-                  "text": {"en":"Mammogram", "pl":"Mammografia"}, 
-                  "dependsOn": {"questionId": "screen.summary", "value": "mammogram"}, 
+                  "id": "mammogram",
+                  "text": { "en": "Mammogram", "pl": "Mammografia" },
+                  "dependsOn": { "questionId": "screen.summary", "value": "mammogram" },
                   "questions": [
-                    {"id": "screen.mammo.date", "text": {"en":"Year of last mammogram", "pl":"Rok ostatniej mammografii"}, "type": "year_input"},
-                    {"id": "screen.mammo.result", "text": {"en":"Result", "pl":"Wynik"}, "type": "select", "options": ["Normal", "Abnormal", "Unsure"]}
+                    { "id": "screen.mammo.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
+                    { "id": "screen.breast.mammo_last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Benign", "Abnormal", "Unsure"] }
                   ]
                 },
                 {
-                  "id": "pap_test", 
-                  "text": {"en": "Pap/HPV Test", "pl": "Badanie Pap/HPV"}, 
-                  "dependsOn": {"questionId": "screen.summary", "value": "pap_test"}, 
+                  "id": "pap_test",
+                  "text": { "en": "Pap/HPV", "pl": "Pap/HPV" },
+                  "dependsOn": { "questionId": "screen.summary", "value": "pap_test" },
                   "questions": [
-                    {"id": "screen.pap.date", "text": {"en":"Year of last test", "pl": "Rok ostatniego badania"}, "type": "year_input"},
-                    {"id": "screen.cervix.last_type", "text": {"en":"Type of last test", "pl": "Rodzaj ostatniego badania"}, "type": "select", "options": ["Pap", "HPV", "Co-testing", "Unsure"]},
-                    {"id": "screen.cervix.last_result", "text": {"en":"Last result", "pl": "Ostatni wynik"}, "type": "select", "options": ["Normal", "Abnormal", "Unsure"]}
+                    { "id": "screen.pap.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
+                    { "id": "screen.cervix.last_type", "text": {"en": "Type", "pl": "Typ"}, "type": "select", "options": ["Pap only", "HPV only", "Co-testing"] },
+                    { "id": "screen.cervix.last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Abnormal", "Unsure"] }
                   ]
                 },
                 {
-                  "id": "psa_test", 
-                  "text": {"en":"PSA Test", "pl": "Badanie PSA"}, 
-                  "dependsOn": {"questionId": "screen.summary", "value": "psa_test"}, 
+                  "id": "psa_test",
+                  "text": { "en": "PSA", "pl": "PSA" },
+                  "dependsOn": { "questionId": "screen.summary", "value": "psa_test" },
                   "questions": [
-                    {"id": "screen.psa.date", "text": {"en":"Year of last test", "pl":"Rok ostatniego badania"}, "type": "year_input"},
-                    {"id": "screen.psa.result", "text": {"en":"Result", "pl":"Wynik"}, "type": "select", "options": ["Normal", "Elevated", "Unsure"]}
+                    { "id": "screen.psa.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
+                    { "id": "screen.prostate.psa_abnormal", "text": {"en": "Was it elevated?", "pl": "Czy był podwyższony?"}, "type": "radio", "options": ["Yes", "No"] }
                   ]
                 },
                 {
-                  "id": "screen.lung",
-                  "text": {"en": "Lung Cancer Screening (LDCT)", "pl": "Badanie przesiewowe raka płuc (LDCT)"},
-                  "dependsOn": {"questionId": "screen.summary", "value": "lung_scan"}, 
+                  "id": "lung_scan",
+                  "text": { "en": "Lung CT", "pl": "TK Płuc" },
+                  "dependsOn": { "questionId": "screen.summary", "value": "lung_scan" },
                   "questions": [
-                    {"id": "screen.lung.ldct_last_year", "text": {"en": "Year of last LDCT", "pl": "Rok ostatniego LDCT"}, "type": "year_input"},
-                    {"id": "screen.lung.result", "text": {"en":"Result", "pl":"Wynik"}, "type": "select", "options": ["Normal", "Abnormal/Nodule", "Unsure"]}
+                    { "id": "screen.lung.ldct_last_year", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
+                    { "id": "screen.lung.ldct_last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Nodules", "Unsure"] }
                   ]
-                },
-                {
-                   "id": "screen.skin",
-                   "text": {"en": "Skin Cancer Screening", "pl": "Badanie skóry"},
-                   "dependsOn": {"questionId": "screen.summary", "value": "skin_exam"},
-                   "questions": [
-                      {"id": "screen.skin.last_year", "text": {"en": "Year of last exam", "pl": "Rok ostatniego badania"}, "type": "year_input"},
-                      {"id": "screen.skin.finding", "text": {"en": "Finding", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Pre-cancerous", "Melanoma", "Other", "Unsure"]}
-                   ]
-                },
-                {
-                   "id": "screen.hcc",
-                   "text": {"en": "Liver Cancer Screening", "pl": "Badanie wątroby"},
-                   "dependsOn": {"questionId": "screen.summary", "value": "liver_us"},
-                   "questions": [
-                      {"id": "screen.hcc.us_last_year", "text": {"en": "Year of last ultrasound", "pl": "Rok ostatniego USG"}, "type": "year_input"},
-                      {"id": "screen.hcc.result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Abnormal", "Unsure"]}
-                   ]
-                },
-                {
-                    "id": "screen.upper_endo",
-                    "text": {"en": "Upper Endoscopy", "pl": "Gastroskopia"},
-                    "dependsOn": {"questionId": "screen.summary", "value": "gastroscopy"},
-                    "questions": [
-                      {"id": "screen.upper_endo.last_year", "text": {"en": "Year of last endoscopy", "pl": "Rok ostatniej gastroskopii"}, "type": "year_input"},
-                      {"id": "screen.upper_endo.finding", "text": {"en": "Finding", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Gastritis", "Barrett's", "Ulcer", "Cancer", "Other"]}
-                    ]
                 }
               ],
               "immunizations": [
-                {"id": "imm.hpv", "text": {"en": "HPV vaccination", "pl": "Szczepienie przeciwko HPV"}, "type": "select", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]},
-                {"id": "imm.hbv", "text": {"en": "HBV vaccination", "pl": "Szczepienie przeciwko HBV"}, "type": "select", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]},
-                {"id": "imm.hav.any", "text": {"en": "HAV vaccination (Hep A)", "pl": "Szczepienie przeciwko WZW A"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
-                {"id": "imm.flu.last_season", "text": {"en": "Flu shot last season?", "pl": "Szczepienie na grypę w ost. sezonie?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
-                {"id": "imm.covid.doses", "text": {"en": "Number of COVID-19 doses", "pl": "Liczba dawek na COVID-19"}, "type": "select", "options": ["0", "1", "2", "3", "4+"]},
-                {"id": "imm.td_tdap.year_last", "text": {"en": "Year of last Tetanus/Tdap", "pl": "Rok ostatniego szczepienia na tężec"}, "type": "year_input" },
-                {"id": "imm.pneumo.ever", "text": {"en": "Pneumococcal vaccination ever?", "pl": "Szczepienie przeciwko pneumokokom?"}, "type": "select", "options": ["Yes", "No", "Unsure"]},
-                {"id": "imm.zoster.ever", "text": {"en": "Shingles (Zoster) vaccination ever?", "pl": "Szczepienie przeciwko półpaścowi?"}, "type": "select", "options": ["Yes", "No", "Unsure"]}
-              ]
-            },
-            {
-              "id": "medications_iatrogenic",
-              "title": {"en": "Medications / Iatrogenic", "pl": "Leki / Jatrogenne"},
-              "questions": [
-                {
-                  "id": "immunosuppression_now",
-                  "text": {"en": "Are you currently taking any medication that suppresses your immune system?", "pl": "Czy obecnie przyjmujesz leki osłabiające układ odpornościowy?"},
-                  "type": "select",
-                  "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Unsure", "label": {"en": "Unsure", "pl": "Nie wiem"}}]
-                },
-                {
-                  "id": "immunosuppression_cause",
-                  "text": {"en": "If yes, please specify the reason or medication.", "pl": "Jeśli tak, podaj przyczynę lub nazwę leku."},
-                  "type": "text_input",
-                  "placeholder": {"en": "e.g., for transplant, autoimmune disease, medication name", "pl": "np. po przeszczepie, choroba autoimmunologiczna, nazwa leku"},
-                  "dependsOn": { "questionId": "immunosuppression_now", "value": "Yes" }
-                }
-              ]
-            },
-            {
-              "id": "sexual_health",
-              "title": {"en": "Sexual Health (Optional)", "pl": "Zdrowie Seksualne (Opcjonalne)"},
-              "questions": [
-                {"id": "sexhx.section_opt_in", "text": {"en": "Would you like to answer equal optional questions about sexual health?", "pl": "Czy chciałbyś odpowiedzieć na kilka opcjonalnych pytań dotyczących zdrowia seksualnego?"}, "type": "select", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}, {"value":"Prefer not to say", "label":"Prefer not to say"}]},
-                {"id": "sexhx.ever_sexual_contact", "text": {"en": "Have you ever had any sexual contact?", "pl": "Czy kiedykolwiek miał(a)eś kontakt seksualny?"}, "type": "radio", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}, {"value":"Prefer not to say", "label":"Prefer not to say"}], "dependsOn": {"questionId": "sexhx.section_opt_in", "value": "Yes"}},
-                
-                {"id": "sexhx.new_partner_12m", "text": {"en": "New partner in last 12 months?", "pl": "Nowy partner w ciągu ostatnich 12 miesięcy?"}, "type": "select", "options": ["Yes", "No"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
-                
-                {"id": "sexhx.partner_genders", "text": {"en": "Gender of partners", "pl": "Płeć partnerów/partnerek"}, "type": "checkbox_group", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": [{"id": "male", "label": {"en":"Male", "pl": "Mężczyźni"}}, {"id": "female", "label": {"en":"Female", "pl": "Kobiety"}}, {"id": "other", "label": {"en":"Other", "pl": "Inne"}}, {"id": "prefer_not_to_say", "label": {"en":"Prefer not to say", "pl": "Wolę nie odpowiadać"}}]},
-                {"id": "sexhx.lifetime_partners_cat", "text": {"en": "Lifetime sexual partners", "pl": "Liczba partnerów/partnerek seksualnych w ciągu całego życia"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["0-1", "2-4", "5-9", "10-19", "20+", "Prefer not to say"]},
-                {"id": "sexhx.partners_12m_cat", "text": {"en": "Partners in last 12 months", "pl": "Liczba partnerów/partnerek w ciągu ostatnich 12 miesięcy"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["0", "1", "2-3", "4-5", "6+", "Prefer not to say"]},
-                
-                {"id": "sexhx.sex_work_ever", "text": {"en": "Ever engaged in sex work?", "pl": "Praca seksualna kiedykolwiek?"}, "type": "radio", "options": ["Yes", "No", "Prefer not to say"]},
-                {"id": "sexhx.sex_work_role", "text": {"en": "Role in sex work", "pl": "Rola w pracy seksualnej"}, "type": "text_input", "dependsOn": {"questionId": "sexhx.sex_work_ever", "value": "Yes"}},
-                
-                {"id": "sexhx.age_first_sex", "text": {"en": "Age at first sexual intercourse", "pl": "Wiek inicjacji seksualnej"}, "type": "number_input", "validation": { "min": 8, "max": 80 }},
-                {"id": "sexhx.sex_sites_ever", "text": {"en": "Sexual practices (Lifetime)", "pl": "Praktyki seksualne (Całe życie)"}, "type": "checkbox_group", "options": [{"id": "vaginal", "label": "Vaginal"}, {"id": "anal", "label": "Anal"}, {"id": "oral", "label": "Oral"}, {"id": "prefer_not_to_say", "label": "Prefer not to say"}]},
-                {"id": "sexhx.sex_sites_12m", "text": {"en": "Sexual practices (Last 12m)", "pl": "Praktyki seksualne (Ost. 12 mies.)"}, "type": "checkbox_group", "options": [{"id": "vaginal", "label": "Vaginal"}, {"id": "anal", "label": "Anal"}, {"id": "oral", "label": "Oral"}, {"id": "prefer_not_to_say", "label": "Prefer not to say"}]},
-                
-                {"id": "sexhx.condom_use_12m", "text": {"en": "Condom/barrier use frequency", "pl": "Częstotliwość używania prezerwatyw/barier"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["Always", "Sometimes", "Never", "Prefer not to say"]},
-                
-                {"id": "sexhx.sti_history_other", "text": {"en": "History of sexually transmitted infections (STIs)?", "pl": "Historia infekcji przenoszonych drogą płciową (STI)?"}, "type": "radio", "options": ["Yes", "No", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
-                {"id": "sexhx.sti_types_other", "text": {"en": "Which STIs have you been diagnosed with?", "pl": "Które STI zostały u Ciebie zdiagnozowane?"}, "type": "checkbox_group", "dependsOn": {"questionId": "sexhx.sti_history_other", "value": "Yes"}, "options": [{"id": "hpv", "label": "HPV"}, {"id": "chlamydia", "label": "Chlamydia"}, {"id": "hiv", "label": "HIV"}, {"id": "syphilis", "label": "Syphilis"}, {"id": "gonorrhea", "label": "Gonorrhea"}]},
-                
-                {"id": "sexhx.sti_treated_12m", "text": {"en": "Were you treated for an STI in the last 12 months?", "pl": "Czy byłeś/aś leczony/a na STI w ciągu ostatnich 12 miesięcy?"}, "type": "select", "options": ["Yes", "No"], "dependsOn": {"questionId": "sexhx.sti_history_other", "value": "Yes"}},
-                
-                {"id": "sexhx.hpv_precancer_history", "text": {"en": "History of HPV-related precancer?", "pl": "Historia zmian przedrakowych HPV?"}, "type": "checkbox_group", "options": [{"id": "cervix", "label": "Cervix"}, {"id": "vulva", "label": "Vulva"}, {"id": "vagina", "label": "Vagina"}, {"id": "anus", "label": "Anus"}, {"id": "penis", "label": "Penis"}, {"id": "mouth_throat", "label": "Mouth/Throat"}, {"id": "not_sure", "label": "Not sure"}, {"id": "prefer_not_to_say", "label": "Prefer not to say"}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
-
-                {"id": "sex_anal", "text": {"en": "Anal intercourse?", "pl": "Stosunek analny?"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["Yes", "No", "Prefer not to say"]},
-                {"id": "sex_oral", "text": {"en": "Oral sex?", "pl": "Seks oralny?"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["Yes", "No", "Prefer not to say"]},
-                {"id": "sex_barriers_practices", "text": {"en": "How often were barriers (e.g., condoms) used during these practices?", "pl": "Jak często stosowano bariery (np. prezerwatywy) podczas tych praktyk?"}, "type": "select", "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}, "options": ["Always", "Sometimes", "Never", "Prefer not to say"]}
-              ]
-            },
-            {
-              "id": "occupational_hazards",
-              "title": { "en": "Occupational Hazards (Optional)", "pl": "Zagrożenia Zawodowe (Opcjonalne)"},
-              "dependsOn": { "questionId": "occ.exposure_any", "value": "Yes" },
-              "questions": [
-                { "id": "occ.hazards.subs", "text": {"en": "Check all hazards you have been exposed to:", "pl": "Zaznacz wszystkie zagrożenia, na które byłeś/aś narażony/a:"}, "type": "checkbox_group", "options": [
-                  {"id": "asbestos", "label": "Asbestos"}, {"id": "silica", "label": "Silica dust"}, {"id": "diesel", "label": "Diesel exhaust"}, {"id": "pesticides", "label": "Pesticides"}, {"id": "solvents", "label": "Solvents"}, {"id": "welding", "label": "Welding fumes"}, {"id": "radiation", "label": "Ionizing Radiation"},
-                  {"id": "wood_dust", "label": "Wood dust"}, {"id": "leather_dust", "label": "Leather dust"}, {"id": "metal_fluids", "label": "Metalworking fluids"}, {"id": "soot", "label": "Soot/coal tar"}, {"id": "rubber", "label": "Rubber production"}, {"id": "benzene", "label": "Benzene"}, {"id": "formaldehyde", "label": "Formaldehyde"}, {"id": "uv_sunlight", "label": "Sunlight (UV) (Outdoor worker)"},
-                  {"id": "shift_night", "label": "Night shift work (long term)"}, {"id": "firefighter", "label": "Firefighter"}, {"id": "hairdresser", "label": "Hairdresser/Barber"}, {"id": "painter", "label": "Painter"},
-                  {"id": "none", "label": "None"}
-                ], "exclusiveOptionId": "none"},
-                {"id": "employment_status", "text": {"en": "What is your current employment status?", "pl": "Jaki jest Pana/Pani obecny status zatrudnienia?"}, "type": "select", "options": ["Employed", "Self-employed", "Unemployed", "Student", "Retired"]},
-                {"id": "occ_exposure_duration", "text": {"en": "Approx. years exposed (sum)", "pl": "Przybliżona liczba lat ekspozycji (suma)"}, "type": "number_input", "placeholder": "e.g., 5"},
-                {"id": "occ.exposure.year_first_exposed", "text": {"en": "Year first exposed", "pl": "Rok pierwszego narażenia"}, "type": "year_input"},
-                {"id": "occ_radiation_badge", "text": {"en": "Worked with radiation badge monitoring?", "pl": "Praca z dozymetrem (promieniowanie)?"}, "type": "select", "options": ["Yes", "No", "Unsure"]}
-              ],
-              "options": {
-                "jobTitles": [
-                  { "value": "driver", "label": "Driver" },
-                  { "value": "farmer", "label": "Farmer" },
-                  { "value": "firefighter", "label": "Firefighter" },
-                  { "value": "hairdresser", "label": "Hairdresser" },
-                  { "value": "mechanic", "label": "Mechanic" },
-                  { "value": "miner", "label": "Miner" },
-                  { "value": "nurse", "label": "Nurse" },
-                  { "value": "painter", "label": "Painter" },
-                  { "value": "welder", "label": "Welder" }
-                ],
-                "exposures": [
-                  { "value": "asbestos", "label": "Asbestos" },
-                  { "value": "benzene", "label": "Benzene" },
-                  { "value": "diesel", "label": "Diesel exhaust" },
-                  { "value": "formaldehyde", "label": "Formaldehyde" },
-                  { "value": "silica", "label": "Silica" },
-                  { "value": "welding", "label": "Welding fumes" },
-                  { "value": "wood_dust", "label": "Wood dust" },
-                  { "value": "rubber", "label": "Rubber production" },
-                  { "value": "radiation", "label": "Ionizing Radiation" },
-                  { "value": "pesticides", "label": "Pesticides" },
-                  { "value": "solvents", "label": "Solvents" },
-                  { "value": "leather_dust", "label": "Leather dust" },
-                  { "value": "metal_fluids", "label": "Metalworking fluids" },
-                  { "value": "soot", "label": "Soot/coal tar" },
-                  { "value": "uv_sunlight", "label": "Sunlight (UV)" },
-                  { "value": "shift_night", "label": "Night shift work" },
-                  { "value": "firefighter", "label": "Firefighter" },
-                  { "value": "hairdresser", "label": "Hairdresser/Barber" },
-                  { "value": "painter", "label": "Painter" }
-                ],
-                "ppe": [
-                  {"value": "respirator", "label": "Respirator"}, 
-                  {"value": "local_exhaust", "label": "Local exhaust"},
-                  {"value": "gloves", "label": "Gloves"},
-                  {"value": "eye_face_protection", "label": "Eye/face protection"},
-                  {"value": "protective_clothing", "label": "Protective clothing"},
-                  {"value": "none", "label": "None"},
-                  {"value": "not_applicable", "label": "Not applicable"}
-                ],
-                "shiftPatterns": ["Never", "Occasionally", "Frequently"],
-                "intensities": ["Low", "Moderate", "High", "Unsure"],
-                "radiationBadgeOptions": ["Yes", "No", "Unsure"]
-              }
-            },
-            {
-              "id": "environmental_exposures",
-              "title": {"en": "Environmental Exposures (Optional)", "pl": "Narażenie Środowiskowe (Opcjonalne)"},
-              "questions": [
-                {
-                  "id": "env.summary",
-                  "text": { "en": "Select all that apply to your history", "pl": "Zaznacz wszystkie, które dotyczą Twojej historii" },
-                  "type": "checkbox_group",
-                  "options": [
-                    { "id": "traffic_air", "label": { "en": "Lived near heavy traffic or in high pollution city", "pl": "Mieszkanie w pobliżu dużego ruchu lub w mieście o dużym zanieczyszczeniu" } },
-                    { "id": "industry", "label": { "en": "Lived near heavy industry/power plant", "pl": "Mieszkanie w pobliżu przemysłu ciężkiego/elektrowni" } },
-                    { "id": "solid_fuel", "label": { "en": "Used coal/wood for cooking/heating indoors", "pl": "Używanie węgla/drewna do gotowania/ogrzewania w domu" } },
-                    { "id": "radon", "label": { "en": "Lived in high radon area", "pl": "Mieszkanie w rejonie o wysokim stężeniu radonu" } },
-                    { "id": "asbestos", "label": { "en": "Known asbestos in home", "pl": "Znany azbest w domu" } },
-                    { "id": "private_well", "label": { "en": "Drank from private well", "pl": "Picie wody z prywatnej studni" } },
-                    { "id": "pesticides", "label": { "en": "Regular pesticide use (mixing/applying)", "pl": "Regularne stosowanie pestycydów (mieszanie/stosowanie)" } },
-                    { "id": "sunbed", "label": { "en": "Sunbed/Tanning salon use", "pl": "Korzystanie z solarium" } },
-                    { "id": "none", "label": { "en": "None of the above", "pl": "Żadne z powyższych" } }
-                  ],
-                  "exclusiveOptionId": "none"
-                },
-                
-                { "id": "env.air.high_pollution_years", "text": {"en": "Years lived in area?", "pl": "Lata mieszkania w rejonie?"}, "type": "number_input", "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "traffic_air"} },
-                { "id": "env.industry.type", "text": {"en": "Industry type", "pl": "Rodzaj przemysłu"}, "type": "checkbox_group", "options": [{"id": "refinery", "label": "Refinery"}, {"id": "chemical", "label": "Chemical Plant"}, {"id": "smelter", "label": "Smelter"}], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "industry"} },
-                
-                { "id": "env.indoor.solidfuel_years", "text": {"en": "Years of exposure?", "pl": "Lata narażenia?"}, "type": "number_input", "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "solid_fuel"} },
-                { "id": "env.indoor.ventilation", "text": {"en": "Was ventilation used?", "pl": "Czy używano wentylacji?"}, "type": "select", "options": ["Always", "Sometimes", "Never"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "solid_fuel"} },
-                
-                { "id": "env.radon.tested", "text": {"en": "Was home tested?", "pl": "Czy dom był badany?"}, "type": "select", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "radon"} },
-                { "id": "env.radon.result", "text": {"en": "Result", "pl": "Wynik"}, "type": "text_input", "dependsOn": {"questionId": "env.radon.tested", "value": "Yes"} },
-                
-                { "id": "env.asbestos.disturbance", "text": {"en": "Was asbestos disturbed/damaged?", "pl": "Czy azbest był uszkodzony?"}, "type": "select", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "asbestos"} },
-                
-                { "id": "env.water.well_tested", "text": {"en": "Was water tested?", "pl": "Czy woda była badana?"}, "type": "select", "options": ["Yes", "No", "Unsure"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "private_well"} },
-                { "id": "env.water.arsenic", "text": {"en": "History of arsenic?", "pl": "Historia arsenu?"}, "type": "checkbox", "dependsOn": {"questionId": "env.water.well_tested", "value": "Yes"} },
-                
-                { "id": "env.pesticide.type", "text": {"en": "Type/Frequency", "pl": "Rodzaj/Częstotliwość"}, "type": "select", "options": ["Occupational", "Home/Garden (Heavy)", "Occasional"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
-                
-                { "id": "env.uv.sunbed_use", "text": {"en": "How would you describe your use of indoor tanning beds (sunbed/solarium)?", "pl": "Jak opisał(a)by Pan/Pani korzystanie z solarium (łóżka opalającego)?"}, "type": "select", "options": ["Never", "Few times (<10 sessions)", "Occasionally (10-50 sessions)", "Frequently (>50 sessions)", "Not sure"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "sunbed"} },
-                { "id": "env.uv.sunburn_child", "text": {"en": "Before age 18, about how many times did you have a sunburn with redness and soreness lasting more than one day?", "pl": "Przed 18 r.ż., ile razy mniej więcej miał(a) Pan/Pani oparzenie słoneczne z zaczerwienieniem i bolesnością skóry trwającą ponad 1 dzień?"}, "type": "number_input", "min": 0, "max": 50 },
-                { "id": "env.uv.sunburn_adult", "text": {"en": "After age 18, about how many such sunburns have you had?", "pl": "Po 18 r.ż., ile razy miał(a) Pan/Pani takie oparzenie słoneczne?"}, "type": "number_input", "min": 0, "max": 100 }
-              ]
-
-            },
-            {
-              "id": "labs_and_imaging",
-              "title": {"en": "Labs & Imaging (Optional)", "pl": "Badania Laboratoryjne i Obrazowe (Opcjonalne)"},
-              "options": {
-                "studyCategories": [
-                  {"value": "lab", "label": "Lab Test"},
-                  {"value": "imaging", "label": "Imaging Study"}
-                ],
-                "labTypes": [
-                  {"value": "cbc", "label": "CBC (Complete Blood Count)"},
-                  {"value": "ferritin", "label": "Ferritin"},
-                  {"value": "alt_ast", "label": "ALT/AST (Liver Enzymes)"},
-                  {"value": "creatinine", "label": "Creatinine"},
-                  {"value": "psa", "label": "PSA (Prostate-Specific Antigen)"}
-                ],
-                "imagingTypes": [
-                  {"value": "xray", "label": "X-ray"},
-                  {"value": "ultrasound", "label": "Ultrasound"},
-                  {"value": "ct", "label": "CT Scan"},
-                  {"value": "mri", "label": "MRI"},
-                  {"value": "pet", "label": "PET Scan"}
-                ],
-                "resultSummaries": [
-                  {"value": "no_findings", "label": "No significant findings"},
-                  {"value": "indeterminate", "label": "Indeterminate findings"},
-                  {"value": "significant", "label": "Significant findings noted"}
-                ],
-                "commonUnits": ["mg/dL", "g/dL", "mmol/L", "U/L", "ng/mL", "%"]
-              }
-            },
-            {
-              "id": "functional_status",
-              "title": {"en": "Functional Status (Optional)", "pl": "Stan Funkcjonalny (Opcjonalne)"},
-              "questions": [
-                {
-                  "id": "ecog",
-                  "text": {"en": "ECOG Performance Status", "pl": "Skala sprawności ECOG"},
-                  "type": "select",
-                  "options": [
-                    {"value": "0", "label": "0 - Fully active, able to carry on all pre-disease performance without restriction"},
-                    {"value": "1", "label": "1 - Restricted in physically strenuous activity but ambulatory"},
-                    {"value": "2", "label": "2 - Ambulatory and capable of all selfcare but unable to carry out any work activities"},
-                    {"value": "3", "label": "3 - Capable of only limited selfcare, confined to bed or chair more than 50% of waking hours"},
-                    {"value": "4", "label": "4 - Completely disabled. Cannot carry on any selfcare. Totally confined to bed or chair"}
-                  ]
-                },
-                {
-                  "id": "qlq_c30_consent",
-                  "type": "checkbox",
-                  "text": {"en": "Quality of Life Details", "pl": "Szczegóły Jakości Życia"},
-                  "checkboxLabel": {
-                    "en": "I would like to provide more details on my quality of life (optional).",
-                    "pl": "Chciałbym/abym podać więcej szczegółów na temat mojej jakości życia (opcjonalnie)."
-                  }
-                },
-                {
-                  "id": "qlq_c30_item_29",
-                  "text": { "en": "During the past week, how would you rate your overall health?", "pl": "Jak ocenił(a)by Pan(i) ogólnie swoje zdrowie w ciągu ostatniego tygodnia?" },
-                  "type": "select",
-                  "dependsOn": { "questionId": "qlq_c30_consent", "value": "true" },
-                  "options": [
-                    { "value": "7", "label": { "en": "7 - Excellent", "pl": "7 - Doskonałe" } },
-                    { "value": "6", "label": "6" }, { "value": "5", "label": "5" },
-                    { "value": "4", "label": { "en": "4 - Average", "pl": "4 - Przeciętne" } },
-                    { "value": "3", "label": { "en": "3" } }, { "value": "2", "label": "2" },
-                    { "value": "1", "label": { "en": "1 - Very poor", "pl": "1 - Bardzo złe" } }
-                  ]
-                },
-                {
-                  "id": "qlq_c30_item_2",
-                  "text": { "en": "During the past week, have you had pain?", "pl": "Czy w ciągu ostatniego tygodnia odczuwał(a) Pan(i) ból?" },
-                  "type": "select",
-                  "dependsOn": { "questionId": "qlq_c30_consent", "value": "true" },
-                  "options": [
-                    { "value": "1", "label": { "en": "1 - Not at all", "pl": "1 - Wcale nie" } },
-                    { "value": "2", "label": { "en": "2 - A little", "pl": "2 - Trochę" } },
-                    { "value": "3", "label": { "en": "3 - Quite a bit", "pl": "3 - Dość mocno" } },
-                    { "value": "4", "label": { "en": "4 - Very much", "pl": "4 - Bardzo mocno" } }
-                  ]
-                }
+                { "id": "imm.hav.any", "text": {"en": "Hep A Vaccine?", "pl": "Szczepienie WZW A?"}, "type": "select", "options": ["Yes", "No", "Unsure"] },
+                { "id": "imm.flu.last_season", "text": {"en": "Flu shot last season?", "pl": "Grypa w ost. sezonie?"}, "type": "select", "options": ["Yes", "No"] },
+                { "id": "imm.covid.doses", "text": {"en": "COVID doses", "pl": "Dawki COVID"}, "type": "select", "options": ["0", "1", "2", "3", "4+"] },
+                { "id": "imm.td_tdap.year_last", "text": {"en": "Last Tetanus year", "pl": "Ost. Tężec rok"}, "type": "year_input" },
+                { "id": "imm.pneumo.ever", "text": {"en": "Pneumococcal ever?", "pl": "Pneumokoki?"}, "type": "select", "options": ["Yes", "No"] },
+                { "id": "imm.zoster.ever", "text": {"en": "Shingles ever?", "pl": "Półpasiec?"}, "type": "select", "options": ["Yes", "No"] }
               ]
             }
           ]

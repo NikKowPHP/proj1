@@ -152,6 +152,7 @@ export const GenericModule = ({ answers, onAnswer, questions }: GenericModulePro
                     value={answers[key] ? JSON.parse(answers[key]) : []}
                     onChange={(val) => onAnswer(key, JSON.stringify(val))}
                     exclusiveOption={q.exclusiveOptionId}
+                    idPrefix={key}
                 />
                 );
             case 'file_upload':

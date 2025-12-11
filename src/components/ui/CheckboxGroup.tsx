@@ -17,6 +17,7 @@ interface CheckboxGroupProps {
   onChange: (selectedIds: string[]) => void;
   className?: string;
   exclusiveOption?: string; // e.g., 'none'
+  idPrefix?: string;
 }
 
 export const CheckboxGroup = ({
@@ -25,6 +26,7 @@ export const CheckboxGroup = ({
   onChange,
   className,
   exclusiveOption,
+  idPrefix,
 }: CheckboxGroupProps) => {
   const handleCheckedChange = (checked: boolean, optionId: string) => {
     let newValue: string[];
@@ -65,21 +67,24 @@ export const CheckboxGroup = ({
   // revert to simple list to avoid "Other" header unless explicitly mixed.
   const hasCategories = options.some(o => !!o.category);
 
+  const getUniqueId = (optionId: string) => idPrefix ? `${idPrefix}-${optionId}` : optionId;
+
   if (!hasCategories) {
       return (
         <div className={cn("flex flex-wrap gap-2", className)}>
           {options.map((option) => {
             const isSelected = value.includes(option.id);
+            const uniqueId = getUniqueId(option.id);
             return (
             <div key={option.id}>
               <Checkbox
-                id={option.id}
+                id={uniqueId}
                 checked={isSelected}
                 onCheckedChange={(checked) => handleCheckedChange(!!checked, option.id)}
                 className="sr-only"
               />
               <Label 
-                htmlFor={option.id} 
+                htmlFor={uniqueId} 
                 className={cn(
                     "flex items-center justify-center px-4 py-2 rounded-full border cursor-pointer transition-colors text-sm font-medium",
                     isSelected 
@@ -103,16 +108,17 @@ export const CheckboxGroup = ({
               <div className="flex flex-wrap gap-2">
                 {groupedOptions[category].map((option) => {
                     const isSelected = value.includes(option.id);
+                    const uniqueId = getUniqueId(option.id);
                     return (
                         <div key={option.id}>
                             <Checkbox
-                                id={option.id}
+                                id={uniqueId}
                                 checked={isSelected}
                                 onCheckedChange={(checked) => handleCheckedChange(!!checked, option.id)}
                                 className="sr-only" // Hide default checkbox
                             />
                             <Label 
-                                htmlFor={option.id} 
+                                htmlFor={uniqueId} 
                                 className={cn(
                                     "flex items-center justify-center px-4 py-2 rounded-full border cursor-pointer transition-colors text-sm font-medium",
                                     isSelected 

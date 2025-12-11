@@ -5,16 +5,10 @@ import { medicalConditionsMap } from "@/lib/mappings/medical-conditions.map";
 import { occupationalExposuresMap } from "@/lib/mappings/occupational-exposures.map";
 import { environmentalExposuresMap } from "@/lib/mappings/environmental-exposures.map";
 
-/**
- * Safely parses a JSON string from an answers object.
- * @param value The value to parse, which might be a JSON string.
- * @returns The parsed object/array, or an empty array if parsing fails.
- */
 const safeJsonParse = (value: any): any[] => {
   if (typeof value !== 'string' || !value) return [];
   try {
     const parsed = JSON.parse(value);
-    // Allow parsing objects as well for single entries, but always return array for consistency if it's not one
     if (Array.isArray(parsed)) return parsed;
     if (typeof parsed === 'object' && parsed !== null) return [parsed];
     return [];
@@ -23,16 +17,7 @@ const safeJsonParse = (value: any): any[] => {
   }
 };
 
-/**
- * A service to standardize raw form answers into a structured, coded format
- * as specified in new_requirements.md.
- */
 export const StandardizationService = {
-  /**
-   * Processes the flat answer object from the form into a structured payload.
-   * @param answers - The raw answers from the Zustand store.
-   * @returns A structured object with core and advanced sections.
-   */
   standardize: (answers: Record<string, any>): Record<string, any> => {
     const standardized: { core: Record<string, any>, advanced: Record<string, any> } = {
       core: {},
@@ -42,46 +27,44 @@ export const StandardizationService = {
     try {
       // --- CORE SECTION ---
       standardized.core = {
-        dob: answers.dob,
+        dob: answers.dob, // Year only now
         sex_at_birth: answers.sex_at_birth,
         height_cm: Number(answers.height_cm) || undefined,
         weight_kg: Number(answers.weight_kg) || undefined,
         smoking_status: answers.smoking_status,
         alcohol_status: answers['alcohol.status'],
         alcohol_former_since: Number(answers['alcohol.former_since']) || undefined,
-        // Alcohol (AUDIT-C)
+        
+        // Alcohol (AUDIT-C) - UPDATED KEYS
         alcohol_audit: {
             q1: Number(answers['auditc.q1_freq']),
             q2: Number(answers['auditc.q2_typical']),
             q3: Number(answers['auditc.q3_6plus']),
         },
         symptoms: safeJsonParse(answers.symptoms),
-        family_cancer_any: answers.family_cancer_any,
-        // Optional core fields
-        intent: answers.intent,
-        source: answers.source,
-        language: answers.language,
-        gender_identity: answers.gender_identity,
-        // Diet (WCRF FFQ)
+        family_cancer_any: answers['famhx.any_family_cancer'], // UPDATED KEY
+        
+        // Diet (WCRF FFQ) - UPDATED KEYS
         diet: {
             vegetables: Number(answers['diet.fv_portions_day']),
-            red_meat: Number(answers['diet.red_meat_servings_week']), // Old: diet_red_meat
-            processed_meat: Number(answers['diet.processed_meat_servings_week']), // Old: diet_processed_meat
+            red_meat: Number(answers['diet.red_meat_servings_week']), 
+            processed_meat: Number(answers['diet.processed_meat_servings_week']),
             sugary_drinks: Number(answers['diet.ssb_servings_week']),
             whole_grains: Number(answers['diet.whole_grains_servings_day']),
             fast_food: Number(answers['diet.fastfoods_freq_week']),
             legumes: Number(answers['diet.legumes_freq_week']),
-            upf_share: answers['diet.upf_share_pct'],
+            upf_share: Number(answers['diet.upf_share_pct']),
             ssb_container: answers['diet.ssb_container'],
         },
-        // Physical Activity (IPAQ)
+        
+        // Physical Activity (IPAQ) - UPDATED KEYS
         physical_activity: {
             vigorous_days: Number(answers['pa.vig.days7']),
             vigorous_min: Number(answers['pa.vig.minperday']),
             moderate_days: Number(answers['pa.mod.days7']),
             moderate_min: Number(answers['pa.mod.minperday']),
             walking_days: Number(answers['pa.walk.days7']),
-            walking_min: Number(answers['pa.walk.minperday']), // Old: ipaq_walking_min
+            walking_min: Number(answers['pa.walk.minperday']),
             sitting_min: Number(answers['pa.sit.min_day']),
         },
       };
@@ -93,54 +76,49 @@ export const StandardizationService = {
       standardized.core.symptoms.forEach((symptomId: string) => {
         const detailKey = `symptom_details_${symptomId}`;
         if (answers[detailKey]) {
-          symptomDetails[symptomId] = safeJsonParse(answers[detailKey]); // Changed to safeJsonParse
+          symptomDetails[symptomId] = safeJsonParse(answers[detailKey]);
         }
       });
       if (Object.keys(symptomDetails).length > 0) {
         standardized.advanced.symptom_details = symptomDetails;
       }
       
-      // Family History
+      // Family History - UPDATED KEYS
       if (answers.family_cancer_history) {
         const familyHistory = safeJsonParse(answers.family_cancer_history);
         standardized.advanced.family = familyHistory.map((member: any) => ({
           ...member,
           cancer_code: cancerTypesMap[member.cancer_type] || undefined,
-          // New fields are passed through automatically via spread, but explicitly listed for clarity if needed
         }));
       }
       
-      // Genetics
+      // Genetics - UPDATED KEYS
       if (['yes_report', 'yes_no_details'].includes(answers['gen.testing_ever'])) {
         standardized.advanced.genetics = {
           tested: true,
-          type: answers.genetic_test_type,
-          year: answers.genetic_test_year,
-          lab: answers.genetic_lab,
-          findings_present: answers['gen.path_variant_self'] === 'yes', // Old logic mapped
+          type: safeJsonParse(answers['gen.test_type']), // Now a checkbox group
+          year: answers['gen.test_year_first'],
+          findings_present: answers['gen.path_variant_self'] === 'Yes',
           variant_self_status: answers['gen.path_variant_self'],
-          genes: answers.genetic_genes ? JSON.parse(answers.genetic_genes) : [],
-          variants_hgvs: answers.genetic_variants_hgvs,
-          vus_present: answers.genetic_vus_present,
+          genes: answers['gen.self_genes'] ? JSON.parse(answers['gen.self_genes']) : [],
+          // Map to internal structure
+          variants_hgvs: null, // Removed from new JSON spec
         };
       }
+      
       // PRS
-      if (answers['gen.prs_done'] === 'Yes') {
+      if (answers['gen.prs_done'] && answers['gen.prs_done'].includes('Yes')) {
           standardized.advanced.genetics = {
               ...standardized.advanced.genetics,
               prs: {
                   done: true,
-                  red_flags: answers['gen.prs_cancers_flagged'] ? (Array.isArray(answers['gen.prs_cancers_flagged']) ? answers['gen.prs_cancers_flagged'] : [answers['gen.prs_cancers_flagged']]) : [],
-                  risk_band: answers['gen.prs_overall_band']
+                  // No specific flags in new JSON, mostly just "done" for now based on spec
+                  risk_band: 'unknown' 
               }
           }
       }
 
-      // Illnesses (Mapped from Core cond.summary)
-      // cond.summary is likely an array of strings (e.g. ["hbv", "diabetes"]) or a JSON string depending on storage.
-      // Usually checkbox groups store as array or stringified array. safeJsonParse handles stringified.
-      // If it's already an array, safeJsonParse returns it? safeJsonParse expects string.
-      // Let's handle both.
+      // Illnesses (cond.summary)
       let illnessList = answers['cond.summary'];
       if (typeof illnessList === 'string') {
           illnessList = safeJsonParse(illnessList);
@@ -150,9 +128,9 @@ export const StandardizationService = {
 
       if (illnessList.length > 0) {
           standardized.advanced.illnesses = illnessList.map((illnessId: string) => {
-              // New Logic: specific fields per illness
               const details: any = {};
               
+              // Mapped using new keys
               if (illnessId === 'hbv') {
                   details.status = answers['cond.hbv.status'];
                   details.antiviral = answers['cond.hbv.antiviral_now'];
@@ -165,15 +143,8 @@ export const StandardizationService = {
               if (illnessId === 'ibd') {
                   details.type = answers['cond.ibd.type'];
                   details.extent = answers['cond.ibd.extent'];
-                  // Need year of diagnosis for duration calculation
-                  // Assuming 'illness_details_ibd' might store year if collected via GenericModule or similar
-                  // But current JSON uses specific questions.
-                  // If year is not collected, duration logic will fail gracefully.
-                  // Let's check if we can add year collection for IBD.
-                  // For now, mapping what we have.
               }
-              if (illnessId === 'diabetes') details.type = answers['cond.diabetes.type'];
-              if (illnessId === 'hypertension') details.controlled = answers['cond.hypertension.controlled'];
+              if (illnessId === 'diabetes') details.type = answers['cond.t2dm.status'] === 'Yes' ? 'Type 2' : 'Unknown';
 
               return {
                   id: illnessId,
@@ -192,10 +163,9 @@ export const StandardizationService = {
         }));
       }
 
-       // Occupational History (Hazard Centric)
+       // Occupational History
       if (answers.occupational_hazards) {
         const occupationalHistory = safeJsonParse(answers.occupational_hazards);
-        // Map hazard-centric entries
         standardized.advanced.occupational = occupationalHistory.map((entry: any) => {
           return {
              hazard: entry.hazardId,
@@ -211,60 +181,50 @@ export const StandardizationService = {
         });
       }
       
-      // Screening and Immunization
+      // Screening and Immunization - UPDATED KEYS
       const screeningImmunization: Record<string, any> = {};
       const screeningKeys = [
-          'screen.colonoscopy.done', 'screen.colonoscopy.date', 
-          'screen.mammo.done', 'screen.mammo.date', 
-          'screen.pap.done', 'screen.pap.date', 
-          'screen.psa.done', 'screen.psa.date', 
-          'imm.hpv', 'imm.hbv',
-          // New Screening
-          'screen.lung.ldct_ever', 'screen.lung.ldct_last_year',
-          'screen.skin.full_exam_ever', 'screen.skin.last_year',
-          'screen.hcc.us_ever', 'screen.hcc.us_last_year',
-          'screen.upper_endo.ever', 'screen.upper_endo.last_year',
-          'screen.cervix.last_type', 'screen.cervix.last_result', // Added
-          // New Immunization
-          'imm.hav.any', 'imm.flu.last_season', 'imm.covid.doses',
-          'imm.td_tdap.year_last', 'imm.pneumo.ever', 'imm.zoster.ever'
+          'screen.colonoscopy.date', 
+          'screen.crc.last_result',
+          'screen.mammo.date', 
+          'screen.breast.mammo_last_result',
+          'screen.pap.date', 
+          'screen.cervix.last_type',
+          'screen.cervix.last_result',
+          'screen.psa.date', 
+          'screen.prostate.psa_abnormal',
+          'screen.lung.ldct_last_year',
+          'screen.lung.ldct_last_result',
+          'imm.hpv.doses',
+          'imm.hbv.completed',
+          'imm.hav.any',
+          'imm.flu.last_season',
+          'imm.covid.doses',
+          'imm.td_tdap.year_last',
+          'imm.pneumo.ever',
+          'imm.zoster.ever'
       ];
+      
       screeningKeys.forEach(key => {
         if (answers[key]) {
           screeningImmunization[key] = answers[key];
         }
       });
+      
       if (Object.keys(screeningImmunization).length > 0) {
         standardized.advanced.screening_immunization = screeningImmunization;
       }
 
-      // Medications / Iatrogenic
-      const medications: Record<string, any> = {};
-      const medicationKeys = ['immunosuppression_now', 'immunosuppression_cause'];
-      medicationKeys.forEach(key => {
-          if (answers[key]) {
-              medications[key] = answers[key];
-          }
-      });
-        if (Object.keys(medications).length > 0) {
-        standardized.advanced.medications_iatrogenic = medications;
-      }
-
-
-      // Sexual Health
+      // Sexual Health - UPDATED KEYS
       const sexualHealth: Record<string, any> = {};
       const sexualHealthKeys = [
           'sexhx.section_opt_in',
-          'sex_active', 
+          'sexhx.ever_sexual_contact',
           'sexhx.partner_genders', 
-          'sexhx.lifetime_partners_cat', // Old: sex_lifetime_partners
+          'sexhx.lifetime_partners_cat',
           'sexhx.partners_12m_cat', 
-          'sexhx.condom_use_12m', // Old: sex_barrier_freq
+          'sexhx.condom_use_12m',
           'sexhx.sti_history_other', 
-          'sex_anal', 
-          'sex_oral', 
-          'sex_barriers_practices',
-          // New
           'sexhx.new_partner_12m',
           'sexhx.age_first_sex',
           'sexhx.sex_sites_ever',
@@ -272,11 +232,12 @@ export const StandardizationService = {
           'sexhx.sex_work_ever',
           'sexhx.sex_work_role',
           'sexhx.sti_treated_12m',
-          'sexhx.hpv_precancer_history' // Female only
+          'sexhx.hpv_precancer_history'
       ];
+      
       sexualHealthKeys.forEach(key => {
         if (answers[key]) {
-             if (['sexhx.partner_genders', 'sexhx.sex_sites_ever', 'sexhx.sex_sites_12m', 'sexhx.sex_work_role', 'sexhx.sex_work_ever', 'sexhx.hpv_precancer_history'].includes(key) && answers[key].startsWith('[')) {
+             if (['sexhx.partner_genders', 'sexhx.sex_sites_ever', 'sexhx.sex_sites_12m', 'sexhx.sex_work_role', 'sexhx.hpv_precancer_history'].includes(key) && answers[key].startsWith('[')) {
                  sexualHealth[key] = safeJsonParse(answers[key]);
              } else {
                  sexualHealth[key] = answers[key];
@@ -287,21 +248,17 @@ export const StandardizationService = {
         standardized.advanced.sexual_health = sexualHealth;
       }
 
-      // Environmental Exposures
+      // Environmental Exposures - UPDATED KEYS
       const environmental: Record<string, any> = {};
       const envKeys = [
           'env.summary',
-          // Detail fields
-          'env.air.high_pollution_years', 'env.industry.type',
-          'env.indoor.solidfuel_years', 'env.indoor.ventilation',
-          'env.radon.tested', 'env.radon.result', 'env.radon.mitigation_done',
-          'env.asbestos.disturbance',
-          'env.water.well_tested', 'env.water.arsenic',
-          'env.pesticide.type',
-          'env.uv.sunbed_freq',
-          // Retained/Common fields
-          'home_years_here', 'home_postal_coarse', 'home_year_built', 'home_basement',
-          'home_shs_home', 'env_outdoor_uv', 'env.uv.sunburn_child', 'env.uv.sunburn_adult'
+          'env.air.high_pollution_years', 'env.air.current_high',
+          'env.indoor.solidfuel_years', 'env.indoor.solidfuel_ventilation',
+          'env.radon.tested', 'env.radon.level_cat', 'env.radon.mitigation',
+          'env.asbestos.home_status', 'env.asbestos.disturbance',
+          'env.water.main_source_10y', 'env.water.well_contam_notice',
+          'env.pesticide.use_freq_year', 'env.pesticide.years_use', 'env.pesticide.protection',
+          'env.uv.sunbed_use', 'env.uv.sunburn_child', 'env.uv.sunburn_adult'
       ];
       
       envKeys.forEach(key => {
@@ -310,7 +267,6 @@ export const StandardizationService = {
           }
       });
 
-      // Map environmental summary to codes
       if (answers['env.summary']) {
           const envList = safeJsonParse(answers['env.summary']);
           environmental.coded_exposures = envList.map((id: string) => ({
@@ -320,72 +276,33 @@ export const StandardizationService = {
       }
 
       if (Object.keys(environmental).length > 0) {
-        standardized.advanced.environmental = environmental;
-      }
-      envKeys.forEach(key => {
-         if (answers[key]) {
-           environmental[key] = answers[key];
-        }
-      });
-       if (Object.keys(environmental).length > 0) {
         standardized.advanced.environment = environmental;
       }
 
-      // Labs & Imaging
-      if (answers.labs_and_imaging) {
-        standardized.advanced.labs_imaging = safeJsonParse(answers.labs_and_imaging);
-      }
-      
-      // Functional Status
-      const functionalStatus: Record<string, any> = {};
-      if (answers.ecog) {
-        functionalStatus.ecog = answers.ecog;
-      }
-      if (answers.qlq_c30_consent === 'true') {
-        functionalStatus.qlq_c30_consent = true;
-      }
-      for (const key in answers) {
-        if (key.startsWith('qlq_c30_item_')) {
-          functionalStatus[key] = answers[key];
-        }
-      }
-      if (Object.keys(functionalStatus).length > 0) {
-        standardized.advanced.functional_status = functionalStatus;
-      }
-
-      // Smoking Details
-      // Consolidating new logic
+      // Smoking Details - UPDATED KEYS
       const smokingDetails: any = {
           pattern: answers['smoking.pattern'],
           start_age: Number(answers['smoking.start_age']) || undefined,
           cigs_per_day: Number(answers['smoking.intensity']) || undefined,
           intensity_unit: answers['smoking.intensity_unit'],
           years: Number(answers['smoking.years_smoked']) || undefined,
-          quit_date: answers['smoking.quit_date'], // Updated key
-          other_tobacco: answers['smoking.other_tobacco_smoked'],
-          cigars_week: Number(answers['smoking.other_cigar_per_week']) || undefined,
-          pipe_week: Number(answers['smoking.pipe_per_week']) || undefined,
-          shisha_week: Number(answers['smoking.shisha_per_week']) || undefined,
+          quit_date: answers['smoking.quit_date'],
+          other_tobacco: safeJsonParse(answers['smoking.other_tobacco_smoked']),
           vape: {
               status: answers['vape.status'],
               days_30d: Number(answers['vape.days_30d']) || undefined,
-              device: answers['vape.device_type'],
               nicotine: answers['vape.nicotine'],
           },
           htp: {
               status: answers['htp.status'],
-              days_30d: Number(answers['htp.days_30d']) || undefined,
               sticks_day: Number(answers['htp.sticks_per_day']) || undefined,
           },
           shs: {
               home_freq: answers['shs.home_freq'],
               work_freq: answers['shs.work_freq'],
-              public_30d: answers['shs.public_30d_bars'],
-              hours_7d: Number(answers['shs.hours_7d']) || undefined,
           }
       };
 
-      // Clean undefined
       const cleanObject = (obj: any): any => {
          Object.keys(obj).forEach(key => {
              if (obj[key] && typeof obj[key] === 'object') cleanObject(obj[key]);
@@ -393,11 +310,6 @@ export const StandardizationService = {
          });
          return obj;
       };
-      
-      // Update alcohol with beverage mix
-      if (answers['alcohol.beverage_mix']) {
-          standardized.core.alcohol_beverage_mix = answers['alcohol.beverage_mix'];
-      }
 
       standardized.advanced.smoking_detail = cleanObject(smokingDetails);
 
@@ -409,120 +321,5 @@ export const StandardizationService = {
     }
 
     return standardized;
-  },
-
-  /**
-   * Converts the standardized data into a FHIR Bundle.
-   * @param standardizedData - The output from standardize().
-   * @returns A FHIR Bundle resource.
-   */
-  toFhir: (standardizedData: Record<string, any>): Record<string, any> => {
-      const bundle: Record<string, any> = {
-          resourceType: "Bundle",
-          type: "collection",
-          entry: []
-      };
-
-      try {
-          const core = standardizedData.core || {};
-          const advanced = standardizedData.advanced || {};
-          const patientId = "patient-001"; // Placeholder
-
-          // 1. Patient Resource
-          bundle.entry.push({
-              resource: {
-                  resourceType: "Patient",
-                  id: patientId,
-                  birthDate: core.dob,
-                  gender: core.sex_at_birth === 'Male' ? 'male' : (core.sex_at_birth === 'Female' ? 'female' : 'other'),
-                  ...(core.height_cm && core.weight_kg ? {
-                      // Extensions could go here
-                  } : {})
-              }
-          });
-
-          // 2. Observations (Vital Signs / Biometrics)
-          if (core.height_cm) {
-              bundle.entry.push({
-                  resource: {
-                      resourceType: "Observation",
-                      status: "final",
-                      code: { coding: [{ system: "http://loinc.org", code: "8302-2", display: "Body height" }] },
-                      subject: { reference: `Patient/${patientId}` },
-                      valueQuantity: { value: core.height_cm, unit: "cm", system: "http://unitsofmeasure.org", code: "cm" }
-                  }
-              });
-          }
-           if (core.weight_kg) {
-              bundle.entry.push({
-                  resource: {
-                      resourceType: "Observation",
-                      status: "final",
-                      code: { coding: [{ system: "http://loinc.org", code: "29463-7", display: "Body weight" }] },
-                      subject: { reference: `Patient/${patientId}` },
-                      valueQuantity: { value: core.weight_kg, unit: "kg", system: "http://unitsofmeasure.org", code: "kg" }
-                  }
-              });
-          }
-
-          // 3. Observations (Social History)
-          if (core.smoking_status) {
-              bundle.entry.push({
-                  resource: {
-                      resourceType: "Observation",
-                      status: "final",
-                      code: { coding: [{ system: "http://loinc.org", code: "72166-2", display: "Tobacco smoking status" }] },
-                      subject: { reference: `Patient/${patientId}` },
-                      valueCodeableConcept: { text: core.smoking_status }
-                  }
-              });
-          }
-          
-          // 4. Family Member History
-           if (advanced.family && Array.isArray(advanced.family)) {
-               advanced.family.forEach((member: any, index: number) => {
-                   bundle.entry.push({
-                       resource: {
-                           resourceType: "FamilyMemberHistory",
-                           id: `family-${index}`,
-                           status: "completed",
-                           patient: { reference: `Patient/${patientId}` },
-                           relationship: { text: member.relation },
-                           condition: [
-                               {
-                                   code: { text: member.cancer_type },
-                                   onsetAge: { value: member.age_dx, unit: "a", system: "http://unitsofmeasure.org", code: "a" }
-                               }
-                           ]
-                       }
-                   });
-               });
-           }
-
-          // 5. Conditions (Personal History)
-          if (advanced.personal_cancer_history && Array.isArray(advanced.personal_cancer_history)) {
-              advanced.personal_cancer_history.forEach((cancer: any, index: number) => {
-                   bundle.entry.push({
-                       resource: {
-                           resourceType: "Condition",
-                           id: `history-cancer-${index}`,
-                           clinicalStatus: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-clinical", code: "active" }] }, // Assuming active history
-                           verificationStatus: { coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-ver-status", code: "confirmed" }] },
-                           category: [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-category", code: "problem-list-item" }] }],
-                           code: { text: cancer.type },
-                           subject: { reference: `Patient/${patientId}` },
-                           onsetDateTime: cancer.year_dx ? `${cancer.year_dx}` : undefined
-                       }
-                   });
-              });
-          }
-
-
-      } catch (error) {
-           logger.error("Failed to map to FHIR", { error });
-      }
-
-      return bundle;
   }
 };
-      

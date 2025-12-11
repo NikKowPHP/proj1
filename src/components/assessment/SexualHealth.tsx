@@ -55,6 +55,7 @@ export const SexualHealth = ({ answers, onAnswer, questions }: SexualHealthProps
               value={answers[q.id] ? JSON.parse(answers[q.id]) : []}
               onChange={(selected) => onAnswer(q.id, JSON.stringify(selected))}
               exclusiveOption={q.exclusiveOptionId}
+              idPrefix={q.id}
             />
           )}
            {q.type === 'radio' && (

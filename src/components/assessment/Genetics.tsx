@@ -9,17 +9,13 @@ import { useTranslations } from 'next-intl';
 import { Input } from '../ui/input';
 import { YearInput } from '../ui/YearInput';
 import { CheckboxGroup } from '../ui/CheckboxGroup';
-import { Button } from '../ui/button';
-import Spinner from '../ui/Spinner';
-import { Paperclip, Trash2, AlertCircle } from 'lucide-react';
-import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 import { FileUploadComponent } from './FileUpload';
 
 interface GeneticsProps {
   answers: Record<string, any>;
   onAnswer: (id: string, value: any) => void;
-  questions: any[]; // Simplified for brevity
+  questions: any[];
 }
 
 const isVisible = (question: any, answers: Record<string, string>): boolean => {
@@ -29,9 +25,14 @@ const isVisible = (question: any, answers: Record<string, string>): boolean => {
   if (Array.isArray(question.dependsOn.value)) {
     return question.dependsOn.value.includes(dependencyAnswer);
   }
+  
+  // Handle Not Equal Logic
+  if (question.dependsOn.operator === '!=') {
+      return dependencyAnswer !== question.dependsOn.value;
+  }
+
   return dependencyAnswer === question.dependsOn.value;
 };
-
 
 export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
   const t = useTranslations("AssessmentPage");
@@ -41,10 +42,8 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
     let error: string | undefined = undefined;
     const currentYear = new Date().getFullYear();
 
-    if (id === 'genetic_test_year' && value > currentYear) {
+    if (id === 'gen.test_year_first' && value > currentYear) {
       error = 'Year cannot be in the future.';
-    } else if (id === 'genetic_variants_hgvs' && value && !/^(c|p)\..+>.+$/.test(value)) {
-      error = 'Please enter a valid HGVS format (e.g., c.123A>G).';
     }
 
     setErrors(prev => ({ ...prev, [id]: error }));
@@ -60,6 +59,7 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
         const error = errors[key];
         switch (q.type) {
           case 'select':
+          case 'radio':
             return (
               <div key={key} className="space-y-2">
                 <Label htmlFor={key}>{q.text}</Label>
@@ -68,7 +68,7 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
                   <SelectContent>
                     {q.options.map((opt: string | {value: string, label: string}) => {
                       if(typeof opt === 'object'){
-                        return <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        return <SelectItem key={opt.value} value={opt.value}>{typeof opt.label === 'object' ? (opt.label as any).en : opt.label}</SelectItem>
                       }
                       return <SelectItem key={opt} value={opt}>{opt}</SelectItem>
                     })}
@@ -92,33 +92,20 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
                 {error && <p className="text-sm text-destructive">{error}</p>}
               </div>
             );
-          case 'checkbox_group': // for genes or others
-            const isLongList = (q.options?.length > 15) || key === 'genetic_genes';
+          case 'checkbox_group': 
+            const isLongList = (q.options?.length > 10);
             
-            // Group genes if it's the gene list
-            if (key === 'genetic_genes') {
-                const groupedOptions = [
-                    { category: 'Breast/Ovarian', genes: ['BRCA1', 'BRCA2', 'PALB2', 'TP53', 'PTEN', 'STK11', 'CDH1', 'ATM', 'CHEK2', 'BARD1', 'BRIP1', 'RAD51C', 'RAD51D'] },
-                    { category: 'Lynch/GI', genes: ['MLH1', 'MSH2', 'MSH6', 'PMS2', 'EPCAM', 'APC', 'MUTYH', 'POLE', 'POLD1', 'SMAD4', 'BMPR1A', 'NTHL1'] },
-                    { category: 'Endocrine/Other', genes: ['MEN1', 'RET', 'VHL', 'FH', 'FLCN', 'MET', 'MAX', 'TSC1', 'TSC2', 'CDKN2A', 'CDK4', 'MITF', 'PRSS1', 'DICER1', 'PTCH1', 'SUFU', 'SDHB', 'SDHC', 'SDHD', 'BAP1'] }
-                ];
-                
-                // Flatten options with category for CheckboxGroup component which handles grouping
-                const groupedFlatOptions = groupedOptions.flatMap(group => 
-                    group.genes.map(geneId => {
-                        const opt = q.options.find((o: any) => o.id === geneId);
-                        return opt ? { ...opt, category: group.category } : null;
-                    }).filter(Boolean)
-                );
-
+            // Special grouping logic for gene list if needed, updated to new ID
+            if (key === 'gen.self_genes') {
                 return (
                   <div key={key} className="space-y-2">
                     <Label>{q.text}</Label>
                     <div className={cn("max-h-[400px] overflow-y-auto border rounded-md p-4")}>
                         <CheckboxGroup
-                        options={groupedFlatOptions as any}
+                        options={q.options}
                         value={answers[key] ? JSON.parse(answers[key]) : []}
                         onChange={(val) => onAnswer(key, JSON.stringify(val))}
+                        idPrefix={key}
                         />
                     </div>
                   </div>
@@ -128,11 +115,12 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
             return (
               <div key={key} className="space-y-2">
                 <Label>{q.text}</Label>
-                <div className={cn(isLongList && "max-h-[400px] overflow-y-auto border rounded-md p-4")}>
+                <div className={cn(isLongList && "max-h-[300px] overflow-y-auto border rounded-md p-4")}>
                     <CheckboxGroup
                     options={q.options}
                     value={answers[key] ? JSON.parse(answers[key]) : []}
                     onChange={(val) => onAnswer(key, JSON.stringify(val))}
+                    idPrefix={key}
                     />
                 </div>
               </div>
@@ -140,27 +128,6 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
           case 'file_upload':
             return (
               <FileUploadComponent key={key} question={q} answers={answers} onAnswer={onAnswer} />
-            )
-          case 'consent_checkbox':
-            return (
-              <div key={key} className="flex items-start space-x-3 rounded-md border p-4 mt-4">
-                <Checkbox
-                  id={key}
-                  checked={answers[key] === "true"}
-                  onCheckedChange={(checked) => onAnswer(key, checked ? "true" : "false")}
-                />
-                <div className="grid gap-1.5 leading-none">
-                  <label htmlFor={key} className="text-sm leading-snug text-muted-foreground">
-                    {t.rich("consentGenetics", {
-                      privacyLink: (chunks) => (
-                        <Link href="/privacy" className="font-semibold text-primary hover:underline" target="_blank" rel="noopener noreferrer">
-                          {chunks}
-                        </Link>
-                      ),
-                    })}
-                  </label>
-                </div>
-              </div>
             );
           default:
             return null;
@@ -169,4 +136,3 @@ export const Genetics = ({ answers, onAnswer, questions }: GeneticsProps) => {
     </div>
   );
 };
-      

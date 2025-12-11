@@ -268,8 +268,8 @@ export default function AssessmentPage() {
     );
   }
 
-  const advancedModules = questionnaire?.steps.flatMap(step => step.questions).find((q: Question) => q.id === 'advanced_modules')?.modules || [];
-  const symptomDetailsOptions = advancedModules.find((m: { id: string; options?: any }) => m.id === 'symptom_details')?.options;
+  const allAdvancedModules = questionnaire?.steps.flatMap(step => step.questions).filter((q: Question) => q.type === 'advanced_modules').flatMap(q => q.modules) || [];
+  const symptomDetailsOptions = allAdvancedModules.find((m: { id: string; options?: any }) => m.id === 'symptom_details')?.options;
 
 
   return (
@@ -338,8 +338,8 @@ export default function AssessmentPage() {
                   {q.type === "year_input" && <><Input id={q.id} type="number" inputMode="numeric" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} placeholder="YYYY" /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
                   {q.type === "date_input" && <><Input id={q.id} type="date" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
                   {q.type === "consent_checkbox" && <div className="flex items-start space-x-3 rounded-md border p-4"><Checkbox id={q.id} checked={answers[q.id] === "true"} onCheckedChange={(c) => setAnswer(q.id, c ? "true" : "false")} /><div className="grid gap-1.5"><label htmlFor={q.id} className="text-sm leading-snug text-muted-foreground">{t.rich("consentHealth", { privacyLink: (chunks) => <Link href="/privacy" className="font-semibold text-primary hover:underline" target="_blank" rel="noopener noreferrer">{chunks}</Link> })}</label></div></div>}
-                  {q.type === "checkbox_group" && <CheckboxGroup options={q.options as CheckboxOption[]} value={answers[q.id] ? JSON.parse(answers[q.id]) : []} onChange={(s) => setAnswer(q.id, JSON.stringify(s))} exclusiveOption={q.exclusiveOptionId} />}
-                  {q.type === 'advanced_modules' && <Accordion type="multiple" className="w-full">{q.modules?.filter(m => isQuestionVisible(m, answers)).map(m => <AccordionItem value={m.id} key={m.id}><AccordionTrigger>{m.title[locale] || m.title.en}</AccordionTrigger><AccordionContent>
+                  {q.type === "checkbox_group" && <CheckboxGroup options={q.options as CheckboxOption[]} value={answers[q.id] ? JSON.parse(answers[q.id]) : []} onChange={(s) => setAnswer(q.id, JSON.stringify(s))} exclusiveOption={q.exclusiveOptionId} idPrefix={q.id} />}
+                  {q.type === 'advanced_modules' && <Accordion type="multiple" className="w-full">{q.modules?.filter(m => isQuestionVisible(m, answers)).map(m => <AccordionItem value={m.id} key={m.id}><AccordionTrigger>{typeof m.title === 'string' ? m.title : (m.title[locale] || m.title.en)}</AccordionTrigger><AccordionContent>
                     {m.id === 'symptom_details' && <SymptomDetails selectedSymptoms={answers.symptoms ? questionnaire?.steps.flatMap(s => s.questions).find(q => q.id === 'symptoms')?.options?.filter((o: any) => JSON.parse(answers.symptoms).includes(o.id)) || [] : []} value={Object.keys(answers).reduce((acc, k) => { if(k.startsWith('symptom_details_')) { const sId=k.replace('symptom_details_',''); acc[sId]=JSON.parse(answers[k]);} return acc;}, {} as Record<string,any>)} onChange={(sId, d) => setAnswer(`symptom_details_${sId}`, JSON.stringify(d))} symptomOptions={symptomDetailsOptions?.symptomList || []} featureOptions={symptomDetailsOptions?.associatedFeatures || []} />}
                     {m.id === 'family_cancer_history' && <FamilyCancerHistory value={answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : []} onChange={(v) => setAnswer('family_cancer_history', JSON.stringify(v))} options={m.options} />}
                     {m.id === 'genetics' && <Genetics answers={answers} onAnswer={setAnswer} questions={m.questions} />}
@@ -353,6 +353,7 @@ export default function AssessmentPage() {
                     {m.id === 'environmental_exposures' && <EnvironmentalExposures answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'labs_and_imaging' && <LabsAndImaging value={answers.labs_and_imaging ? JSON.parse(answers.labs_and_imaging) : []} onChange={(v) => setAnswer('labs_and_imaging', JSON.stringify(v))} options={m.options} />}
                     {m.id === 'functional_status' && <FunctionalStatus answers={answers} onAnswer={setAnswer} questions={m.questions} />}
+                    {m.id === 'physical_activity_details' && <GenericModule answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                     {m.id === 'smoking_details' && <SmokingDetails answers={answers} onAnswer={setAnswer} questions={m.questions} />}
                   </AccordionContent></AccordionItem>)}</Accordion>}
                   

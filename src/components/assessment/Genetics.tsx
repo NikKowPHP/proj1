@@ -5,7 +5,7 @@ import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Checkbox } from '../ui/checkbox';
 import { Link } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Input } from '../ui/input';
 import { YearInput } from '../ui/YearInput';
 import { CheckboxGroup } from '../ui/CheckboxGroup';
@@ -37,7 +37,17 @@ const isVisible = (question: any, answers: Record<string, string>): boolean => {
 
 export const Genetics = ({ answers, onAnswer, questions, errors: externalErrors }: GeneticsProps) => {
   const t = useTranslations("AssessmentPage");
+  const locale = useLocale();
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
+
+  const getOptionLabel = (opt: any) => {
+    const rawLabel = typeof opt === 'object' ? opt.label : opt;
+    if (typeof rawLabel === 'object' && rawLabel !== null) {
+      const localized = (rawLabel as Record<string, string>)[locale as string];
+      return localized ?? (rawLabel as any).en ?? Object.values(rawLabel)[0];
+    }
+    return rawLabel;
+  };
 
   const handleValidatedChange = (id: string, value: any) => {
     let error: string | undefined = undefined;
@@ -67,11 +77,11 @@ export const Genetics = ({ answers, onAnswer, questions, errors: externalErrors 
                 <Select onValueChange={(value) => onAnswer(key, value)} value={answers[key] || ""}>
                   <SelectTrigger id={key}><SelectValue placeholder="Select an option" /></SelectTrigger>
                   <SelectContent>
-                    {q.options.map((opt: string | { value: string, label: string }) => {
+                    {q.options.map((opt: string | { value: string, label: any }) => {
                       if (typeof opt === 'object') {
-                        return <SelectItem key={opt.value} value={opt.value}>{typeof opt.label === 'object' ? (opt.label as any).en : opt.label}</SelectItem>
+                        return <SelectItem key={opt.value} value={opt.value}>{getOptionLabel(opt)}</SelectItem>
                       }
-                      return <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                      return <SelectItem key={opt} value={opt}>{getOptionLabel(opt)}</SelectItem>
                     })}
                   </SelectContent>
                 </Select>

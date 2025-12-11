@@ -123,7 +123,25 @@
     "adultGateError": "Ta wersja narzędzia jest przeznaczona dla osób dorosłych. W razie wątpliwości skonsultuj się z lekarzem rodzinnym lub pediatrą.",
     "biologicalFamilyHelper": "Rodzina biologiczna = rodzice, dzieci, rodzeństwo (także przyrodnie), dziadkowie, ciocie/wujkowie, siostrzeńcy/bratankowie, kuzynostwo.",
     "decadeHelper": "Wskazówka: Zsumuj wszystkie okresy palenia. 10 lat = 1 dekada.",
-    "approximateOk": "Przybliżone odpowiedzi są w porządku."
+    "approximateOk": "Przybliżone odpowiedzi są w porządku.",
+    "symptomDetails": {
+      "noSymptoms": "Brak wybranych objawów w poprzednim kroku.",
+      "searchPlaceholder": "Wybierz lub doprecyzuj objaw...",
+      "whenStart": "Kiedy się zaczęło?",
+      "monthPlaceholder": "Miesiąc",
+      "yearPlaceholder": "Rok",
+      "severityLabel": "Nasilenie (0-10)",
+      "frequencyLabel": "Częstość",
+      "frequencyPlaceholder": "Wybierz częstość",
+      "frequencyDaily": "Codziennie",
+      "frequencyWeekly": "Raz w tygodniu",
+      "frequencyConstant": "Stały",
+      "frequencyIntermittent": "Nawracający (pojawia się i znika)",
+      "frequencyWorsening": "Stopniowo się nasila",
+      "associatedFeatures": "Objawy towarzyszące",
+      "notesLabel": "Notatki (opcjonalnie)",
+      "notesPlaceholder": "Opisz dokładniej swój objaw..."
+    }
   },
   "ResultsPage": {
     "noDataTitle": "Brak Danych Planu",

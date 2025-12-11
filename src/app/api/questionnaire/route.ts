@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
-import questionnaireData from "@/lib/assessment-questions.json";
+import { promises as fs } from 'fs';
+import path from 'path';
 
 type Locale = "en" | "pl";
 
@@ -56,6 +57,10 @@ export async function GET(request: NextRequest) {
     : "en";
 
   try {
+    const filePath = path.join(process.cwd(), 'src/lib/assessment-questions.json');
+    const fileContents = await fs.readFile(filePath, 'utf8');
+    const questionnaireData = JSON.parse(fileContents);
+
     const localizedQuestionnaire = project(questionnaireData, finalLocale);
     logger.info(`[API:questionnaire] Processed questionnaire for locale: ${finalLocale}`);
     return NextResponse.json(localizedQuestionnaire);

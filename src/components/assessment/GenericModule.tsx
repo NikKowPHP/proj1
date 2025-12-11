@@ -5,7 +5,7 @@ import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Checkbox } from '../ui/checkbox';
 import { Link } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Input } from '../ui/input';
 import { YearInput } from '../ui/YearInput';
 import { CheckboxGroup } from '../ui/CheckboxGroup';
@@ -23,7 +23,17 @@ interface GenericModuleProps {
 
 export const GenericModule = ({ answers, onAnswer, questions, errors: externalErrors }: GenericModuleProps) => {
     const t = useTranslations("AssessmentPage");
+    const locale = useLocale();
     const [errors, setErrors] = useState<Record<string, string | undefined>>({});
+
+    const getOptionLabel = (opt: any) => {
+        const rawLabel = typeof opt === 'object' ? opt.label : opt;
+        if (typeof rawLabel === 'object' && rawLabel !== null) {
+            const localized = (rawLabel as Record<string, string>)[locale as string];
+            return localized ?? (rawLabel as any).en ?? Object.values(rawLabel)[0];
+        }
+        return rawLabel;
+    };
 
     const handleValidatedChange = (id: string, value: any, type?: string) => {
         let error: string | undefined = undefined;
@@ -70,13 +80,13 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                         case 'select':
                             return (
                                 <Select onValueChange={(value) => onAnswer(key, value)} value={answers[key] || ""}>
-                                    <SelectTrigger id={key}><SelectValue placeholder="Select an option" /></SelectTrigger>
+                                    <SelectTrigger id={key}><SelectValue placeholder={locale === 'pl' ? "Wybierz opcję" : "Select an option"} /></SelectTrigger>
                                     <SelectContent>
-                                        {q.options.map((opt: string | { value: string, label: string }) => {
+                                        {q.options.map((opt: string | { value: string, label: any }) => {
                                             if (typeof opt === 'object') {
-                                                return <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                                return <SelectItem key={opt.value} value={opt.value}>{getOptionLabel(opt)}</SelectItem>
                                             }
-                                            return <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                            return <SelectItem key={opt} value={opt}>{getOptionLabel(opt)}</SelectItem>
                                         })}
                                     </SelectContent>
                                 </Select>
@@ -84,13 +94,13 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                         case 'radio':
                             return (
                                 <Select onValueChange={(value) => onAnswer(key, value)} value={answers[key] || ""}>
-                                    <SelectTrigger id={key}><SelectValue placeholder="Select an option" /></SelectTrigger>
+                                    <SelectTrigger id={key}><SelectValue placeholder={locale === 'pl' ? "Wybierz opcję" : "Select an option"} /></SelectTrigger>
                                     <SelectContent>
-                                        {q.options.map((opt: string | { value: string, label: string }) => {
+                                        {q.options.map((opt: string | { value: string, label: any }) => {
                                             if (typeof opt === 'object') {
-                                                return <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                                return <SelectItem key={opt.value} value={opt.value}>{getOptionLabel(opt)}</SelectItem>
                                             }
-                                            return <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                            return <SelectItem key={opt} value={opt}>{getOptionLabel(opt)}</SelectItem>
                                         })}
                                     </SelectContent>
                                 </Select>
@@ -149,7 +159,10 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                         case 'checkbox_group':
                             return (
                                 <CheckboxGroup
-                                    options={q.options}
+                                    options={q.options.map((opt: any) => ({
+                                        ...opt,
+                                        label: getOptionLabel(opt)
+                                    }))}
                                     value={answers[key] ? JSON.parse(answers[key]) : []}
                                     onChange={(val) => onAnswer(key, JSON.stringify(val))}
                                     exclusiveOption={q.exclusiveOptionId}

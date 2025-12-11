@@ -2,6 +2,7 @@ import React from 'react';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { CheckboxGroup } from '../ui/CheckboxGroup';
+import { useLocale } from 'next-intl';
 
 interface SexualHealthProps {
   answers: Record<string, any>;
@@ -18,7 +19,17 @@ const isVisible = (question: any, answers: Record<string, string>): boolean => {
 
 
 export const SexualHealth = ({ answers, onAnswer, questions, errors }: SexualHealthProps) => {
+  const locale = useLocale();
   const visibleQuestions = questions.filter(q => isVisible(q, answers));
+
+  const getOptionLabel = (opt: any) => {
+    const rawLabel = typeof opt === 'object' ? opt.label : opt;
+    if (typeof rawLabel === 'object' && rawLabel !== null) {
+      const localized = (rawLabel as Record<string, string>)[locale as string];
+      return localized ?? (rawLabel as any).en ?? Object.values(rawLabel)[0];
+    }
+    return rawLabel;
+  };
 
   // Opt-in Logic
   // If opt-in question is present and answer is No/Prefer not to say, specific logic might be needed
@@ -40,12 +51,12 @@ export const SexualHealth = ({ answers, onAnswer, questions, errors }: SexualHea
             <>
               <Select onValueChange={(value) => onAnswer(q.id, value)} value={answers[q.id] || ""}>
                 <SelectTrigger id={q.id} className={errors?.[q.id] ? "border-destructive" : ""}>
-                  <SelectValue placeholder="Select an option" />
+                  <SelectValue placeholder={locale === 'pl' ? "Wybierz opcję" : "Select an option"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {q.options.map((opt: string | { value: string; label: string }) => {
+                  {q.options.map((opt: string | { value: string; label: any }) => {
                     const value = typeof opt === 'object' ? opt.value : opt;
-                    const label = typeof opt === 'object' ? opt.label : opt;
+                    const label = getOptionLabel(opt);
                     return <SelectItem key={value} value={value}>{label}</SelectItem>;
                   })}
                 </SelectContent>
@@ -55,7 +66,10 @@ export const SexualHealth = ({ answers, onAnswer, questions, errors }: SexualHea
           )}
           {q.type === 'checkbox_group' && (
             <CheckboxGroup
-              options={q.options}
+              options={q.options.map((opt: any) => ({
+                ...opt,
+                label: getOptionLabel(opt)
+              }))}
               value={answers[q.id] ? JSON.parse(answers[q.id]) : []}
               onChange={(selected) => onAnswer(q.id, JSON.stringify(selected))}
               exclusiveOption={q.exclusiveOptionId}
@@ -66,12 +80,12 @@ export const SexualHealth = ({ answers, onAnswer, questions, errors }: SexualHea
             // Fallback for radio if passed (though JSON mostly uses select for these)
             <Select onValueChange={(value) => onAnswer(q.id, value)} value={answers[q.id] || ""}>
               <SelectTrigger id={q.id}>
-                <SelectValue placeholder="Select an option" />
+                <SelectValue placeholder={locale === 'pl' ? "Wybierz opcję" : "Select an option"} />
               </SelectTrigger>
               <SelectContent>
-                {q.options.map((opt: string | { value: string; label: string }) => {
+                {q.options.map((opt: string | { value: string; label: any }) => {
                   const value = typeof opt === 'object' ? opt.value : opt;
-                  const label = typeof opt === 'object' ? opt.label : opt;
+                  const label = getOptionLabel(opt);
                   return <SelectItem key={value} value={value}>{label}</SelectItem>;
                 })}
               </SelectContent>

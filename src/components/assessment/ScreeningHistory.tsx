@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { YearInput } from '../ui/YearInput';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { CheckboxGroup } from '../ui/CheckboxGroup';
+import { useLocale } from 'next-intl';
 
 interface ScreeningQuestion {
   id: string;
@@ -76,7 +77,17 @@ const isVisible = (
 };
 
 export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizationQuestions, questions, errors: externalErrors }: ScreeningHistoryProps) => {
+  const locale = useLocale();
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
+
+  const getOptionLabel = (opt: any) => {
+    const rawLabel = typeof opt === 'object' ? opt.label : opt;
+    if (typeof rawLabel === 'object' && rawLabel !== null) {
+      const localized = (rawLabel as Record<string, string>)[locale as string];
+      return localized ?? (rawLabel as any).en ?? Object.values(rawLabel)[0];
+    }
+    return rawLabel;
+  };
 
   const handleValidatedChange = (id: string, value: string | undefined) => {
     let error: string | undefined = undefined;
@@ -137,8 +148,8 @@ export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizat
                               <SelectContent>
                                 {q.options?.map((opt: any) => {
                                   const val = typeof opt === 'object' ? opt.value : opt;
-                                  const lbl = typeof opt === 'object' ? opt.label : opt;
-                                  return <SelectItem key={val} value={val}>{lbl ? (typeof lbl === 'object' ? lbl.en : lbl) : val}</SelectItem>
+                                  const lbl = getOptionLabel(opt);
+                                  return <SelectItem key={val} value={val}>{lbl}</SelectItem>
                                 })}
                               </SelectContent>
                             </Select>
@@ -176,7 +187,10 @@ export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizat
               <Select onValueChange={(value) => onAnswer(q.id, value)} value={answers[q.id] || ""}>
                 <SelectTrigger id={q.id}><SelectValue placeholder="Select an option" /></SelectTrigger>
                 <SelectContent>
-                  {q.options?.map((opt) => <SelectItem key={opt.value} value={opt.value}>{typeof opt.label === 'object' ? (opt.label as any).en : opt.label}</SelectItem>)}
+                  {q.options?.map((opt) => {
+                    const lbl = getOptionLabel(opt);
+                    return <SelectItem key={opt.value} value={opt.value}>{lbl}</SelectItem>;
+                  })}
                 </SelectContent>
               </Select>
             </div>

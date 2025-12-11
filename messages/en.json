@@ -120,7 +120,25 @@
     "remove": "Remove",
     "addCancer": "+ Add Cancer",
     "addCustomRelative": "Add Custom Relative",
-    "adultGateError": "This version of the tool is designed for adults. Please discuss any concerns with a paediatrician / family doctor."
+    "adultGateError": "This version of the tool is designed for adults. Please discuss any concerns with a paediatrician / family doctor.",
+    "symptomDetails": {
+      "noSymptoms": "No symptoms selected in the previous step.",
+      "searchPlaceholder": "Select or refine symptom...",
+      "whenStart": "When did it start?",
+      "monthPlaceholder": "Month",
+      "yearPlaceholder": "Year",
+      "severityLabel": "Severity (0-10)",
+      "frequencyLabel": "Frequency",
+      "frequencyPlaceholder": "Select frequency",
+      "frequencyDaily": "Daily",
+      "frequencyWeekly": "Weekly",
+      "frequencyConstant": "Constant",
+      "frequencyIntermittent": "Intermittent (comes and goes)",
+      "frequencyWorsening": "Getting progressively worse",
+      "associatedFeatures": "Associated Features",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Describe your symptom in more detail..."
+    }
   },
   "ResultsPage": {
     "noDataTitle": "No Plan Data",

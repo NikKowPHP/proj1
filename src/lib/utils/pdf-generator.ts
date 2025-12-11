@@ -1,16 +1,9 @@
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import type { ActionPlan } from "../types";
 import { onkonoLogoBase64 } from "../assets/onkono-logo-base64";
 import { openSansBold } from "../assets/open-sans-bold-base64";
 import { openSansRegular } from "../assets/open-sans-regular-base64";
-
-interface jsPDFWithAutoTable extends jsPDF {
-  autoTable: {
-    (options: any): jsPDF;
-    previous?: { finalY: number };
-  };
-}
 
 const THEME = {
   BRAND_COLOR: "#FF3B30",
@@ -119,7 +112,7 @@ const translations: Record<string, any> = {
   },
 };
 
-const drawSectionHeader = (doc: jsPDFWithAutoTable, title: string, startY: number): number => {
+const drawSectionHeader = (doc: jsPDF, title: string, startY: number): number => {
   const headerHeight = 10;
   const padding = 14;
 
@@ -206,7 +199,7 @@ export const generateAssessmentPdf = (
   locale: string = "en",
 ) => {
   const t = translations[locale] || translations.en;
-  const doc = new jsPDF() as jsPDFWithAutoTable;
+  const doc = new jsPDF();
   const pageMargin = 14;
 
   doc.addFileToVFS("OpenSans-Regular.ttf", openSansRegular);
@@ -248,49 +241,49 @@ export const generateAssessmentPdf = (
 
   const commonTableStyles = {
     showHead: false,
-    theme: "plain",
+    theme: "plain" as const,
     styles: {
       cellPadding: { top: 1.5, right: 3, bottom: 1.5, left: 1 },
       font: "OpenSans",
       fontSize: STYLING.FONT_SIZES.BODY,
-      valign: 'top',
+      valign: 'top' as const,
       lineHeight: STYLING.LINE_HEIGHT,
     },
-    columnStyles: { 0: { fontStyle: 'bold' } },
+    columnStyles: { 0: { fontStyle: 'bold' as const } },
     margin: { left: pageMargin },
   };
 
   if (planData.recommendedScreenings.length > 0) {
     startY = checkPageBreak(startY);
     startY = drawSectionHeader(doc, t.recommendedScreenings, startY);
-    doc.autoTable({
+    autoTable(doc, {
       startY,
       body: planData.recommendedScreenings.map((s) => [s.title, s.why]),
       ...commonTableStyles,
     });
-    startY = (doc.autoTable.previous?.finalY ?? startY) + 12;
+    startY = ((doc as any).lastAutoTable?.finalY ?? startY) + 12;
   }
 
   if (planData.lifestyleGuidelines.length > 0) {
     startY = checkPageBreak(startY);
     startY = drawSectionHeader(doc, t.lifestyleGuidelines, startY);
-    doc.autoTable({
+    autoTable(doc, {
       startY,
       body: planData.lifestyleGuidelines.map((l) => [l.title, l.description]),
       ...commonTableStyles,
     });
-    startY = (doc.autoTable.previous?.finalY ?? startY) + 12;
+    startY = ((doc as any).lastAutoTable?.finalY ?? startY) + 12;
   }
 
   if (planData.topicsForDoctor.length > 0) {
     startY = checkPageBreak(startY);
     startY = drawSectionHeader(doc, t.topicsForDoctor, startY);
-    doc.autoTable({
+    autoTable(doc, {
       startY,
       body: planData.topicsForDoctor.map((topic) => [topic.title, topic.why]),
       ...commonTableStyles,
     });
-    startY = (doc.autoTable.previous?.finalY ?? startY) + 12;
+    startY = ((doc as any).lastAutoTable?.finalY ?? startY) + 12;
   }
 
   if (Object.keys(answers).length > 0) {
@@ -305,7 +298,7 @@ export const generateAssessmentPdf = (
                !key.includes('brinkman_index');
     });
 
-    doc.autoTable({
+    autoTable(doc, {
       startY,
       body: filteredAnswers.map(([key, value]) => [
         formatQuestionKey(key, t),

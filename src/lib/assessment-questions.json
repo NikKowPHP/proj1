@@ -73,13 +73,23 @@
               "title": { "en": "Smoking Details", "pl": "Szczegóły Palenia" },
               "dependsOn": { "questionId": "smoking_status", "value": ["Current", "Former"] },
               "questions": [
-                { "id": "smoking.pattern", "text": {"en": "On days you smoke, do you smoke every day or some days?", "pl": "W dni, w które palisz, czy palisz codziennie czy tylko w niektóre dni?"}, "type": "radio", "options": ["Every day", "Some days"], "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
+                { "id": "smoking.pattern", "text": {"en": "On days you smoke, do you smoke every day or some days?", "pl": "W dni, w które palisz, czy palisz codziennie czy tylko w niektóre dni?"}, "type": "radio", "options": [
+                  { "value": "Every day", "label": { "en": "Every day", "pl": "Codziennie" } },
+                  { "value": "Some days", "label": { "en": "Some days", "pl": "Niektóre dni" } }
+                ], "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
                 { "id": "smoking.intensity", "text": { "en": "On average, how many cigarettes do you smoke per day?", "pl": "Średnio, ile papierosów palisz dziennie?"}, "type": "number_input", "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
                 { "id": "smoking.years_smoked", "text": { "en": "Total years you have smoked", "pl": "Łączna liczba lat palenia"}, "type": "number_input", "min": 0.5, "max": 80 },
                 { "id": "smoking.start_age", "text": { "en": "At what age did you start smoking regularly?", "pl": "W jakim wieku zacząłeś/zaczęłaś palić regularnie?"}, "type": "number_input", "min": 5, "max": 99 },
                 { "id": "smoking.quit_date", "text": { "en": "When did you completely quit? (Year)", "pl": "Kiedy całkowicie rzuciłeś/rzuciłaś palenie? (Rok)"}, "type": "year_input", "dependsOn": {"questionId": "smoking_status", "value": "Former"}},
                 
-                { "id": "smoking.other_tobacco_smoked", "text": {"en": "Do you also use other smoked tobacco products?", "pl": "Czy używasz też innych wyrobów tytoniowych do palenia?"}, "type": "checkbox_group", "options": [{"id": "Cigar", "label": "Cigar"}, {"id": "Cigarillos", "label": "Cigarillos"}, {"id": "Pipe", "label": "Pipe"}, {"id": "Roll-your-own", "label": "Roll-your-own"}, {"id": "Waterpipe", "label": "Waterpipe"}, {"id": "None", "label": "None"}], "exclusiveOptionId": "None", "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
+                { "id": "smoking.other_tobacco_smoked", "text": {"en": "Do you also use other smoked tobacco products?", "pl": "Czy używasz też innych wyrobów tytoniowych do palenia?"}, "type": "checkbox_group", "options": [
+                  { "id": "Cigar", "label": { "en": "Cigar", "pl": "Cygaro" } },
+                  { "id": "Cigarillos", "label": { "en": "Cigarillos", "pl": "Cygaretki" } },
+                  { "id": "Pipe", "label": { "en": "Pipe", "pl": "Fajka" } },
+                  { "id": "Roll-your-own", "label": { "en": "Roll-your-own", "pl": "Skręcane papierosy" } },
+                  { "id": "Waterpipe", "label": { "en": "Waterpipe", "pl": "Fajka wodna" } },
+                  { "id": "None", "label": { "en": "None", "pl": "Brak" } }
+                ], "exclusiveOptionId": "None", "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
                 
                 { "id": "smoking.other_cigar_per_week", "text": {"en": "Cigars per week", "pl": "Cygara na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "operator": "array_contains", "value": "Cigar"} },
                 { "id": "smoking.other_cigarillos_per_week", "text": {"en": "Cigarillos per week", "pl": "Cygaretki na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "operator": "array_contains", "value": "Cigarillos"} },
@@ -87,20 +97,20 @@
                 { "id": "smoking.other_hookah_sessions_per_week", "text": {"en": "Waterpipe sessions per week", "pl": "Sesje fajki wodnej na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "operator": "array_contains", "value": "Waterpipe"} },
                 { "id": "smoking.other_other_per_week", "text": {"en": "Other products per week", "pl": "Inne produkty na tydzień"}, "type": "number_input", "dependsOn": {"questionId": "smoking.other_tobacco_smoked", "operator": "array_contains", "value": "Other"} },
 
-                { "id": "vape.status", "text": {"en": "Do you use e-cigarettes (vapes)?", "pl": "Czy używasz e-papierosów (vape)?"}, "type": "radio", "options": ["Lifetime never", "Former", "Current"] },
+                { "id": "vape.status", "text": {"en": "Do you use e-cigarettes (vapes)?", "pl": "Czy używasz e-papierosów (vape)?"}, "type": "radio", "options": [{"value": "Lifetime never", "label": {"en": "Lifetime never", "pl": "Nigdy w życiu"}}, {"value": "Former", "label": {"en": "Former", "pl": "W przeszłości"}}, {"value": "Current", "label": {"en": "Current", "pl": "Obecnie"}}] },
                 { "id": "vape.days_30d", "text": {"en": "In the past 30 days, on how many days did you use an e-cigarette?", "pl": "W ostatnich 30 dniach, w ile dni używałeś/aś e-papierosa?"}, "type": "number_input", "min": 0, "max": 30, "dependsOn": {"questionId": "vape.status", "value": "Current"} },
-                { "id": "vape.device_type", "text": {"en": "Which device type do you usually use?", "pl": "Jakiego typu urządzenia zwykle używasz?"}, "type": "select", "options": ["Disposable", "Prefilled pod or cartridge", "Refillable tank or mod", "Other"], "dependsOn": {"questionId": "vape.status", "value": "Current"} },
-                { "id": "vape.nicotine", "text": {"en": "Does your usual e-liquid contain nicotine?", "pl": "Czy zwykle używany płyn zawiera nikotynę?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "vape.status", "value": "Current"} },
+                { "id": "vape.device_type", "text": {"en": "Which device type do you usually use?", "pl": "Jakiego typu urządzenia zwykle używasz?"}, "type": "select", "options": [{"value": "Disposable", "label": {"en": "Disposable", "pl": "Jednorazowe"}}, {"value": "Prefilled pod or cartridge", "label": {"en": "Prefilled pod or cartridge", "pl": "Wkłady (pods) lub kartridże"}}, {"value": "Refillable tank or mod", "label": {"en": "Refillable tank or mod", "pl": "Zbiornik do napełniania lub mod"}}, {"value": "Other", "label": {"en": "Other", "pl": "Inne"}}], "dependsOn": {"questionId": "vape.status", "value": "Current"} },
+                { "id": "vape.nicotine", "text": {"en": "Does your usual e-liquid contain nicotine?", "pl": "Czy zwykle używany płyn zawiera nikotynę?"}, "type": "radio", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}], "dependsOn": {"questionId": "vape.status", "value": "Current"} },
 
-                { "id": "htp.status", "text": {"en": "Do you use heated-tobacco products (e.g., IQOS®)?", "pl": "Czy używasz wyrobów tytoniu podgrzewanego (np. IQOS®)?"}, "type": "radio", "options": ["Lifetime never", "Former", "Current"] },
+                { "id": "htp.status", "text": {"en": "Do you use heated-tobacco products (e.g., IQOS®)?", "pl": "Czy używasz wyrobów tytoniu podgrzewanego (np. IQOS®)?"}, "type": "radio", "options": [{"value": "Lifetime never", "label": {"en": "Lifetime never", "pl": "Nigdy w życiu"}}, {"value": "Former", "label": {"en": "Former", "pl": "W przeszłości"}}, {"value": "Current", "label": {"en": "Current", "pl": "Obecnie"}}] },
                 { "id": "htp.days_30d", "text": {"en": "Days used in last 30 days", "pl": "Dni używania w ciągu ostatnich 30 dni"}, "type": "number_input", "min": 0, "max": 30, "dependsOn": {"questionId": "htp.status", "value": "Current"} },
                 { "id": "htp.sticks_per_day", "text": {"en": "Average tobacco sticks per day", "pl": "Średnia liczba wkładów dziennie"}, "type": "number_input", "dependsOn": {"questionId": "htp.status", "value": "Current"} },
 
-                { "id": "shs.home_freq", "text": {"en": "How often does anyone smoke inside your home?", "pl": "Jak często ktoś pali wewnątrz Twojego domu?"}, "type": "select", "options": ["Never", "Daily", "Weekly", "Monthly", "Less than monthly"] },
-                { "id": "shs.work_freq", "text": {"en": "How often does smoking occur indoors at work?", "pl": "Jak często pali się w pomieszczeniach w pracy?"}, "type": "select", "options": ["Never", "Daily", "Weekly", "Monthly", "Less than monthly"] },
-                { "id": "shs.public_30d_bars", "text": {"en": "In the past 30 days, were you in a café/bar where people smoked indoors?", "pl": "W ostatnich 30 dniach, czy byłeś/byłaś w kawiarni/barze, gdzie palono w środku?"}, "type": "radio", "options": ["Yes", "No"] },
+                { "id": "shs.home_freq", "text": {"en": "How often does anyone smoke inside your home?", "pl": "Jak często ktoś pali wewnątrz Twojego domu?"}, "type": "select", "options": [{"value": "Never", "label": {"en": "Never", "pl": "Nigdy"}}, {"value": "Daily", "label": {"en": "Daily", "pl": "Codziennie"}}, {"value": "Weekly", "label": {"en": "Weekly", "pl": "Raz w tygodniu"}}, {"value": "Monthly", "label": {"en": "Monthly", "pl": "Raz w miesiącu"}}, {"value": "Less than monthly", "label": {"en": "Less than monthly", "pl": "Rzadziej niż raz w miesiącu"}}] },
+                { "id": "shs.work_freq", "text": {"en": "How often does smoking occur indoors at work?", "pl": "Jak często pali się w pomieszczeniach w pracy?"}, "type": "select", "options": [{"value": "Never", "label": {"en": "Never", "pl": "Nigdy"}}, {"value": "Daily", "label": {"en": "Daily", "pl": "Codziennie"}}, {"value": "Weekly", "label": {"en": "Weekly", "pl": "Raz w tygodniu"}}, {"value": "Monthly", "label": {"en": "Monthly", "pl": "Raz w miesiącu"}}, {"value": "Less than monthly", "label": {"en": "Less than monthly", "pl": "Rzadziej niż raz w miesiącu"}}] },
+                { "id": "shs.public_30d_bars", "text": {"en": "In the past 30 days, were you in a café/bar where people smoked indoors?", "pl": "W ostatnich 30 dniach, czy byłeś/byłaś w kawiarni/barze, gdzie palono w środku?"}, "type": "radio", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}] },
                 { "id": "shs.hours_7d", "text": {"en": "Total hours exposed to smoke in last 7 days", "pl": "Całkowita liczba godzin narażenia na dym w ciągu ostatnich 7 dni"}, "type": "number_input", "min": 0, "max": 168 },
-                { "id": "shs.life_course", "text": {"en": "Where have you been exposed to smoke?", "pl": "Gdzie byłeś/byłaś narażony/a na dym?"}, "type": "checkbox_group", "options": [{"id": "Childhood home", "label": "Childhood home"}, {"id": "Adult home", "label": "Adult home"}, {"id": "Work", "label": "Work"}, {"id": "Social", "label": "Social venues"}] }
+                { "id": "shs.life_course", "text": {"en": "Where have you been exposed to smoke?", "pl": "Gdzie byłeś/byłaś narażony/a na dym?"}, "type": "checkbox_group", "options": [{"id": "Childhood home", "label": {"en": "Childhood home", "pl": "Dom w dzieciństwie"}}, {"id": "Adult home", "label": {"en": "Adult home", "pl": "Dom w dorosłości"}}, {"id": "Work", "label": {"en": "Work", "pl": "Praca"}}, {"id": "Social", "label": {"en": "Social venues", "pl": "Miejsca towarzyskie"}}] }
               ]
             }
           ]
@@ -273,36 +283,36 @@
               "id": "sexual_health",
               "title": {"en": "Sexual Health", "pl": "Zdrowie Seksualne"},
               "questions": [
-                {"id": "sexhx.section_opt_in", "text": {"en": "Answer optional sexual health questions?", "pl": "Odpowiedzieć na pytania o zdrowie seksualne?"}, "type": "radio", "options": [{"value":"Yes", "label":"Yes"}, {"value":"No", "label":"No"}, {"value":"Prefer not to say", "label":"Prefer not to say"}]},
-                {"id": "sexhx.ever_sexual_contact", "text": {"en": "Ever had sexual contact?", "pl": "Kontakt seksualny kiedykolwiek?"}, "type": "radio", "options": ["Yes", "No, never", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.section_opt_in", "value": "Yes"}},
+                {"id": "sexhx.section_opt_in", "text": {"en": "Answer optional sexual health questions?", "pl": "Odpowiedzieć na pytania o zdrowie seksualne?"}, "type": "radio", "options": [{"value":"Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value":"No", "label": {"en": "No", "pl": "Nie"}}, {"value":"Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie odpowiadać"}}]},
+                {"id": "sexhx.ever_sexual_contact", "text": {"en": "Ever had sexual contact?", "pl": "Kontakt seksualny kiedykolwiek?"}, "type": "radio", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No, never", "label": {"en": "No, never", "pl": "Nie, nigdy"}}, {"value": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.section_opt_in", "value": "Yes"}},
                 
                 {"id": "sexhx.age_first_sex", "text": {"en": "Age at first sex", "pl": "Wiek inicjacji"}, "type": "number_input", "validation": { "min": 8, "max": 80 }, "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.lifetime_partners_cat", "text": {"en": "Lifetime partners count", "pl": "Liczba partnerów (całe życie)"}, "type": "select", "options": ["0-1", "2-4", "5-9", "10-19", "20 or more", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                {"id": "sexhx.lifetime_partners_cat", "text": {"en": "Lifetime partners count", "pl": "Liczba partnerów (całe życie)"}, "type": "select", "options": [{"value": "0-1", "label": {"en": "0-1", "pl": "0-1"}}, {"value": "2-4", "label": {"en": "2-4", "pl": "2-4"}}, {"value": "5-9", "label": {"en": "5-9", "pl": "5-9"}}, {"value": "10-19", "label": {"en": "10-19", "pl": "10-19"}}, {"value": "20 or more", "label": {"en": "20 or more", "pl": "20 lub więcej"}}, {"value": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.partners_12m_cat", "text": {"en": "Partners in last 12 months", "pl": "Partnerzy w ost. 12 mies."}, "type": "select", "options": ["0", "1", "2-3", "4-5", "6 or more", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                {"id": "sexhx.partners_12m_cat", "text": {"en": "Partners in last 12 months", "pl": "Partnerzy w ost. 12 mies."}, "type": "select", "options": [{"value": "0", "label": {"en": "0", "pl": "0"}}, {"value": "1", "label": {"en": "1", "pl": "1"}}, {"value": "2-3", "label": {"en": "2-3", "pl": "2-3"}}, {"value": "4-5", "label": {"en": "4-5", "pl": "4-5"}}, {"value": "6 or more", "label": {"en": "6 or more", "pl": "6 lub więcej"}}, {"value": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.new_partner_12m", "text": {"en": "New partner in last 12m?", "pl": "Nowy partner w ost. 12 mies.?"}, "type": "radio", "options": ["Yes", "No", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                {"id": "sexhx.new_partner_12m", "text": {"en": "New partner in last 12m?", "pl": "Nowy partner w ost. 12 mies.?"}, "type": "radio", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.partner_genders", "text": {"en": "Partners' gender", "pl": "Płeć partnerów"}, "type": "checkbox_group", "options": [{"id": "Only men", "label": "Only men"}, {"id": "Only women", "label": "Only women"}, {"id": "Men and women", "label": "Men and women"}, {"id": "Partners of other genders", "label": "Other genders"}, {"id": "Prefer not to say", "label": "Prefer not to say"}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                {"id": "sexhx.partner_genders", "text": {"en": "Partners' gender", "pl": "Płeć partnerów"}, "type": "checkbox_group", "options": [{"id": "Only men", "label": {"en": "Only men", "pl": "Tylko mężczyźni"}}, {"id": "Only women", "label": {"en": "Only women", "pl": "Tylko kobiety"}}, {"id": "Men and women", "label": {"en": "Men and women", "pl": "Mężczyźni i kobiety"}}, {"id": "Partners of other genders", "label": {"en": "Partners of other genders", "pl": "Inne płcie"}}, {"id": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.sex_sites_ever", "text": {"en": "Sexual practices (Lifetime)", "pl": "Praktyki (Całe życie)"}, "type": "checkbox_group", "options": [{"id": "Vaginal sex", "label": "Vaginal"}, {"id": "Anal sex – receptive", "label": "Anal (receptive)"}, {"id": "Anal sex – insertive", "label": "Anal (insertive)"}, {"id": "Oral sex", "label": "Oral"}, {"id": "Prefer not to say", "label": "Prefer not to say"}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                {"id": "sexhx.sex_sites_ever", "text": {"en": "Sexual practices (Lifetime)", "pl": "Praktyki (Całe życie)"}, "type": "checkbox_group", "options": [{"id": "Vaginal sex", "label": {"en": "Vaginal", "pl": "Pochwowy"}}, {"id": "Anal sex – receptive", "label": {"en": "Anal (receptive)", "pl": "Analny (bierny)"}}, {"id": "Anal sex – insertive", "label": {"en": "Anal (insertive)", "pl": "Analny (czynny)"}}, {"id": "Oral sex", "label": {"en": "Oral", "pl": "Oralny"}}, {"id": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.sex_sites_12m", "text": {"en": "Sexual practices (12m)", "pl": "Praktyki (12 mies.)"}, "type": "checkbox_group", "options": [{"id": "Vaginal sex", "label": "Vaginal"}, {"id": "Anal sex – receptive", "label": "Anal (receptive)"}, {"id": "Anal sex – insertive", "label": "Anal (insertive)"}, {"id": "Oral sex", "label": "Oral"}, {"id": "None in past 12 months", "label": "None"}, {"id": "Prefer not to say", "label": "Prefer not to say"}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                {"id": "sexhx.sex_sites_12m", "text": {"en": "Sexual practices (12m)", "pl": "Praktyki (12 mies.)"}, "type": "checkbox_group", "options": [{"id": "Vaginal sex", "label": {"en": "Vaginal", "pl": "Pochwowy"}}, {"id": "Anal sex – receptive", "label": {"en": "Anal (receptive)", "pl": "Analny (bierny)"}}, {"id": "Anal sex – insertive", "label": {"en": "Anal (insertive)", "pl": "Analny (czynny)"}}, {"id": "Oral sex", "label": {"en": "Oral", "pl": "Oralny"}}, {"id": "None in past 12 months", "label": {"en": "None", "pl": "Żadne"}}, {"id": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.condom_use_12m", "text": {"en": "Condom use frequency", "pl": "Częstotliwość prezerwatyw"}, "type": "select", "options": ["Always", "More than half the time", "Less than half the time", "Never", "No vaginal/anal sex in past 12 months", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                {"id": "sexhx.condom_use_12m", "text": {"en": "Condom use frequency", "pl": "Częstotliwość prezerwatyw"}, "type": "select", "options": [{"value": "Always", "label": {"en": "Always", "pl": "Zawsze"}}, {"value": "More than half the time", "label": {"en": "More than half the time", "pl": "Częściej niż połowę razy"}}, {"value": "Less than half the time", "label": {"en": "Less than half the time", "pl": "Rzadziej niż połowę razy"}}, {"value": "Never", "label": {"en": "Never", "pl": "Nigdy"}}, {"value": "No vaginal/anal sex in past 12 months", "label": {"en": "No vaginal/anal sex in past 12 months", "pl": "Brak seksu pochwowego/analnego w ost. 12 mies."}}, {"value": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.sex_work_ever", "text": {"en": "Ever exchanged sex for money/goods?", "pl": "Seks za pieniądze/korzyści?"}, "type": "radio", "options": ["No", "Yes", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                {"id": "sexhx.sex_work_ever", "text": {"en": "Ever exchanged sex for money/goods?", "pl": "Seks za pieniądze/korzyści?"}, "type": "radio", "options": [{"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.sex_work_role", "text": {"en": "Role in sex work", "pl": "Rola"}, "type": "checkbox_group", "options": [{"id": "Mainly provided", "label": "Provided"}, {"id": "Mainly received", "label": "Received"}, {"id": "Both", "label": "Both"}, {"id": "Prefer not to say", "label": "Prefer not to say"}], "dependsOn": {"questionId": "sexhx.sex_work_ever", "value": "Yes"}},
+                {"id": "sexhx.sex_work_role", "text": {"en": "Role in sex work", "pl": "Rola"}, "type": "checkbox_group", "options": [{"id": "Mainly provided", "label": {"en": "Provided", "pl": "Świadczenie"}}, {"id": "Mainly received", "label": {"en": "Received", "pl": "Korzystanie"}}, {"id": "Both", "label": {"en": "Both", "pl": "Obie role"}}, {"id": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.sex_work_ever", "value": "Yes"}},
                 
-                {"id": "sexhx.sti_history_other", "text": {"en": "History of other STIs?", "pl": "Historia innych STI?"}, "type": "radio", "options": ["No", "Yes", "Not sure", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                {"id": "sexhx.sti_history_other", "text": {"en": "History of other STIs?", "pl": "Historia innych STI?"}, "type": "radio", "options": [{"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}, {"value": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.sti_types_other", "text": {"en": "Which STIs?", "pl": "Które STI?"}, "type": "checkbox_group", "options": [{"id": "Chlamydia", "label": "Chlamydia"}, {"id": "Gonorrhoea", "label": "Gonorrhoea"}, {"id": "Syphilis", "label": "Syphilis"}, {"id": "Genital herpes", "label": "Genital herpes"}, {"id": "Genital warts", "label": "Genital warts"}, {"id": "Other", "label": "Other"}, {"id": "Not sure", "label": "Not sure"}], "dependsOn": {"questionId": "sexhx.sti_history_other", "value": "Yes"}},
+                {"id": "sexhx.sti_types_other", "text": {"en": "Which STIs?", "pl": "Które STI?"}, "type": "checkbox_group", "options": [{"id": "Chlamydia", "label": {"en": "Chlamydia", "pl": "Chlamydia"}}, {"id": "Gonorrhoea", "label": {"en": "Gonorrhoea", "pl": "Rzeżączka"}}, {"id": "Syphilis", "label": {"en": "Syphilis", "pl": "Kiła"}}, {"id": "Genital herpes", "label": {"en": "Genital herpes", "pl": "Opryszczka narządów płciowych"}}, {"id": "Genital warts", "label": {"en": "Genital warts", "pl": "Kłykciny kończyste"}}, {"id": "Other", "label": {"en": "Other", "pl": "Inne"}}, {"id": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}], "dependsOn": {"questionId": "sexhx.sti_history_other", "value": "Yes"}},
                 
-                {"id": "sexhx.sti_treated_12m", "text": {"en": "Treated for STI in last 12m?", "pl": "Leczenie STI w ost. 12 mies.?"}, "type": "radio", "options": ["Yes", "No", "Not sure", "Prefer not to say"], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                {"id": "sexhx.sti_treated_12m", "text": {"en": "Treated for STI in last 12m?", "pl": "Leczenie STI w ost. 12 mies.?"}, "type": "radio", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}, {"value": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.hpv_precancer_history", "text": {"en": "History of HPV precancer?", "pl": "Historia zmian przedrakowych HPV?"}, "type": "checkbox_group", "options": [{"id": "Cervix", "label": "Cervix"}, {"id": "Vulva/vagina", "label": "Vulva/vagina"}, {"id": "Anus", "label": "Anus"}, {"id": "Penis", "label": "Penis"}, {"id": "Mouth/throat", "label": "Mouth/throat"}, {"id": "Not sure", "label": "Not sure"}, {"id": "Prefer not to say", "label": "Prefer not to say"}]}
+                {"id": "sexhx.hpv_precancer_history", "text": {"en": "History of HPV precancer?", "pl": "Historia zmian przedrakowych HPV?"}, "type": "checkbox_group", "options": [{"id": "Cervix", "label": {"en": "Cervix", "pl": "Szyjka macicy"}}, {"id": "Vulva/vagina", "label": {"en": "Vulva/vagina", "pl": "Srom/pochwa"}}, {"id": "Anus", "label": {"en": "Anus", "pl": "Odbyt"}}, {"id": "Penis", "label": {"en": "Penis", "pl": "Penis"}}, {"id": "Mouth/throat", "label": {"en": "Mouth/throat", "pl": "Usta/gardło"}}, {"id": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}, {"id": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}]}
               ]
             }
           ]
@@ -363,17 +373,17 @@
           "type": "checkbox_group",
           "text": { "en": "Diagnosed Conditions", "pl": "Zdiagnozowane choroby" },
           "options": [
-            { "id": "hbv", "label": "HBV" },
-            { "id": "hcv", "label": "HCV" },
-            { "id": "cirrhosis", "label": "Cirrhosis" },
-            { "id": "h_pylori", "label": "H. pylori" },
-            { "id": "hiv", "label": "HIV" },
-            { "id": "ibd", "label": "IBD" },
-            { "id": "psc", "label": "PSC" },
-            { "id": "barretts", "label": "Barrett's" },
-            { "id": "pancreatitis", "label": "Chronic Pancreatitis" },
-            { "id": "diabetes", "label": "Type 2 Diabetes" },
-            { "id": "transplant", "label": "Organ Transplant" },
+            { "id": "hbv", "label": { "en": "HBV", "pl": "HBV" } },
+            { "id": "hcv", "label": { "en": "HCV", "pl": "HCV" } },
+            { "id": "cirrhosis", "label": { "en": "Cirrhosis", "pl": "Marskość wątroby" } },
+            { "id": "h_pylori", "label": { "en": "H. pylori", "pl": "H. pylori" } },
+            { "id": "hiv", "label": { "en": "HIV", "pl": "HIV" } },
+            { "id": "ibd", "label": { "en": "IBD", "pl": "IBD" } },
+            { "id": "psc", "label": { "en": "PSC", "pl": "PSC" } },
+            { "id": "barretts", "label": { "en": "Barrett's", "pl": "Przełyk Barretta" } },
+            { "id": "pancreatitis", "label": { "en": "Chronic Pancreatitis", "pl": "Przewlekłe zapalenie trzustki" } },
+            { "id": "diabetes", "label": { "en": "Type 2 Diabetes", "pl": "Cukrzyca typu 2" } },
+            { "id": "transplant", "label": { "en": "Organ Transplant", "pl": "Przeszczep narządu" } },
             { "id": "none", "label": { "en": "None", "pl": "Brak" } }
           ],
           "exclusiveOptionId": "none"
@@ -382,32 +392,32 @@
           "id": "meds.immunosupp.current",
           "type": "radio",
           "text": { "en": "Long-term immunosuppressive therapy?", "pl": "Długotrwała immunosupresja?" },
-          "options": ["Yes", "No"]
+          "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}]
         },
         {
           "id": "meds.hrt.use",
           "type": "radio",
           "text": { "en": "Menopausal HRT?", "pl": "HTZ (menopauza)?" },
-          "options": ["Never", "Past", "Current"]
+          "options": [{"value": "Never", "label": {"en": "Never", "pl": "Nigdy"}}, {"value": "Past", "label": {"en": "Past", "pl": "W przeszłości"}}, {"value": "Current", "label": {"en": "Current", "pl": "Obecnie"}}]
         },
         {
           "id": "ca.any_history",
           "type": "radio",
           "text": { "en": "Personal history of cancer?", "pl": "Osobista historia raka?" },
-          "options": ["No", "Yes", "Not sure"]
+          "options": [{"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}]
         },
         {
           "id": "ca.active_treatment_now",
           "type": "radio",
           "text": { "en": "Currently in cancer treatment?", "pl": "Obecnie w trakcie leczenia?" },
-          "options": ["No", "Yes", "Not sure"],
+          "options": [{"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}],
           "dependsOn": { "questionId": "ca.any_history", "value": "Yes" }
         },
         {
           "id": "famhx.any_family_cancer",
           "type": "radio",
           "text": { "en": "Family history of cancer?", "pl": "Rak w rodzinie?" },
-          "options": ["Yes", "No", "Adopted/Unknown", "Not sure"]
+          "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Adopted/Unknown", "label": {"en": "Adopted/Unknown", "pl": "Adoptowany/Nieznana"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}]
         },
         {
           "id": "advanced_modules_symptoms_cond",
@@ -471,43 +481,136 @@
               "title": { "en": "Condition Details", "pl": "Szczegóły Chorób" },
               "dependsOn": { "questionId": "cond.summary", "value": true },
               "questions": [
-                { "id": "cond.hbv.status", "text": {"en": "HBV Status", "pl": "Status HBV"}, "type": "radio", "options": ["Never", "Past (resolved)", "Current", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "hbv"} },
+                { "id": "cond.hbv.status", "text": {"en": "HBV Status", "pl": "Status HBV"}, "type": "radio", "options": [
+                  { "value": "Never", "label": { "en": "Never", "pl": "Nigdy" } },
+                  { "value": "Past (resolved)", "label": { "en": "Past (resolved)", "pl": "W przeszłości (wyleczone)" } },
+                  { "value": "Current", "label": { "en": "Current", "pl": "Obecnie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": "hbv"} },
                 { "id": "cond.hbv.year_dx", "text": {"en": "Year diagnosed", "pl": "Rok diagnozy"}, "type": "year_input", "dependsOn": {"questionId": "cond.hbv.status", "value": ["Past (resolved)", "Current"]} },
-                { "id": "cond.hbv.antiviral_now", "text": {"en": "On antiviral therapy?", "pl": "Leczenie przeciwwirusowe?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.hbv.status", "value": "Current"} },
-                
-                { "id": "cond.hcv.status", "text": {"en": "HCV Status", "pl": "Status HCV"}, "type": "radio", "options": ["Never", "Past (cured/SVR)", "Current", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "hcv"} },
+                { "id": "cond.hbv.antiviral_now", "text": {"en": "On antiviral therapy?", "pl": "Leczenie przeciwwirusowe?"}, "type": "radio", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.hbv.status", "value": "Current"} },
+
+                { "id": "cond.hcv.status", "text": {"en": "HCV Status", "pl": "Status HCV"}, "type": "radio", "options": [
+                  { "value": "Never", "label": { "en": "Never", "pl": "Nigdy" } },
+                  { "value": "Past (cured/SVR)", "label": { "en": "Past (cured/SVR)", "pl": "W przeszłości (wyleczone/SVR)" } },
+                  { "value": "Current", "label": { "en": "Current", "pl": "Obecnie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": "hcv"} },
                 { "id": "cond.hcv.year_dx", "text": {"en": "Year diagnosed", "pl": "Rok diagnozy"}, "type": "year_input", "dependsOn": {"questionId": "cond.summary", "value": "hcv"} },
-                { "id": "cond.hcv.svr12", "text": {"en": "Cured (SVR) confirmed?", "pl": "Wyleczenie potwierdzone?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.hcv.status", "value": ["Past (cured/SVR)", "Current"]} },
-                
-                { "id": "cond.cirrhosis.etiology", "text": {"en": "Main cause", "pl": "Główna przyczyna"}, "type": "select", "options": ["Alcohol", "Viral", "NASH", "Autoimmune", "Other"], "dependsOn": {"questionId": "cond.summary", "value": "cirrhosis"} },
-                
-                { "id": "cond.hpylori.status", "text": {"en": "H. pylori Status", "pl": "Status H. pylori"}, "type": "radio", "options": ["Never", "Past (treated)", "Current", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "h_pylori"} },
+                { "id": "cond.hcv.svr12", "text": {"en": "Cured (SVR) confirmed?", "pl": "Wyleczenie potwierdzone?"}, "type": "radio", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.hcv.status", "value": ["Past (cured/SVR)", "Current"]} },
+
+                { "id": "cond.cirrhosis.etiology", "text": {"en": "Main cause", "pl": "Główna przyczyna"}, "type": "select", "options": [
+                  { "value": "Alcohol", "label": { "en": "Alcohol", "pl": "Alkohol" } },
+                  { "value": "Viral", "label": { "en": "Viral", "pl": "Wirusowa" } },
+                  { "value": "NASH", "label": { "en": "NASH", "pl": "NASH" } },
+                  { "value": "Autoimmune", "label": { "en": "Autoimmune", "pl": "Autoimmunologiczna" } },
+                  { "value": "Other", "label": { "en": "Other", "pl": "Inna" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": "cirrhosis"} },
+
+                { "id": "cond.hpylori.status", "text": {"en": "H. pylori Status", "pl": "Status H. pylori"}, "type": "radio", "options": [
+                  { "value": "Never", "label": { "en": "Never", "pl": "Nigdy" } },
+                  { "value": "Past (treated)", "label": { "en": "Past (treated)", "pl": "W przeszłości (leczone)" } },
+                  { "value": "Current", "label": { "en": "Current", "pl": "Obecnie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": "h_pylori"} },
                 { "id": "cond.hpylori.year_tx", "text": {"en": "Year of eradication", "pl": "Rok eradykacji"}, "type": "year_input", "dependsOn": {"questionId": "cond.hpylori.status", "value": "Past (treated)"} },
-                
-                { "id": "cond.ibd.type", "text": {"en": "IBD Type", "pl": "Typ IBD"}, "type": "radio", "options": ["Ulcerative Colitis", "Crohn's", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "ibd"} },
+
+                { "id": "cond.ibd.type", "text": {"en": "IBD Type", "pl": "Typ IBD"}, "type": "radio", "options": [
+                  { "value": "Ulcerative Colitis", "label": { "en": "Ulcerative Colitis", "pl": "Wrzodziejące zapalenie jelita grubego" } },
+                  { "value": "Crohn's", "label": { "en": "Crohn's", "pl": "Choroba Crohna" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": "ibd"} },
                 { "id": "cond.ibd.year_dx", "text": {"en": "Year diagnosed", "pl": "Rok diagnozy"}, "type": "year_input", "dependsOn": {"questionId": "cond.summary", "value": "ibd"} },
-                { "id": "cond.ibd.extent", "text": {"en": "Extent (UC)", "pl": "Zasięg (WZJG)"}, "type": "select", "options": ["Proctitis", "Left-sided", "Pancolitis", "Not sure"], "dependsOn": {"questionId": "cond.ibd.type", "value": "Ulcerative Colitis"} },
-                { "id": "cond.ibd.psc", "text": {"en": "PSC also diagnosed?", "pl": "Współistniejące PSC?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "ibd"} },
-                
-                { "id": "cond.psc.status", "text": {"en": "PSC Status", "pl": "Status PSC"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "psc"} },
-                
-                { "id": "cond.barrett.status", "text": {"en": "Barrett's esophagus?", "pl": "Przełyk Barretta?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "barretts"} },
+                { "id": "cond.ibd.extent", "text": {"en": "Extent (UC)", "pl": "Zasięg (WZJG)"}, "type": "select", "options": [
+                  { "value": "Proctitis", "label": { "en": "Proctitis", "pl": "Zapalenie odbytnicy" } },
+                  { "value": "Left-sided", "label": { "en": "Left-sided", "pl": "Lewostronne" } },
+                  { "value": "Pancolitis", "label": { "en": "Pancolitis", "pl": "Zapalenie całego jelita grubego" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.ibd.type", "value": "Ulcerative Colitis"} },
+                { "id": "cond.ibd.psc", "text": {"en": "PSC also diagnosed?", "pl": "Współistniejące PSC?"}, "type": "radio", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": "ibd"} },
+
+                { "id": "cond.psc.status", "text": {"en": "PSC Status", "pl": "Status PSC"}, "type": "radio", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": "psc"} },
+
+                { "id": "cond.barrett.status", "text": {"en": "Barrett's esophagus?", "pl": "Przełyk Barretta?"}, "type": "radio", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": "barretts"} },
                 { "id": "cond.barrett.last_endo", "text": {"en": "Last endoscopy (year)", "pl": "Ostatnia endoskopia (rok)"}, "type": "year_input", "dependsOn": {"questionId": "cond.barrett.status", "value": "Yes"} },
-                
-                { "id": "cond.pancr.status", "text": {"en": "Chronic pancreatitis?", "pl": "Przewlekłe zapalenie trzustki?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "pancreatitis"} },
-                { "id": "cond.pancr.etiology", "text": {"en": "Main cause", "pl": "Główna przyczyna"}, "type": "select", "options": ["Alcohol", "Hereditary", "Obstructive", "Other", "Not sure"], "dependsOn": {"questionId": "cond.pancr.status", "value": "Yes"} },
-                
-                { "id": "cond.t2dm.status", "text": {"en": "Type 2 Diabetes?", "pl": "Cukrzyca typu 2?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "diabetes"} },
-                
-                { "id": "cond.hiv.status", "text": {"en": "HIV Infection?", "pl": "Zakażenie HIV?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.summary", "value": "hiv"} },
-                { "id": "cond.hiv.on_art", "text": {"en": "On ART therapy?", "pl": "Leczenie ARV?"}, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": {"questionId": "cond.hiv.status", "value": "Yes"} },
-                
-                { "id": "cond.tx.status", "text": {"en": "Solid organ transplant?", "pl": "Przeszczep narządu?"}, "type": "radio", "options": ["Yes", "No"], "dependsOn": {"questionId": "cond.summary", "value": "transplant"} },
-                { "id": "cond.tx.organ", "text": {"en": "Organ", "pl": "Narząd"}, "type": "select", "options": ["Kidney", "Liver", "Lung", "Heart", "Pancreas", "Other"], "dependsOn": {"questionId": "cond.tx.status", "value": "Yes"} },
+
+                { "id": "cond.pancr.status", "text": {"en": "Chronic pancreatitis?", "pl": "Przewlekłe zapalenie trzustki?"}, "type": "radio", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": "pancreatitis"} },
+                { "id": "cond.pancr.etiology", "text": {"en": "Main cause", "pl": "Główna przyczyna"}, "type": "select", "options": [
+                  { "value": "Alcohol", "label": { "en": "Alcohol", "pl": "Alkohol" } },
+                  { "value": "Hereditary", "label": { "en": "Hereditary", "pl": "Dziedziczna" } },
+                  { "value": "Obstructive", "label": { "en": "Obstructive", "pl": "Zaporowa" } },
+                  { "value": "Other", "label": { "en": "Other", "pl": "Inna" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.pancr.status", "value": "Yes"} },
+
+                { "id": "cond.t2dm.status", "text": {"en": "Type 2 Diabetes?", "pl": "Cukrzyca typu 2?"}, "type": "radio", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": "diabetes"} },
+
+                { "id": "cond.hiv.status", "text": {"en": "HIV Infection?", "pl": "Zakażenie HIV?"}, "type": "radio", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": "hiv"} },
+                { "id": "cond.hiv.on_art", "text": {"en": "On ART therapy?", "pl": "Leczenie ARV?"}, "type": "radio", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": {"questionId": "cond.hiv.status", "value": "Yes"} },
+
+                { "id": "cond.tx.status", "text": {"en": "Solid organ transplant?", "pl": "Przeszczep narządu?"}, "type": "radio", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": "transplant"} },
+                { "id": "cond.tx.organ", "text": {"en": "Organ", "pl": "Narząd"}, "type": "select", "options": [
+                  { "value": "Kidney", "label": { "en": "Kidney", "pl": "Nerka" } },
+                  { "value": "Liver", "label": { "en": "Liver", "pl": "Wątroba" } },
+                  { "value": "Lung", "label": { "en": "Lung", "pl": "Płuco" } },
+                  { "value": "Heart", "label": { "en": "Heart", "pl": "Serce" } },
+                  { "value": "Pancreas", "label": { "en": "Pancreas", "pl": "Trzustka" } },
+                  { "value": "Other", "label": { "en": "Other", "pl": "Inny" } }
+                ], "dependsOn": {"questionId": "cond.tx.status", "value": "Yes"} },
                 { "id": "cond.tx.year", "text": {"en": "Year of transplant", "pl": "Rok przeszczepu"}, "type": "year_input", "dependsOn": {"questionId": "cond.tx.status", "value": "Yes"} },
                 
-                { "id": "meds.immunosupp.current", "text": {"en": "Long-term immunosuppression?", "pl": "Długotrwała immunosupresja?"}, "type": "radio", "options": ["Yes", "No"], "dependsOn": {"questionId": "cond.summary", "value": true} },
-                { "id": "meds.immunosupp.classes", "text": {"en": "Medication classes", "pl": "Klasy leków"}, "type": "checkbox_group", "options": [{"id": "Calcineurin", "label": "Calcineurin inhibitor"}, {"id": "mTOR", "label": "mTOR inhibitor"}, {"id": "Thiopurine", "label": "Thiopurine"}, {"id": "Anti-TNF", "label": "Anti-TNF"}, {"id": "Other biologic", "label": "Other biologic"}, {"id": "Steroid", "label": "Chronic steroid"}, {"id": "Other", "label": "Other"}], "dependsOn": {"questionId": "meds.immunosupp.current", "value": "Yes"} },
+                { "id": "meds.immunosupp.current", "text": {"en": "Long-term immunosuppression?", "pl": "Długotrwała immunosupresja?"}, "type": "radio", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } }
+                ], "dependsOn": {"questionId": "cond.summary", "value": true} },
+                { "id": "meds.immunosupp.classes", "text": {"en": "Medication classes", "pl": "Klasy leków"}, "type": "checkbox_group", "options": [
+                  {"id": "Calcineurin", "label": { "en": "Calcineurin inhibitor", "pl": "Inhibitor kalcyneuryny" }},
+                  {"id": "mTOR", "label": { "en": "mTOR inhibitor", "pl": "Inhibitor mTOR" }},
+                  {"id": "Thiopurine", "label": { "en": "Thiopurine", "pl": "Tiopuryna" }},
+                  {"id": "Anti-TNF", "label": { "en": "Anti-TNF", "pl": "Lek przeciw TNF" }},
+                  {"id": "Other biologic", "label": { "en": "Other biologic", "pl": "Inny lek biologiczny" }},
+                  {"id": "Steroid", "label": { "en": "Chronic steroid", "pl": "Przewlekłe stosowanie steroidów" }},
+                  {"id": "Other", "label": { "en": "Other", "pl": "Inny" }}
+                ], "dependsOn": {"questionId": "meds.immunosupp.current", "value": "Yes"} },
                 
                 { "id": "meds.hrt.use", "text": {"en": "Menopausal HRT use", "pl": "Stosowanie HTZ"}, "type": "radio", "options": ["Never", "Past", "Current"], "dependsOn": {"questionId": "sex_at_birth", "value": "Female"} },
                 { "id": "meds.hrt.type", "text": {"en": "HRT Type", "pl": "Typ HTZ"}, "type": "select", "options": ["Combined", "Estrogen-only", "Other"], "dependsOn": {"questionId": "meds.hrt.use", "value": ["Past", "Current"]} },

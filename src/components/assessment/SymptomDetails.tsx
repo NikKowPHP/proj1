@@ -6,6 +6,7 @@ import { Slider } from '../ui/slider';
 import { SearchableSelect, SearchableSelectOption } from '../ui/SearchableSelect';
 import { Chip } from '../ui/chip';
 import { YearInput } from '../ui/YearInput';
+import { useLocale, useTranslations } from 'next-intl';
 
 interface Symptom {
   id: string;
@@ -38,6 +39,9 @@ const months = [
 
 export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptions, featureOptions, errors }: SymptomDetailsProps) => {
 
+  const t = useTranslations('AssessmentPage');
+  const locale = useLocale();
+
   const handleDetailChange = (symptomId: string, field: keyof SymptomDetailsValue, fieldValue: any) => {
     const currentDetails = value[symptomId] || {};
     onChange(symptomId, { ...currentDetails, [field]: fieldValue });
@@ -55,7 +59,7 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
   if (selectedSymptoms.length === 0) {
     return (
       <p className="text-muted-foreground text-sm">
-        No symptoms selected in the previous step.
+        {t('symptomDetails.noSymptoms')}
       </p>
     );
   }
@@ -69,19 +73,19 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
               value={value[symptom.id]?.code || symptom.id}
               onChange={(val) => handleDetailChange(symptom.id, 'code', val)}
               options={symptomOptions}
-              placeholder="Select or refine symptom..."
+              placeholder={t('symptomDetails.searchPlaceholder')}
             />
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>When did it start?</Label>
+              <Label>{t('symptomDetails.whenStart')}</Label>
               <div className="grid grid-cols-2 gap-2">
                 <Select
                   value={value[symptom.id]?.onset_month}
                   onValueChange={(val) => handleDetailChange(symptom.id, 'onset_month', val)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Month" />
+                    <SelectValue placeholder={t('symptomDetails.monthPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     {months.map((month, i) => (
@@ -92,12 +96,12 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
                 <YearInput
                   value={value[symptom.id]?.onset_year}
                   onChange={(val) => handleDetailChange(symptom.id, 'onset_year', val)}
-                  placeholder="Year"
+                  placeholder={t('symptomDetails.yearPlaceholder')}
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Severity (0-10)</Label>
+              <Label>{t('symptomDetails.severityLabel')}</Label>
               <div className="flex items-center gap-4">
                 <Slider
                   value={[value[symptom.id]?.severity || 0]}
@@ -110,25 +114,25 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Frequency</Label>
+              <Label>{t('symptomDetails.frequencyLabel')}</Label>
               <Select
                 value={value[symptom.id]?.frequency}
                 onValueChange={(val) => handleDetailChange(symptom.id, 'frequency', val)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select frequency" />
+                  <SelectValue placeholder={t('symptomDetails.frequencyPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="constant">Constant</SelectItem>
-                  <SelectItem value="intermittent">Intermittent (comes and goes)</SelectItem>
-                  <SelectItem value="worsening">Getting progressively worse</SelectItem>
+                  <SelectItem value="daily">{t('symptomDetails.frequencyDaily')}</SelectItem>
+                  <SelectItem value="weekly">{t('symptomDetails.frequencyWeekly')}</SelectItem>
+                  <SelectItem value="constant">{t('symptomDetails.frequencyConstant')}</SelectItem>
+                  <SelectItem value="intermittent">{t('symptomDetails.frequencyIntermittent')}</SelectItem>
+                  <SelectItem value="worsening">{t('symptomDetails.frequencyWorsening')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Associated Features</Label>
+              <Label>{t('symptomDetails.associatedFeatures')}</Label>
               <div className="flex flex-wrap gap-2">
                 {featureOptions.map(feature => (
                   <Chip
@@ -143,12 +147,12 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Notes (optional)</Label>
+              <Label>{t('symptomDetails.notesLabel')}</Label>
               <textarea
                 className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 value={value[symptom.id]?.notes || ""}
                 onChange={(e) => handleDetailChange(symptom.id, 'notes', e.target.value)}
-                placeholder="Describe your symptom in more detail..."
+                placeholder={t('symptomDetails.notesPlaceholder')}
               />
             </div>
           </CardContent>

@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Input } from '../ui/input';
 import { YearInput } from '../ui/YearInput';
 import { CheckboxGroup } from '../ui/CheckboxGroup';
+import { useLocale } from 'next-intl';
 
 interface EnvironmentalExposuresProps {
   answers: Record<string, any>;
@@ -48,7 +49,17 @@ const isVisible = (question: any, answers: Record<string, string>): boolean => {
 
 
 export const EnvironmentalExposures = ({ answers, onAnswer, questions, errors }: EnvironmentalExposuresProps) => {
+  const locale = useLocale();
   const visibleQuestions = questions.filter(q => isVisible(q, answers));
+
+  const getOptionLabel = (opt: any) => {
+    const rawLabel = typeof opt === 'object' ? opt.label : opt;
+    if (typeof rawLabel === 'object' && rawLabel !== null) {
+      const localized = (rawLabel as Record<string, string>)[locale as string];
+      return localized ?? (rawLabel as any).en ?? Object.values(rawLabel)[0];
+    }
+    return rawLabel;
+  };
 
   return (
     <div className="space-y-6">
@@ -62,9 +73,9 @@ export const EnvironmentalExposures = ({ answers, onAnswer, questions, errors }:
                   <SelectValue placeholder="Select an option" />
                 </SelectTrigger>
                 <SelectContent>
-                  {q.options.map((opt: string | { value: string; label: string }) => {
+                  {q.options.map((opt: string | { value: string; label: any }) => {
                     const value = typeof opt === 'object' ? opt.value : opt;
-                    const label = typeof opt === 'object' ? opt.label : opt;
+                    const label = getOptionLabel(opt);
                     return <SelectItem key={value} value={value}>{label}</SelectItem>;
                   })}
                 </SelectContent>
@@ -122,9 +133,11 @@ export const EnvironmentalExposures = ({ answers, onAnswer, questions, errors }:
                   <SelectValue placeholder="Unit" />
                 </SelectTrigger>
                 <SelectContent>
-                  {q.options.units.map((opt: string) => (
-                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-                  ))}
+                  {q.options.units.map((opt: any) => {
+                    const value = typeof opt === 'object' ? opt.value : opt;
+                    const label = getOptionLabel(opt);
+                    return <SelectItem key={value} value={value}>{label}</SelectItem>;
+                  })}
                 </SelectContent>
               </Select>
             </div>

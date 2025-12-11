@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { isQuestionVisible } from '@/lib/utils/question-visibility';
 import { CheckboxGroup } from '../ui/CheckboxGroup';
 import { cn } from '@/lib/utils';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -21,7 +21,17 @@ interface SmokingDetailsProps {
 
 export const SmokingDetails = ({ answers, onAnswer, questions, errors: externalErrors }: SmokingDetailsProps) => {
   const t = useTranslations("AssessmentPage");
+  const locale = useLocale();
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
+
+  const getOptionLabel = (opt: any) => {
+    const rawLabel = typeof opt === 'object' ? opt.label : opt;
+    if (typeof rawLabel === 'object' && rawLabel !== null) {
+      const localized = (rawLabel as Record<string, string>)[locale as string];
+      return localized ?? rawLabel.en ?? Object.values(rawLabel)[0];
+    }
+    return rawLabel;
+  };
 
   const handleValidatedChange = (id: string, value: string, type: string) => {
     let error: string | undefined = undefined;
@@ -124,7 +134,7 @@ export const SmokingDetails = ({ answers, onAnswer, questions, errors: externalE
                 <SelectContent>
                   {q.options?.map((opt: any) => {
                     const val = typeof opt === 'object' ? opt.value : opt;
-                    const label = typeof opt === 'object' ? (typeof opt.label === 'object' ? opt.label.en : opt.label) : opt;
+                    const label = getOptionLabel(opt);
                     return <SelectItem key={val} value={val}>{label}</SelectItem>
                   })}
                 </SelectContent>
@@ -137,14 +147,18 @@ export const SmokingDetails = ({ answers, onAnswer, questions, errors: externalE
                 <SelectContent>
                   {q.options?.map((opt: any) => {
                     const val = typeof opt === 'object' ? opt.value : opt;
-                    const label = typeof opt === 'object' ? (typeof opt.label === 'object' ? opt.label.en : opt.label) : opt;
+                    const label = getOptionLabel(opt);
                     return <SelectItem key={val} value={val}>{label}</SelectItem>
                   })}
                 </SelectContent>
               </Select>
             ) : q.type === 'checkbox_group' ? (
               <CheckboxGroup
-                options={q.options}
+                options={q.options.map((opt: any) => ({
+                  ...opt,
+                  id: opt.id || opt.value,
+                  label: getOptionLabel(opt)
+                }))}
                 value={value ? JSON.parse(value) : []}
                 onChange={(val) => onAnswer(q.id, JSON.stringify(val))}
                 exclusiveOption={q.exclusiveOptionId}

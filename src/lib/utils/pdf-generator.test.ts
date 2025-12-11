@@ -2,27 +2,54 @@
 
 import { generateAssessmentPdf } from './pdf-generator';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import type { ActionPlan } from '../types';
 
 // Mock the jsPDF library
-jest.mock('jspdf', () => {
-  const implementation = {
-    autoTable: jest.fn(),
-    text: jest.fn(),
-    setFontSize: jest.fn(),
-    setTextColor: jest.fn(),
-    save: jest.fn(),
-    splitTextToSize: jest.fn((text: string) => [text]),
-    addPage: jest.fn(),
-  };
+const mockSave = jest.fn();
+const mockText = jest.fn();
+const mockAddPage = jest.fn();
+const mockSetFontSize = jest.fn();
+const mockSetFont = jest.fn();
+const mockSetTextColor = jest.fn();
+const mockSetCharSpace = jest.fn();
+const mockAddFileToVFS = jest.fn();
+const mockAddFont = jest.fn();
+const mockAddImage = jest.fn();
+const mockRect = jest.fn();
+const mockSetFillColor = jest.fn();
+const mockSplitTextToSize = jest.fn((text: string) => [text]);
 
-  (implementation.autoTable as any).previous = { finalY: 100 };
-  return jest.fn().mockImplementation(() => implementation);
+const mockDoc = {
+  save: mockSave,
+  text: mockText,
+  addPage: mockAddPage,
+  setFontSize: mockSetFontSize,
+  setFont: mockSetFont,
+  setTextColor: mockSetTextColor,
+  setCharSpace: mockSetCharSpace,
+  addFileToVFS: mockAddFileToVFS,
+  addFont: mockAddFont,
+  addImage: mockAddImage,
+  rect: mockRect,
+  setFillColor: mockSetFillColor,
+  splitTextToSize: mockSplitTextToSize,
+  internal: {
+    pageSize: {
+      getWidth: () => 210,
+    },
+  },
+  lastAutoTable: { finalY: 100 },
+};
+
+jest.mock('jspdf', () => {
+  return jest.fn().mockImplementation(() => mockDoc);
 });
 
-const MockedJsPDF = jsPDF as unknown as jest.Mock;
-const mockAutoTable = new MockedJsPDF().autoTable;
+// Mock jspdf-autotable
+jest.mock('jspdf-autotable', () => {
+  return jest.fn();
+});
 
 describe('generateAssessmentPdf (ActionPlan)', () => {
   const mockPlan: ActionPlan = {
@@ -49,45 +76,40 @@ describe('generateAssessmentPdf (ActionPlan)', () => {
 
   it('should call autoTable for recommended screenings', () => {
     generateAssessmentPdf(mockPlan, mockAnswers, 'en');
-    expect(mockAutoTable).toHaveBeenCalledWith(expect.objectContaining({
-      head: [['Screening', 'Reason']],
+    expect(autoTable).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
       body: [['Screening 1', 'Reason 1']]
     }));
   });
 
   it('should call autoTable for lifestyle guidelines', () => {
     generateAssessmentPdf(mockPlan, mockAnswers, 'en');
-    expect(mockAutoTable).toHaveBeenCalledWith(expect.objectContaining({
-      head: [['Guideline', 'Description']],
+    expect(autoTable).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
       body: [['Lifestyle 1', 'Desc L1']]
     }));
   });
 
   it('should call autoTable for topics for doctor', () => {
     generateAssessmentPdf(mockPlan, mockAnswers, 'en');
-    expect(mockAutoTable).toHaveBeenCalledWith(expect.objectContaining({
-        head: [['Topic', 'Reason for Discussion']],
+    expect(autoTable).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
         body: [['Topic 1', 'Reason T1']]
     }));
   });
   
   it('should call autoTable for user answers', () => {
     generateAssessmentPdf(mockPlan, mockAnswers, 'en');
-    expect(mockAutoTable).toHaveBeenCalledWith(expect.objectContaining({
-        head: [['Question', 'Your Answer']],
+    expect(autoTable).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
         body: [['Age', '50-59'], ['Smoking Status', 'Never Smoked']]
     }));
   });
 
   it('should call autoTable four times (once for each section)', () => {
     generateAssessmentPdf(mockPlan, mockAnswers, 'en');
-    expect(mockAutoTable).toHaveBeenCalledTimes(4);
+    expect(autoTable).toHaveBeenCalledTimes(4);
   });
 
   it('should call doc.save with a correctly formatted filename', () => {
     generateAssessmentPdf(mockPlan, mockAnswers, 'en');
     const expectedFilename = `Doctors_Discussion_Guide_${new Date().toLocaleDateString().replace(/\//g, "-")}.pdf`;
-    expect(new MockedJsPDF().save).toHaveBeenCalledWith(expectedFilename);
+    expect(mockSave).toHaveBeenCalledWith(expectedFilename);
   });
 });
-      

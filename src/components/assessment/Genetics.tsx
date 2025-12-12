@@ -32,6 +32,16 @@ const isVisible = (question: any, answers: Record<string, string>): boolean => {
     return dependencyAnswer !== question.dependsOn.value;
   }
 
+  // Handle Array Contains (new)
+  if (question.dependsOn.operator === 'array_contains') {
+    try {
+      const arr = JSON.parse(dependencyAnswer || '[]');
+      return Array.isArray(arr) && arr.includes(question.dependsOn.value);
+    } catch (e) {
+      return false;
+    }
+  }
+
   return dependencyAnswer === question.dependsOn.value;
 };
 
@@ -107,7 +117,7 @@ export const Genetics = ({ answers, onAnswer, questions, errors: externalErrors 
             const isLongList = (q.options?.length > 10);
 
             // Special grouping logic for gene list if needed, updated to new ID
-            if (key === 'gen.self_genes') {
+            if (key === 'gen.self_genes' || key === 'gen.family_genes') {
               return (
                 <div key={key} className="space-y-2 animate-fade-in">
                   <Label>{q.text}</Label>

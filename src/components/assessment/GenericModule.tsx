@@ -42,6 +42,10 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
         if (type === 'year_input' && value > currentYear) {
             error = 'Year cannot be in the future.';
         }
+        if (type === 'month_year_input' && value) {
+            const y = parseInt(value.toString().split('-')[0]);
+            if (y > currentYear) error = 'Year cannot be in the future.';
+        }
 
         setErrors(prev => ({ ...prev, [id]: error }));
         onAnswer(id, value);
@@ -155,6 +159,56 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                                     </div>
                                     {error && <p className="text-sm text-destructive">{error}</p>}
                                 </>
+                            );
+                        case 'month_year_input':
+                            const [yearStr, monthStr] = (answers[key] || "").split('-');
+                            const months = [
+                                { value: '01', label: locale === 'pl' ? 'Styczeń' : 'January' },
+                                { value: '02', label: locale === 'pl' ? 'Luty' : 'February' },
+                                { value: '03', label: locale === 'pl' ? 'Marzec' : 'March' },
+                                { value: '04', label: locale === 'pl' ? 'Kwiecień' : 'April' },
+                                { value: '05', label: locale === 'pl' ? 'Maj' : 'May' },
+                                { value: '06', label: locale === 'pl' ? 'Czerwiec' : 'June' },
+                                { value: '07', label: locale === 'pl' ? 'Lipiec' : 'July' },
+                                { value: '08', label: locale === 'pl' ? 'Sierpień' : 'August' },
+                                { value: '09', label: locale === 'pl' ? 'Wrzesień' : 'September' },
+                                { value: '10', label: locale === 'pl' ? 'Październik' : 'October' },
+                                { value: '11', label: locale === 'pl' ? 'Listopad' : 'November' },
+                                { value: '12', label: locale === 'pl' ? 'Grudzień' : 'December' }
+                            ];
+
+                            const handleMonthYearChange = (newYear: string | undefined, newMonth: string | undefined) => {
+                                const y = newYear !== undefined ? newYear : (yearStr || '');
+                                const m = newMonth !== undefined ? newMonth : (monthStr || '');
+
+                                if (y || m) {
+                                    const val = m ? `${y}-${m}` : y;
+                                    handleValidatedChange(key, val, 'month_year_input');
+                                } else {
+                                    onAnswer(key, undefined);
+                                }
+                            };
+
+                            return (
+                                <div className="flex gap-2">
+                                    <div className="w-1/3 min-w-[120px]">
+                                        <Select value={monthStr || ""} onValueChange={(val) => handleMonthYearChange(undefined, val)}>
+                                            <SelectTrigger><SelectValue placeholder={locale === 'pl' ? "Miesiąc" : "Month"} /></SelectTrigger>
+                                            <SelectContent>
+                                                {months.map(m => (
+                                                    <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="w-1/3 min-w-[100px]">
+                                        <YearInput
+                                            value={yearStr ? parseInt(yearStr) : undefined}
+                                            onChange={(val) => handleMonthYearChange(val?.toString(), undefined)}
+                                            placeholder={locale === 'pl' ? "Rok" : "Year"}
+                                        />
+                                    </div>
+                                </div>
                             );
                         case 'checkbox_group':
                             return (

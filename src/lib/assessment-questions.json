@@ -81,7 +81,7 @@
                 { "id": "smoking.intensity", "text": { "en": "On average, how many cigarettes do you smoke per day?", "pl": "Średnio, ile papierosów palisz dziennie?"}, "type": "number_input", "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
                 { "id": "smoking.years_smoked", "text": { "en": "Total years you have smoked", "pl": "Łączna liczba lat palenia"}, "type": "number_input", "min": 0.5, "max": 80 },
                 { "id": "smoking.start_age", "text": { "en": "At what age did you start smoking regularly?", "pl": "W jakim wieku zacząłeś/zaczęłaś palić regularnie?"}, "type": "number_input", "min": 5, "max": 99 },
-                { "id": "smoking.quit_date", "text": { "en": "When did you completely quit? (Year)", "pl": "Kiedy całkowicie rzuciłeś/rzuciłaś palenie? (Rok)"}, "type": "year_input", "dependsOn": {"questionId": "smoking_status", "value": "Former"}},
+                { "id": "smoking.quit_date", "text": { "en": "When did you completely quit? (YYYY-MM)", "pl": "Kiedy całkowicie rzuciłeś/rzuciłaś palenie? (YYYY-MM)"}, "type": "month_year_input", "dependsOn": {"questionId": "smoking_status", "value": "Former"}},
                 
                 { "id": "smoking.other_tobacco_smoked", "text": {"en": "Do you also use other smoked tobacco products?", "pl": "Czy używasz też innych wyrobów tytoniowych do palenia?"}, "type": "checkbox_group", "options": [
                   { "id": "Cigar", "label": { "en": "Cigar", "pl": "Cygaro" } },
@@ -132,8 +132,8 @@
         },
         {
             "id": "alcohol.former_since",
-            "text": { "en": "If former: when did you last drink alcohol (year)?", "pl": "Jeśli „Wcześniej”: kiedy ostatnio piłeś/aś alkohol (rok)?" },
-            "type": "year_input",
+            "text": { "en": "If former: when did you last drink alcohol? (YYYY-MM)", "pl": "Jeśli „Wcześniej”: kiedy ostatnio piłeś/aś alkohol? (YYYY-MM)" },
+            "type": "month_year_input",
             "dependsOn": { "questionId": "alcohol.status", "value": "Former" }
         },
         {
@@ -703,6 +703,41 @@
           ]
         },
         {
+          "id": "gen.mutyh_biallelic",
+          "type": "radio",
+          "text": { "en": "If MUTYH: did report say both copies changed (biallelic)?", "pl": "Jeśli MUTYH: czy zmiany dotyczą obu kopii (biallelic)?" },
+          "options": [
+             { "value": "yes_biallelic", "label": { "en": "Yes (Biallelic)", "pl": "Tak (Bialleliczna)" } }, 
+             { "value": "no_monoallelic", "label": { "en": "No (Monoallelic/Carrier)", "pl": "Nie (Jedna kopia/Nosiciel)" } }, 
+             { "value": "not_sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+          ],
+          "dependsOn": { "questionId": "gen.self_genes", "operator": "array_contains", "value": "MUTYH" }
+        },
+        {
+           "id": "gen.path_variant_family",
+           "type": "radio",
+           "text": { "en": "Has any relative been found to have a pathogenic variant?", "pl": "Czy u krewnego stwierdzono wariant patogenny?" },
+           "options": [
+             { "value": "no", "label": { "en": "No", "pl": "Nie" } },
+             { "value": "yes_first_deg", "label": { "en": "Yes, first-degree (parent/sibling/child)", "pl": "Tak, krewny I stopnia" } },
+             { "value": "yes_other", "label": { "en": "Yes, other relative", "pl": "Tak, inny krewny" } },
+             { "value": "not_sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+           ]
+        },
+        {
+          "id": "gen.family_genes",
+          "type": "checkbox_group",
+          "text": { "en": "Which genes in family?", "pl": "Które geny w rodzinie?" },
+          "dependsOn": { "questionId": "gen.path_variant_family", "value": ["yes_first_deg", "yes_other"] },
+          "options": [
+            { "id": "BRCA1", "label": "BRCA1" }, { "id": "BRCA2", "label": "BRCA2" }, { "id": "PALB2", "label": "PALB2" },
+            { "id": "TP53", "label": "TP53" }, { "id": "PTEN", "label": "PTEN" }, { "id": "CDH1", "label": "CDH1" },
+            { "id": "STK11", "label": "STK11" }, { "id": "Lynch", "label": "Lynch (MLH1/MSH2/MSH6/PMS2/EPCAM)" },
+            { "id": "APC", "label": "APC" }, { "id": "MUTYH", "label": "MUTYH" },
+            { "id": "Other", "label": "Other" }
+          ]
+        },
+        {
           "id": "gen.test_type",
           "type": "checkbox_group",
           "text": { "en": "What type of test?", "pl": "Jaki typ badania?" },
@@ -878,6 +913,8 @@
             { "id": "psa_test", "label": "PSA Test" },
             { "id": "lung_scan", "label": "Lung CT" },
             { "id": "skin_exam", "label": "Skin Exam" },
+            { "id": "liver_ultrasound", "label": "Liver Ultrasound" },
+            { "id": "upper_endoscopy", "label": "Upper GI Endoscopy" },
             { "id": "none", "label": "None" }
           ]
         },
@@ -963,6 +1000,35 @@
                   "questions": [
                     { "id": "screen.lung.ldct_last_year", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
                     { "id": "screen.lung.ldct_last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Nodules", "Unsure"] }
+                  ]
+                },
+                {
+                  "id": "liver_ultrasound",
+                  "text": { "en": "Liver Ultrasound", "pl": "USG wątroby" },
+                  "dependsOn": { "questionId": "screen.summary", "value": "liver_ultrasound" },
+                  "questions": [
+                    { "id": "screen.hcc.us_last_year", "text": {"en": "Year of last exam", "pl": "Rok ostatniego USG"}, "type": "year_input" },
+                    { "id": "screen.hcc.us_interval", "text": {"en": "How often?", "pl": "Jak często?"}, "type": "select", "options": [
+                      { "value": "Every 6 months", "label": { "en": "Every 6 months", "pl": "Co 6 miesięcy" } },
+                      { "value": "Every 12 months", "label": { "en": "Every 12 months", "pl": "Co 12 miesięcy" } },
+                      { "value": "Other / Not on a fixed schedule", "label": { "en": "Other / Not on a fixed schedule", "pl": "Inny / Brak stałego planu" } },
+                      { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                    ] }
+                  ]
+                },
+                {
+                  "id": "upper_endoscopy",
+                  "text": { "en": "Upper GI Endoscopy", "pl": "Gastroskopia" },
+                  "dependsOn": { "questionId": "screen.summary", "value": "upper_endoscopy" },
+                  "questions": [
+                    { "id": "screen.upper_endo.last_year", "text": {"en": "Year of last exam", "pl": "Rok ostatniego badania"}, "type": "year_input" },
+                    { "id": "screen.upper_endo.reason", "text": {"en": "Reason", "pl": "Powód"}, "type": "select", "options": [
+                      { "value": "Symptoms", "label": { "en": "Symptoms (pain, reflux, etc)", "pl": "Objawy (ból, refluks itp.)" } },
+                      { "value": "Follow-up Barretts", "label": { "en": "Follow-up Barrett's", "pl": "Kontrola przełyku Barretta" } },
+                      { "value": "Screening", "label": { "en": "Screening (Family Hx)", "pl": "Badanie przesiewowe" } },
+                      { "value": "Other", "label": { "en": "Other", "pl": "Inny" } },
+                      { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                    ] }
                   ]
                 }
               ],

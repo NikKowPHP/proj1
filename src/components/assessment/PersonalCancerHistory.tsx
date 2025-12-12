@@ -23,6 +23,21 @@ interface CancerDiagnosis {
   genetic_flag?: boolean;
   status_current?: string; // No evidence of disease, In remission, Active treatment, Stable
   surgery_type?: string; // Mastectomy, Lumpectomy
+
+  // Radiotherapy details
+  rt_region?: string[];
+  rt_age_first?: number;
+  rt_year_last?: number;
+
+  // Systemic / Drug details
+  sys_type?: string[];
+  sys_current?: string;
+  sys_year_last?: number; // Only if not current
+
+  // Endocrine / Hormone details
+  endo_indication?: string;
+  endo_current?: string; // Yes/No
+  endo_years_total?: number;
 }
 
 interface PersonalCancerHistoryProps {
@@ -221,6 +236,108 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          )}
+
+          {/* Radiotherapy Details */}
+          {(item.treatments || []).includes('radio') && (
+            <div className="space-y-4 border p-4 rounded-md mt-4 animate-fade-in bg-slate-50 dark:bg-slate-900/50">
+              <h4 className="font-semibold text-sm">Radiotherapy Details</h4>
+              <div className="space-y-2">
+                <Label>Which area(s) received radiotherapy?</Label>
+                <CheckboxGroup
+                  options={[
+                    { id: "head_neck", label: "Head/neck/brain" },
+                    { id: "chest", label: "Chest/breast/mediastinum" },
+                    { id: "abdomen", label: "Abdomen/pelvis" },
+                    { id: "spine", label: "Spine/limbs" },
+                    { id: "whole", label: "Whole body" },
+                    { id: "other", label: "Other" }
+                  ]}
+                  value={item.rt_region || []}
+                  onChange={(val) => handleFieldChange(index, 'rt_region', val)}
+                  idPrefix={`rt_region_${index}`}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Age at first RT</Label>
+                  <input type="number" className="flex h-10 w-full border border-input px-3" value={item.rt_age_first || ""} onChange={e => handleFieldChange(index, 'rt_age_first', Number(e.target.value))} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Year of last RT</Label>
+                  <YearInput value={item.rt_year_last} onChange={val => handleFieldChange(index, 'rt_year_last', val)} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Systemic/Drug Details */}
+          {((item.treatments || []).includes('chemo') || (item.treatments || []).includes('immuno')) && (
+            <div className="space-y-4 border p-4 rounded-md mt-4 animate-fade-in bg-slate-50 dark:bg-slate-900/50">
+              <h4 className="font-semibold text-sm">Drug Treatment Details</h4>
+              <div className="space-y-2">
+                <Label>Type of drug treatment?</Label>
+                <CheckboxGroup
+                  options={[
+                    { id: "chemo_classic", label: "Classic Chemo" },
+                    { id: "targeted", label: "Targeted Therapy" },
+                    { id: "immuno", label: "Immunotherapy" },
+                    { id: "other", label: "Other" }
+                  ]}
+                  value={item.sys_type || []}
+                  onChange={(val) => handleFieldChange(index, 'sys_type', val)}
+                  idPrefix={`sys_type_${index}`}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Are you still taking these?</Label>
+                <Select value={item.sys_current} onValueChange={(val) => handleFieldChange(index, 'sys_current', val)}>
+                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Yes">Yes</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {item.sys_current === 'No' && (
+                <div className="space-y-2">
+                  <Label>Year finished</Label>
+                  <YearInput value={item.sys_year_last} onChange={val => handleFieldChange(index, 'sys_year_last', val)} />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Endocrine Details */}
+          {(item.treatments || []).includes('endo') && (
+            <div className="space-y-4 border p-4 rounded-md mt-4 animate-fade-in bg-slate-50 dark:bg-slate-900/50">
+              <h4 className="font-semibold text-sm">Hormone Therapy Details</h4>
+              <div className="space-y-2">
+                <Label>Indication</Label>
+                <Select value={item.endo_indication} onValueChange={(val) => handleFieldChange(index, 'endo_indication', val)}>
+                  <SelectTrigger><SelectValue placeholder="Select indication" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="breast">Breast Cancer</SelectItem>
+                    <SelectItem value="prostate">Prostate Cancer</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Currently taking?</Label>
+                <Select value={item.endo_current} onValueChange={(val) => handleFieldChange(index, 'endo_current', val)}>
+                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Yes">Yes</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Total duration (years)</Label>
+                <input type="number" step="0.5" className="flex h-10 w-full border border-input px-3" value={item.endo_years_total || ""} onChange={e => handleFieldChange(index, 'endo_years_total', Number(e.target.value))} />
+              </div>
             </div>
           )}
         </div>

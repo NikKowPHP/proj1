@@ -45,6 +45,13 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
   const locale = useLocale();
 
   const handleDetailChange = (symptomId: string, field: keyof SymptomDetailsValue, fieldValue: any) => {
+    if (field === 'onset_year' && typeof fieldValue === 'number') {
+      const currentYear = new Date().getFullYear();
+      if (fieldValue > currentYear) {
+        // Prevent setting future year
+        return;
+      }
+    }
     const currentDetails = value[symptomId] || {};
     onChange(symptomId, { ...currentDetails, [field]: fieldValue });
   };
@@ -99,6 +106,7 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
                   value={value[symptom.id]?.onset_year}
                   onChange={(val) => handleDetailChange(symptom.id, 'onset_year', val)}
                   placeholder={t('symptomDetails.yearPlaceholder')}
+                  max={new Date().getFullYear()}
                 />
               </div>
             </div>

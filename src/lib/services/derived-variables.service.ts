@@ -330,18 +330,44 @@ function calculateFamilyClusters(familyHistory?: any[]): Record<string, boolean>
     );
 
     // Condition 2: 2+ on same side
-    const maternalCrc = relatives.filter(r => r.side === 'Maternal' && (r.cancer.includes('colon') || r.cancer.includes('rectal') || r.cancer.includes('colorectal'))).length;
-    const paternalCrc = relatives.filter(r => r.side === 'Paternal' && (r.cancer.includes('colon') || r.cancer.includes('rectal') || r.cancer.includes('colorectal'))).length;
+    // Siblings (and Children) share genes with BOTH parents' sides (from the proband's perspective).
+    // So for "Maternal Cluster", we count Maternal relatives + Nuclear (Siblings/Children).
+    // For "Paternal Cluster", we count Paternal relatives + Nuclear.
     
-    // Siblings/Children (N/A side) count towards "relatives" but for strict "same side" logic, usually we add them to a dominant side or count as a group.
-    // For simplicity, we assume if Maternal >= 2 OR Paternal >= 2 it counts.
-    // Also, if side is N/A (siblings) and total CRC >= 2, we flag it as a cluster because siblings share genes with both parents.
-    // However, if we have 1 paternal aunt and 1 maternal uncle, that is NOT a cluster.
-    // So: (Maternal >= 2) OR (Paternal >= 2) OR (First Degree >= 2).
-    // Note: FDR includes siblings/children/parents.
+    // Helper to identify side or nuclear status
+    // Relations: 'Mother', 'Father', 'Sister', 'Brother', 'Daughter', 'Son' ...
+    const isNuclear = (r: any) => ['Sister', 'Brother', 'Daughter', 'Son'].includes(r.relation);
+    
+    // Maternal Side: Explicit 'Maternal', Relation 'Mother', or Nuclear
+    const isMaternalSide = (r: any) => 
+        r.side === 'Maternal' || 
+        r.relation === 'Mother' || 
+        r.relation === 'Maternal Grandmother' || 
+        r.relation === 'Maternal Grandfather' || 
+        r.relation === 'Maternal Aunt' || 
+        r.relation === 'Maternal Uncle' || 
+        isNuclear(r);
+
+    // Paternal Side: Explicit 'Paternal', Relation 'Father', or Nuclear
+    const isPaternalSide = (r: any) => 
+        r.side === 'Paternal' || 
+        r.relation === 'Father' || 
+        r.relation === 'Paternal Grandmother' || 
+        r.relation === 'Paternal Grandfather' || 
+        r.relation === 'Paternal Aunt' || 
+        r.relation === 'Paternal Uncle' || 
+        isNuclear(r);
+
+    const maternalCrc = relatives.filter(r => isMaternalSide(r) && (r.cancer.includes('colon') || r.cancer.includes('rectal') || r.cancer.includes('colorectal'))).length;
+    const paternalCrc = relatives.filter(r => isPaternalSide(r) && (r.cancer.includes('colon') || r.cancer.includes('rectal') || r.cancer.includes('colorectal'))).length;
+    
     const fdrCrcCount = relatives.filter(r => firstDegree.includes(r.relation) && (r.cancer.includes('colon') || r.cancer.includes('rectal') || r.cancer.includes('colorectal'))).length;
 
-    const twoOrMoreCrcSameSide = (maternalCrc >= 2) || (paternalCrc >= 2) || (fdrCrcCount >= 2); 
+    const twoOrMoreCrcSameSide = (maternalCrc >= 2) || (paternalCrc >= 2); 
+    // Note: fdrCrcCount >= 2 is implicitly covered if we include nuclear in both, 
+    // e.g. 2 siblings -> maternalCrc=2, paternalCrc=2. 
+    // 1 Parent + 1 Sibling -> maternalCrc=2 (if Mother+Sib) or paternalCrc=2 (if Father+Sib).
+    // So twoOrMoreCrcSameSide is sufficient. 
 
     const colorectalCluster = fdrYoungCrc || twoOrMoreCrcSameSide;
 

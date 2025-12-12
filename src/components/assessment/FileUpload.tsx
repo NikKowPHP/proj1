@@ -86,7 +86,7 @@ export const FileUploadComponent = ({ question, answers, onAnswer }: FileUploadP
     <div className="space-y-2">
       <Label htmlFor={question.id}>{question.text}</Label>
       {uploadedFileUrl ? (
-        <div className="flex items-center justify-between text-sm p-2 bg-secondary rounded-md">
+        <div className="flex items-center justify-between text-sm p-2 bg-secondary ">
           <div className="flex items-center gap-2 truncate">
             <Paperclip className="h-4 w-4 flex-shrink-0" />
             <span className="truncate">{filename}</span>

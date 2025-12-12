@@ -86,7 +86,7 @@ export const CheckboxGroup = ({
               <Label
                 htmlFor={uniqueId}
                 className={cn(
-                  "flex items-center justify-center px-4 py-2 rounded-full border cursor-pointer transition-colors text-sm font-medium",
+                  "flex items-center justify-center px-4 py-2   border cursor-pointer transition-colors text-sm font-medium",
                   isSelected
                     ? "bg-primary text-primary-foreground border-primary"
                     : "bg-background hover:bg-accent hover:text-accent-foreground border-input"
@@ -121,7 +121,7 @@ export const CheckboxGroup = ({
                   <Label
                     htmlFor={uniqueId}
                     className={cn(
-                      "flex items-center justify-center px-4 py-2 rounded-full border cursor-pointer transition-colors text-sm font-medium",
+                      "flex items-center justify-center px-4 py-2   border cursor-pointer transition-colors text-sm font-medium",
                       isSelected
                         ? "bg-primary text-primary-foreground border-primary"
                         : "bg-background hover:bg-accent hover:text-accent-foreground border-input"

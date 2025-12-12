@@ -111,7 +111,7 @@ export const Genetics = ({ answers, onAnswer, questions, errors: externalErrors 
               return (
                 <div key={key} className="space-y-2">
                   <Label>{q.text}</Label>
-                  <div className={cn("max-h-[400px] overflow-y-auto border rounded-md p-4")}>
+                  <div className={cn("max-h-[400px] overflow-y-auto border  p-4")}>
                     <CheckboxGroup
                       options={q.options}
                       value={answers[key] ? JSON.parse(answers[key]) : []}
@@ -126,7 +126,7 @@ export const Genetics = ({ answers, onAnswer, questions, errors: externalErrors 
             return (
               <div key={key} className="space-y-2">
                 <Label>{q.text}</Label>
-                <div className={cn(isLongList && "max-h-[300px] overflow-y-auto border rounded-md p-4")}>
+                <div className={cn(isLongList && "max-h-[300px] overflow-y-auto border  p-4")}>
                   <CheckboxGroup
                     options={q.options}
                     value={answers[key] ? JSON.parse(answers[key]) : []}

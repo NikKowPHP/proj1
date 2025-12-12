@@ -24,7 +24,7 @@ export function RepeatingGroup<T>({
   return (
     <div className={cn("space-y-4", className)}>
       {values.map((item, index) => (
-        <div key={index} className="flex items-start gap-2 p-4 border rounded-md">
+        <div key={index} className="flex items-start gap-2 p-4 border  ">
           <div className="flex-grow">{children(item, index)}</div>
           <Button
             type="button"

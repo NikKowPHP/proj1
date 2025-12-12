@@ -129,7 +129,7 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                                                 const val = Number(answers[key] || 0);
                                                 handleValidatedChange(key, Math.max(0, val - 1));
                                             }}
-                                            className="h-10 w-10 flex items-center justify-center rounded-md border bg-muted hover:bg-muted/80"
+                                            className="h-10 w-10 flex items-center justify-center  border bg-muted hover:bg-muted/80"
                                         >
                                             -
                                         </button>
@@ -148,7 +148,7 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                                                 const val = Number(answers[key] || 0);
                                                 handleValidatedChange(key, val + 1);
                                             }}
-                                            className="h-10 w-10 flex items-center justify-center rounded-md border bg-muted hover:bg-muted/80"
+                                            className="h-10 w-10 flex items-center justify-center  border bg-muted hover:bg-muted/80"
                                         >
                                             +
                                         </button>
@@ -173,7 +173,7 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                             return <FileUploadComponent key={key} question={q} answers={answers} onAnswer={onAnswer} />;
                         case 'consent_checkbox':
                             return (
-                                <div className="flex items-start space-x-3 rounded-md border p-4 mt-4">
+                                <div className="flex items-start space-x-3  border p-4 mt-4">
                                     <Checkbox
                                         id={key}
                                         checked={answers[key] === "true"}

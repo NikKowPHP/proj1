@@ -40,7 +40,7 @@ export const FunctionalStatus = ({ answers, onAnswer, questions, errors }: Funct
             </>
           )}
           {q.type === 'checkbox' && (
-            <div className="flex items-start space-x-3 rounded-md border p-4">
+            <div className="flex items-start space-x-3  border p-4">
               <Checkbox
                 id={q.id}
                 checked={answers[q.id] === 'true'}

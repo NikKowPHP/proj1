@@ -79,7 +79,7 @@ export const SmokingDetails = ({ answers, onAnswer, questions, errors: externalE
                     type="button"
                     onClick={() => onAnswer(q.id, opt)}
                     className={cn(
-                      "px-4 py-2 rounded-md text-sm font-medium transition-colors border",
+                      "px-4 py-2   text-sm font-medium transition-colors border",
                       value === opt
                         ? "bg-primary text-primary-foreground border-primary"
                         : "bg-background text-foreground hover:bg-muted border-input"

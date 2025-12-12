@@ -131,7 +131,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
             key={rel}
             type="button"
             onClick={() => handleAdd(rel)}
-            className="px-3 py-1 bg-primary/10 hover:bg-primary/20 text-primary rounded-full text-sm font-medium transition-colors"
+            className="px-3 py-1 bg-primary/10 hover:bg-primary/20 text-primary  text-sm font-medium transition-colors"
           >
             {t(`add${rel}`)}
           </button>
@@ -139,7 +139,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
         <button
           type="button"
           onClick={() => handleAdd()}
-          className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors"
+          className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700  text-sm font-medium transition-colors"
         >
           {t('addOther')}
         </button>

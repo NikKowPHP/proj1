@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 
 const chipVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap   text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -54,7 +54,7 @@ const Chip = React.forwardRef<HTMLDivElement, ChipProps>(
               e.stopPropagation(); // Prevent chip click event if inside one
               onRemove();
             }}
-            className="ml-2 -mr-1 flex-shrink-0 rounded-full opacity-50 hover:opacity-100"
+            className="ml-2 -mr-1 flex-shrink-0   opacity-50 hover:opacity-100"
           >
             <X className="h-3.5 w-3.5" />
             <span className="sr-only">Remove</span>

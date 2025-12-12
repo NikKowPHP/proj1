@@ -72,7 +72,7 @@ export const Genetics = ({ answers, onAnswer, questions, errors: externalErrors 
           case 'select':
           case 'radio':
             return (
-              <div key={key} className="space-y-2">
+              <div key={key} className="space-y-2 animate-fade-in">
                 <Label htmlFor={key}>{q.text}</Label>
                 <Select onValueChange={(value) => onAnswer(key, value)} value={answers[key] || ""}>
                   <SelectTrigger id={key}><SelectValue placeholder="Select an option" /></SelectTrigger>
@@ -89,7 +89,7 @@ export const Genetics = ({ answers, onAnswer, questions, errors: externalErrors 
             );
           case 'year_input':
             return (
-              <div key={key} className="space-y-2">
+              <div key={key} className="space-y-2 animate-fade-in">
                 <Label htmlFor={key}>{q.text}</Label>
                 <YearInput id={key} value={answers[key]} onChange={(val) => handleValidatedChange(key, val)} aria-invalid={!!error} />
                 {error && <p className="text-sm text-destructive">{error}</p>}
@@ -97,7 +97,7 @@ export const Genetics = ({ answers, onAnswer, questions, errors: externalErrors 
             );
           case 'text_input':
             return (
-              <div key={key} className="space-y-2">
+              <div key={key} className="space-y-2 animate-fade-in">
                 <Label htmlFor={key}>{q.text}</Label>
                 <Input id={key} value={answers[key] || ""} onChange={(e) => handleValidatedChange(key, e.target.value)} aria-invalid={!!error} />
                 {error && <p className="text-sm text-destructive">{error}</p>}
@@ -109,7 +109,7 @@ export const Genetics = ({ answers, onAnswer, questions, errors: externalErrors 
             // Special grouping logic for gene list if needed, updated to new ID
             if (key === 'gen.self_genes') {
               return (
-                <div key={key} className="space-y-2">
+                <div key={key} className="space-y-2 animate-fade-in">
                   <Label>{q.text}</Label>
                   <div className={cn("max-h-[400px] overflow-y-auto border  p-4")}>
                     <CheckboxGroup
@@ -124,7 +124,7 @@ export const Genetics = ({ answers, onAnswer, questions, errors: externalErrors 
             }
 
             return (
-              <div key={key} className="space-y-2">
+              <div key={key} className="space-y-2 animate-fade-in">
                 <Label>{q.text}</Label>
                 <div className={cn(isLongList && "max-h-[300px] overflow-y-auto border  p-4")}>
                   <CheckboxGroup

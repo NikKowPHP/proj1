@@ -70,7 +70,7 @@ export const SmokingDetails = ({ answers, onAnswer, questions, errors: externalE
         // Custom rendering for unit toggle to match "Number with unit toggle" spec
         if (q.id === 'smoking.intensity_unit') {
           return (
-            <div key={q.id} className="space-y-2">
+            <div key={q.id} className="space-y-2 animate-fade-in">
               <Label>{q.text}</Label>
               <div className="flex space-x-2">
                 {q.options?.map((opt: string) => (
@@ -94,7 +94,7 @@ export const SmokingDetails = ({ answers, onAnswer, questions, errors: externalE
         }
 
         return (
-          <div key={q.id} className="space-y-2">
+          <div key={q.id} className="space-y-2 animate-fade-in">
             <div className="flex items-center gap-2">
               <Label htmlFor={q.id}>{q.text}</Label>
               {q.id === 'smoking.years_smoked' && (

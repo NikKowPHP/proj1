@@ -344,7 +344,7 @@ export default function AssessmentPage() {
             {showSafetyBanner && <SafetyBanner answers={answers} />}
             <section className="space-y-6">
               {visibleQuestions.map((q) => (
-                <div key={q.id} className="space-y-2">
+                <div key={q.id} className="space-y-2 animate-fade-in">
                   {q.text && (
                     <div className="flex items-center gap-2">
                       <Label htmlFor={q.id}>{q.text}</Label>

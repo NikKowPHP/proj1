@@ -62,7 +62,7 @@ export const LabsAndImaging = ({ value, onChange, options, errors: externalError
       addLabel="Add Lab or Imaging Study"
     >
       {(item, index) => (
-        <div className="space-y-4">
+        <div className="space-y-4 animate-fade-in">
           <div className="space-y-2">
             <Label>Study Category</Label>
             <Select value={item.study_category} onValueChange={(val) => handleFieldChange(index, "study_category", val)}>

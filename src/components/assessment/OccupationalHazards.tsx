@@ -58,7 +58,7 @@ const HazardDetailItem = ({
   };
 
   return (
-    <Card className="mb-4 bg-muted/20">
+    <Card className="mb-4 bg-muted/20 animate-fade-in">
       <CardHeader>
         <CardTitle className="text-base font-semibold">{hazardLabel}</CardTitle>
       </CardHeader>

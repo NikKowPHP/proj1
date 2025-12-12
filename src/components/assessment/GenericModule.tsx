@@ -192,7 +192,7 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                 };
 
                 return (
-                    <div key={key} className="space-y-2">
+                    <div key={key} className="space-y-2 animate-fade-in">
                         {q.type !== 'consent_checkbox' && <Label htmlFor={key}>{q.text}</Label>}
                         {renderInput()}
                         {renderInfoCard()}

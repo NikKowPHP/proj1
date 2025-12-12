@@ -151,7 +151,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
         addLabel="Add Custom Relative"
       >
         {(item, index) => (
-          <div className="space-y-4 border-b pb-4 mb-4 last:border-0 last:pb-0 last:mb-0">
+          <div className="space-y-4 border-b pb-4 mb-4 last:border-0 last:pb-0 last:mb-0 animate-fade-in">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Relation</Label>
@@ -253,7 +253,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
               <Label className="font-semibold">Cancer History</Label>
               <div className="pl-4 border-l-2 border-gray-200 space-y-3">
                 {(item.cancers || []).map((cancer, cancerIndex) => (
-                  <div key={cancerIndex} className="space-y-2 bg-gray-50 p-3 rounded relative">
+                  <div key={cancerIndex} className="space-y-2 bg-gray-50 p-3 rounded relative animate-fade-in">
                     <button
                       type="button"
                       onClick={() => handleRemoveCancer(index, cancerIndex)}

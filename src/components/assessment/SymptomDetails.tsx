@@ -67,7 +67,7 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
   return (
     <div className="space-y-4">
       {selectedSymptoms.map(symptom => (
-        <Card key={symptom.id}>
+        <Card key={symptom.id} className="animate-fade-in">
           <CardHeader>
             <SearchableSelect
               value={value[symptom.id]?.code || symptom.id}

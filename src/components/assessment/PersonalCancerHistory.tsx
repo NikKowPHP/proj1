@@ -74,7 +74,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
       addLabel="Add Diagnosis"
     >
       {(item, index) => (
-        <div className="space-y-4 border-b pb-4 mb-4 last:border-0 last:pb-0 last:mb-0">
+        <div className="space-y-4 border-b pb-4 mb-4 last:border-0 last:pb-0 last:mb-0 animate-fade-in">
           <div className="space-y-2">
             <Label>Type of Cancer</Label>
             <SearchableSelect
@@ -211,7 +211,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
 
           {/* Granular Surgery Details (Example for Breast Cancer) */}
           {(item.treatments || []).includes('surgery') && (item.type?.toLowerCase().includes('breast')) && (
-            <div className="space-y-2">
+            <div className="space-y-2 animate-fade-in">
               <Label>Surgery Type</Label>
               <Select value={item.surgery_type} onValueChange={(val) => handleFieldChange(index, 'surgery_type', val)}>
                 <SelectTrigger><SelectValue placeholder="Select surgery type" /></SelectTrigger>

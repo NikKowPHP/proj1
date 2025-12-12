@@ -22,7 +22,7 @@ export const FunctionalStatus = ({ answers, onAnswer, questions, errors }: Funct
   return (
     <div className="space-y-6">
       {visibleQuestions.map(q => (
-        <div key={q.id} className="space-y-2">
+        <div key={q.id} className="space-y-2 animate-fade-in">
           <Label htmlFor={q.id}>{q.text}</Label>
           {q.type === 'select' && (
             <>

@@ -133,13 +133,13 @@ export const ScreeningHistory = ({ answers, onAnswer, screeningGroups, immunizat
           <h3 className="text-lg font-semibold mb-4">Screening Details</h3>
           <div className="space-y-4">
             {visibleScreeningGroups.map(group => (
-              <Card key={group.id}>
+              <Card key={group.id} className="animate-fade-in">
                 <CardHeader><CardTitle>{group.text}</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
                   {group.questions.filter(q => isVisible(q, answers)).map(q => {
                     const error = errors[q.id];
                     return (
-                      <div key={q.id} className="space-y-2">
+                      <div key={q.id} className="space-y-2 animate-fade-in">
                         <Label htmlFor={q.id}>{q.text}</Label>
                         {q.type === 'select' && (
                           <>

@@ -133,11 +133,10 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
                   <SelectValue placeholder={t('symptomDetails.frequencyPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="daily">{t('symptomDetails.frequencyDaily')}</SelectItem>
-                  <SelectItem value="weekly">{t('symptomDetails.frequencyWeekly')}</SelectItem>
-                  <SelectItem value="constant">{t('symptomDetails.frequencyConstant')}</SelectItem>
-                  <SelectItem value="intermittent">{t('symptomDetails.frequencyIntermittent')}</SelectItem>
-                  <SelectItem value="worsening">{t('symptomDetails.frequencyWorsening')}</SelectItem>
+                  <SelectItem value="Daily">{t('symptomDetails.frequencyDaily')}</SelectItem>
+                  <SelectItem value="Most days">{t('symptomDetails.frequencyMostDays')}</SelectItem>
+                  <SelectItem value="Weekly">{t('symptomDetails.frequencyWeekly')}</SelectItem>
+                  <SelectItem value="Rarely">{t('symptomDetails.frequencyRarely')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -416,6 +416,36 @@
           "dependsOn": { "questionId": "ca.any_history", "value": "Yes" }
         },
         {
+          "id": "ca.prophylactic_surgery.any",
+          "type": "radio",
+          "text": { "en": "Have you ever had surgery mainly to reduce cancer risk?", "pl": "Czy miałaś/eś kiedykolwiek operację głównie w celu zmniejszenia ryzyka raka?" },
+          "options": [
+            { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+            { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } }
+          ]
+        },
+        {
+          "id": "advanced_modules_prophylactic",
+          "type": "advanced_modules",
+          "modules": [
+            {
+              "id": "prophylactic_surgery_details",
+              "title": { "en": "Surgery Details", "pl": "Szczegóły Operacji" },
+              "dependsOn": { "questionId": "ca.prophylactic_surgery.any", "value": "Yes" },
+              "questions": [
+                 { "id": "ca.prophylactic_surgery.type", "text": { "en": "Surgery Type", "pl": "Rodzaj operacji" }, "type": "checkbox_group", "options": [
+                   { "id": "Mastectomy", "label": { "en": "Mastectomy (Breast removal)", "pl": "Mastektomia (usunięcie piersi)" } },
+                   { "id": "Oophorectomy", "label": { "en": "Oophorectomy (Ovary removal)", "pl": "Ooforektomia (usunięcie jajników)" } },
+                   { "id": "Hysterectomy", "label": { "en": "Hysterectomy (Uterus removal)", "pl": "Histerektomia (usunięcie macicy)" } },
+                   { "id": "Salpingectomy", "label": { "en": "Salpingectomy (Fallopian tube removal)", "pl": "Salpingektomia (usunięcie jajowodów)" } },
+                   { "id": "Other", "label": { "en": "Other", "pl": "Inne" } }
+                 ]},
+                 { "id": "ca.prophylactic_surgery.year", "text": { "en": "Year of surgery", "pl": "Rok operacji" }, "type": "year_input" }
+              ]
+            }
+          ]
+        },
+        {
           "id": "famhx.any_family_cancer",
           "type": "radio",
           "text": { "en": "Family history of cancer?", "pl": "Rak w rodzinie?" },
@@ -474,7 +504,9 @@
                   { "id": "pain", "label": { "en": "Pain", "pl": "Ból" } },
                   { "id": "rash", "label": { "en": "Rash", "pl": "Wysypka" } },
                   { "id": "fatigue", "label": { "en": "Fatigue", "pl": "Zmęczenie" } },
-                  { "id": "weight_loss", "label": { "en": "Weight Loss", "pl": "Utrata wagi" } }
+                  { "id": "weight_loss", "label": { "en": "Weight Loss", "pl": "Utrata wagi" } },
+                  { "id": "night_sweats", "label": { "en": "Night sweats", "pl": "Nocne poty" } },
+                  { "id": "itching", "label": { "en": "Itching", "pl": "Świąd" } }
                 ]
               }
             },
@@ -509,11 +541,14 @@
                   { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
                 ], "dependsOn": {"questionId": "cond.hcv.status", "value": ["Past (cured/SVR)", "Current"]} },
 
+
+
                 { "id": "cond.cirrhosis.etiology", "text": {"en": "Main cause", "pl": "Główna przyczyna"}, "type": "select", "options": [
                   { "value": "Alcohol", "label": { "en": "Alcohol", "pl": "Alkohol" } },
                   { "value": "Viral", "label": { "en": "Viral", "pl": "Wirusowa" } },
                   { "value": "NASH", "label": { "en": "NASH", "pl": "NASH" } },
                   { "value": "Autoimmune", "label": { "en": "Autoimmune", "pl": "Autoimmunologiczna" } },
+                  { "value": "PBC", "label": { "en": "PBC (Primary Biliary Cholangitis)", "pl": "PBC (Pierwotne zapalenie dróg żółciowych)" } },
                   { "value": "Other", "label": { "en": "Other", "pl": "Inna" } }
                 ], "dependsOn": {"questionId": "cond.summary", "value": "cirrhosis"} },
 
@@ -580,7 +615,7 @@
                   { "value": "No", "label": { "en": "No", "pl": "Nie" } },
                   { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
                 ], "dependsOn": {"questionId": "cond.summary", "value": "hiv"} },
-                { "id": "cond.hiv.on_art", "text": {"en": "On ART therapy?", "pl": "Leczenie ARV?"}, "type": "radio", "options": [
+                { "id": "cond.hiv.on_art", "text": {"en": "On antiviral therapy?", "pl": "Leczenie ARV?"}, "type": "radio", "options": [
                   { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
                   { "value": "No", "label": { "en": "No", "pl": "Nie" } },
                   { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
@@ -600,6 +635,28 @@
                 ], "dependsOn": {"questionId": "cond.tx.status", "value": "Yes"} },
                 { "id": "cond.tx.year", "text": {"en": "Year of transplant", "pl": "Rok przeszczepu"}, "type": "year_input", "dependsOn": {"questionId": "cond.tx.status", "value": "Yes"} },
                 
+                { "id": "imm.varicella.status", "text": { "en": "Chickenpox (varicella) – history or vaccination?", "pl": "Ospa wietrzna – historia lub szczepienie?" }, "type": "radio", "options": [
+                  { "value": "Natural infection", "label": { "en": "History of disease (natural immunity)", "pl": "Przebyta choroba (naturalna odporność)" } },
+                  { "value": "Vaccinated", "label": { "en": "Vaccinated", "pl": "Zaszczepiony/a" } },
+                  { "value": "No immunity", "label": { "en": "No history and no vaccine", "pl": "Brak historii i szczepienia" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ]},
+                { "id": "imm.mmr.status", "text": { "en": "Measles–mumps–rubella (MMR) – status?", "pl": "Odra-świnka-różyczka (MMR) – status?" }, "type": "radio", "options": [
+                  { "value": "Vaccinated (2 doses)", "label": { "en": "Fully vaccinated (2 doses)", "pl": "W pełni zaszczepiony (2 dawki)" } },
+                  { "value": "Vaccinated (1 dose)", "label": { "en": "Partially vaccinated (1 dose)", "pl": "Częściowo zaszczepiony (1 dawka)" } },
+                  { "value": "Not vaccinated", "label": { "en": "Not vaccinated", "pl": "Niezaszczepiony/a" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ]},
+                { "id": "imm.pneumo.status", "text": { "en": "Pneumococcal vaccine?", "pl": "Szczepionka przeciw pneumokokom?" }, "type": "radio", "options": [
+                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ]},
+                { "id": "imm.pneumo.vaccine_type", "text": { "en": "Pneumococcal vaccine type", "pl": "Typ szczepionki przeciw pneumokokom" }, "type": "radio", "options": [
+                  { "value": "PCV13", "label": "PCV13" }, { "value": "PCV15", "label": "PCV15" }, { "value": "PCV20", "label": "PCV20" }, { "value": "PPSV23", "label": "PPSV23" }, { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+                ], "dependsOn": { "questionId": "imm.pneumo.status", "value": "Yes" } }, 
+                { "id": "imm.pneumo.year", "text": { "en": "Year of last pneumococcal vaccine", "pl": "Rok ostatniego szczepienia przeciw pneumokokom" }, "type": "year_input", "dependsOn": { "questionId": "imm.pneumo.status", "value": "Yes" } },
+         
                 { "id": "meds.immunosupp.current", "text": {"en": "Long-term immunosuppression?", "pl": "Długotrwała immunosupresja?"}, "type": "radio", "options": [
                   { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
                   { "value": "No", "label": { "en": "No", "pl": "Nie" } }
@@ -685,10 +742,70 @@
                    { "id": "ldl", "label": "LDL Cholesterol", "units": ["mg/dL", "mmol/L"] },
                    { "id": "hdl", "label": "HDL Cholesterol", "units": ["mg/dL", "mmol/L"] },
                    { "id": "psa", "label": "PSA", "units": ["ng/mL"] }
+                ],
+                "screening": [
+                  { "id": "screen.colon.ever", "text": { "en": "Ever had colon cancer screening?", "pl": "Czy kiedykolwiek miałaś/eś badanie przesiewowe w kierunku raka jelita grubego?" }, "type": "radio", "options": ["Yes", "No", "Not sure"] },
+                  { "id": "screen.colon.type", "text": { "en": "Type of last screening", "pl": "Rodzaj ostatniego badania przesiewowego" }, "type": "radio", "options": [
+                    { "value": "Colonoscopy", "label": { "en": "Colonoscopy", "pl": "Kolonoskopia" } },
+                    { "value": "Sigmoidoscopy", "label": { "en": "Sigmoidoscopy", "pl": "Sigmoidoskopia" } },
+                    { "value": "FIT/FOBT", "label": { "en": "FIT/FOBT", "pl": "FIT/FOBT" } },
+                    { "value": "Cologuard", "label": { "en": "Cologuard", "pl": "Cologuard" } },
+                    { "value": "Other", "label": { "en": "Other", "pl": "Inne" } }
+                  ], "dependsOn": { "questionId": "screen.colon.ever", "value": "Yes" } },
+                  { "id": "screen.crc.polyps_ever", "text": { "en": "Have you ever been told that polyps were found?", "pl": "Czy kiedykolwiek stwierdzono u Ciebie polipy?" }, "type": "radio", "options": ["Yes", "No", "Not sure", "Prefer not to say"], "dependsOn": { "questionId": "screen.colon.ever", "value": "Yes" } },
+                  { "id": "screen.colon.year", "text": { "en": "Year of last screening", "pl": "Rok ostatniego badania przesiewowego" }, "type": "year_input", "dependsOn": { "questionId": "screen.colon.ever", "value": "Yes" } },
+                  { "id": "screen.lung.ever", "text": { "en": "Ever had lung cancer screening (LDCT)?", "pl": "Czy kiedykolwiek miałaś/eś badanie przesiewowe w kierunku raka płuc (LDCT)?" }, "type": "radio", "options": ["Yes", "No", "Not sure"] },
+                  { "id": "screen.lung.year", "text": { "en": "Year of last LDCT", "pl": "Rok ostatniego LDCT" }, "type": "year_input", "dependsOn": { "questionId": "screen.lung.ever", "value": "Yes" } },
+                  { "id": "screen.cervical.ever", "text": { "en": "Ever had cervical cancer screening (Pap/HPV)?", "pl": "Czy kiedykolwiek miałaś/eś badanie przesiewowe w kierunku raka szyjki macicy (Pap/HPV)?" }, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": { "questionId": "sex_at_birth", "value": "Female" } },
+                  { "id": "screen.cervical.year", "text": { "en": "Year of last screening", "pl": "Rok ostatniego badania przesiewowego" }, "type": "year_input", "dependsOn": { "questionId": "screen.cervical.ever", "value": "Yes" } },
+                  { "id": "screen.mammogram.ever", "text": { "en": "Ever had a mammogram?", "pl": "Czy kiedykolwiek miałaś/eś mammografię?" }, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": { "questionId": "sex_at_birth", "value": "Female" } },
+                  { "id": "screen.mammogram.year", "text": { "en": "Year of last mammogram", "pl": "Rok ostatniej mammografii" }, "type": "year_input", "dependsOn": { "questionId": "screen.mammogram.ever", "value": "Yes" } },
+                  { "id": "screen.skin.biopsy_ever", "text": { "en": "Have you ever had a skin lesion removed or biopsied?", "pl": "Czy kiedykolwiek miałaś/eś usuwaną lub biopsjowaną zmianę skórną?" }, "type": "radio", "options": ["Yes", "No", "Not sure"] },
+                  { "id": "screen.skin.full_exam_ever", "text": { "en": "Have you ever had a full-body skin exam by a doctor?", "pl": "Czy kiedykolwiek miałaś/eś pełne badanie skóry przez lekarza?" }, "type": "radio", "options": ["Yes", "No", "Not sure"] }
                 ]
               }
             }
           ]
+        },
+        {
+          "id": "env.radon.exposure",
+          "type": "radio",
+          "text": { "en": "Ever lived in a home with known radon exposure?", "pl": "Czy kiedykolwiek mieszkałeś/aś w domu z narażeniem na radon?" },
+          "options": [
+            { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+            { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+            { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+          ]
+        },
+        {
+          "id": "env.radon.tested",
+          "type": "radio",
+          "text": { "en": "Has your home ever been tested for radon?", "pl": "Czy Twój dom był kiedykolwiek badany pod kątem radonu?" },
+          "options": [
+            { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
+            { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+            { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+          ],
+          "dependsOn": { "questionId": "env.radon.exposure", "value": "Yes" }
+        },
+        {
+          "id": "env.radon.levels",
+          "type": "number_input",
+          "text": { "en": "Highest radon level measured (Bq/m³)", "pl": "Najwyższy zmierzony poziom radonu (Bq/m³)" },
+          "helperText": { "en": "Enter value in Bq/m³. 1 pCi/L = 37 Bq/m³", "pl": "Wprowadź wartość w Bq/m³. 1 pCi/L = 37 Bq/m³" },
+          "dependsOn": { "questionId": "env.radon.tested", "value": "Yes" }
+        },
+        {
+          "id": "env.radon.mitigation",
+          "type": "radio",
+          "text": {"en": "Has mitigation been done?", "pl": "Czy wykonano mitygację?"},
+          "options": [
+            { "value": "Yes", "label": {"en": "Yes", "pl": "Tak"} },
+            { "value": "No", "label": {"en": "No", "pl": "Nie"} },
+            { "value": "Planned or in progress", "label": {"en": "Planned or in progress", "pl": "Planowane lub w trakcie"} },
+            { "value": "Not applicable", "label": {"en": "Not applicable", "pl": "Nie dotyczy"} }
+          ],
+          "dependsOn": {"questionId": "env.radon.levels", "operator": ">=", "value": 100}
         }
       ]
     },
@@ -830,6 +947,7 @@
           "id": "occ.exposure_any",
           "type": "radio",
           "text": { "en": "Any significant occupational exposures?", "pl": "Istotne narażenia zawodowe?" },
+          "helperText": { "en": "e.g. asbestos, chemicals, radiation, night shifts", "pl": "np. azbest, chemikalia, promieniowanie, praca zmianowa" },
           "options": ["No", "Yes", "Not sure"]
         },
         {
@@ -852,6 +970,7 @@
             { "id": "formaldehyde", "label": "Formaldehyde" },
             { "id": "pesticides", "label": "Pesticides" },
             { "id": "radiation", "label": "Ionizing Radiation" },
+            { "id": "radon", "label": "Radon" },
             { "id": "uv_sunlight", "label": "Outdoor work (UV)" },
             { "id": "shift_night", "label": "Night shift work" },
             { "id": "firefighter", "label": "Firefighter smoke" },
@@ -875,10 +994,13 @@
                 ],
                 "exposures": [
                   { "value": "asbestos", "label": "Asbestos" }, { "value": "silica", "label": "Silica" }, { "value": "diesel", "label": "Diesel" },
-                  { "value": "welding", "label": "Welding" }, { "value": "benzene", "label": "Benzene" }
+                  { "value": "welding", "label": "Welding" }, { "value": "benzene", "label": "Benzene" }, { "value": "radon", "label": "Radon" }
                 ],
                 "ppe": [
-                  { "value": "Mask", "label": "Mask/Respirator" }, { "value": "Ventilation", "label": "Ventilation" }, { "value": "None", "label": "None" }
+                  { "value": "Always", "label": { "en": "Always", "pl": "Zawsze" } },
+                  { "value": "Often", "label": { "en": "Often", "pl": "Często" } },
+                  { "value": "Rarely", "label": { "en": "Rarely", "pl": "Rzadko" } },
+                  { "value": "Never", "label": { "en": "Never", "pl": "Nigdy" } }
                 ]
               }
             }
@@ -917,6 +1039,7 @@
         { "id": "env.asbestos.disturbance", "type": "radio", "text": {"en": "Was it disturbed/drilled?", "pl": "Czy był naruszany/wiercony?"}, "options": ["Yes - once", "Yes - multiple", "No"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "asbestos"} },
         
         { "id": "env.water.main_source_10y", "type": "select", "text": {"en": "Main water source >10y?", "pl": "Główne źródło wody >10 lat?"}, "options": ["Municipal", "Private well", "Bottled"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "private_well"} },
+        { "id": "env.water.official_advisory_30d", "type": "radio", "text": { "en": "Official notice not to drink tap water >30 days?", "pl": "Oficjalne ostrzeżenie, by nie pić wody >30 dni?" }, "options": ["Yes", "No", "Not sure"], "dependsOn": { "questionId": "env.water.main_source_10y", "value": "Municipal" } },
         { "id": "env.water.well_contam_notice", "type": "radio", "text": {"en": "Ever told about contamination (arsenic/nitrates)?", "pl": "Informacja o skażeniu (arsen/azotany)?"}, "options": ["Yes", "No"], "dependsOn": {"questionId": "env.water.main_source_10y", "value": "Private well"} },
         
         { "id": "env.pesticide.use_freq_year", "type": "number_input", "text": {"en": "Times/year mixing pesticides?", "pl": "Ile razy w roku mieszasz pestycydy?"}, "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
@@ -1087,11 +1210,9 @@
                   { "value": "No", "label": { "en": "No", "pl": "Nie" } },
                   { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
                 ] },
-                { "id": "imm.zoster.ever", "text": {"en": "Shingles ever?", "pl": "Półpasiec?"}, "type": "select", "options": [
-                  { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
-                  { "value": "No", "label": { "en": "No", "pl": "Nie" } },
-                  { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
-                ] }
+                { "id": "imm.zoster.ever", "text": {"en": "Shingles ever?", "pl": "Półpasiec?"}, "type": "select", "options": ["Yes", "No", "Not sure"] },
+                { "id": "imm.zoster.vaccine_type", "text": { "en": "Shingles vaccine type?", "pl": "Typ szczepionki na półpasiec?" }, "type": "radio", "options": ["Live (Zostavax)", "Recombinant (Shingrix)", "Not sure"], "dependsOn": { "questionId": "imm.zoster.status", "value": "Yes" } }
+
               ]
             }
           ]

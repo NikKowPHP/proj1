@@ -3,6 +3,7 @@
  * This ensures that data sent for AI processing is standardized.
  */
 export const occupationalExposuresMap: Record<string, string> = {
+  'radon': '409569002', // Exposure to radon (event)
   'asbestos': '406482008', // Exposure to asbestos (event)
   'silica': '406484009', // Exposure to silica (event)
   'wood_dust': '425264009', // Exposure to wood dust (event)

@@ -102,7 +102,7 @@ function calculateFamilySiteMetrics(familyHistory?: any[]): Record<string, any> 
     const metrics: Record<string, any> = {};
 
     const firstDegree = ['Mother', 'Father', 'Sister', 'Brother', 'Daughter', 'Son'];
-    const secondDegree = ['Maternal Grandmother', 'Maternal Grandfather', 'Paternal Grandmother', 'Paternal Grandfather', 'Aunt', 'Uncle', 'Niece', 'Nephew'];
+    const secondDegree = ['Maternal Grandmother', 'Maternal Grandfather', 'Paternal Grandmother', 'Paternal Grandfather', 'Aunt', 'Uncle', 'Niece', 'Nephew', 'Cousin'];
     
     sites.forEach(site => {
         let fdrCount = 0;
@@ -436,7 +436,7 @@ function calculateOccupationalFlags(history?: any[]): Record<string, boolean> {
     // Lung High Risk (PDF Spec)
     // Asbestos, Silica, Diesel, Welding, Painting, Radon, Arsenic, Cadmium, Chromium, Nickel, Beryllium, Soot
     const lungCarcinogens = [
-        'asbestos', 'silica', 'diesel', 'welding', 'painting', 'painter', 'radon__occ', 
+        'asbestos', 'silica', 'diesel', 'welding', 'painting', 'painter', 'radon', 
         'arsenic', 'cadmium', 'chromium', 'nickel', 'beryllium', 'soot', 'metal_fluids',
         'pahs', 'firefighter', 'mineral_oil', 'rubber_chem' // Added based on PDF Page 51 lists for lung context (e.g. metals_welding)
     ]; 
@@ -548,7 +548,7 @@ function calculateHpvExposureBand(sexualHealth: any): string {
 
     // Higher
     if (
-        (lifetimePartners === '20+' || lifetimePartners === '10-19') || 
+        (lifetimePartners === '20 or more' || lifetimePartners === '10-19') || 
         ['4-5', '6+'].includes(recentPartners) ||
         hasAnal ||
         isSexWork
@@ -802,7 +802,7 @@ export const DerivedVariablesService = {
       const hasAnalReceptive = Array.isArray(sexSitesEver) && sexSitesEver.includes('anal');
       
       const hpvPrecancer = sexHistory['sexhx.hpv_precancer_history'] || [];
-      const hasAnalPrecancer = Array.isArray(hpvPrecancer) && hpvPrecancer.includes('anus');
+      const hasAnalPrecancer = Array.isArray(hpvPrecancer) && hpvPrecancer.includes('Anus');
 
       if (
           (msmBehavior && derived.age_years >= 35) || 
@@ -836,7 +836,7 @@ export const DerivedVariablesService = {
       // Cervix HPV Persistent Pattern (PDF Page 14)
       // Rule: derived.sex.hpv_exposure_band = Higher AND (sexhx.hpv_precancer_history includes "Cervix" OR cond.hpv.status ∈ {Past, Current})
       const hpvPrecancerHistory = sexHistory['sexhx.hpv_precancer_history'] || [];
-      const hpvPrecancerCervix = Array.isArray(hpvPrecancerHistory) && hpvPrecancerHistory.includes('cervix');
+      const hpvPrecancerCervix = Array.isArray(hpvPrecancerHistory) && hpvPrecancerHistory.includes('Cervix');
       
       const illnesses = advanced.illnesses || [];
       const hpvStatus = illnesses.find((i: any) => i.id === 'hpv');
@@ -912,6 +912,14 @@ export const DerivedVariablesService = {
       derived['imm.covid_booster_due'] = imm['imm.covid.doses'] !== '4+'; // Simplified logic
       derived['imm.pneumo_candidate'] = derived.age_years >= 65 || core.smoking_status === 'Current'; // Example criteria
       derived['imm.zoster_candidate'] = derived.age_years >= 50;
+
+      // Tetanus Booster calculation
+      const tetanusYear = imm['imm.td_tdap.year_last'];
+      if (tetanusYear) {
+          derived['imm.tetanus_booster_due'] = (currentYear - tetanusYear) >= 10;
+      } else {
+          derived['imm.tetanus_booster_due'] = false; // or null if we want to signal unknown
+      }
 
       // --- New Logic ---
 

@@ -130,14 +130,22 @@ const HazardDetailItem = ({
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Protective Equipment (PPE)</Label>
-          <div className="flex flex-wrap gap-2">
-            {options.ppe.map(ppe => (
-              <Chip key={ppe.value} variant="selectable" selected={(item.ppe_use || []).includes(ppe.value)} onClick={() => togglePPE(ppe.value)}>
-                {ppe.label}
-              </Chip>
-            ))}
-          </div>
+          <Label>How often did you use appropriate PPE?</Label>
+          <Select
+            value={item.ppe_use?.[0] || ""}
+            onValueChange={(val) => handleFieldChange("ppe_use", [val])}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select frequency..." />
+            </SelectTrigger>
+            <SelectContent>
+              {options.ppe.map(opt => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">

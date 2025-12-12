@@ -40,8 +40,10 @@ export function SearchableSelect({
   placeholder = "Select an option...",
   searchPlaceholder = "Search...",
   emptyMessage = "No results found.",
-}: SearchableSelectProps) {
+  allowCustom = false,
+}: SearchableSelectProps & { allowCustom?: boolean }) {
   const [open, setOpen] = React.useState(false)
+  const [searchValue, setSearchValue] = React.useState("")
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -53,24 +55,45 @@ export function SearchableSelect({
           className="w-full justify-between"
         >
           {value
-            ? options.find((option) => option.value === value)?.label
+            ? (options.find((option) => option.value === value)?.label || (allowCustom ? value : placeholder))
             : placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
         <Command>
-          <CommandInput placeholder={searchPlaceholder} />
+          <CommandInput
+            placeholder={searchPlaceholder}
+            value={searchValue}
+            onValueChange={setSearchValue}
+          />
           <CommandList>
-            <CommandEmpty>{emptyMessage}</CommandEmpty>
+            <CommandEmpty>
+              {allowCustom ? (
+                <div
+                  className="py-2 px-4 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                  onClick={() => {
+                    onChange(searchValue)
+                    setOpen(false)
+                    setSearchValue("")
+                  }}
+                >
+                  Use "{searchValue}"
+                </div>
+              ) : (
+                emptyMessage
+              )}
+            </CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
                 <CommandItem
                   key={option.value}
-                  value={option.value}
+                  value={option.label} // Use label for searching
                   onSelect={(currentValue) => {
-                    onChange(currentValue === value ? "" : currentValue)
+                    // We need to pass the original value (ID) back, not the label/search term
+                    onChange(option.value === value ? "" : option.value)
                     setOpen(false)
+                    setSearchValue("")
                   }}
                 >
                   <Check

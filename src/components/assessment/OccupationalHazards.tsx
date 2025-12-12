@@ -73,6 +73,7 @@ const HazardDetailItem = ({
             onChange={(val) => handleFieldChange("main_job_title", val)}
             options={options.jobTitles}
             placeholder="Select job title..."
+            allowCustom={true}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">

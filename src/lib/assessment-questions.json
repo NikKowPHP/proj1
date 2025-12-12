@@ -385,6 +385,7 @@
             { "id": "pancreatitis", "label": { "en": "Chronic Pancreatitis", "pl": "Przewlekłe zapalenie trzustki" } },
             { "id": "diabetes", "label": { "en": "Type 2 Diabetes", "pl": "Cukrzyca typu 2" } },
             { "id": "transplant", "label": { "en": "Organ Transplant", "pl": "Przeszczep narządu" } },
+            { "id": "cond.copd", "label": { "en": "COPD/Emphysema", "pl": "POChP/Rozedma" } },
             { "id": "none", "label": { "en": "None", "pl": "Brak" } }
           ],
           "exclusiveOptionId": "none"
@@ -662,6 +663,30 @@
                   { "value": "other", "label": "Other" }
                 ]
               }
+            },
+            {
+              "id": "functional_status",
+              "title": { "en": "Functional Status", "pl": "Stan Funkcjonalny" },
+              "dependsOn": { "questionId": "age", "operator": ">=", "value": 65 },
+              "questions": [
+                { "id": "func.adl_help", "text": {"en": "Need help with daily activities?", "pl": "Potrzeba pomocy w codziennych czynnościach?"}, "type": "radio", "options": ["Yes", "No"] },
+                { "id": "func.falls_last_year", "text": {"en": "Falls in last year?", "pl": "Upadki w ostatnim roku?"}, "type": "radio", "options": ["Yes", "No"] }
+              ]
+            },
+            {
+              "id": "labs_and_imaging",
+              "title": { "en": "Labs & Imaging", "pl": "Wyniki Badań" },
+              "dependsOn": { "questionId": "age", "operator": ">=", "value": 18 },
+              "options": {
+                "labs": [
+                   { "id": "creat", "label": "Creatinine", "units": ["mg/dL", "umol/L"] },
+                   { "id": "hba1c", "label": "HbA1c", "units": ["%", "mmol/mol"] },
+                   { "id": "chol_total", "label": "Total Cholesterol", "units": ["mg/dL", "mmol/L"] },
+                   { "id": "ldl", "label": "LDL Cholesterol", "units": ["mg/dL", "mmol/L"] },
+                   { "id": "hdl", "label": "HDL Cholesterol", "units": ["mg/dL", "mmol/L"] },
+                   { "id": "psa", "label": "PSA", "units": ["ng/mL"] }
+                ]
+              }
             }
           ]
         }
@@ -701,6 +726,12 @@
             { "id": "APC", "label": "APC" }, { "id": "MUTYH", "label": "MUTYH" },
             { "id": "Other", "label": "Other" }
           ]
+        },
+        {
+          "id": "gen.self_genes_other_label",
+          "type": "text_input",
+          "text": { "en": "Other Gene Name", "pl": "Nazwa innego genu" },
+          "dependsOn": { "questionId": "gen.self_genes", "operator": "array_contains", "value": "Other" }
         },
         {
           "id": "gen.mutyh_biallelic",

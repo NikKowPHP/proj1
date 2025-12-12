@@ -8,6 +8,8 @@ import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Chip } from '../ui/chip';
+import { Textarea } from '../ui/textarea';
+import { cn } from '@/lib/utils';
 
 export interface HazardExposure {
   hazardId: string;
@@ -18,6 +20,7 @@ export interface HazardExposure {
   current_exposure?: string;
   ppe_use?: string[];
   year_first_exposed?: number;
+  notes?: string;
 }
 
 interface OccupationalHazardsProps {
@@ -92,6 +95,39 @@ const HazardDetailItem = ({
             />
           </div>
         </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Hours per week</Label>
+            <Input
+              type="number"
+              value={item.hours_per_week ?? ""}
+              onChange={(e) => handleFieldChange("hours_per_week", e.target.value ? Number(e.target.value) : undefined)}
+              placeholder="e.g. 40"
+              min={0}
+              max={80}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Current exposure?</Label>
+            <div className="flex space-x-2">
+              {['Yes', 'No', 'Not sure'].map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => handleFieldChange("current_exposure", opt)}
+                  className={cn(
+                    "px-3 py-2 text-sm font-medium transition-colors border rounded-md flex-1",
+                    item.current_exposure === opt
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background text-foreground hover:bg-muted border-input"
+                  )}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
         <div className="space-y-2">
           <Label>Protective Equipment (PPE)</Label>
           <div className="flex flex-wrap gap-2">
@@ -102,8 +138,18 @@ const HazardDetailItem = ({
             ))}
           </div>
         </div>
+
+        <div className="space-y-2">
+          <Label>Notes (optional)</Label>
+          <Textarea
+            value={item.notes || ""}
+            onChange={(e) => handleFieldChange("notes", e.target.value)}
+            placeholder="Anything important to add about this exposure?"
+            maxLength={300}
+          />
+        </div>
       </CardContent>
-    </Card>
+    </Card >
   );
 };
 

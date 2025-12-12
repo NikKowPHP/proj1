@@ -137,7 +137,10 @@
       "frequencyWorsening": "Getting progressively worse",
       "associatedFeatures": "Associated Features",
       "notesLabel": "Notes (optional)",
-      "notesPlaceholder": "Describe your symptom in more detail..."
+      "notesPlaceholder": "Describe your symptom in more detail...",
+      "progressionLabel": "Getting worse?",
+      "progressionYes": "Yes",
+      "progressionNo": "No"
     }
   },
   "ResultsPage": {

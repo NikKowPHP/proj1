@@ -140,7 +140,10 @@
       "frequencyWorsening": "Stopniowo się nasila",
       "associatedFeatures": "Objawy towarzyszące",
       "notesLabel": "Notatki (opcjonalnie)",
-      "notesPlaceholder": "Opisz dokładniej swój objaw..."
+      "notesPlaceholder": "Opisz dokładniej swój objaw...",
+      "progressionLabel": "Nasilenie narasta?",
+      "progressionYes": "Tak",
+      "progressionNo": "Nie"
     }
   },
   "ResultsPage": {

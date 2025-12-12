@@ -77,6 +77,7 @@
                   { "value": "Every day", "label": { "en": "Every day", "pl": "Codziennie" } },
                   { "value": "Some days", "label": { "en": "Some days", "pl": "Niektóre dni" } }
                 ], "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
+                { "id": "smoking.intensity_unit", "text": { "en": "Intensity unit", "pl": "Jednostka intensywności"}, "type": "radio", "options": ["Cigarettes per day", "Packs per day"], "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
                 { "id": "smoking.intensity", "text": { "en": "On average, how many cigarettes do you smoke per day?", "pl": "Średnio, ile papierosów palisz dziennie?"}, "type": "number_input", "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
                 { "id": "smoking.years_smoked", "text": { "en": "Total years you have smoked", "pl": "Łączna liczba lat palenia"}, "type": "number_input", "min": 0.5, "max": 80 },
                 { "id": "smoking.start_age", "text": { "en": "At what age did you start smoking regularly?", "pl": "W jakim wieku zacząłeś/zaczęłaś palić regularnie?"}, "type": "number_input", "min": 5, "max": 99 },
@@ -727,6 +728,36 @@
           "type": "radio",
           "text": { "en": "Have you had a Polygenic Risk Score (PRS) test?", "pl": "Czy miałeś/aś test PRS (wielogenowy)?" },
           "options": ["Never", "Yes - Clinical", "Yes - Consumer", "Not sure"]
+        },
+        {
+          "id": "gen.prs_cancers_flagged",
+          "type": "checkbox_group",
+          "text": { "en": "For which cancer types did the report say your risk was higher than average?", "pl": "Dla jakich nowotworów w raporcie napisano, że Pana/Pani ryzyko jest wyższe niż przeciętne?" },
+          "options": [
+            { "id": "breast", "label": { "en": "Breast", "pl": "Pierś" } },
+            { "id": "colorectal", "label": { "en": "Colorectal", "pl": "Jelito grubym" } },
+            { "id": "prostate", "label": { "en": "Prostate", "pl": "Prostata" } },
+            { "id": "ovarian", "label": { "en": "Ovarian", "pl": "Jajnik" } },
+            { "id": "melanoma", "label": { "en": "Melanoma", "pl": "Czerniak" } },
+            { "id": "pancreatic", "label": { "en": "Pancreatic", "pl": "Trzustka" } },
+            { "id": "other", "label": { "en": "Other", "pl": "Inne" } },
+            { "id": "none_higher", "label": { "en": "None / No elevated risk", "pl": "Brak / Brak podwyższonego ryzyka" } }
+          ],
+          "exclusiveOptionId": "none_higher",
+          "dependsOn": { "questionId": "gen.prs_done", "value": ["Yes - Clinical", "Yes - Consumer"] }
+        },
+        {
+          "id": "gen.prs_overall_band",
+          "type": "radio",
+          "text": { "en": "Overall, how did the test describe your genetic risk for cancer?", "pl": "Ogólnie, jak test opisywał Pana/Pani genetyczne ryzyko nowotworów?" },
+          "options": [
+            { "value": "lower", "label": { "en": "Lower than average", "pl": "Niższe niż przeciętne" } },
+            { "value": "average", "label": { "en": "Average", "pl": "Przeciętne" } },
+            { "value": "higher", "label": { "en": "Higher than average", "pl": "Wyższe niż przeciętne" } },
+            { "value": "mixed", "label": { "en": "Mixed results", "pl": "Wyniki mieszane" } },
+            { "value": "not_sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
+          ],
+          "dependsOn": { "questionId": "gen.prs_done", "value": ["Yes - Clinical", "Yes - Consumer"] }
         },
         
         {

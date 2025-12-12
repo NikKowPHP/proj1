@@ -7,6 +7,7 @@ import { SearchableSelect, SearchableSelectOption } from '../ui/SearchableSelect
 import { Chip } from '../ui/chip';
 import { YearInput } from '../ui/YearInput';
 import { useLocale, useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 
 interface Symptom {
   id: string;
@@ -19,6 +20,7 @@ interface SymptomDetailsValue {
   onset_month?: string;
   severity?: number;
   frequency?: string;
+  progression?: string;
   associated_features?: string[];
   notes?: string;
 }
@@ -131,6 +133,30 @@ export const SymptomDetails = ({ selectedSymptoms, value, onChange, symptomOptio
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label>{t('symptomDetails.progressionLabel')}</Label>
+              <div className="flex space-x-2">
+                {[
+                  { val: 'Yes', label: t('symptomDetails.progressionYes') },
+                  { val: 'No', label: t('symptomDetails.progressionNo') }
+                ].map((opt) => (
+                  <button
+                    key={opt.val}
+                    type="button"
+                    onClick={() => handleDetailChange(symptom.id, 'progression', opt.val)}
+                    className={cn(
+                      "px-3 py-2 text-sm font-medium transition-colors border rounded-md flex-1",
+                      value[symptom.id]?.progression === opt.val
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground hover:bg-muted border-input"
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label>{t('symptomDetails.associatedFeatures')}</Label>
               <div className="flex flex-wrap gap-2">

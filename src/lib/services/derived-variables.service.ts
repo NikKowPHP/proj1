@@ -667,10 +667,13 @@ export const DerivedVariablesService = {
           // Adult Gate
           derived.adult_gate_ok = age >= 18;
           
-          // Age Map
-          if (age >= 18 && age <= 39) derived.age_band = "18-39";
-          else if (age >= 40 && age <= 49) derived.age_band = "40-49";
-          else if (age >= 50 && age <= 59) derived.age_band = "50-59";
+          // Age Map (granular 5-year bands for screening precision)
+          if (age >= 18 && age <= 29) derived.age_band = "18-29";
+          else if (age >= 30 && age <= 39) derived.age_band = "30-39";
+          else if (age >= 40 && age <= 44) derived.age_band = "40-44";
+          else if (age >= 45 && age <= 49) derived.age_band = "45-49";
+          else if (age >= 50 && age <= 54) derived.age_band = "50-54";
+          else if (age >= 55 && age <= 59) derived.age_band = "55-59";
           else if (age >= 60 && age <= 69) derived.age_band = "60-69";
           else if (age >= 70) derived.age_band = "70+";
       } else {
@@ -856,7 +859,44 @@ export const DerivedVariablesService = {
       const hasBarretts = illnesses.some((i: any) => i.id === 'barretts'); // Assuming ID 'barretts' if added to list
       // const hasImmunosuppression handled above
       
-      // IBD Duration check (need onset year)
+      // --- Personal Cancer History Flags (PDF Page 48, Table 5) - C-03 Fix ---
+      const personalCancerHistory = advanced.personal_cancer_history || [];
+
+      // ca.young_onset_breast_gyn: Breast/Gyn cancer diagnosed ≤ 45
+      // Used to flag potential hereditary risk patterns
+      const youngOnsetBreastGyn = personalCancerHistory.some((cancer: any) => {
+        const gynSites = ['breast', 'ovarian', 'endometrial', 'cervical', 'ovary', 'uterine'];
+        const isGynSite = gynSites.some(site => cancer.type?.toLowerCase().includes(site));
+        return isGynSite && cancer.age_at_dx !== undefined && cancer.age_at_dx <= 45;
+      });
+      derived['ca.young_onset_breast_gyn'] = youngOnsetBreastGyn;
+
+      // ca.chest_rt_lt30: Chest/mediastinal RT before age 30
+      // Increased breast and thyroid cancer risk for survivors
+      const chestRtLt30 = personalCancerHistory.some((cancer: any) => {
+        const hasRt = Array.isArray(cancer.treatments_modalities) && 
+                      cancer.treatments_modalities.includes('Radiotherapy');
+        const rtRegion = cancer.rt?.region;
+        const rtAge = cancer.rt?.age_first;
+        const isChestRt = rtRegion && (
+          rtRegion.toLowerCase().includes('chest') ||
+          rtRegion.toLowerCase().includes('breast') ||
+          rtRegion.toLowerCase().includes('mediastin') ||
+          rtRegion.toLowerCase().includes('thorax')
+        );
+        return hasRt && isChestRt && rtAge !== undefined && rtAge < 30;
+      });
+      derived['ca.chest_rt_lt30'] = chestRtLt30;
+
+      // ca.hsct_survivor: History of stem cell/bone marrow transplant
+      // Requires special vaccination schedule and surveillance for secondary cancers
+      const hsctSurvivor = personalCancerHistory.some((cancer: any) => {
+        const hsctType = cancer.hsct?.type;
+        return hsctType === 'autologous' || hsctType === 'allogeneic';
+      });
+      derived['ca.hsct_survivor'] = hsctSurvivor;
+
+      // --- HCC Surveillance Logic ---
       let ibdLongDuration = false;
       if (hasIbd) {
           const ibdEntry = illnesses.find((i: any) => i.id === 'ibd');

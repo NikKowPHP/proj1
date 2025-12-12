@@ -10,15 +10,15 @@ export const SafetyBanner = ({ answers }: SafetyBannerProps) => {
     const t = useTranslations('AssessmentPage');
 
     // Red Flag Symptoms IDs (based on PDF) mapped to HP codes from assessment-questions.json
-    // Hemoptysis: HP:0002860
+    // Hemoptysis: HP:0002105
     // Melena: HP:0002027
     // Hematuria: HP:0000132
     // Postmenopausal bleeding: HP:0000868
     // Breast lump: HP:0003002
     // Dysphagia: HP:0002015
-    // Unexplained weight loss: HP:0001824 (Corrected from previous HP:0004355)
+    // Unexplained weight loss: HP:0001824
     // Hoarseness: HP:0001609
-    // Persistent cough: HP:0002118
+    // Persistent cough: HP:0012735
     // Skin changes (mole): HP:0000989
     // Night sweats: HP:0030166
     // Bone pain: HP:0002653
@@ -26,9 +26,9 @@ export const SafetyBanner = ({ answers }: SafetyBannerProps) => {
     // Back pain with nerve symptoms: HP:0003418
 
     const redFlags = [
-        'HP:0002860', 'HP:0002027', 'HP:0000132', 'HP:0033840',
+        'HP:0002105', 'HP:0002027', 'HP:0000132', 'HP:0033840',
         'HP:0003002', 'HP:0002015', 'HP:0001824', 'HP:0001609',
-        'HP:0002118', 'HP:0000989', 'HP:0030166', 'HP:0002653',
+        'HP:0012735', 'HP:0000989', 'HP:0030166', 'HP:0002653',
         'HP:0001250', 'HP:0003418', 'HP:0000790', 'HP:0002573'
     ];
 
@@ -37,6 +37,7 @@ export const SafetyBanner = ({ answers }: SafetyBannerProps) => {
         'HP:0002015': { en: "Urgent: Endoscopy within 2 weeks recommended.", pl: "Pilne: Zalecana gastroskopia w ciągu 2 tygodni." },
         'HP:0000790': { en: "Urgent: Urology referral pathway recommended.", pl: "Pilne: Zalecana diagnostyka urologiczna." },
         'HP:0002105': { en: "Urgent: Chest assessment recommended.", pl: "Pilne: Zalecana diagnostyka klatki piersiowej." },
+        'HP:0012735': { en: "Urgent: Chest assessment for persistent cough recommended.", pl: "Pilne: Zalecana diagnostyka klatki piersiowej (kaszel >3 tyg.)." },
         'HP:0002573': { en: "Urgent: Colorectal pathway referral recommended.", pl: "Pilne: Zalecana diagnostyka w kierunku raka jelita grubego." },
         'HP:0001824': { en: "Urgent: Evaluation for unexplained weight loss recommended.", pl: "Pilne: Zalecana diagnostyka utraty masy ciała." },
     };

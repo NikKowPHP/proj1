@@ -38,9 +38,12 @@ const mapAgeToRange = (age?: number): string => {
     if (age === undefined) return "";
     if (age >= 18 && age <= 29) return "18-29";
     if (age >= 30 && age <= 39) return "30-39";
-    if (age >= 40 && age <= 49) return "40-49";
-    if (age >= 50 && age <= 59) return "50-59";
-    if (age >= 60) return "60+";
+    if (age >= 40 && age <= 44) return "40-44";
+    if (age >= 45 && age <= 49) return "45-49";
+    if (age >= 50 && age <= 54) return "50-54";
+    if (age >= 55 && age <= 59) return "55-59";
+    if (age >= 60 && age <= 69) return "60-69";
+    if (age >= 70) return "70+";
     return "";
 }
 

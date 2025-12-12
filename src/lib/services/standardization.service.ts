@@ -245,6 +245,15 @@ export const StandardizationService = {
         }
       });
       if (Object.keys(sexualHealth).length > 0) {
+        // Extract oral sex flag for derived variables (C-02 fix)
+        // The oral HPV cancer exposure logic needs this as a simple Yes/No field
+        if (Array.isArray(sexualHealth['sexhx.sex_sites_ever']) && 
+            sexualHealth['sexhx.sex_sites_ever'].includes('Oral sex')) {
+          sexualHealth['sex_oral'] = 'Yes';
+        } else if (sexualHealth['sexhx.sex_sites_ever'] !== undefined) {
+          sexualHealth['sex_oral'] = 'No';
+        }
+        
         standardized.advanced.sexual_health = sexualHealth;
       }
 

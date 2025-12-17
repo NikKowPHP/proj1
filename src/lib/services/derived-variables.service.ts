@@ -3,6 +3,33 @@ import { differenceInYears } from 'date-fns';
 import clinicalConfig from '@/lib/clinical-config.json';
 import { occupationalExposuresMap } from '@/lib/mappings/occupational-exposures.map';
 
+const VERSION_TAG = "v2025.1";
+
+// Red flag symptoms for triage
+const RED_FLAGS: Record<string, string> = {
+    'HP:0033840': 'Urgent: Postmenopausal bleeding',
+    'HP:0002027': 'Emergency: Severe abdominal pain',
+    'HP:0002015': 'Urgent: Dysphagia',
+    'HP:0000790': 'Urgent: Visible Hematuria',
+    'HP:0002105': 'Urgent: Hemoptysis',
+    'HP:0012735': 'Urgent: Persistent cough',
+    'HP:0002573': 'Urgent: Rectal bleeding',
+    'HP:0002249': 'Urgent: Melena',
+    'HP:0001824': 'Urgent: Unexplained weight loss',
+    'HP:0030166': 'Urgent: Night sweats',
+    'HP:0002653': 'Urgent: Bone pain',
+    'HP:0003418': 'Urgent: Back pain (nerve)',
+    'HP:0002315': 'Urgent: New headache',
+    'HP:0001609': 'Urgent: Hoarseness',
+    'onkn.symptom.indigestion_alarm': 'Urgent: Indigestion + alarm',
+    'HP:0001031': 'Urgent: Changing mole',
+    'onkn.symptom.skin_ulcer': 'Urgent: Non-healing ulcer',
+    'HP:0032408': 'Urgent: Breast lump',
+    'HP:0001250': 'Emergency: Seizures',
+    'HP:0001324': 'Emergency: Focal weakness',
+    'onkn.symptom.neuro_other': 'Urgent: Neuro changes'
+};
+
 /**
  * Calculates Body Mass Index (BMI).
  * @param height - Height in cm.
@@ -420,13 +447,15 @@ function calculateSyndromeFlags(familyHistory?: any[]): Record<string, boolean> 
     // 3 relatives with Lynch-associated cancer on SAME side of family
     const lynchCancers = ['colorectal', 'endometrial', 'ovarian', 'stomach', 'pancreatic', 'biliary', 'urinary', 'brain', 'skin', 'small intestine'];
     
+    // Helper: Nuclear relatives (Siblings/Children) contribute to BOTH sides logic in this simplified view
+    // because we don't know which parent they share the risk with, but they definitely belong to the cluster.
+    const isNuclear = (r: any) => ['Sister', 'Brother', 'Daughter', 'Son'].includes(r.relation);
+
     // Group by side (Maternal, Paternal)
-    const maternalLynch = relatives.filter(r => r.side === 'Maternal' && lynchCancers.some(c => r.cancer.includes(c)));
-    const paternalLynch = relatives.filter(r => r.side === 'Paternal' && lynchCancers.some(c => r.cancer.includes(c)));
+    // FIX: Include Nuclear relatives in side counts to capture "Mother + Sister" clusters
+    const maternalLynch = relatives.filter(r => (r.side === 'Maternal' || isNuclear(r)) && lynchCancers.some(c => r.cancer.includes(c)));
+    const paternalLynch = relatives.filter(r => (r.side === 'Paternal' || isNuclear(r)) && lynchCancers.some(c => r.cancer.includes(c)));
     
-    // Also consider N/A (siblings/children) - they contribute to both or need context. 
-    // For simplicity in this derived logic without full pedigree, we check if ANY side has >= 3 OR total >= 3 if side unknown.
-    // Ideally, we strictly check sides.
     const isLynch = maternalLynch.length >= 3 || paternalLynch.length >= 3;
     
     return {
@@ -482,8 +511,10 @@ function calculateOccupationalFlags(history?: any[]): Record<string, boolean> {
         const years = job.years || 0;
         
         // 1. Lung Risk
+        // FIX: Added check for current exposure
         const hasLungCarcinogen = lungCarcinogens.some(c => possibleHazards.includes(c));
-        if (hasLungCarcinogen && years >= config.high_risk_years_min) {
+        const isCurrent = job.current === 'Yes';
+        if (hasLungCarcinogen && (years >= config.high_risk_years_min || isCurrent)) {
             lungRisk = true;
         }
         
@@ -582,7 +613,7 @@ function calculateHpvExposureBand(sexualHealth: any): string {
     // Medium
     if (
         ['2-4', '5-9'].includes(lifetimePartners) ||
-        ['2-3'].includes(recentPartners) ||
+        ['2-3', '4-5'].includes(recentPartners) ||
         (ageFirstSex && ageFirstSex < 18)
     ) {
         return 'Medium';
@@ -635,7 +666,23 @@ function calculateGeneticsFlags(genetics: any): Record<string, boolean> {
     const hasModerate = hasMatch(moderatePenetranceGenes);
     
     const hasLynch = hasMatch(lynchGenes) || userGenes.some((g:string) => g.toLowerCase().includes('lynch'));
-    const hasPolyposis = hasMatch(polyposisGenes);
+    
+    // FIX: Polyposis logic must check for Biallelic MUTYH
+    // If MUTYH is present, it is only High Risk (Polyposis) if biallelic = yes.
+    // If monoallelic/carrier, it falls to Moderate (covered by hasModerate if MUTYH is in moderate list, or we handle here).
+    
+    // 1. Check other polyposis genes (APC, etc) normally
+    const otherPolyposisGenes = polyposisGenes.filter((g: string) => g !== 'MUTYH');
+    let hasPolyposis = hasMatch(otherPolyposisGenes);
+
+    // 2. Check MUTYH specifically
+    if (userGenes.includes('MUTYH')) {
+        if (genetics.mutyh_biallelic === 'yes_biallelic') {
+            hasPolyposis = true;
+        }
+        // Note: If monoallelic, it should ideally trigger hasModerate. 
+        // MUTYH is often in moderate list in config, so hasModerate might already be true.
+    }
     
     // PRS Elevated
     // Logic: true if gen.prs_done=Yes AND (any cancer flagged OR band in {higher, mixed})
@@ -685,6 +732,39 @@ function calculateFamilySyndromes(familyHistory?: any[]): string[] {
 }
 
 /**
+ * Calculates symptom triage hints based on red flag symptoms.
+ * Moved from frontend SafetyBanner to backend for AI context.
+ */
+function calculateSymptomTriage(symptoms: string[]): Record<string, string | null> {
+    if (!Array.isArray(symptoms)) return {};
+    
+    const triage: Record<string, string | null> = {};
+    
+    // Pain Triage
+    if (symptoms.includes('HP:0002653') || symptoms.includes('HP:0003418') || symptoms.includes('HP:0002315')) {
+        triage['symptoms.pain.triage_hint'] = "Pain red flags present (Bone/Back/Headache)";
+    }
+
+    // Bleeding Triage
+    if (symptoms.some(s => ['HP:0002105', 'HP:0002573', 'HP:0002249', 'HP:0033840', 'HP:0000790'].includes(s))) {
+        triage['symptoms.bleeding.triage_hint'] = "Bleeding red flags present";
+    }
+
+    // Neuro Triage
+    if (symptoms.some(s => ['HP:0001250', 'HP:0001324', 'onkn.symptom.neuro_other'].includes(s))) {
+        triage['symptoms.neuro.triage_hint'] = "Neurological red flags present";
+    }
+
+    // Generic list of red flags for AI context
+    const activeRedFlags = symptoms.filter(s => RED_FLAGS[s]).map(s => RED_FLAGS[s]);
+    if (activeRedFlags.length > 0) {
+        triage['symptoms.active_red_flags'] = activeRedFlags.join('; ');
+    }
+
+    return triage;
+}
+
+/**
  * A service to calculate derived health variables from standardized user data.
  */
 export const DerivedVariablesService = {
@@ -694,7 +774,12 @@ export const DerivedVariablesService = {
    * @returns An object containing the derived variables.
    */
   calculateAll: (standardizedData: Record<string, any>): Record<string, any> => {
-    const derived: Record<string, any> = {};
+    const derived: Record<string, any> = {
+        meta: {
+            version: VERSION_TAG,
+            generated: new Date().toISOString()
+        }
+    };
     const thresholds = clinicalConfig.screening_thresholds;
 
     try {
@@ -734,6 +819,11 @@ export const DerivedVariablesService = {
         derived.flags = derived.flags || {};
         derived.flags.bmi_obesity = bmi >= 30;
       }
+      
+      // Calculate Symptom Triage (moved from frontend)
+      const symptoms = core.symptoms || [];
+      const symptomTriage = calculateSymptomTriage(symptoms);
+      Object.assign(derived, symptomTriage);
       
       // Diet Calcs
       if (typeof core.diet?.red_meat === 'number') {
@@ -844,9 +934,9 @@ export const DerivedVariablesService = {
 
       // High Risk Anal Cancer Group (PDF Page 14)
       // Rule: (MSM + Age >= 35) OR HIV OR Transplant OR Immunosuppression OR Receptive Anal Sex OR HPV Precancer Anus
-      const conditions = standardizedData.core?.conditions || []; 
-      const hasHiv = conditions.includes('hiv');
-      const hasTransplant = conditions.includes('transplant');
+      const illnesses = advanced.illnesses || []; 
+      const hasHiv = illnesses.some((i: any) => i.id === 'hiv');
+      const hasTransplant = illnesses.some((i: any) => i.id === 'transplant');
       
       const meds = advanced.medications_iatrogenic || {};
       const hasImmunosuppression = meds.immunosuppression_now === 'Yes';
@@ -874,12 +964,13 @@ export const DerivedVariablesService = {
       derived['sex.hpv_exposure_band'] = calculateHpvExposureBand(sexHistory);
       
       // Oral HPV Cancer Exposure (PDF Page 14)
+      // [FIXED]: Expanded criteria for oral exposure (Medium + High tiers)
       const sexOral = sexHistory['sex_oral'];
       const lifetimePartners = sexHistory['sexhx.lifetime_partners_cat'];
       const recentPartners = sexHistory['sexhx.partners_12m_cat'];
       if (sexOral === 'Yes' && (
-          ['10-19', '20+'].includes(lifetimePartners) || 
-          ['6+'].includes(recentPartners)
+          ['5-9', '10-19', '20+', '20 or more'].includes(lifetimePartners) || 
+          ['2-3', '4-5', '6+', '6 or more'].includes(recentPartners)
       )) {
           derived['sex.oral_hpvcancer_exposure'] = true;
       } else {
@@ -888,14 +979,15 @@ export const DerivedVariablesService = {
       
       // Cervix HPV Persistent Pattern (PDF Page 14)
       // Rule: derived.sex.hpv_exposure_band = Higher AND (sexhx.hpv_precancer_history includes "Cervix" OR cond.hpv.status ∈ {Past, Current})
+      // [FIXED]: Use organ inventory instead of sex_at_birth to account for hysterectomy
       const hpvPrecancerHistory = sexHistory['sexhx.hpv_precancer_history'] || [];
       const hpvPrecancerCervix = Array.isArray(hpvPrecancerHistory) && hpvPrecancerHistory.includes('Cervix');
       
-      const illnesses = advanced.illnesses || [];
       const hpvStatus = illnesses.find((i: any) => i.id === 'hpv');
       const hpvPersistent = hpvStatus && (hpvStatus.status === 'Past' || hpvStatus.status === 'Current');
       
-      if (core.sex_at_birth === 'Female' && derived['sex.hpv_exposure_band'] === 'Higher' && (hpvPrecancerCervix || hpvPersistent)) {
+      const hasCervix = derived.organ_inventory?.has_cervix;
+      if (hasCervix && derived['sex.hpv_exposure_band'] === 'Higher' && (hpvPrecancerCervix || hpvPersistent)) {
           derived['sex.cervix_hpv_persistent_pattern'] = true;
       } else {
           derived['sex.cervix_hpv_persistent_pattern'] = false;
@@ -959,7 +1051,7 @@ export const DerivedVariablesService = {
       derived['hcc.surveillance_candidate'] = hasCirrhosis || hasActiveHbv;
       derived['crc.ibd_surveillance'] = (hasIbd && ibdLongDuration) || hasPsc;
       derived['barrett.surveillance'] = hasBarretts;
-      derived['skin.lymphoma_highrisk'] = hasImmunosuppression;
+      derived['skin.lymphoma_highrisk'] = hasImmunosuppression || hasTransplant;
       derived['hpv_related.vigilance'] = hasHiv || hasImmunosuppression; // Simplified vigilance flag
 
       // --- Environmental Flags (PDF Page 57) ---
@@ -987,7 +1079,9 @@ export const DerivedVariablesService = {
       
       const pesticideFreq = Number(env['env.pesticide.use_freq_year']);
       const pesticideYears = Number(env['env.pesticide.years_use']);
-      derived['env.pesticide_intensive'] = !isNaN(pesticideFreq) && !isNaN(pesticideYears) && pesticideFreq >= 12 && pesticideYears >= 5;
+      // [FIXED]: Added check for protection level 'Almost always' to mitigate flag
+      const pesticideProtection = env['env.pesticide.protection'];
+      derived['env.pesticide_intensive'] = !isNaN(pesticideFreq) && !isNaN(pesticideYears) && pesticideFreq >= 12 && pesticideYears >= 5 && pesticideProtection !== 'Almost always';
       derived['env.uv_high'] = sunburnChild >= 3 || sunburnAdult >= 5 || isSunbedUser;
       
       // --- Screening Candidate Flags ---
@@ -1018,7 +1112,6 @@ export const DerivedVariablesService = {
        derived['screen.skin_check_recommended'] = derived['skin.lymphoma_highrisk'] || derived['env.uv_high'] || derived['occ.skin_uv_highrisk'] || hasSkinSymptom || hasBiopsyHistory;
 
       const ageBand = derived.age_band || '';
-      const hasCervix = derived.organ_inventory?.has_cervix;
       const isBreastEligible = core.sex_at_birth === 'Female';
 
       const lastPapYear = screening['screen.cervix.last_year'] ?? screening['screen.cervical.year'];

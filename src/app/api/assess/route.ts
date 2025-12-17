@@ -6,7 +6,7 @@ import { z } from "zod";
 import { generatePlan } from "@/lib/services/guideline-engine.service";
 import { StandardizationService } from "@/lib/services/standardization.service";
 import { DerivedVariablesService } from "@/lib/services/derived-variables.service";
-import { del } from '@vercel/blob';
+import { FhirMapperService } from "@/lib/services/fhir-mapper.service";
 
 // A flexible schema to accept the complex, potentially nested data from the new form.
 // Detailed validation is handled by the standardization and derived variable services.
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let reportUrlToDelete: string | undefined;
+
 
   try {
     const body = await request.json();
@@ -79,7 +79,6 @@ export async function POST(request: NextRequest) {
     }
     
     const { answers, locale } = parsedRequest.data;
-    reportUrlToDelete = answers.genetic_report_upload as string | undefined;
     logger.info("[API:assess] Raw answers successfully parsed.");
 
     // 1. Standardize the raw answers into a structured payload
@@ -99,15 +98,20 @@ export async function POST(request: NextRequest) {
       `[API:assess] Guideline engine completed. Found ${guidelinePlan.screenings.length} screenings, ${guidelinePlan.lifestyle.length} lifestyle tips, ${guidelinePlan.topicsForDoctor.length} topics.`,
     );
 
-    // 4. Construct the final envelope for the AI
+    // 4. Generate FHIR Bundle for interoperability
+    logger.info("[API:assess] Generating FHIR R4 Bundle...");
+    const fhirBundle = FhirMapperService.toFhirBundle(answers, standardizedPayload, derivedVariables);
+    logger.info(`[API:assess] FHIR Bundle generated with ${fhirBundle.entry.length} resources.`);
+
+    // 5. Construct the final envelope for the AI
     const payloadForAI = {
       standardized_data: standardizedPayload,
       derived_variables: derivedVariables,
       guideline_plan: guidelinePlan,
-      genetic_report_ref: reportUrlToDelete
+      fhir_data: fhirBundle,
     };
 
-    // 5. Get AI-powered explanation for the generated plan
+    // 6. Get AI-powered explanation for the generated plan
     logger.info(`[API:assess] Requesting AI explanation in locale: ${locale}`);
     const aiService = getAIService();
     const { result, serviceUsed } =
@@ -116,7 +120,7 @@ export async function POST(request: NextRequest) {
       `[API:assess] AI explanation received from service: ${serviceUsed}.`,
     );
 
-    // 6. Validate the AI's explanation response
+    // 7. Validate the AI's explanation response
     logger.info("[API:assess] Validating AI response structure...");
     const validatedResult = aiResponseSchema.safeParse(result);
     if (!validatedResult.success) {
@@ -148,15 +152,6 @@ export async function POST(request: NextRequest) {
       { error: "Failed to process plan" },
       { status: 500 },
     );
-  } finally {
-     if (reportUrlToDelete) {
-        try {
-            await del(reportUrlToDelete);
-            logger.info(`[API:assess] Successfully deleted temporary report: ${reportUrlToDelete}`);
-        } catch (delError) {
-            logger.error(`[API:assess] FAILED to delete temporary report: ${reportUrlToDelete}`, { delError });
-        }
-    }
   }
 }
       

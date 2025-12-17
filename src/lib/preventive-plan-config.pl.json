@@ -107,6 +107,27 @@
       "conditions": [
         { "questionId": "wcrf_score.compliance", "operator": "equals", "value": "Low" }
       ]
+    },
+    {
+      "actionId": "DISCUSS_RADON_MITIGATION",
+      "category": "lifestyle",
+      "conditions": [
+        { "questionId": "env.radon_high", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "DISCUSS_UV_PROTECTION",
+      "category": "lifestyle",
+      "conditions": [
+        { "questionId": "env.uv_high", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "DISCUSS_INDOOR_AIR_QUALITY",
+      "category": "lifestyle",
+      "conditions": [
+        { "questionId": "env.solidfuel_longterm", "operator": "equals", "value": true }
+      ]
     }
   ]
 }

@@ -70,6 +70,9 @@ Based on the input data, generate a response in the following single JSON format
 - **DISCUSS_DIET_AND_EXERCISE**: Suggest discussing manageable changes to improve well-being, especially if their reported activity level is low or 'derived.bmi' is elevated.
 - **GENETIC_COUNSELING_REFERRAL**: Explain that because their genetic test results indicated a variant in a significant gene (e.g., BRCA1/2, MLH1), a discussion with a genetic counselor is highly recommended to understand the implications for them and their family.
 - **DERMATOLOGY_CONSULT_BENZENE**: Explain that because they reported occupational exposure to benzene, which can be associated with skin-related health issues, a discussion with a dermatologist for a baseline skin check is a sensible precaution.
+- **DISCUSS_RADON_MITIGATION**: Explain that high radon levels in the home are a risk factor for lung health. Suggest discussing testing or mitigation strategies (like ventilation) with a professional.
+- **DISCUSS_UV_PROTECTION**: Mention that due to reported high sun or sunbed exposure, regular skin checks and sun protection habits are important for preventing skin issues.
+- **DISCUSS_INDOOR_AIR_QUALITY**: Note that long-term use of solid fuels (like coal/wood) indoors can affect lung health. Suggest discussing symptoms like cough with a doctor and ensuring good ventilation.
 
 Now, generate the structured explanation based on the provided health payload.
 `;

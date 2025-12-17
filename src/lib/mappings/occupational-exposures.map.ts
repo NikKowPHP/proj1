@@ -24,5 +24,6 @@ export const occupationalExposuresMap: Record<string, string> = {
   // Aliases or grouped items from PDF
   'pahs': '419799009', // Exposure to soot (event) - Mapping PAHs to Soot/Coal Tar code
   'rubber_chem': '419137000', // Mapping rubber chemicals to rubber fume
-  'painter': '66238002' // Painter (occupation)
+  'painter': '66238002', // Painter (occupation)
+  'hairdresser': '160920005' // Hairdresser (occupation)
 };

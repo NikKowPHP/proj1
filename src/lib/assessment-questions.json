@@ -839,6 +839,15 @@
       "title": { "en": "Genetics & Exposures", "pl": "Genetyka i Narażenia" },
       "questions": [
         {
+          "id": "consent.genetics",
+          "type": "consent_checkbox",
+          "text": { 
+            "en": "I give specific consent to process my genetic data for this assessment.", 
+            "pl": "Wyrażam szczególną zgodę na przetwarzanie moich danych genetycznych w celu tej oceny." 
+          },
+          "validation": { "required": true }
+        },
+        {
           "id": "gen.testing_ever",
           "type": "radio",
           "text": { "en": "Have you ever had a genetic test for cancer risk?", "pl": "Czy miałeś/aś badania genetyczne pod kątem raka?" },

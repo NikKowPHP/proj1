@@ -361,7 +361,7 @@ export const StandardizationService = {
           cigs_per_day: Number(answers['smoking.intensity']) || undefined,
           intensity_unit: answers['smoking.intensity_unit'],
           years: Number(answers['smoking.years_smoked']) || undefined,
-          quit_date: answers['smoking.quit_date'],
+          quit_date: parseYear(answers['smoking.quit_date'] ? String(answers['smoking.quit_date']).split('-')[0] : undefined),
           other_tobacco: safeJsonParse(answers['smoking.other_tobacco_smoked']),
           vape: {
               status: answers['vape.status'],

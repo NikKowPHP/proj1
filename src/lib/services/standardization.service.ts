@@ -156,7 +156,7 @@ export const StandardizationService = {
                   details.status = answers['cond.hcv.status'];
                   details.svr12 = answers['cond.hcv.svr12'];
               }
-              if (illnessId === 'cirrhosis') details.etiology = answers['cond.cirrhosis.etiology'];
+              if (illnessId === 'cirrhosis') details.etiology = answers['cond.cirr.etiology'];
               if (illnessId === 'ibd') {
                   details.type = answers['cond.ibd.type'];
                   details.extent = answers['cond.ibd.extent'];
@@ -232,6 +232,9 @@ export const StandardizationService = {
         'imm.pneumo.ever',
         'imm.zoster.ever',
         'imm.zoster.vaccine_type',
+        'screen.skin.biopsy_ever',
+        'screen.other.list',
+        'imm.other_list',
       ];
 
       rawScreeningKeys.forEach((key) => {
@@ -239,6 +242,19 @@ export const StandardizationService = {
           screeningImmunization[key] = answers[key];
         }
       });
+
+      // Map screen.summary to legacy ever flags
+      const screenSummary = safeJsonParse(answers['screen.summary']);
+      if (screenSummary.length > 0) {
+        if (screenSummary.includes('Colonoscopy')) screeningImmunization['screen.colon.ever'] = 'Yes';
+        if (screenSummary.includes('Mammogram')) screeningImmunization['screen.mammo.ever'] = 'Yes';
+        if (screenSummary.includes('Pap/HPV')) screeningImmunization['screen.pap.ever'] = 'Yes';
+        if (screenSummary.includes('PSA')) screeningImmunization['screen.psa.ever'] = 'Yes';
+        if (screenSummary.includes('Lung CT')) screeningImmunization['screen.lung.ever'] = 'Yes';
+        if (screenSummary.includes('Skin Exam')) screeningImmunization['screen.skin.ever'] = 'Yes';
+        if (screenSummary.includes('Liver Ultrasound')) screeningImmunization['screen.liver.ever'] = 'Yes';
+        if (screenSummary.includes('Upper Endoscopy')) screeningImmunization['screen.ued.ever'] = 'Yes';
+      }
 
       // Normalize key mismatches between questionnaire and downstream logic
       setScreeningYear('screen.colon.year', ['screen.colon.year', 'screen.crc.last_year']);

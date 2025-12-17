@@ -30,6 +30,7 @@ export const SafetyBanner = ({ answers, symptomOptions = [] }: SafetyBannerProps
         'HP:0001609': { level: 'urgent', en: "Urgent: ENT evaluation for persistent hoarseness.", pl: "Pilne: Ocena Laryngologiczna (chrypka)." },
         'onkn.symptom.indigestion_alarm': { level: 'urgent', en: "Urgent: Gastroscopy for indigestion with alarm features.", pl: "Pilne: Gastroskopia (niestrawność z objawami alarmowymi)." },
         'HP:0001031': { level: 'urgent', en: "Urgent: Dermatology evaluation for changing mole.", pl: "Pilne: Ocena dermatologiczna." },
+        'onkn.symptom.skin_ulcer': { level: 'urgent', en: "Urgent: Dermatology evaluation for non-healing skin ulcer.", pl: "Pilne: Ocena dermatologiczna." },
         'HP:0032408': { level: 'urgent', en: "Urgent: Breast clinic referral recommended.", pl: "Pilne: Skierowanie do poradni chorób piersi." },
         'HP:0001250': { level: 'emergency', en: "Emergency: New onset seizures require immediate care.", pl: "Nagłe: Nowe napady drgawkowe wymagają natychmiastowej pomocy." },
         'HP:0001324': { level: 'emergency', en: "Emergency: Acute focal weakness requires immediate stroke assessment.", pl: "Nagłe: Ogniskowe osłabienie wymaga natychmiastowej oceny (udar)." },

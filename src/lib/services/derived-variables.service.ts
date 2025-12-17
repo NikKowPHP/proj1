@@ -1007,11 +1007,15 @@ export const DerivedVariablesService = {
       // Prostate: Age 50+ Male
       derived['screen.prostate_discuss'] = (core.sex_at_birth === 'Male' && derived.age_years >= thresholds.prostate_age_min);
       
-      // Skin: High risk factors
-      derived['screen.skin_check_recommended'] = derived['skin.lymphoma_highrisk'] || derived['env.uv_high'] || derived['occ.skin_uv_highrisk'];
-
       // --- Screening Due Flags ---
       const screening = advanced.screening_immunization || {};
+
+      // Skin: High risk factors
+       const skinSymptoms = ['HP:0001031', 'onkn.symptom.skin_ulcer'];
+       const hasSkinSymptom = standardizedData.core?.symptoms?.some((s: string) => skinSymptoms.includes(s));
+       const hasBiopsyHistory = screening['screen.skin.biopsy_ever'] === 'Yes';
+       
+       derived['screen.skin_check_recommended'] = derived['skin.lymphoma_highrisk'] || derived['env.uv_high'] || derived['occ.skin_uv_highrisk'] || hasSkinSymptom || hasBiopsyHistory;
 
       const ageBand = derived.age_band || '';
       const hasCervix = derived.organ_inventory?.has_cervix;
@@ -1058,8 +1062,21 @@ export const DerivedVariablesService = {
       derived['imm.hbv_complete'] = imm['imm.hbv.completed'] === 'Yes';
       derived['imm.flu_due'] = imm['imm.flu.last_season'] !== 'Yes';
       derived['imm.covid_booster_due'] = imm['imm.covid.doses'] !== '4+'; // Simplified logic
-      derived['imm.pneumo_candidate'] = derived.age_years >= 65 || core.smoking_status === 'Current'; // Example criteria
+      
+      const chronicConditions = illnesses.map((i: any) => i.id);
+      const pneumoRiskConditions = [
+          'cond.copd', 'diabetes', 'cirrhosis', 'hiv', 
+          'transplant', 'meds.immunosupp.current' // Approximation
+      ];
+      // Note: 'meds.immunosupp.current' is dealt with in hasImmunosuppression above, but checking illness list or meds
+      const hasPneumoRiskCondition = pneumoRiskConditions.some(c => chronicConditions.includes(c)) || hasImmunosuppression || (illnesses.some((i:any) => i.id === 'transplant'));
+
+      derived['imm.pneumo_candidate'] = derived.age_years >= 65 || core.smoking_status === 'Current' || hasPneumoRiskCondition;
       derived['imm.zoster_candidate'] = derived.age_years >= 50;
+      
+      // Sexual Health - Multiple Partners
+      const partners12m = sexHistory['sexhx.partners_12m_cat'];
+      derived['sex.multiple_partners_12m'] = ['2-3', '4-5', '6 or more', '6+'].includes(partners12m);
 
       // Tetanus Booster calculation
       const tetanusYear = imm['imm.td_tdap.year_last'];

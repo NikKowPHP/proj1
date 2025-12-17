@@ -3,12 +3,14 @@ import React from "react";
 import { Checkbox } from "./checkbox";
 import { Label } from "./label";
 import { cn } from "@/lib/utils";
+import { isQuestionVisible } from "@/lib/utils/question-visibility";
 
 export interface CheckboxOption {
   id: string;
   label: string;
   category?: string;
   red_flag?: boolean;
+  dependsOn?: any;
 }
 
 interface CheckboxGroupProps {
@@ -18,6 +20,7 @@ interface CheckboxGroupProps {
   className?: string;
   exclusiveOption?: string; // e.g., 'none'
   idPrefix?: string;
+  answers?: Record<string, any>;
 }
 
 export const CheckboxGroup = ({
@@ -27,7 +30,15 @@ export const CheckboxGroup = ({
   className,
   exclusiveOption,
   idPrefix,
+  answers,
 }: CheckboxGroupProps) => {
+
+  const visibleOptions = options.filter(option => {
+    if (option.dependsOn && answers) {
+      return isQuestionVisible(option, answers);
+    }
+    return true;
+  });
   const handleCheckedChange = (checked: boolean, optionId: string) => {
     let newValue: string[];
 
@@ -53,7 +64,7 @@ export const CheckboxGroup = ({
   };
 
   // Group options by category
-  const groupedOptions = options.reduce((acc, option) => {
+  const groupedOptions = visibleOptions.reduce((acc, option) => {
     const category = option.category || "Other";
     if (!acc[category]) {
       acc[category] = [];
@@ -65,14 +76,14 @@ export const CheckboxGroup = ({
   const categories = Object.keys(groupedOptions).sort();
   // If no categories (everything is "Other" and original options didn't have category), 
   // revert to simple list to avoid "Other" header unless explicitly mixed.
-  const hasCategories = options.some(o => !!o.category);
+  const hasCategories = visibleOptions.some(o => !!o.category);
 
   const getUniqueId = (optionId: string) => idPrefix ? `${idPrefix}-${optionId}` : optionId;
 
   if (!hasCategories) {
     return (
       <div className={cn("flex flex-wrap gap-2", className)}>
-        {options.map((option) => {
+        {visibleOptions.map((option) => {
           const isSelected = value.includes(option.id);
           const uniqueId = getUniqueId(option.id);
           return (

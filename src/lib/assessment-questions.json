@@ -15,8 +15,8 @@
         },
         {
           "id": "dob",
-          "type": "date_input",
-          "text": { "en": "Date of birth", "pl": "Data urodzenia" },
+          "type": "year_input",
+          "text": { "en": "Year of birth", "pl": "Rok urodzenia" },
           "validation": { "required": true, "message": { "en": "Required for age calculation.", "pl": "Wymagane do obliczenia wieku." } }
         },
         {
@@ -368,7 +368,7 @@
             { "id": "HP:0002015", "label": { "en": "Difficulty swallowing (dysphagia)", "pl": "Trudności w połykaniu (dysfagia)" }, "red_flag": true, "category": "Gastrointestinal (GI)" },
             { "id": "onkn.symptom.indigestion_alarm", "label": { "en": "Indigestion with alarm features", "pl": "Niestrawność z objawami alarmowymi" }, "red_flag": true, "category": "Gastrointestinal (GI)" },
             { "id": "HP:0001031", "label": { "en": "Changing mole", "pl": "Zmieniające się znamię" }, "red_flag": true, "category": "Skin / mouth" },
-            { "id": "onkn.symptom.skin_ulcer", "label": { "en": "Non-healing skin ulcer/lesion", "pl": "Niegojące się owrzodzenie/zmiana skórna" }, "category": "Skin / mouth" },
+            { "id": "onkn.symptom.skin_ulcer", "label": { "en": "Non-healing skin ulcer/lesion", "pl": "Niegojące się owrzodzenie/zmiana skórna" }, "red_flag": true, "category": "Skin / mouth" },
             { "id": "HP:0000155", "label": { "en": "Persistent mouth ulcer", "pl": "Przewlekłe owrzodzenie jamy ustnej" }, "category": "Skin / mouth" },
             { "id": "HP:0011107", "label": { "en": "Oral white patch (leukoplakia)", "pl": "Biała plama w jamie ustnej (leukoplakia)" }, "category": "Skin / mouth" },
             { "id": "HP:0032408", "label": { "en": "New breast lump or change", "pl": "Nowy guzek w piersi lub zmiana" }, "red_flag": true, "category": "Breast or testicular changes" },
@@ -426,6 +426,13 @@
           "id": "ca.active_treatment_now",
           "type": "radio",
           "text": { "en": "Currently in cancer treatment?", "pl": "Obecnie w trakcie leczenia?" },
+          "options": [{"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}],
+          "dependsOn": { "questionId": "ca.any_history", "value": "Yes" }
+        },
+        {
+          "id": "ca.current_followup",
+          "type": "radio",
+          "text": { "en": "Are you still under regular follow-up for any past cancer?", "pl": "Czy nadal jesteś pod stałą kontrolą onkologiczną?" },
           "options": [{"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}],
           "dependsOn": { "questionId": "ca.any_history", "value": "Yes" }
         },
@@ -519,7 +526,7 @@
             { "id": "HP:0002015", "label": { "en": "Difficulty swallowing (dysphagia)", "pl": "Trudności w połykaniu (dysfagia)" }, "red_flag": true, "category": "Gastrointestinal (GI)" },
             { "id": "onkn.symptom.indigestion_alarm", "label": { "en": "Indigestion with alarm features", "pl": "Niestrawność z objawami alarmowymi" }, "red_flag": true, "category": "Gastrointestinal (GI)" },
             { "id": "HP:0001031", "label": { "en": "Changing mole", "pl": "Zmieniające się znamię" }, "red_flag": true, "category": "Skin / mouth" },
-            { "id": "onkn.symptom.skin_ulcer", "label": { "en": "Non-healing skin ulcer/lesion", "pl": "Niegojące się owrzodzenie/zmiana skórna" }, "category": "Skin / mouth" },
+            { "id": "onkn.symptom.skin_ulcer", "label": { "en": "Non-healing skin ulcer/lesion", "pl": "Niegojące się owrzodzenie/zmiana skórna" }, "red_flag": true, "category": "Skin / mouth" },
             { "id": "HP:0000155", "label": { "en": "Persistent mouth ulcer", "pl": "Przewlekłe owrzodzenie jamy ustnej" }, "category": "Skin / mouth" },
             { "id": "HP:0011107", "label": { "en": "Oral white patch (leukoplakia)", "pl": "Biała plama w jamie ustnej (leukoplakia)" }, "category": "Skin / mouth" },
             { "id": "HP:0032408", "label": { "en": "New breast lump or change", "pl": "Nowy guzek w piersi lub zmiana" }, "red_flag": true, "category": "Breast or testicular changes" },
@@ -576,7 +583,7 @@
 
 
 
-                { "id": "cond.cirrhosis.etiology", "text": {"en": "Main cause", "pl": "Główna przyczyna"}, "type": "select", "options": [
+                { "id": "cond.cirr.etiology", "text": {"en": "Main cause", "pl": "Główna przyczyna"}, "type": "select", "options": [
                   { "value": "Alcohol", "label": { "en": "Alcohol", "pl": "Alkohol" } },
                   { "value": "Viral", "label": { "en": "Viral", "pl": "Wirusowa" } },
                   { "value": "NASH", "label": { "en": "NASH", "pl": "NASH" } },
@@ -694,6 +701,7 @@
                   { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
                   { "value": "No", "label": { "en": "No", "pl": "Nie" } }
                 ], "dependsOn": {"questionId": "cond.summary", "value": true} },
+                { "id": "meds.immunosupp.start_year", "text": {"en": "Start year", "pl": "Rok rozpoczęcia"}, "type": "year_input", "dependsOn": {"questionId": "meds.immunosupp.current", "value": "Yes"} },
                 { "id": "meds.immunosupp.classes", "text": {"en": "Medication classes", "pl": "Klasy leków"}, "type": "checkbox_group", "options": [
                   {"id": "Calcineurin", "label": { "en": "Calcineurin inhibitor", "pl": "Inhibitor kalcyneuryny" }},
                   {"id": "mTOR", "label": { "en": "mTOR inhibitor", "pl": "Inhibitor mTOR" }},
@@ -743,7 +751,7 @@
               "title": { "en": "Family Cancer Details", "pl": "Szczegóły Rodzinne" },
               "dependsOn": { "questionId": "famhx.any_family_cancer", "value": "Yes" },
               "options": {
-                "relations": ["Mother", "Father", "Sister", "Brother", "Daughter", "Son", "Maternal Grandmother", "Maternal Grandfather", "Paternal Grandmother", "Paternal Grandfather", "Aunt", "Uncle", "Niece", "Nephew", "Cousin"],
+                "relations": ["Mother", "Father", "Sister", "Brother", "Daughter", "Son", "Maternal Grandmother", "Maternal Grandfather", "Paternal Grandmother", "Paternal Grandfather", "Aunt", "Uncle", "Niece", "Nephew", "Cousin", "Other blood relative", "Step-relative"],
                 "cancerTypes": [
                   { "value": "breast", "label": "Breast" },
                   { "value": "prostate", "label": "Prostate" },
@@ -779,26 +787,6 @@
                    { "id": "ldl", "label": "LDL Cholesterol", "units": ["mg/dL", "mmol/L"] },
                    { "id": "hdl", "label": "HDL Cholesterol", "units": ["mg/dL", "mmol/L"] },
                    { "id": "psa", "label": "PSA", "units": ["ng/mL"] }
-                ],
-                "screening": [
-                  { "id": "screen.colon.ever", "text": { "en": "Ever had colon cancer screening?", "pl": "Czy kiedykolwiek miałaś/eś badanie przesiewowe w kierunku raka jelita grubego?" }, "type": "radio", "options": ["Yes", "No", "Not sure"] },
-                  { "id": "screen.colon.type", "text": { "en": "Type of last screening", "pl": "Rodzaj ostatniego badania przesiewowego" }, "type": "radio", "options": [
-                    { "value": "Colonoscopy", "label": { "en": "Colonoscopy", "pl": "Kolonoskopia" } },
-                    { "value": "Sigmoidoscopy", "label": { "en": "Sigmoidoscopy", "pl": "Sigmoidoskopia" } },
-                    { "value": "FIT/FOBT", "label": { "en": "FIT/FOBT", "pl": "FIT/FOBT" } },
-                    { "value": "Cologuard", "label": { "en": "Cologuard", "pl": "Cologuard" } },
-                    { "value": "Other", "label": { "en": "Other", "pl": "Inne" } }
-                  ], "dependsOn": { "questionId": "screen.colon.ever", "value": "Yes" } },
-                  { "id": "screen.crc.polyps_ever", "text": { "en": "Have you ever been told that polyps were found?", "pl": "Czy kiedykolwiek stwierdzono u Ciebie polipy?" }, "type": "radio", "options": ["Yes", "No", "Not sure", "Prefer not to say"], "dependsOn": { "questionId": "screen.colon.ever", "value": "Yes" } },
-                  { "id": "screen.colon.year", "text": { "en": "Year of last screening", "pl": "Rok ostatniego badania przesiewowego" }, "type": "year_input", "dependsOn": { "questionId": "screen.colon.ever", "value": "Yes" } },
-                  { "id": "screen.lung.ever", "text": { "en": "Ever had lung cancer screening (LDCT)?", "pl": "Czy kiedykolwiek miałaś/eś badanie przesiewowe w kierunku raka płuc (LDCT)?" }, "type": "radio", "options": ["Yes", "No", "Not sure"] },
-                  { "id": "screen.lung.year", "text": { "en": "Year of last LDCT", "pl": "Rok ostatniego LDCT" }, "type": "year_input", "dependsOn": { "questionId": "screen.lung.ever", "value": "Yes" } },
-                  { "id": "screen.cervical.ever", "text": { "en": "Ever had cervical cancer screening (Pap/HPV)?", "pl": "Czy kiedykolwiek miałaś/eś badanie przesiewowe w kierunku raka szyjki macicy (Pap/HPV)?" }, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": { "questionId": "sex_at_birth", "value": "Female" } },
-                  { "id": "screen.cervical.year", "text": { "en": "Year of last screening", "pl": "Rok ostatniego badania przesiewowego" }, "type": "year_input", "dependsOn": { "questionId": "screen.cervical.ever", "value": "Yes" } },
-                  { "id": "screen.mammogram.ever", "text": { "en": "Ever had a mammogram?", "pl": "Czy kiedykolwiek miałaś/eś mammografię?" }, "type": "radio", "options": ["Yes", "No", "Not sure"], "dependsOn": { "questionId": "sex_at_birth", "value": "Female" } },
-                  { "id": "screen.mammogram.year", "text": { "en": "Year of last mammogram", "pl": "Rok ostatniej mammografii" }, "type": "year_input", "dependsOn": { "questionId": "screen.mammogram.ever", "value": "Yes" } },
-                  { "id": "screen.skin.biopsy_ever", "text": { "en": "Have you ever had a skin lesion removed or biopsied?", "pl": "Czy kiedykolwiek miałaś/eś usuwaną lub biopsjowaną zmianę skórną?" }, "type": "radio", "options": ["Yes", "No", "Not sure"] },
-                  { "id": "screen.skin.full_exam_ever", "text": { "en": "Have you ever had a full-body skin exam by a doctor?", "pl": "Czy kiedykolwiek miałaś/eś pełne badanie skóry przez lekarza?" }, "type": "radio", "options": ["Yes", "No", "Not sure"] }
                 ]
               }
             }
@@ -1101,22 +1089,38 @@
         { "id": "env.pesticide.protection", "type": "select", "text": {"en": "Protective gear used?", "pl": "Odzież ochronna?"}, "options": ["Almost always", "Sometimes", "Almost never"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
         
         { "id": "env.uv.sunbed_use", "type": "select", "text": {"en": "Lifetime sunbed use", "pl": "Użycie solarium w życiu"}, "options": ["Never", "Few (<10)", "Occasional (10-50)", "Frequent (>50)"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "sunbed"} },
-        { "id": "env.uv.sunburn_child", "type": "number_input", "text": {"en": "Blistering sunburns <18y", "pl": "Oparzenia z pęcherzami <18 lat"}, "min": 0, "max": 50 },
-        { "id": "env.uv.sunburn_adult", "type": "number_input", "text": {"en": "Blistering sunburns 18+y", "pl": "Oparzenia z pęcherzami 18+ lat"}, "min": 0, "max": 100 }
+        { "id": "env.uv.sunburn_child", "type": "number_input", "text": {"en": "Blistering sunburns <18y", "pl": "Oparzenia z pęcherzami <18 lat"}, "min": 0, "max": 20 },
+        { "id": "env.uv.sunburn_adult", "type": "number_input", "text": {"en": "Blistering sunburns 18+y", "pl": "Oparzenia z pęcherzami 18+ lat"}, "min": 0, "max": 50 }
       ]
     },
     {
       "id": "screening_imm",
       "title": { "en": "Screening & Immunization", "pl": "Badania i Szczepienia" },
       "questions": [
-        { "id": "screen.colon.ever", "type": "radio", "text": { "en": "Colonoscopy?", "pl": "Kolonoskopia?" }, "options": ["Yes", "No", "Not sure"] },
-        { "id": "screen.mammo.ever", "type": "radio", "text": { "en": "Mammogram?", "pl": "Mammografia?" }, "options": ["Yes", "No", "Not sure"], "dependsOn": { "questionId": "sex_at_birth", "value": "Female" } },
-        { "id": "screen.pap.ever", "type": "radio", "text": { "en": "Pap/HPV Test?", "pl": "Test Pap/HPV?" }, "options": ["Yes", "No", "Not sure"], "dependsOn": { "questionId": "sex_at_birth", "value": "Female" } },
-        { "id": "screen.psa.ever", "type": "radio", "text": { "en": "PSA Test?", "pl": "Test PSA?" }, "options": ["Yes", "No", "Not sure"], "dependsOn": { "questionId": "sex_at_birth", "value": "Male" } },
-        { "id": "screen.lung.ever", "type": "radio", "text": { "en": "Lung CT?", "pl": "TK Płuc?" }, "options": ["Yes", "No", "Not sure"] },
-        { "id": "screen.skin.ever", "type": "radio", "text": { "en": "Skin Exam?", "pl": "Badanie skóry?" }, "options": ["Yes", "No", "Not sure"] },
-        { "id": "screen.liver.ever", "type": "radio", "text": { "en": "Liver Ultrasound?", "pl": "USG wątroby?" }, "options": ["Yes", "No", "Not sure"] },
-        { "id": "screen.ued.ever", "type": "radio", "text": { "en": "Upper Endoscopy?", "pl": "Gastroskopia?" }, "options": ["Yes", "No", "Not sure"] },
+        {
+          "id": "screen.summary",
+          "type": "checkbox_group",
+          "text": { "en": "Which of the following preventive screenings / exams have you ever had?", "pl": "Które z poniższych badań przesiewowych kiedykolwiek wykonywałaś/eś?" },
+          "options": [
+            { "id": "Colonoscopy", "label": { "en": "Colonoscopy", "pl": "Kolonoskopia" } },
+            { "id": "Mammogram", "label": { "en": "Mammogram", "pl": "Mammografia" }, "dependsOn": { "questionId": "sex_at_birth", "value": "Female" } },
+            { "id": "Pap/HPV", "label": { "en": "Pap/HPV Test", "pl": "Test Pap/HPV" }, "dependsOn": { "questionId": "sex_at_birth", "value": "Female" } },
+            { "id": "PSA", "label": { "en": "PSA Test", "pl": "Test PSA" }, "dependsOn": { "questionId": "sex_at_birth", "value": "Male" } },
+            { "id": "Lung CT", "label": { "en": "Lung CT", "pl": "TK Płuc" } },
+            { "id": "Skin Exam", "label": { "en": "Skin Exam", "pl": "Badanie skóry" } },
+            { "id": "Liver Ultrasound", "label": { "en": "Liver Ultrasound", "pl": "USG wątroby" } },
+            { "id": "Upper Endoscopy", "label": { "en": "Upper Endoscopy", "pl": "Gastroskopia" } },
+            { "id": "Other", "label": { "en": "Any other cancer screening", "pl": "Inne badanie w kierunku raka" } },
+            { "id": "None", "label": { "en": "None of the above", "pl": "Żadne z powyższych" } }
+          ],
+          "exclusiveOptionId": "None"
+        },
+        {
+            "id": "screen.other.list",
+            "type": "text_input",
+            "text": { "en": "Please list other screenings", "pl": "Wymień inne badania" },
+            "dependsOn": { "questionId": "screen.summary", "operator": "array_contains", "value": "Other" }
+        },
         {
           "id": "imm.card_available",
           "type": "radio",
@@ -1136,6 +1140,12 @@
           ]
         },
         {
+          "id": "imm.hpv.year_last",
+          "type": "year_input",
+          "text": { "en": "Year of last HPV dose", "pl": "Rok ostatniej dawki HPV" },
+          "dependsOn": { "questionId": "imm.hpv.doses", "operator": "!=", "value": "0" }
+        },
+        {
           "id": "imm.hbv.completed",
           "type": "radio",
           "text": { "en": "Hepatitis B series completed?", "pl": "Seria WZW B zakończona?" },
@@ -1144,6 +1154,19 @@
             { "value": "No", "label": { "en": "No", "pl": "Nie" } },
             { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
           ]
+        },
+        {
+          "id": "imm.hbv.doses",
+          "type": "select",
+          "text": { "en": "Total HBV doses", "pl": "Liczba dawek HBV" },
+          "options": [{"value": "1", "label": "1"}, {"value": "2", "label": "2"}, {"value": "3", "label": "3"}, {"value": "4+", "label": "4+"}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}],
+          "dependsOn": { "questionId": "imm.hbv.completed", "value": "Yes" }
+        },
+        {
+          "id": "imm.hbv.year_last",
+          "type": "year_input",
+          "text": { "en": "Year of last HBV dose", "pl": "Rok ostatniej dawki HBV" },
+          "dependsOn": { "questionId": "imm.hbv.completed", "value": "Yes" }
         },
         {
           "id": "advanced_modules_screen",
@@ -1156,7 +1179,7 @@
                 {
                   "id": "colonoscopy",
                   "text": { "en": "Colonoscopy", "pl": "Kolonoskopia" },
-                  "dependsOn": { "questionId": "screen.colon.ever", "value": "Yes" },
+                  "dependsOn": { "questionId": "screen.summary", "operator": "array_contains", "value": "Colonoscopy" },
                   "questions": [
                     { "id": "screen.colonoscopy.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
                     { "id": "screen.crc.last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Polyps", "Cancer", "Unsure"] },
@@ -1166,7 +1189,7 @@
                 {
                   "id": "mammogram",
                   "text": { "en": "Mammogram", "pl": "Mammografia" },
-                  "dependsOn": { "questionId": "screen.mammo.ever", "value": "Yes" },
+                  "dependsOn": { "questionId": "screen.summary", "operator": "array_contains", "value": "Mammogram" },
                   "questions": [
                     { "id": "screen.mammo.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
                     { "id": "screen.breast.mammo_last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Benign", "Abnormal", "Unsure"] }
@@ -1175,7 +1198,7 @@
                 {
                   "id": "pap_test",
                   "text": { "en": "Pap/HPV", "pl": "Pap/HPV" },
-                  "dependsOn": { "questionId": "screen.pap.ever", "value": "Yes" },
+                  "dependsOn": { "questionId": "screen.summary", "operator": "array_contains", "value": "Pap/HPV" },
                   "questions": [
                     { "id": "screen.pap.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
                     { "id": "screen.cervix.last_type", "text": {"en": "Type", "pl": "Typ"}, "type": "select", "options": ["Pap only", "HPV only", "Co-testing"] },
@@ -1185,7 +1208,7 @@
                 {
                   "id": "psa_test",
                   "text": { "en": "PSA", "pl": "PSA" },
-                  "dependsOn": { "questionId": "screen.psa.ever", "value": "Yes" },
+                  "dependsOn": { "questionId": "screen.summary", "operator": "array_contains", "value": "PSA" },
                   "questions": [
                     { "id": "screen.psa.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
                     { "id": "screen.prostate.psa_abnormal", "text": {"en": "Was it elevated?", "pl": "Czy był podwyższony?"}, "type": "radio", "options": ["Yes", "No"] }
@@ -1194,7 +1217,7 @@
                 {
                   "id": "lung_scan",
                   "text": { "en": "Lung CT", "pl": "TK Płuc" },
-                  "dependsOn": { "questionId": "screen.lung.ever", "value": "Yes" },
+                  "dependsOn": { "questionId": "screen.summary", "operator": "array_contains", "value": "Lung CT" },
                   "questions": [
                     { "id": "screen.lung.ldct_last_year", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
                     { "id": "screen.lung.ldct_last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Nodules", "Unsure"] }
@@ -1203,7 +1226,7 @@
                 {
                   "id": "liver_ultrasound",
                   "text": { "en": "Liver Ultrasound", "pl": "USG wątroby" },
-                  "dependsOn": { "questionId": "screen.liver.ever", "value": "Yes" },
+                  "dependsOn": { "questionId": "screen.summary", "operator": "array_contains", "value": "Liver Ultrasound" },
                   "questions": [
                     { "id": "screen.hcc.us_last_year", "text": {"en": "Year of last exam", "pl": "Rok ostatniego USG"}, "type": "year_input" },
                     { "id": "screen.hcc.us_interval", "text": {"en": "How often?", "pl": "Jak często?"}, "type": "select", "options": [
@@ -1217,7 +1240,7 @@
                 {
                   "id": "upper_endoscopy",
                   "text": { "en": "Upper GI Endoscopy", "pl": "Gastroskopia" },
-                  "dependsOn": { "questionId": "screen.ued.ever", "value": "Yes" },
+                  "dependsOn": { "questionId": "screen.summary", "operator": "array_contains", "value": "Upper Endoscopy" },
                   "questions": [
                     { "id": "screen.upper_endo.last_year", "text": {"en": "Year of last exam", "pl": "Rok ostatniego badania"}, "type": "year_input" },
                     { "id": "screen.upper_endo.reason", "text": {"en": "Reason", "pl": "Powód"}, "type": "select", "options": [
@@ -1227,6 +1250,16 @@
                       { "value": "Other", "label": { "en": "Other", "pl": "Inny" } },
                       { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
                     ] }
+                  ]
+                },
+                {
+                  "id": "skin_exam",
+                  "text": { "en": "Skin Exam", "pl": "Badanie skóry" },
+                  "dependsOn": { "questionId": "screen.summary", "operator": "array_contains", "value": "Skin Exam" },
+                  "questions": [
+                    { "id": "screen.skin.full_exam_ever", "text": {"en": "Have you ever had a full body skin exam by a doctor?", "pl": "Czy kiedykolwiek miałeś/aś pełne badanie skóry przez lekarza?"}, "type": "radio", "options": ["Yes", "No", "Not sure"] },
+                    { "id": "screen.skin.last_year", "text": {"en": "Year of last exam", "pl": "Rok ostatniego badania"}, "type": "year_input", "dependsOn": {"questionId": "screen.skin.full_exam_ever", "value": "Yes"} },
+                    { "id": "screen.skin.biopsy_ever", "text": {"en": "Have you ever had a skin biopsy?", "pl": "Czy kiedykolwiek miałeś/aś biopsję skóry?"}, "type": "radio", "options": ["Yes", "No", "Not sure"] }
                   ]
                 }
               ],
@@ -1255,7 +1288,8 @@
                   { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
                 ] },
                 { "id": "imm.zoster.ever", "text": {"en": "Shingles ever?", "pl": "Półpasiec?"}, "type": "select", "options": ["Yes", "No", "Not sure"] },
-                { "id": "imm.zoster.vaccine_type", "text": { "en": "Shingles vaccine type?", "pl": "Typ szczepionki na półpasiec?" }, "type": "radio", "options": ["Live (Zostavax)", "Recombinant (Shingrix)", "Not sure"], "dependsOn": { "questionId": "imm.zoster.status", "value": "Yes" } }
+                { "id": "imm.zoster.vaccine_type", "text": { "en": "Shingles vaccine type?", "pl": "Typ szczepionki na półpasiec?" }, "type": "radio", "options": ["Live (Zostavax)", "Recombinant (Shingrix)", "Not sure"], "dependsOn": { "questionId": "imm.zoster.status", "value": "Yes" } },
+                { "id": "imm.other_list", "text": {"en": "Any other vaccines recommended by your doctor?", "pl": "Inne zalecane szczepionki?"}, "type": "text_input" }
 
               ]
             }

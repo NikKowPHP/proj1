@@ -23,5 +23,6 @@ export const occupationalExposuresMap: Record<string, string> = {
   'uv_sunlight': '69930006', // Exposure to UV radiation (event)
   // Aliases or grouped items from PDF
   'pahs': '419799009', // Exposure to soot (event) - Mapping PAHs to Soot/Coal Tar code
-  'rubber_chem': '419137000' // Mapping rubber chemicals to rubber fume
+  'rubber_chem': '419137000', // Mapping rubber chemicals to rubber fume
+  'painter': '66238002' // Painter (occupation)
 };

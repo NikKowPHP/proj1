@@ -446,7 +446,7 @@ export default function AssessmentPage() {
                   {q.type === "checkbox_group" && (
                     <>
                       <div className={localErrors[q.id] ? "border border-destructive  p-2" : ""}>
-                        <CheckboxGroup options={q.options as CheckboxOption[]} value={answers[q.id] ? JSON.parse(answers[q.id]) : []} onChange={(s) => setAnswer(q.id, JSON.stringify(s))} exclusiveOption={q.exclusiveOptionId} idPrefix={q.id} />
+                        <CheckboxGroup options={q.options as CheckboxOption[]} value={answers[q.id] ? JSON.parse(answers[q.id]) : []} onChange={(s) => setAnswer(q.id, JSON.stringify(s))} exclusiveOption={q.exclusiveOptionId} idPrefix={q.id} answers={answers} />
                       </div>
                       {localErrors[q.id] && <p className="text-sm text-destructive">{localErrors[q.id]}</p>}
                     </>

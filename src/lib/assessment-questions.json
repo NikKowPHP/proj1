@@ -141,10 +141,10 @@
             "text": { "en": "How often do you have a drink containing alcohol?", "pl": "Jak często pijesz napoje zawierające alkohol?" },
             "type": "select",
             "options": [
-              { "value": "0", "label": { "en": "Monthly or less", "pl": "Raz w miesiącu lub rzadziej" } },
-              { "value": "1", "label": { "en": "2-4 times a month", "pl": "2-4 razy w miesiącu" } },
-              { "value": "2", "label": { "en": "2-3 times a week", "pl": "2-3 razy w tygodniu" } },
-              { "value": "3", "label": { "en": "4+ times a week", "pl": "4 razy w tygodniu lub częściej" } }
+              { "value": "1", "label": { "en": "Monthly or less", "pl": "Raz w miesiącu lub rzadziej" } },
+              { "value": "2", "label": { "en": "2-4 times a month", "pl": "2-4 razy w miesiącu" } },
+              { "value": "3", "label": { "en": "2-3 times a week", "pl": "2-3 razy w tygodniu" } },
+              { "value": "4", "label": { "en": "4+ times a week", "pl": "4 razy w tygodniu lub częściej" } }
             ]
         },
         {
@@ -174,10 +174,25 @@
             ]
         },
         {
-          "id": "alcohol.beverage_mix",
-          "text": { "en": "Typical weekly split (beer / wine / spirits %)", "pl": "Typowy tygodniowy podział (piwo / wino / mocne %)" },
-          "type": "text_input",
+          "id": "alcohol.beer_pct",
+          "text": { "en": "% Beer", "pl": "% Piwo" },
+          "type": "number_input",
+          "min": 0, "max": 100,
           "dependsOn": { "questionId": "alcohol.status", "value": "Current" }
+        },
+        {
+          "id": "alcohol.wine_pct",
+          "text": { "en": "% Wine", "pl": "% Wino" },
+          "type": "number_input",
+          "min": 0, "max": 100,
+          "dependsOn": { "questionId": "alcohol.status", "value": "Current" }
+        },
+        {
+            "id": "alcohol.spirits_pct",
+            "text": { "en": "% Spirits", "pl": "% Mocne alkohole" },
+            "type": "number_input",
+            "min": 0, "max": 100,
+            "dependsOn": { "questionId": "alcohol.status", "value": "Current" }
         },
         {
           "id": "diet.fv_portions_day",
@@ -449,6 +464,25 @@
           "type": "radio",
           "text": { "en": "Family history of cancer?", "pl": "Rak w rodzinie?" },
           "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Adopted/Unknown", "label": {"en": "Adopted/Unknown", "pl": "Adoptowany/Nieznana"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}]
+        },
+        {
+          "id": "famhx.quick_relatives_chips",
+          "type": "checkbox_group",
+          "text": { "en": "Which relatives had cancer?", "pl": "Którzy krewni chorowali?" },
+          "dependsOn": { "questionId": "famhx.any_family_cancer", "value": "Yes" },
+          "options": [
+            { "id": "Mother", "label": { "en": "Mother", "pl": "Matka" } },
+            { "id": "Father", "label": { "en": "Father", "pl": "Ojciec" } },
+            { "id": "Sister", "label": { "en": "Sister", "pl": "Siostra" } },
+            { "id": "Brother", "label": { "en": "Brother", "pl": "Brat" } },
+            { "id": "Daughter", "label": { "en": "Daughter", "pl": "Córka" } },
+            { "id": "Son", "label": { "en": "Son", "pl": "Syn" } },
+            { "id": "Maternal Grandmother", "label": { "en": "Maternal Grandmother", "pl": "Babcia (Matka)" } },
+            { "id": "Maternal Grandfather", "label": { "en": "Maternal Grandfather", "pl": "Dziadek (Matka)" } },
+            { "id": "Paternal Grandmother", "label": { "en": "Paternal Grandmother", "pl": "Babcia (Ojciec)" } },
+            { "id": "Paternal Grandfather", "label": { "en": "Paternal Grandfather", "pl": "Dziadek (Ojciec)" } },
+            { "id": "Other", "label": { "en": "Other", "pl": "Inni" } }
+          ]
         },
         {
           "id": "advanced_modules_symptoms_cond",
@@ -993,7 +1027,14 @@
               "options": {
                 "jobTitles": [
                   { "value": "Welder", "label": "Welder" }, { "value": "Miner", "label": "Miner" }, { "value": "Painter", "label": "Painter" }, 
-                  { "value": "Firefighter", "label": "Firefighter" }, { "value": "Farmer", "label": "Farmer" }, { "value": "Driver", "label": "Driver" }
+                  { "value": "Firefighter", "label": "Firefighter" }, { "value": "Farmer", "label": "Farmer" }, { "value": "Driver", "label": "Driver" },
+                  { "value": "Construction worker", "label": "Construction worker" },
+                  { "value": "Chemical plant operator", "label": "Chemical plant operator" },
+                  { "value": "Factory worker", "label": "Factory worker" },
+                  { "value": "Insulation worker", "label": "Insulation worker" },
+                  { "value": "Shipyard worker", "label": "Shipyard worker" },
+                  { "value": "Healthcare worker", "label": "Healthcare worker" },
+                  { "value": "Laboratory worker", "label": "Laboratory worker" }
                 ],
                 "exposures": [
                   { "value": "asbestos", "label": "Asbestos" }, { "value": "silica", "label": "Silica" }, { "value": "diesel", "label": "Diesel" },
@@ -1057,7 +1098,7 @@
         
         { "id": "env.pesticide.use_freq_year", "type": "number_input", "text": {"en": "Times/year mixing pesticides?", "pl": "Ile razy w roku mieszasz pestycydy?"}, "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
         { "id": "env.pesticide.years_use", "type": "number_input", "text": {"en": "Years used?", "pl": "Lata używania?"}, "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
-        { "id": "env.pesticide.protection", "type": "select", "text": {"en": "Protective gear used?", "pl": "Odzież ochronna?"}, "options": ["Always", "Sometimes", "Never"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
+        { "id": "env.pesticide.protection", "type": "select", "text": {"en": "Protective gear used?", "pl": "Odzież ochronna?"}, "options": ["Almost always", "Sometimes", "Almost never"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
         
         { "id": "env.uv.sunbed_use", "type": "select", "text": {"en": "Lifetime sunbed use", "pl": "Użycie solarium w życiu"}, "options": ["Never", "Few (<10)", "Occasional (10-50)", "Frequent (>50)"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "sunbed"} },
         { "id": "env.uv.sunburn_child", "type": "number_input", "text": {"en": "Blistering sunburns <18y", "pl": "Oparzenia z pęcherzami <18 lat"}, "min": 0, "max": 50 },
@@ -1068,23 +1109,14 @@
       "id": "screening_imm",
       "title": { "en": "Screening & Immunization", "pl": "Badania i Szczepienia" },
       "questions": [
-        {
-          "id": "screen.summary",
-          "type": "checkbox_group",
-          "text": { "en": "Which screenings have you EVER had?", "pl": "Które badania miałeś/aś kiedykolwiek?" },
-          "exclusiveOptionId": "none",
-          "options": [
-            { "id": "colonoscopy", "label": "Colonoscopy" },
-            { "id": "mammogram", "label": "Mammogram" },
-            { "id": "pap_test", "label": "Pap/HPV Test" },
-            { "id": "psa_test", "label": "PSA Test" },
-            { "id": "lung_scan", "label": "Lung CT" },
-            { "id": "skin_exam", "label": "Skin Exam" },
-            { "id": "liver_ultrasound", "label": "Liver Ultrasound" },
-            { "id": "upper_endoscopy", "label": "Upper GI Endoscopy" },
-            { "id": "none", "label": "None" }
-          ]
-        },
+        { "id": "screen.colon.ever", "type": "radio", "text": { "en": "Colonoscopy?", "pl": "Kolonoskopia?" }, "options": ["Yes", "No", "Not sure"] },
+        { "id": "screen.mammo.ever", "type": "radio", "text": { "en": "Mammogram?", "pl": "Mammografia?" }, "options": ["Yes", "No", "Not sure"], "dependsOn": { "questionId": "sex_at_birth", "value": "Female" } },
+        { "id": "screen.pap.ever", "type": "radio", "text": { "en": "Pap/HPV Test?", "pl": "Test Pap/HPV?" }, "options": ["Yes", "No", "Not sure"], "dependsOn": { "questionId": "sex_at_birth", "value": "Female" } },
+        { "id": "screen.psa.ever", "type": "radio", "text": { "en": "PSA Test?", "pl": "Test PSA?" }, "options": ["Yes", "No", "Not sure"], "dependsOn": { "questionId": "sex_at_birth", "value": "Male" } },
+        { "id": "screen.lung.ever", "type": "radio", "text": { "en": "Lung CT?", "pl": "TK Płuc?" }, "options": ["Yes", "No", "Not sure"] },
+        { "id": "screen.skin.ever", "type": "radio", "text": { "en": "Skin Exam?", "pl": "Badanie skóry?" }, "options": ["Yes", "No", "Not sure"] },
+        { "id": "screen.liver.ever", "type": "radio", "text": { "en": "Liver Ultrasound?", "pl": "USG wątroby?" }, "options": ["Yes", "No", "Not sure"] },
+        { "id": "screen.ued.ever", "type": "radio", "text": { "en": "Upper Endoscopy?", "pl": "Gastroskopia?" }, "options": ["Yes", "No", "Not sure"] },
         {
           "id": "imm.card_available",
           "type": "radio",
@@ -1120,12 +1152,11 @@
             {
               "id": "screening_immunization",
               "title": { "en": "Screening Details", "pl": "Szczegóły Badań" },
-              "dependsOn": { "questionId": "screen.summary", "value": true },
               "screenings": [
                 {
                   "id": "colonoscopy",
                   "text": { "en": "Colonoscopy", "pl": "Kolonoskopia" },
-                  "dependsOn": { "questionId": "screen.summary", "value": "colonoscopy" },
+                  "dependsOn": { "questionId": "screen.colon.ever", "value": "Yes" },
                   "questions": [
                     { "id": "screen.colonoscopy.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
                     { "id": "screen.crc.last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Polyps", "Cancer", "Unsure"] },
@@ -1135,7 +1166,7 @@
                 {
                   "id": "mammogram",
                   "text": { "en": "Mammogram", "pl": "Mammografia" },
-                  "dependsOn": { "questionId": "screen.summary", "value": "mammogram" },
+                  "dependsOn": { "questionId": "screen.mammo.ever", "value": "Yes" },
                   "questions": [
                     { "id": "screen.mammo.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
                     { "id": "screen.breast.mammo_last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Benign", "Abnormal", "Unsure"] }
@@ -1144,7 +1175,7 @@
                 {
                   "id": "pap_test",
                   "text": { "en": "Pap/HPV", "pl": "Pap/HPV" },
-                  "dependsOn": { "questionId": "screen.summary", "value": "pap_test" },
+                  "dependsOn": { "questionId": "screen.pap.ever", "value": "Yes" },
                   "questions": [
                     { "id": "screen.pap.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
                     { "id": "screen.cervix.last_type", "text": {"en": "Type", "pl": "Typ"}, "type": "select", "options": ["Pap only", "HPV only", "Co-testing"] },
@@ -1154,7 +1185,7 @@
                 {
                   "id": "psa_test",
                   "text": { "en": "PSA", "pl": "PSA" },
-                  "dependsOn": { "questionId": "screen.summary", "value": "psa_test" },
+                  "dependsOn": { "questionId": "screen.psa.ever", "value": "Yes" },
                   "questions": [
                     { "id": "screen.psa.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
                     { "id": "screen.prostate.psa_abnormal", "text": {"en": "Was it elevated?", "pl": "Czy był podwyższony?"}, "type": "radio", "options": ["Yes", "No"] }
@@ -1163,7 +1194,7 @@
                 {
                   "id": "lung_scan",
                   "text": { "en": "Lung CT", "pl": "TK Płuc" },
-                  "dependsOn": { "questionId": "screen.summary", "value": "lung_scan" },
+                  "dependsOn": { "questionId": "screen.lung.ever", "value": "Yes" },
                   "questions": [
                     { "id": "screen.lung.ldct_last_year", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
                     { "id": "screen.lung.ldct_last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Nodules", "Unsure"] }
@@ -1172,7 +1203,7 @@
                 {
                   "id": "liver_ultrasound",
                   "text": { "en": "Liver Ultrasound", "pl": "USG wątroby" },
-                  "dependsOn": { "questionId": "screen.summary", "value": "liver_ultrasound" },
+                  "dependsOn": { "questionId": "screen.liver.ever", "value": "Yes" },
                   "questions": [
                     { "id": "screen.hcc.us_last_year", "text": {"en": "Year of last exam", "pl": "Rok ostatniego USG"}, "type": "year_input" },
                     { "id": "screen.hcc.us_interval", "text": {"en": "How often?", "pl": "Jak często?"}, "type": "select", "options": [
@@ -1186,7 +1217,7 @@
                 {
                   "id": "upper_endoscopy",
                   "text": { "en": "Upper GI Endoscopy", "pl": "Gastroskopia" },
-                  "dependsOn": { "questionId": "screen.summary", "value": "upper_endoscopy" },
+                  "dependsOn": { "questionId": "screen.ued.ever", "value": "Yes" },
                   "questions": [
                     { "id": "screen.upper_endo.last_year", "text": {"en": "Year of last exam", "pl": "Rok ostatniego badania"}, "type": "year_input" },
                     { "id": "screen.upper_endo.reason", "text": {"en": "Reason", "pl": "Powód"}, "type": "select", "options": [

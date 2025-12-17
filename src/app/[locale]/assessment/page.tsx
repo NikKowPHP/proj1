@@ -47,6 +47,7 @@ import { EnvironmentalExposures } from "@/components/assessment/EnvironmentalExp
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info, AlertCircle } from "lucide-react";
 import { SafetyBanner } from "@/components/assessment/SafetyBanner";
+import { UnitToggle } from "@/components/assessment/UnitToggle";
 import { LabsAndImaging } from "@/components/assessment/LabsAndImaging";
 import { FunctionalStatus } from "@/components/assessment/FunctionalStatus";
 import { SmokingDetails } from "@/components/assessment/SmokingDetails";
@@ -335,7 +336,7 @@ export default function AssessmentPage() {
         <div className="hidden md:flex flex-col justify-between p-12 bg-white text-black"><AppHeaderContent /><DisclaimerFooterContent /></div>
         <main className="bg-black text-white w-full flex flex-col flex-grow sm:items-center sm:justify-center p-4 pb-24 md:pb-4">
           <div className="w-full max-w-md space-y-8">
-            <div className=" justify-center w-full hidden sm:flex"><LanguageSwitcher /></div>
+            <div className="flex justify-center w-full hidden sm:flex gap-4"><LanguageSwitcher /><UnitToggle /></div>
             <div>
               <Progress value={progressPercentage} className="mb-4 h-3" indicatorClassName="bg-primary" />
               <h1 className="text-2xl font-bold">{stepData?.title}</h1>

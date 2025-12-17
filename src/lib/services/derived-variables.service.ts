@@ -819,11 +819,23 @@ export const DerivedVariablesService = {
       
       if (sexAtBirth === 'Male') {
           if (Array.isArray(partnerGenders)) {
-             if (partnerGenders.some((g: string) => g.toLowerCase() === 'male' || g.toLowerCase() === 'same sex')) {
+             // Updated to match questionnaire options: "Only men", "Men and women"
+             if (partnerGenders.some((g: string) => 
+                g === 'Only men' || 
+                g === 'Men and women' || 
+                g.toLowerCase() === 'male' || 
+                g.toLowerCase() === 'same sex'
+             )) {
                 msmBehavior = true;
              }
           } else if (typeof partnerGenders === 'string') {
-             if (partnerGenders.toLowerCase() === 'male' || partnerGenders.toLowerCase() === 'both' || partnerGenders.toLowerCase() === 'same sex') {
+             if (
+                partnerGenders === 'Only men' || 
+                partnerGenders === 'Men and women' || 
+                partnerGenders.toLowerCase() === 'male' || 
+                partnerGenders.toLowerCase() === 'both' || 
+                partnerGenders.toLowerCase() === 'same sex'
+             ) {
                  msmBehavior = true;
              }
           }
@@ -970,9 +982,12 @@ export const DerivedVariablesService = {
       
       derived['env.radon_high'] = isRadonHigh || (envSummary.includes('radon') && env['env.radon.tested'] !== 'No' && env['env.radon.level_cat'] && radonHighOptions.some((o:string) => env['env.radon.level_cat'].includes(o))); // Safer fallback
       
-      derived['env.asbestos_unprotected'] = env['env.asbestos.disturbance'] === 'Yes';
-      derived['env.well_contam_flag'] = env['env.water.well_tested'] === 'Yes' && env['env.water.arsenic'] === true; // Assuming arsenic check means contamination found
-      derived['env.pesticide_intensive'] = env['env.pesticide.type'] === 'Occupational' || env['env.pesticide.type'] === 'Home/Garden (Heavy)';
+      derived['env.asbestos_unprotected'] = env['env.asbestos.disturbance'] === 'Yes - multiple' || env['env.asbestos.disturbance'] === 'Yes - once';
+      derived['env.well_contam_flag'] = env['env.water.well_contam_notice'] === 'Yes';
+      
+      const pesticideFreq = Number(env['env.pesticide.use_freq_year']);
+      const pesticideYears = Number(env['env.pesticide.years_use']);
+      derived['env.pesticide_intensive'] = !isNaN(pesticideFreq) && !isNaN(pesticideYears) && pesticideFreq >= 12 && pesticideYears >= 5;
       derived['env.uv_high'] = sunburnChild >= 3 || sunburnAdult >= 5 || isSunbedUser;
       
       // --- Screening Candidate Flags ---

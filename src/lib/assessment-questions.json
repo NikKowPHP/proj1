@@ -15,10 +15,9 @@
         },
         {
           "id": "dob",
-          "type": "year_input",
+          "type": "date_input",
           "text": { "en": "Date of birth", "pl": "Data urodzenia" },
-          "placeholder": "YYYY",
-          "validation": { "min": 1900, "maxCurrentYear": true, "message": { "en": "This tool is for adults.", "pl": "Narzędzie dla osób dorosłych." } }
+          "validation": { "required": true, "message": { "en": "Required for age calculation.", "pl": "Wymagane do obliczenia wieku." } }
         },
         {
           "id": "sex_at_birth",
@@ -79,7 +78,7 @@
                 ], "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
                 { "id": "smoking.intensity_unit", "text": { "en": "Intensity unit", "pl": "Jednostka intensywności"}, "type": "radio", "options": ["Cigarettes per day", "Packs per day"], "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
                 { "id": "smoking.intensity", "text": { "en": "On average, how many cigarettes do you smoke per day?", "pl": "Średnio, ile papierosów palisz dziennie?"}, "type": "number_input", "dependsOn": {"questionId": "smoking_status", "value": "Current"} },
-                { "id": "smoking.years_smoked", "text": { "en": "Total years you have smoked", "pl": "Łączna liczba lat palenia"}, "type": "number_input", "min": 0.5, "max": 80 },
+                { "id": "smoking.years_smoked", "text": { "en": "Total years you have smoked", "pl": "Łączna liczba lat palenia"}, "type": "number_input", "min": 0.1, "max": 80 },
                 { "id": "smoking.start_age", "text": { "en": "At what age did you start smoking regularly?", "pl": "W jakim wieku zacząłeś/zaczęłaś palić regularnie?"}, "type": "number_input", "min": 5, "max": 99 },
                 { "id": "smoking.quit_date", "text": { "en": "When did you completely quit? (YYYY-MM)", "pl": "Kiedy całkowicie rzuciłeś/rzuciłaś palenie? (YYYY-MM)"}, "type": "month_year_input", "dependsOn": {"questionId": "smoking_status", "value": "Former"}},
                 
@@ -696,6 +695,10 @@
                   { "value": "thyroid", "label": "Thyroid" },
                   { "value": "lymphoma", "label": "Lymphoma" },
                   { "value": "leukemia", "label": "Leukemia" },
+                  { "value": "neuroendocrine", "label": "Neuroendocrine" },
+                  { "value": "sarcoma_bone", "label": "Sarcoma - bone" },
+                  { "value": "sarcoma_soft", "label": "Sarcoma - soft tissue" },
+                  { "value": "head_neck", "label": "Head & Neck" },
                   { "value": "other", "label": "Other" }
                 ],
                 "treatmentTypes": [ { "id": "surgery", "label": "Surgery" }, { "id": "chemo", "label": "Chemotherapy" }, { "id": "radio", "label": "Radiotherapy" }, { "id": "endo", "label": "Hormone Therapy" }, { "id": "immuno", "label": "Immunotherapy" }, { "id": "hsct", "label": "Stem-cell Transplant" } ]
@@ -1002,7 +1005,17 @@
                   { "value": "Rarely", "label": { "en": "Rarely", "pl": "Rzadko" } },
                   { "value": "Never", "label": { "en": "Never", "pl": "Nigdy" } }
                 ]
-              }
+              },
+              "questions": [
+                { "id": "main_job_title", "label": { "en": "Job Title", "pl": "Stanowisko" }, "type": "searchable_select", "options": "jobTitles", "allowCustom": true },
+                { "id": "years_total", "label": { "en": "Years Exposed", "pl": "Lata narażenia" }, "type": "number_input", "placeholder": "e.g. 10" },
+                { "id": "year_first_exposed", "label": { "en": "Year First Exposed", "pl": "Rok pierwszego narażenia" }, "type": "number_input", "placeholder": "e.g. 1990" },
+                { "id": "hours_per_week", "label": { "en": "Hours per week", "pl": "Godziny na tydzień" }, "type": "number_input", "placeholder": "e.g. 40", "min": 0, "max": 168 },
+                { "id": "current_exposure", "label": { "en": "Current exposure?", "pl": "Obecne narażenie?" }, "type": "radio", "options": ["Yes", "No", "Not sure"] },
+                { "id": "ppe_use", "label": { "en": "How often did you use appropriate PPE?", "pl": "Jak często używano ŚOI?" }, "type": "select", "options": "ppe" },
+                { "id": "occ_exposures", "label": { "en": "Specific Exposures", "pl": "Konkretne narażenia" }, "type": "checkbox_group", "options": "exposures" },
+                { "id": "notes", "label": { "en": "Notes (optional)", "pl": "Notatki (opcjonalne)" }, "type": "textarea", "placeholder": { "en": "Anything important to add?", "pl": "Coś ważnego do dodania?" }, "maxLength": 300 }
+              ]
             }
           ]
         },

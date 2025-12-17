@@ -341,7 +341,7 @@ export default function AssessmentPage() {
               <h1 className="text-2xl font-bold">{stepData?.title}</h1>
               {stepData?.description && <p className="text-gray-400 mt-2">{stepData.description}</p>}
             </div>
-            {showSafetyBanner && <SafetyBanner answers={answers} />}
+            {showSafetyBanner && <SafetyBanner answers={answers} symptomOptions={questionnaire?.steps.flatMap(s => s.questions).find(q => q.id === 'symptoms')?.options || []} />}
             <section className="space-y-6">
               {visibleQuestions.map((q) => (
                 <div key={q.id} className="space-y-2 animate-fade-in">

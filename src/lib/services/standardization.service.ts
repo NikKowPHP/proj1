@@ -25,6 +25,23 @@ export const StandardizationService = {
     };
 
     try {
+      const parseYear = (value: any): number | undefined => {
+        if (value === null || value === undefined || value === '') return undefined;
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) return undefined;
+        if (numeric < 1900 || numeric > new Date().getFullYear() + 1) return undefined;
+        return numeric;
+      };
+
+      const setScreeningYear = (answersKey: string, targetKeys: string[]) => {
+        const raw = answers[answersKey];
+        if (raw === undefined || raw === null || raw === '') return;
+        const parsed = parseYear(raw);
+        targetKeys.forEach((key) => {
+          screeningImmunization[key] = parsed ?? raw;
+        });
+      };
+
       // --- CORE SECTION ---
       standardized.core = {
         dob: answers.dob, // Year only now
@@ -143,6 +160,7 @@ export const StandardizationService = {
               if (illnessId === 'ibd') {
                   details.type = answers['cond.ibd.type'];
                   details.extent = answers['cond.ibd.extent'];
+                  details.year = parseYear(answers['cond.ibd.year_dx']);
               }
               if (illnessId === 'diabetes') details.type = answers['cond.t2dm.status'] === 'Yes' ? 'Type 2' : 'Unknown';
 
@@ -176,40 +194,63 @@ export const StandardizationService = {
              hours_week: entry.hours_per_week,
              year_first: entry.year_first_exposed,
              current: entry.current_exposure,
-             ppe: entry.ppe_use
+             ppe: entry.ppe_use,
+             occ_exposures: entry.occ_exposures // Map specific exposures if present
           };
         });
       }
       
       // Screening and Immunization - UPDATED KEYS
       const screeningImmunization: Record<string, any> = {};
-      const screeningKeys = [
-          'screen.colonoscopy.date', 
-          'screen.crc.last_result',
-          'screen.mammo.date', 
-          'screen.breast.mammo_last_result',
-          'screen.pap.date', 
-          'screen.cervix.last_type',
-          'screen.cervix.last_result',
-          'screen.psa.date', 
-          'screen.prostate.psa_abnormal',
-          'screen.lung.ldct_last_year',
-          'screen.lung.ldct_last_result',
-          'imm.hpv.doses',
-          'imm.hbv.completed',
-          'imm.hav.any',
-          'imm.flu.last_season',
-          'imm.covid.doses',
-          'imm.td_tdap.year_last',
-          'imm.pneumo.ever',
-          'imm.zoster.ever'
+      const rawScreeningKeys = [
+        'screen.colonoscopy.date',
+        'screen.crc.last_result',
+        'screen.crc.followup_interval',
+        'screen.colon.type',
+        'screen.colon.ever',
+        'screen.colon.year',
+        'screen.mammo.date',
+        'screen.mammogram.year',
+        'screen.breast.mammo_last_result',
+        'screen.cervical.ever',
+        'screen.cervical.year',
+        'screen.pap.date',
+        'screen.cervix.last_type',
+        'screen.cervix.last_result',
+        'screen.psa.date',
+        'screen.prostate.psa_abnormal',
+        'screen.lung.ldct_last_year',
+        'screen.lung.ldct_last_result',
+        'screen.hcc.us_last_year',
+        'screen.upper_endo.last_year',
+        'imm.hpv.doses',
+        'imm.hbv.completed',
+        'imm.hav.any',
+        'imm.flu.last_season',
+        'imm.covid.doses',
+        'imm.td_tdap.year_last',
+        'imm.pneumo.ever',
+        'imm.zoster.ever',
+        'imm.zoster.vaccine_type',
       ];
-      
-      screeningKeys.forEach(key => {
-        if (answers[key]) {
+
+      rawScreeningKeys.forEach((key) => {
+        if (answers[key] !== undefined && answers[key] !== null && answers[key] !== '') {
           screeningImmunization[key] = answers[key];
         }
       });
+
+      // Normalize key mismatches between questionnaire and downstream logic
+      setScreeningYear('screen.colon.year', ['screen.colon.year', 'screen.crc.last_year']);
+      setScreeningYear('screen.cervical.year', ['screen.cervical.year', 'screen.cervix.last_year']);
+      setScreeningYear('screen.mammogram.year', ['screen.mammogram.year', 'screen.breast.mammo_last_year']);
+      setScreeningYear('screen.colonoscopy.date', ['screen.colonoscopy.date', 'screen.crc.last_year']);
+      setScreeningYear('screen.mammo.date', ['screen.mammo.date', 'screen.breast.mammo_last_year']);
+      setScreeningYear('screen.pap.date', ['screen.pap.date', 'screen.cervix.last_year']);
+      setScreeningYear('screen.lung.ldct_last_year', ['screen.lung.ldct_last_year']);
+      setScreeningYear('screen.psa.date', ['screen.psa.date']);
+      setScreeningYear('screen.hcc.us_last_year', ['screen.hcc.us_last_year']);
+      setScreeningYear('screen.upper_endo.last_year', ['screen.upper_endo.last_year']);
       
       if (Object.keys(screeningImmunization).length > 0) {
         standardized.advanced.screening_immunization = screeningImmunization;
@@ -258,6 +299,15 @@ export const StandardizationService = {
       }
 
       // Environmental Exposures - UPDATED KEYS
+      // Functional Status
+      const functional: Record<string, any> = {};
+      if (answers['func.falls_last_year']) { // Not strictly required but good to map
+          functional.falls_last_year = Number(answers['func.falls_last_year']) || 0;
+      }
+      if (Object.keys(functional).length > 0) {
+          standardized.advanced.functional = functional;
+      }
+
       const environmental: Record<string, any> = {};
       const envKeys = [
           'env.summary',

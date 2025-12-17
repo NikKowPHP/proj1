@@ -317,8 +317,9 @@ export const StandardizationService = {
       // Environmental Exposures - UPDATED KEYS
       // Functional Status
       const functional: Record<string, any> = {};
-      if (answers['func.falls_last_year']) { // Not strictly required but good to map
-          functional.falls_last_year = Number(answers['func.falls_last_year']) || 0;
+      if (answers['func.falls_last_year']) {
+          // Config expects "Yes" for "func.falls_last_year", do not convert to Number
+          functional.falls_last_year = answers['func.falls_last_year'];
       }
       if (Object.keys(functional).length > 0) {
           standardized.advanced.functional = functional;

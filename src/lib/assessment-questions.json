@@ -762,6 +762,14 @@
                   { "value": "lung", "label": "Lung" },
                   { "value": "melanoma", "label": "Melanoma" },
                   { "value": "gastric", "label": "Gastric" },
+                  { "value": "kidney", "label": "Kidney" },
+                  { "value": "bladder", "label": "Bladder" },
+                  { "value": "brain", "label": "Brain/CNS" },
+                  { "value": "thyroid", "label": "Thyroid" },
+                  { "value": "sarcoma", "label": "Sarcoma" },
+                  { "value": "leukemia", "label": "Leukemia" },
+                  { "value": "lymphoma", "label": "Lymphoma" },
+                  { "value": "head_neck", "label": "Head & Neck" },
                   { "value": "other", "label": "Other" }
                 ]
               }
@@ -821,6 +829,13 @@
           "dependsOn": { "questionId": "env.radon.tested", "value": "Yes" }
         },
         {
+          "id": "env.radon.level_cat",
+          "type": "select",
+          "text": {"en": "Radon level found?", "pl": "Poziom radonu?"},
+          "options": ["Low", "Moderate (100-299)", "High (>=300)", "Don't know"],
+          "dependsOn": {"questionId": "env.radon.tested", "value": "Yes"}
+        },
+        {
           "id": "env.radon.mitigation",
           "type": "radio",
           "text": {"en": "Has mitigation been done?", "pl": "Czy wykonano mitygację?"},
@@ -830,7 +845,7 @@
             { "value": "Planned or in progress", "label": {"en": "Planned or in progress", "pl": "Planowane lub w trakcie"} },
             { "value": "Not applicable", "label": {"en": "Not applicable", "pl": "Nie dotyczy"} }
           ],
-          "dependsOn": {"questionId": "env.radon.levels", "operator": ">=", "value": 100}
+          "dependsOn": {"questionId": "env.radon.level_cat", "value": ["Moderate (100-299)", "High (>=300)"]}
         }
       ]
     },

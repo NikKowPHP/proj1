@@ -1061,9 +1061,9 @@ export const DerivedVariablesService = {
       // UV High Logic Update (PDF Page 57)
       const sunburnChild = Number(env['env.uv.sunburn_child']) || 0;
       const sunburnAdult = Number(env['env.uv.sunburn_adult']) || 0;
-      const sunbedFreq = env['env.uv.sunbed_use']; // Values: "Never", "Few times", "Occasionally", "Frequently", "Not sure"
+      const sunbedFreq = env['env.uv.sunbed_use']; // Values: "Never", "Few (<10)", "Occasional (10-50)", "Frequent (>50)"
       
-      const isSunbedUser = ['Occasionally (10-50 sessions)', 'Frequently (>50 sessions)'].includes(sunbedFreq);
+      const isSunbedUser = ['Occasional (10-50)', 'Frequent (>50)'].includes(sunbedFreq);
 
       // Discrepancy Fix: Radon options match
       // "Moderate (100-299)" and "High (>=300)"

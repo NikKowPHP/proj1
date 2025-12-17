@@ -73,6 +73,7 @@ Based on the input data, generate a response in the following single JSON format
 - **DISCUSS_RADON_MITIGATION**: Explain that high radon levels in the home are a risk factor for lung health. Suggest discussing testing or mitigation strategies (like ventilation) with a professional.
 - **DISCUSS_UV_PROTECTION**: Mention that due to reported high sun or sunbed exposure, regular skin checks and sun protection habits are important for preventing skin issues.
 - **DISCUSS_INDOOR_AIR_QUALITY**: Note that long-term use of solid fuels (like coal/wood) indoors can affect lung health. Suggest discussing symptoms like cough with a doctor and ensuring good ventilation.
+- **DISCUSS_FALLS_PREVENTION**: Because a recent fall was reported, suggest discussing balance exercises and a review of medications with a doctor to prevent future injury.
 
 Now, generate the structured explanation based on the provided health payload.
 `;

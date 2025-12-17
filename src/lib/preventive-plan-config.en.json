@@ -11,8 +11,7 @@
       "actionId": "LUNG_CANCER_SCREENING",
       "category": "screenings",
       "conditions": [
-        { "questionId": "age", "operator": "in", "value": ["50-59", "60+"] },
-        { "questionId": "smoking_status", "operator": "equals", "value": "Current" }
+        { "questionId": "screen.lung_candidate", "operator": "equals", "value": true }
       ]
     },
     {
@@ -127,6 +126,13 @@
       "category": "lifestyle",
       "conditions": [
         { "questionId": "env.solidfuel_longterm", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "DISCUSS_FALLS_PREVENTION",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "func.falls_last_year", "operator": "equals", "value": "Yes" }
       ]
     }
   ]

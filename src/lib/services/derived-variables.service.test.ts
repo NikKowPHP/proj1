@@ -186,22 +186,26 @@ describe("DerivedVariablesService", () => {
         expect(derived.exposure_composites.has_known_carcinogen_exposure).toBe(false);
     });
 
-    it("should set highrisk_anal_cancer_group to true if user has HIV", () => {
-        // HIV is passed as a condition ID in core.conditions
+    it("should set highrisk_anal_cancer_group to true if user has HIV and MSM behavior", () => {
         const standardizedData = {
-          core: { conditions: ['hiv'] }
+          core: { sex_at_birth: 'Male' },
+          advanced: { 
+              illnesses: [{ id: 'hiv' }],
+              sexual_health: { 'sexhx.partner_genders': 'Male' }
+          }
         };
         const derived = DerivedVariablesService.calculateAll(standardizedData);
         expect(derived['sex.highrisk_anal_cancer_group']).toBe(true);
     });
 
-    it("should set highrisk_anal_cancer_group to true for Male MSM", () => {
+    it("should set highrisk_anal_cancer_group to true for Male MSM >= 35", () => {
       const standardizedData = {
-        core: { sex_at_birth: 'Male' },
+        core: { sex_at_birth: 'Male', dob: '1980-01-01' },
         advanced: { sexual_health: { 'sexhx.partner_genders': 'Male' } }
       };
       const derived = DerivedVariablesService.calculateAll(standardizedData);
       expect(derived['sex.msm_behavior']).toBe(true);
+      expect(derived.age_years).toBeGreaterThanOrEqual(35);
       expect(derived['sex.highrisk_anal_cancer_group']).toBe(true);
     });
 
@@ -247,7 +251,7 @@ describe("DerivedVariablesService", () => {
         expect(derived['occ.lung_highrisk']).toBe(true);
     });
     
-     // Occupational Risk (Painter job title)
+    // Occupational Risk (Painter job title)
      it("should set lung_highrisk for Painter job title > 10 years", () => {
         const standardizedData = {
             advanced: {
@@ -258,6 +262,90 @@ describe("DerivedVariablesService", () => {
         expect(derived['occ.lung_highrisk']).toBe(true);
     });
 
+    it("should calculate AUDIT-C 4-tier risk bands", () => {
+        const testCases = [
+            { q1: 1, q2: 1, q3: 1, expected: 'Low' },
+            { q1: 2, q2: 2, q3: 1, expected: 'Increasing' },
+            { q1: 3, q2: 3, q3: 2, expected: 'Higher' },
+            { q1: 4, q2: 4, q3: 3, expected: 'Possible dependence' }
+        ];
+
+        testCases.forEach(({ q1, q2, q3, expected }) => {
+            const data = { core: { alcohol_audit: { q1, q2, q3 } } };
+            const derived = DerivedVariablesService.calculateAll(data);
+            expect(derived.alcohol_audit.risk).toBe(expected);
+        });
+    });
+
+    it("should classify WCRF Moderate compliance at 1.5", () => {
+        const standardizedData = {
+            core: {
+                diet: { vegetables: 4, fast_food: 1, red_meat: 3.5, processed_meat: 0, sugary_drinks: 0 }
+            }
+        };
+        // compA (fv=4) = 0.5, compB (ff=1) = 1.0, compC (red=350, proc=0) = 1.0, compD (ssb=0) = 1.0
+        // Total = 3.5 -> High
+        // Let's adjust compC to be 0
+        standardizedData.core.diet.red_meat = 6; // redMeatGwk = 600 -> compC = 0
+        standardizedData.core.diet.vegetables = 4; // compA = 0.5
+        // total = 0.5 + 1.0 + 0 + 1.0 = 2.5 -> Moderate
+        
+        let derived = DerivedVariablesService.calculateAll(standardizedData);
+        expect(derived.wcrf_score.compliance).toBe('Moderate');
+
+        // Close to threshold: 1.5
+        const midData = {
+            core: {
+                diet: { vegetables: 4, fast_food: 4, red_meat: 6, processed_meat: 0, sugary_drinks: 0 }
+            }
+        };
+        // compA = 0.5, compB (ff=4) = 0, compC (red=600) = 0, compD (ssb=0) = 1.0
+        // Total = 1.5 -> Moderate
+        derived = DerivedVariablesService.calculateAll(midData);
+        expect(derived.wcrf_score.score).toBe(1.5);
+        expect(derived.wcrf_score.compliance).toBe('Moderate');
+    });
+
+    it("should set env.air_longterm_high based on years", () => {
+        const dataHigh = { advanced: { environment: { 'env.air.high_pollution_years': 10 } } };
+        const derivedHigh = DerivedVariablesService.calculateAll(dataHigh);
+        expect(derivedHigh['env.air_longterm_high']).toBe(true);
+        expect(derivedHigh['env.any_high_count']).toBeGreaterThanOrEqual(1);
+
+        const dataLow = { advanced: { environment: { 'env.air.high_pollution_years': 9 } } };
+        const derivedLow = DerivedVariablesService.calculateAll(dataLow);
+        expect(derivedLow['env.air_longterm_high']).toBe(false);
+    });
+
+    it("should detect ca.colorectal_history from personal cancer history", () => {
+        const data = {
+            advanced: {
+                personal_cancer_history: [{ type: 'Colon Cancer' }]
+            }
+        };
+        const derived = DerivedVariablesService.calculateAll(data);
+        expect(derived['ca.colorectal_history']).toBe(true);
+    });
+
+    it("should set sex.opted_out correctly", () => {
+        const dataOptOut = { advanced: { sexual_health: { 'sexhx.section_opt_in': 'No' } } };
+        const derivedOptOut = DerivedVariablesService.calculateAll(dataOptOut);
+        expect(derivedOptOut['sex.opted_out']).toBe(true);
+
+        const dataOptIn = { advanced: { sexual_health: { 'sexhx.section_opt_in': 'Yes' } } };
+        const derivedOptIn = DerivedVariablesService.calculateAll(dataOptIn);
+        expect(derivedOptIn['sex.opted_out']).toBe(false);
+    });
+
+    it("should set shs.none_flag correctly", () => {
+        const dataNone = { advanced: { smoking_detail: { shs: { home_freq: 'Never', work_freq: 'Never' } } } };
+        const derivedNone = DerivedVariablesService.calculateAll(dataNone);
+        expect(derivedNone['shs.none_flag']).toBe(true);
+
+        const dataSome = { advanced: { smoking_detail: { shs: { home_freq: 'Daily' } } } };
+        const derivedSome = DerivedVariablesService.calculateAll(dataSome);
+        expect(derivedSome['shs.none_flag']).toBe(false);
+    });
   });
 });
       

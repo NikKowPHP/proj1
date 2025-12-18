@@ -58,6 +58,12 @@ export const StandardizationService = {
             q2: Number(answers['auditc.q2_typical']),
             q3: Number(answers['auditc.q3_6plus']),
         },
+        // Alcohol Beverage Mix (Core)
+        alcohol_mix: {
+            beer_pct: Number(answers['alcohol.beer_pct']) || undefined,
+            wine_pct: Number(answers['alcohol.wine_pct']) || undefined,
+            spirits_pct: Number(answers['alcohol.spirits_pct']) || undefined,
+        },
         symptoms: safeJsonParse(answers.symptoms),
         family_cancer_any: answers['famhx.any_family_cancer'], // UPDATED KEY
         
@@ -88,6 +94,15 @@ export const StandardizationService = {
 
       // --- ADVANCED SECTION ---
       
+      // Prophylactic Surgery
+      if (answers['ca.prophylactic_surgery.any']) {
+          standardized.advanced.prophylactic_surgery = {
+              any: answers['ca.prophylactic_surgery.any'],
+              type: safeJsonParse(answers['ca.prophylactic_surgery.type']),
+              year: parseYear(answers['ca.prophylactic_surgery.year'])
+          };
+      }
+
       // Symptom Details
       const symptomDetails: Record<string, any> = {};
       standardized.core.symptoms.forEach((symptomId: string) => {
@@ -318,8 +333,10 @@ export const StandardizationService = {
       // Functional Status
       const functional: Record<string, any> = {};
       if (answers['func.falls_last_year']) {
-          // Config expects "Yes" for "func.falls_last_year", do not convert to Number
           functional.falls_last_year = answers['func.falls_last_year'];
+      }
+      if (answers['func.adl_help']) {
+          functional.adl_help = answers['func.adl_help'];
       }
       if (Object.keys(functional).length > 0) {
           standardized.advanced.functional = functional;

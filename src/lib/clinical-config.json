@@ -14,7 +14,7 @@
     "hcc_ibd_years_min": 8
   },
   "risk_factors": {
-    "radon_high_options": ["High (>=300)"],
+    "radon_high_options": ["High (>=300)", "Moderate (100-299)"],
     "hpv_partners_high": ["20 or more", "10-19"],
     "hpv_partners_recent_high": ["4-5", "6 or more", "6+"]
   },

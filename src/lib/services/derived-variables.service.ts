@@ -785,6 +785,7 @@ export const DerivedVariablesService = {
     try {
       const core = standardizedData.core || {};
       const advanced = standardizedData.advanced || {};
+      const prophylaxis = advanced.prophylactic_surgery || {};
 
       // Calculate Age
       const age = calculateAge(core.dob);
@@ -853,16 +854,29 @@ export const DerivedVariablesService = {
         const { pack_years, brinkman_index } = calculateSmokingMetrics(advanced.smoking_detail);
         if (pack_years !== null) derived.pack_years = pack_years;
         if (brinkman_index !== null) derived.brinkman_index = brinkman_index;
+        
+        // Calculate years since quit if applicable
+        const currentYear = new Date().getFullYear();
+        const quitYear = advanced.smoking_detail?.quit_date;
+        if (core.smoking_status === 'Former' && quitYear) {
+            derived.smoking_years_since_quit = currentYear - quitYear;
+        }
       }
       
       // Determine organ inventory based on sex at birth.
       if(core.sex_at_birth === 'Female') {
           derived.sex_category = "female_at_birth";
+          
+          const surgs = prophylaxis.type || [];
+          const hasHysterectomy = surgs.includes('Hysterectomy');
+          const hasOophorectomy = surgs.includes('Oophorectomy');
+          const hasMastectomy = surgs.includes('Mastectomy');
+
           derived.organ_inventory = {
-              has_cervix: true,
-              has_uterus: true,
-              has_ovaries: true,
-              has_breasts: true
+              has_cervix: !hasHysterectomy,
+              has_uterus: !hasHysterectomy,
+              has_ovaries: !hasOophorectomy,
+              has_breasts: !hasMastectomy
           }
       } else if (core.sex_at_birth === 'Male') {
           derived.sex_category = "male_at_birth";

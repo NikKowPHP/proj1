@@ -74,6 +74,15 @@ Based on the input data, generate a response in the following single JSON format
 - **DISCUSS_UV_PROTECTION**: Mention that due to reported high sun or sunbed exposure, regular skin checks and sun protection habits are important for preventing skin issues.
 - **DISCUSS_INDOOR_AIR_QUALITY**: Note that long-term use of solid fuels (like coal/wood) indoors can affect lung health. Suggest discussing symptoms like cough with a doctor and ensuring good ventilation.
 - **DISCUSS_FALLS_PREVENTION**: Because a recent fall was reported, suggest discussing balance exercises and a review of medications with a doctor to prevent future injury.
+- **CERVICAL_CANCER_SCREENING**: Explain that routine screening (Pap or HPV test) is important for preventing cervical cancer. Mention it is due based on the time since the last reported test.
+- **BREAST_CANCER_SCREENING**: Explain that mammography is the standard for detecting breast cancer early. Mention it is recommended based on age and screening history.
+- **LIVER_ULTRASOUND_SURVEILLANCE**: Explain that for individuals with certain liver conditions (like cirrhosis or hepatitis B), regular ultrasound surveillance is recommended to monitor liver health.
+- **BARRETTS_SURVEILLANCE**: Explain that monitoring Barrett's esophagus with endoscopy helps detect changes early.
+- **SKIN_EXAM**: Explain that a professional skin exam is recommended due to risk factors like high UV exposure, history of sunburns, or concerning skin symptoms.
+- **PNEUMOCOCCAL_VACCINATION**: Explain that this vaccine helps prevent serious lung infections and is often recommended for older adults or those with certain health conditions.
+- **SHINGLES_VACCINATION**: Explain that the shingles vaccine is recommended to prevent painful skin rashes, typically for adults over 50.
+- **FLU_VACCINATION**: Mention that an annual flu shot is recommended to protect against seasonal influenza.
+- **TETANUS_BOOSTER**: Remind that a tetanus booster is generally recommended every 10 years.
 
 Now, generate the structured explanation based on the provided health payload.
 `;

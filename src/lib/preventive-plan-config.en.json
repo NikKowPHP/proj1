@@ -134,6 +134,69 @@
       "conditions": [
         { "questionId": "func.falls_last_year", "operator": "equals", "value": "Yes" }
       ]
+    },
+    {
+      "actionId": "CERVICAL_CANCER_SCREENING",
+      "category": "screenings",
+      "conditions": [
+        { "questionId": "screen.cervix_due", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "BREAST_CANCER_SCREENING",
+      "category": "screenings",
+      "conditions": [
+        { "questionId": "screen.breast_due", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "LIVER_ULTRASOUND_SURVEILLANCE",
+      "category": "screenings",
+      "conditions": [
+        { "questionId": "hcc.surveillance_candidate", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "BARRETTS_SURVEILLANCE",
+      "category": "screenings",
+      "conditions": [
+        { "questionId": "barrett.surveillance", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "SKIN_EXAM",
+      "category": "screenings",
+      "conditions": [
+        { "questionId": "screen.skin_check_recommended", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "PNEUMOCOCCAL_VACCINATION",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "imm.pneumo_candidate", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "SHINGLES_VACCINATION",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "imm.zoster_candidate", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "FLU_VACCINATION",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "imm.flu_due", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "TETANUS_BOOSTER",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "imm.tetanus_booster_due", "operator": "equals", "value": true }
+      ]
     }
   ]
 }

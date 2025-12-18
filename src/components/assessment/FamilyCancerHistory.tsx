@@ -16,6 +16,7 @@ interface CancerDiagnosis {
   age_dx?: number;
   laterality?: string;
   multiple_primaries?: boolean;
+  known_genetic_syndrome?: boolean;
 }
 
 interface FamilyMember {
@@ -24,7 +25,6 @@ interface FamilyMember {
   vital_status?: string; // Alive, Deceased
   age_now_death?: number; // Age now or at death
   cancers?: CancerDiagnosis[]; // Array of cancers instead of single cancer
-  known_genetic_syndrome?: boolean;
   sex_at_birth?: string;
   is_blood_related?: boolean;
 }
@@ -302,7 +302,17 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                         onCheckedChange={(c) => handleCancerFieldChange(index, cancerIndex, "multiple_primaries", !!c)}
                       />
                       <Label htmlFor={`multiple_primaries_${index}_${cancerIndex}`} className="font-normal text-sm">
-                        Multiple primary cancers?
+                        Bilateral or multiple primary cancers?
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 pt-1">
+                      <Checkbox
+                        id={`genetic_syndrome_${index}_${cancerIndex}`}
+                        checked={cancer.known_genetic_syndrome}
+                        onCheckedChange={(c) => handleCancerFieldChange(index, cancerIndex, "known_genetic_syndrome", !!c)}
+                      />
+                      <Label htmlFor={`genetic_syndrome_${index}_${cancerIndex}`} className="font-normal text-sm">
+                        Linked to known genetic syndrome?
                       </Label>
                     </div>
                   </div>
@@ -315,17 +325,6 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                   + Add Cancer
                 </button>
               </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id={`genetic_syndrome_${index}`}
-                checked={item.known_genetic_syndrome}
-                onCheckedChange={(checked) => handleFieldChange(index, "known_genetic_syndrome", !!checked)}
-              />
-              <Label htmlFor={`genetic_syndrome_${index}`} className="font-normal">
-                Known Genetic Syndrome?
-              </Label>
             </div>
           </div>
         )}

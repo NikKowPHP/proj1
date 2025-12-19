@@ -742,6 +742,12 @@ export const DerivedVariablesService = {
           derived.ssb_mLwk = freq * mlPerServing;
       }
 
+      // ADDED: Diet Flags
+      derived['flag.redmeat.high'] = (derived.red_meat_gwk || 0) > 500;
+      derived['flag.procmeat.any'] = (derived.proc_meat_gwk || 0) > 0;
+      derived['flag.ssb.any'] = (core.diet?.sugary_drinks || 0) >= 1;
+      derived['flag.fastfoods.high'] = (core.diet?.fast_food || 0) >= 2;
+
       // Smoking
       if (core.smoking_status === 'Never') {
           derived.pack_years = 0;
@@ -782,7 +788,10 @@ export const DerivedVariablesService = {
 
       // Family History
       const earlyDx = calculateEarlyAgeFamilyDx(advanced.family);
-      if (earlyDx !== null) derived.early_age_family_dx = earlyDx;
+      if (earlyDx !== null) {
+          derived.early_age_family_dx = earlyDx;
+          derived['famhx.early_onset_any'] = earlyDx; // ADDED: Alias for spec compliance
+      }
       
       const famClusters = calculateFamilyClusters(advanced.family);
       const syndromeFlags = calculateSyndromeFlags(advanced.family);
@@ -838,9 +847,12 @@ export const DerivedVariablesService = {
       const meds = advanced.medications_iatrogenic || {};
       const hasImmunosuppression = meds.immunosuppression_now === 'Yes';
       const sexSitesEver = sexHistory['sexhx.sex_sites_ever'] || [];
-      const hasAnalReceptive = Array.isArray(sexSitesEver) && sexSitesEver.includes('anal'); // Logic assumes specific option ID
+      const hasAnalReceptive = Array.isArray(sexSitesEver) && sexSitesEver.includes('anal'); 
       const hpvPrecancer = sexHistory['sexhx.hpv_precancer_history'] || [];
       const hasAnalPrecancer = Array.isArray(hpvPrecancer) && hpvPrecancer.includes('Anus');
+
+      // ADDED: derived.sex.anal_receptive_ever
+      derived['sex.anal_receptive_ever'] = hasAnalReceptive;
 
       // (derived.sex.msm_behavior = true AND user_age ≥ 35)
       const condition1 = msmBehavior && derived.age_years >= 35;
@@ -891,6 +903,15 @@ export const DerivedVariablesService = {
       
       // --- Personal Cancer History Flags ---
       const personalCancerHistory = advanced.personal_cancer_history || [];
+
+      // ADDED: derived.ca.any_history
+      derived['ca.any_history'] = core.cancer_any === 'Yes' || personalCancerHistory.length > 0;
+
+      // ADDED: derived.ca.current_treatment
+      const activeTreatmentNow = core.active_treatment_now === 'Yes';
+      const anyActiveCancer = personalCancerHistory.some((c: any) => c.status_current === 'Active treatment');
+      const anyActiveMeds = personalCancerHistory.some((c: any) => c.sys_current === 'Yes' || c.endo_current === 'Yes');
+      derived['ca.current_treatment'] = activeTreatmentNow || anyActiveCancer || anyActiveMeds;
 
       // ADDED: Num primaries and Multiple primaries
       const distinctCancers = personalCancerHistory.length;
@@ -1059,6 +1080,7 @@ export const DerivedVariablesService = {
       const lastPapYear = screening['screen.cervix.last_year'] ?? screening['screen.cervical.year'];
       const lastMammoYear = screening['screen.breast.mammo_last_year'] ?? screening['screen.mammogram.year'];
       const lastCrcYear = screening['screen.crc.last_year'] ?? screening['screen.colon.year'];
+      const lastHccUsYear = screening['screen.hcc.us_last_year'];
 
       const yearsSince = (year?: number) =>
         typeof year === 'number' ? currentYear - year : Number.POSITIVE_INFINITY;
@@ -1082,6 +1104,11 @@ export const DerivedVariablesService = {
         derived.age_years !== undefined &&
         derived.age_years >= thresholds.crc_age_min &&
         (yearsSince(lastCrcYear) >= crcInterval);
+
+      // ADDED: screen.hcc_surveillance_due
+      derived['screen.hcc_surveillance_due'] = 
+        derived['hcc.surveillance_candidate'] && 
+        (screening['screen.hcc.us_ever'] === 'No' || yearsSince(lastHccUsYear) >= 1); // 1 year tolerance for year-only input
 
       derived['screen.any_overdue'] =
         derived['screen.cervix_due'] ||
@@ -1117,6 +1144,15 @@ export const DerivedVariablesService = {
       } else {
           derived['imm.tetanus_booster_due'] = false; 
       }
+
+      // ADDED: imm.any_gap
+      derived['imm.any_gap'] = 
+        (derived['imm.hbv_susceptible'] === true) ||
+        (derived['imm.flu_due'] === true) ||
+        (derived['imm.covid_booster_due'] === true) ||
+        (derived['imm.tetanus_booster_due'] === true) ||
+        (derived['imm.zoster_candidate'] === true && imm['imm.zoster.ever'] !== 'Yes') ||
+        (derived['imm.pneumo_candidate'] === true && imm['imm.pneumo.ever'] !== 'Yes');
 
       // AUDIT-C
       const audit = calculateAuditC(core.alcohol_audit, core.sex_at_birth);

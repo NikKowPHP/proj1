@@ -100,6 +100,7 @@
                 { "id": "vape.status", "text": {"en": "Do you use e-cigarettes (vapes)?", "pl": "Czy używasz e-papierosów (vape)?"}, "type": "radio", "options": [{"value": "Lifetime never", "label": {"en": "Lifetime never", "pl": "Nigdy w życiu"}}, {"value": "Former", "label": {"en": "Former", "pl": "W przeszłości"}}, {"value": "Current", "label": {"en": "Current", "pl": "Obecnie"}}] },
                 { "id": "vape.days_30d", "text": {"en": "In the past 30 days, on how many days did you use an e-cigarette?", "pl": "W ostatnich 30 dniach, w ile dni używałeś/aś e-papierosa?"}, "type": "number_input", "min": 0, "max": 30, "dependsOn": {"questionId": "vape.status", "value": "Current"} },
                 { "id": "vape.device_type", "text": {"en": "Which device type do you usually use?", "pl": "Jakiego typu urządzenia zwykle używasz?"}, "type": "select", "options": [{"value": "Disposable", "label": {"en": "Disposable", "pl": "Jednorazowe"}}, {"value": "Prefilled pod or cartridge", "label": {"en": "Prefilled pod or cartridge", "pl": "Wkłady (pods) lub kartridże"}}, {"value": "Refillable tank or mod", "label": {"en": "Refillable tank or mod", "pl": "Zbiornik do napełniania lub mod"}}, {"value": "Other", "label": {"en": "Other", "pl": "Inne"}}], "dependsOn": {"questionId": "vape.status", "value": "Current"} },
+                { "id": "vape.device_type_other", "text": {"en": "Other device type", "pl": "Inny typ urządzenia"}, "type": "text_input", "dependsOn": {"questionId": "vape.device_type", "value": "Other"} },
                 { "id": "vape.nicotine", "text": {"en": "Does your usual e-liquid contain nicotine?", "pl": "Czy zwykle używany płyn zawiera nikotynę?"}, "type": "radio", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}], "dependsOn": {"questionId": "vape.status", "value": "Current"} },
 
                 { "id": "htp.status", "text": {"en": "Do you use heated-tobacco products (e.g., IQOS®)?", "pl": "Czy używasz wyrobów tytoniu podgrzewanego (np. IQOS®)?"}, "type": "radio", "options": [{"value": "Lifetime never", "label": {"en": "Lifetime never", "pl": "Nigdy w życiu"}}, {"value": "Former", "label": {"en": "Former", "pl": "W przeszłości"}}, {"value": "Current", "label": {"en": "Current", "pl": "Obecnie"}}] },
@@ -324,6 +325,7 @@
                 {"id": "sexhx.sti_history_other", "text": {"en": "History of other STIs?", "pl": "Historia innych STI?"}, "type": "radio", "options": [{"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}, {"value": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
                 {"id": "sexhx.sti_types_other", "text": {"en": "Which STIs?", "pl": "Które STI?"}, "type": "checkbox_group", "options": [{"id": "Chlamydia", "label": {"en": "Chlamydia", "pl": "Chlamydia"}}, {"id": "Gonorrhoea", "label": {"en": "Gonorrhoea", "pl": "Rzeżączka"}}, {"id": "Syphilis", "label": {"en": "Syphilis", "pl": "Kiła"}}, {"id": "Genital herpes", "label": {"en": "Genital herpes", "pl": "Opryszczka narządów płciowych"}}, {"id": "Genital warts", "label": {"en": "Genital warts", "pl": "Kłykciny kończyste"}}, {"id": "Other", "label": {"en": "Other", "pl": "Inne"}}, {"id": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}], "dependsOn": {"questionId": "sexhx.sti_history_other", "value": "Yes"}},
+                { "id": "sexhx.sti_types_other_text", "text": {"en": "Other STI details", "pl": "Inne STI (szczegóły)"}, "type": "text_input", "dependsOn": {"questionId": "sexhx.sti_types_other", "operator": "array_contains", "value": "Other"} },
                 
                 {"id": "sexhx.sti_treated_12m", "text": {"en": "Treated for STI in last 12m?", "pl": "Leczenie STI w ost. 12 mies.?"}, "type": "radio", "options": [{"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}, {"value": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
@@ -461,6 +463,7 @@
                    { "id": "Salpingectomy", "label": { "en": "Salpingectomy (Fallopian tube removal)", "pl": "Salpingektomia (usunięcie jajowodów)" } },
                    { "id": "Other", "label": { "en": "Other", "pl": "Inne" } }
                  ]},
+                 { "id": "ca.prophylactic_surgery.type_other", "text": { "en": "Other surgery type", "pl": "Inny rodzaj operacji" }, "type": "text_input", "dependsOn": { "questionId": "ca.prophylactic_surgery.type", "operator": "array_contains", "value": "Other" } },
                  { "id": "ca.prophylactic_surgery.year", "text": { "en": "Year of surgery", "pl": "Rok operacji" }, "type": "year_input" }
               ]
             }
@@ -490,6 +493,12 @@
             { "id": "Paternal Grandfather", "label": { "en": "Paternal Grandfather", "pl": "Dziadek (Ojciec)" } },
             { "id": "Other", "label": { "en": "Other", "pl": "Inni" } }
           ]
+        },
+        {
+          "id": "famhx.quick_relatives_other",
+          "type": "text_input",
+          "text": { "en": "Other relatives (please specify)", "pl": "Inni krewni (proszę wpisać)" },
+          "dependsOn": { "questionId": "famhx.quick_relatives_chips", "operator": "array_contains", "value": "Other" }
         },
         {
           "id": "advanced_modules_symptoms_cond",
@@ -591,6 +600,7 @@
                   { "value": "PBC", "label": { "en": "PBC (Primary Biliary Cholangitis)", "pl": "PBC (Pierwotne zapalenie dróg żółciowych)" } },
                   { "value": "Other", "label": { "en": "Other", "pl": "Inna" } }
                 ], "dependsOn": {"questionId": "cond.summary", "value": "cirrhosis"} },
+                { "id": "cond.cirr.etiology_other", "text": {"en": "Other cause", "pl": "Inna przyczyna"}, "type": "text_input", "dependsOn": {"questionId": "cond.cirr.etiology", "value": "Other"} },
 
                 { "id": "cond.hpylori.status", "text": {"en": "H. pylori Status", "pl": "Status H. pylori"}, "type": "radio", "options": [
                   { "value": "Never", "label": { "en": "Never", "pl": "Nigdy" } },
@@ -643,6 +653,7 @@
                   { "value": "Other", "label": { "en": "Other", "pl": "Inna" } },
                   { "value": "Not sure", "label": { "en": "Not sure", "pl": "Nie wiem" } }
                 ], "dependsOn": {"questionId": "cond.pancr.status", "value": "Yes"} },
+                { "id": "cond.pancr.etiology_other", "text": {"en": "Other cause", "pl": "Inna przyczyna"}, "type": "text_input", "dependsOn": {"questionId": "cond.pancr.etiology", "value": "Other"} },
 
                 { "id": "cond.t2dm.status", "text": {"en": "Type 2 Diabetes?", "pl": "Cukrzyca typu 2?"}, "type": "radio", "options": [
                   { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } },
@@ -673,6 +684,7 @@
                   { "value": "Pancreas", "label": { "en": "Pancreas", "pl": "Trzustka" } },
                   { "value": "Other", "label": { "en": "Other", "pl": "Inny" } }
                 ], "dependsOn": {"questionId": "cond.tx.status", "value": "Yes"} },
+                { "id": "cond.tx.organ_other", "text": {"en": "Other organ", "pl": "Inny narząd"}, "type": "text_input", "dependsOn": {"questionId": "cond.tx.organ", "value": "Other"} },
                 { "id": "cond.tx.year", "text": {"en": "Year of transplant", "pl": "Rok przeszczepu"}, "type": "year_input", "dependsOn": {"questionId": "cond.tx.status", "value": "Yes"} },
                 
                 { "id": "imm.varicella.status", "text": { "en": "Chickenpox (varicella) – history or vaccination?", "pl": "Ospa wietrzna – historia lub szczepienie?" }, "type": "radio", "options": [
@@ -711,6 +723,7 @@
                   {"id": "Steroid", "label": { "en": "Chronic steroid", "pl": "Przewlekłe stosowanie steroidów" }},
                   {"id": "Other", "label": { "en": "Other", "pl": "Inny" }}
                 ], "dependsOn": {"questionId": "meds.immunosupp.current", "value": "Yes"} },
+                { "id": "meds.immunosupp.classes_other", "text": {"en": "Other medication class", "pl": "Inna klasa leków"}, "type": "text_input", "dependsOn": {"questionId": "meds.immunosupp.classes", "operator": "array_contains", "value": "Other"} },
                 
                 { "id": "meds.hrt.use", "text": {"en": "Menopausal HRT use", "pl": "Stosowanie HTZ"}, "type": "radio", "options": ["Never", "Past", "Current"], "dependsOn": {"questionId": "sex_at_birth", "value": "Female"} },
                 { "id": "meds.hrt.type", "text": {"en": "HRT Type", "pl": "Typ HTZ"}, "type": "select", "options": ["Combined", "Estrogen-only", "Other"], "dependsOn": {"questionId": "meds.hrt.use", "value": ["Past", "Current"]} },

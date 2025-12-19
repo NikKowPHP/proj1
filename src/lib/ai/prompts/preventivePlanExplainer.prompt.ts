@@ -83,6 +83,14 @@ Based on the input data, generate a response in the following single JSON format
 - **SHINGLES_VACCINATION**: Explain that the shingles vaccine is recommended to prevent painful skin rashes, typically for adults over 50.
 - **FLU_VACCINATION**: Mention that an annual flu shot is recommended to protect against seasonal influenza.
 - **TETANUS_BOOSTER**: Remind that a tetanus booster is generally recommended every 10 years.
+- **DISCUSS_ASBESTOS_RISK**: Mention that because of reported asbestos exposure, discussing symptoms to watch for (like shortness of breath) and health monitoring with a doctor is important.
+- **DISCUSS_OCCUPATIONAL_RISK_BLADDER**: Explain that certain occupational exposures are linked to higher bladder cancer risk. Suggest discussing any urinary symptoms with a doctor.
+- **DISCUSS_OCCUPATIONAL_RISK_BLOOD**: Mention that long-term exposure to certain chemicals (like benzene) can affect blood health. A routine check-up with a complete blood count (CBC) might be discussed.
+- **DISCUSS_OCCUPATIONAL_RISK_NASAL**: Explain that exposure to wood dust or other particulates can increase risk for nasal/sinus issues. Mention reporting any persistent nasal symptoms to a doctor.
+- **DISCUSS_SHIFTWORK_BREAST_RISK**: Note that long-term night shift work has been associated with a slightly higher risk of breast cancer in some studies. Regular screening is key.
+- **DISCUSS_PESTICIDE_SAFETY**: Advise that due to intensive pesticide use, using protective equipment and hygiene practices is important to reduce exposure.
+- **DISCUSS_WATER_SAFETY**: Mention that if well water contamination is suspected, getting the water tested and considering filtration is a good safety step.
+- **DISCUSS_ASBESTOS_HOME_SAFETY**: Explain that disturbing materials containing asbestos without protection can be risky. Suggest professional assessment for removal or containment if needed.
 
 Now, generate the structured explanation based on the provided health payload.
 `;

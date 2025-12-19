@@ -197,6 +197,76 @@
       "conditions": [
         { "questionId": "imm.tetanus_booster_due", "operator": "equals", "value": true }
       ]
+    },
+    {
+      "actionId": "DISCUSS_ASBESTOS_RISK",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "occ.mesothelioma_flag", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "DISCUSS_OCCUPATIONAL_RISK_BLADDER",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "occ.bladder_highrisk", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "DISCUSS_OCCUPATIONAL_RISK_BLOOD",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "occ.blood_cancer_flag", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "DISCUSS_OCCUPATIONAL_RISK_NASAL",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "occ.nasal_sinus_flag", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "DISCUSS_SHIFTWORK_BREAST_RISK",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "occ.breast_shiftwork_flag", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "DISCUSS_PESTICIDE_SAFETY",
+      "category": "lifestyle",
+      "conditions": [
+        { "questionId": "env.pesticide_intensive", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "DISCUSS_WATER_SAFETY",
+      "category": "lifestyle",
+      "conditions": [
+        { "questionId": "env.well_contam_flag", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "DISCUSS_ASBESTOS_HOME_SAFETY",
+      "category": "lifestyle",
+      "conditions": [
+        { "questionId": "env.asbestos_unprotected", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "GENETIC_COUNSELING_REFERRAL",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "gen.polyposis_syndrome", "operator": "equals", "value": true }
+      ]
+    },
+    {
+      "actionId": "GENETIC_COUNSELING_REFERRAL",
+      "category": "topicsForDoctor",
+      "conditions": [
+        { "questionId": "gen.prs_elevated", "operator": "equals", "value": true }
+      ]
     }
   ]
 }

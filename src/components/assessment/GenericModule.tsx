@@ -26,13 +26,13 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
     const locale = useLocale();
     const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
-    const getOptionLabel = (opt: any) => {
-        const rawLabel = typeof opt === 'object' ? opt.label : opt;
-        if (typeof rawLabel === 'object' && rawLabel !== null) {
-            const localized = (rawLabel as Record<string, string>)[locale as string];
-            return localized ?? (rawLabel as any).en ?? Object.values(rawLabel)[0];
+    const getLabel = (label: any) => {
+        // The API already localizes the response, so label should be a string.
+        // We keep the object check for safety if raw JSON is ever passed directly.
+        if (typeof label === 'object' && label !== null) {
+            return label[locale] || label.en || Object.values(label)[0];
         }
-        return rawLabel;
+        return label;
     };
 
     const handleValidatedChange = (id: string, value: any, type?: string) => {
@@ -62,12 +62,11 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
             {visibleQuestions.map(q => {
                 const key = q.id;
                 const error = errors[key] || externalErrors?.[key];
+                const questionText = getLabel(q.text);
 
                 const renderInfoCard = () => {
                     if (!q.infoCard) return null;
-                    const infoText = typeof q.infoCard.text === 'object' ? q.infoCard.text.en : q.infoCard.text; // Locale handled by parent logic usually or handled here if locale prop available. 
-                    // NOTE: GenericModule currently lacks locale prop, defaulting to EN property or raw string.
-                    // For now assuming the 'questions' prop is already localized or we handle raw objects.
+                    const infoText = getLabel(q.infoCard.text);
 
                     return (
                         <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 mt-2">
@@ -82,29 +81,15 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                 const renderInput = () => {
                     switch (q.type) {
                         case 'select':
+                        case 'radio': // Fallback to select for simple radio lists in generic module
                             return (
                                 <Select onValueChange={(value) => onAnswer(key, value)} value={answers[key] || ""}>
                                     <SelectTrigger id={key}><SelectValue placeholder={locale === 'pl' ? "Wybierz opcję" : "Select an option"} /></SelectTrigger>
                                     <SelectContent>
                                         {q.options.map((opt: string | { value: string, label: any }) => {
-                                            if (typeof opt === 'object') {
-                                                return <SelectItem key={opt.value} value={opt.value}>{getOptionLabel(opt)}</SelectItem>
-                                            }
-                                            return <SelectItem key={opt} value={opt}>{getOptionLabel(opt)}</SelectItem>
-                                        })}
-                                    </SelectContent>
-                                </Select>
-                            );
-                        case 'radio':
-                            return (
-                                <Select onValueChange={(value) => onAnswer(key, value)} value={answers[key] || ""}>
-                                    <SelectTrigger id={key}><SelectValue placeholder={locale === 'pl' ? "Wybierz opcję" : "Select an option"} /></SelectTrigger>
-                                    <SelectContent>
-                                        {q.options.map((opt: string | { value: string, label: any }) => {
-                                            if (typeof opt === 'object') {
-                                                return <SelectItem key={opt.value} value={opt.value}>{getOptionLabel(opt)}</SelectItem>
-                                            }
-                                            return <SelectItem key={opt} value={opt}>{getOptionLabel(opt)}</SelectItem>
+                                            const value = typeof opt === 'object' ? opt.value : opt;
+                                            const label = typeof opt === 'object' ? getLabel(opt.label) : opt;
+                                            return <SelectItem key={value} value={value}>{label}</SelectItem>
                                         })}
                                     </SelectContent>
                                 </Select>
@@ -215,7 +200,7 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                                 <CheckboxGroup
                                     options={q.options.map((opt: any) => ({
                                         ...opt,
-                                        label: getOptionLabel(opt)
+                                        label: getLabel(opt.label || opt)
                                     }))}
                                     value={answers[key] ? JSON.parse(answers[key]) : []}
                                     onChange={(val) => onAnswer(key, JSON.stringify(val))}
@@ -224,7 +209,7 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                                 />
                             );
                         case 'file_upload':
-                            return <FileUploadComponent key={key} question={q} answers={answers} onAnswer={onAnswer} />;
+                            return <FileUploadComponent key={key} question={{ ...q, text: questionText }} answers={answers} onAnswer={onAnswer} />;
                         case 'consent_checkbox':
                             return (
                                 <div className="flex items-start space-x-3  border p-4 mt-4">
@@ -235,7 +220,7 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                                     />
                                     <div className="grid gap-1.5 leading-none">
                                         <label htmlFor={key} className="text-sm leading-snug text-muted-foreground">
-                                            {q.text}
+                                            {questionText}
                                         </label>
                                     </div>
                                 </div>
@@ -247,7 +232,7 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
 
                 return (
                     <div key={key} className="space-y-2 animate-fade-in">
-                        {q.type !== 'consent_checkbox' && <Label htmlFor={key}>{q.text}</Label>}
+                        {q.type !== 'consent_checkbox' && <Label htmlFor={key}>{questionText}</Label>}
                         {renderInput()}
                         {renderInfoCard()}
                     </div>

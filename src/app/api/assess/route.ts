@@ -79,6 +79,16 @@ export async function POST(request: NextRequest) {
     }
     
     const { answers, locale } = parsedRequest.data;
+    
+    // Explicit Consent Check
+    if (answers['consent.health'] !== 'true' && answers['consent.health'] !== true) {
+      logger.warn("[API:assess] Request rejected due to missing health consent.");
+      return NextResponse.json(
+        { error: "Health data processing consent is required." },
+        { status: 403 }
+      );
+    }
+
     logger.info("[API:assess] Raw answers successfully parsed.");
 
     // 1. Standardize the raw answers into a structured payload

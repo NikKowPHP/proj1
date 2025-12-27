@@ -543,7 +543,11 @@ function calculateHpvExposureBand(sexualHealth: any): string {
     const ageFirstSex = sexualHealth['sexhx.age_first_sex'];
     const sexWork = sexualHealth['sexhx.sex_work_ever'];
 
-    const hasAnal = Array.isArray(sexSitesEver) && sexSitesEver.includes('anal');
+    // Fix: check for 'Anal sex – receptive' specifically, matching the questionnaire IDs
+    const hasAnal = Array.isArray(sexSitesEver) && (
+        sexSitesEver.includes('Anal sex – receptive') || 
+        sexSitesEver.includes('Anal sex – insertive')
+    );
     const isSexWork = sexWork === 'Yes';
     
     const config = clinicalConfig.risk_factors;
@@ -594,15 +598,17 @@ function calculateGeneticsFlags(genetics: any): Record<string, boolean> {
     const hasMatch = (geneList: string[]) => {
         return userGenes.some((userGene: string) => {
             if (geneList.includes(userGene)) return true;
+            // Handle complex strings like "Lynch (MLH1...)" matching simply "Lynch"
             if (geneList.some(g => userGene.includes(g))) return true;
+            // Handle simple "Lynch" matching complex user selection
             if (geneList.some(g => g.includes(userGene))) return true;
             return false;
         });
     }
 
-    const hasHigh = hasMatch(highPenetranceGenes) || userGenes.some((g:string) => g.toLowerCase().includes('lynch'));
+    const hasHigh = hasMatch(highPenetranceGenes);
     const hasModerate = hasMatch(moderatePenetranceGenes);
-    const hasLynch = hasMatch(lynchGenes) || userGenes.some((g:string) => g.toLowerCase().includes('lynch'));
+    const hasLynch = hasMatch(lynchGenes);
     
     const otherPolyposisGenes = polyposisGenes.filter((g: string) => g !== 'MUTYH');
     let hasPolyposis = hasMatch(otherPolyposisGenes);
@@ -698,6 +704,8 @@ export const DerivedVariablesService = {
       const core = standardizedData.core || {};
       const advanced = standardizedData.advanced || {};
       const prophylaxis = advanced.prophylactic_surgery || {};
+      // --- Personal Cancer History Flags ---
+      const personalCancerHistory = advanced.personal_cancer_history || [];
 
       // Age
       const age = calculateAge(core.dob);
@@ -764,13 +772,45 @@ export const DerivedVariablesService = {
         }
       }
       
-      // Organ Inventory
+      // Organ Inventory (Corrected)
       if(core.sex_at_birth === 'Female') {
           derived.sex_category = "female_at_birth";
           const surgs = prophylaxis.type || [];
-          const hasHysterectomy = surgs.includes('Hysterectomy');
-          const hasOophorectomy = surgs.includes('Oophorectomy');
-          const hasMastectomy = surgs.includes('Mastectomy');
+
+          // Check prophylactic surgeries
+          let hasHysterectomy = surgs.includes('Hysterectomy');
+          let hasOophorectomy = surgs.includes('Oophorectomy');
+          let hasMastectomy = surgs.includes('Mastectomy');
+
+          // Check therapeutic surgeries from personal cancer history
+          personalCancerHistory.forEach((cancer: any) => {
+              const type = cancer.type?.toLowerCase() || '';
+              const treatments = cancer.treatments || [];
+              const hasSurgery = treatments.includes('surgery') || (cancer.treatments_modalities && cancer.treatments_modalities.includes('Surgery'));
+
+              if (hasSurgery) {
+                  if (type.includes('endometri') || type.includes('uter')) hasHysterectomy = true;
+                  if (type.includes('ovarian')) hasOophorectomy = true;
+                  if (type.includes('cervic')) {
+                      // Radical hysterectomy is common for cervical cancer, so we assume cervix removal
+                      // But the uterus might remain in rare trachelectomy cases.
+                      // For screening safety, we assume checking is less critical/different if they had cancer.
+                      // NOTE: 'has_cervix' flag is often used to recommend screening. If they had cervical cancer,
+                      // they follow surveillance, not screening. So setting has_cervix=false is safe to suppress generic screening.
+                      hasHysterectomy = true; 
+                  }
+                  if (type.includes('breast') && cancer.surgery_type === 'mastectomy') {
+                      // Note: usually unilateral, but we can flag as "has_mastectomy_history"
+                      // For simplicity, we don't fully disable breast screening based on this unless bilateral.
+                      // But the flag `has_breasts` usually means "has at least one breast".
+                      // If bilateral mastectomy is recorded in prophylactic, we set to false.
+                      // Determining bilateral therapeutic mastectomy is hard from this data structure without side info.
+                      // We will leave `has_breasts` as true unless prophylactic bilateral is checked, 
+                      // because surveillance of the remaining breast or chest wall is still needed.
+                  }
+              }
+          });
+
           derived.organ_inventory = {
               has_cervix: !hasHysterectomy,
               has_uterus: !hasHysterectomy,
@@ -847,7 +887,10 @@ export const DerivedVariablesService = {
       const meds = advanced.medications_iatrogenic || {};
       const hasImmunosuppression = meds.immunosuppression_now === 'Yes';
       const sexSitesEver = sexHistory['sexhx.sex_sites_ever'] || [];
-      const hasAnalReceptive = Array.isArray(sexSitesEver) && sexSitesEver.includes('anal'); 
+      
+      // Fix: Matching precise option string from questionnaire
+      const hasAnalReceptive = Array.isArray(sexSitesEver) && sexSitesEver.includes('Anal sex – receptive');
+      
       const hpvPrecancer = sexHistory['sexhx.hpv_precancer_history'] || [];
       const hasAnalPrecancer = Array.isArray(hpvPrecancer) && hpvPrecancer.includes('Anus');
 
@@ -902,7 +945,6 @@ export const DerivedVariablesService = {
       const hasBarretts = illnesses.some((i: any) => i.id === 'barretts'); 
       
       // --- Personal Cancer History Flags ---
-      const personalCancerHistory = advanced.personal_cancer_history || [];
 
       // ADDED: derived.ca.any_history
       derived['ca.any_history'] = core.cancer_any === 'Yes' || personalCancerHistory.length > 0;

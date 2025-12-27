@@ -132,7 +132,8 @@ export const StandardizationService = {
           year: answers['gen.test_year_first'],
           findings_present: answers['gen.path_variant_self'] === 'Yes',
           variant_self_status: answers['gen.path_variant_self'],
-          genes: answers['gen.self_genes'] ? JSON.parse(answers['gen.self_genes']) : [],
+          genes: answers['gen.self_genes'] ? safeJsonParse(answers['gen.self_genes']) : [],
+          mutyh_biallelic: answers['gen.mutyh_biallelic'],
           // Map to internal structure
           variants_hgvs: null, // Removed from new JSON spec
         };
@@ -144,8 +145,8 @@ export const StandardizationService = {
               ...standardized.advanced.genetics,
               prs: {
                   done: true,
-                  // No specific flags in new JSON, mostly just "done" for now based on spec
-                  risk_band: 'unknown' 
+                  risk_band: answers['gen.prs_overall_band'],
+                  red_flags: safeJsonParse(answers['gen.prs_cancers_flagged'])
               }
           }
       }

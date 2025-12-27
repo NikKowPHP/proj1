@@ -236,6 +236,28 @@ export const FhirMapperService = {
         bundle.entry.push({ resource: wcrfObs });
     }
 
+    // Exposure Composites flattening
+    if (derived.exposure_composites) {
+        Object.entries(derived.exposure_composites).forEach(([key, value]) => {
+             if (typeof value === 'boolean') {
+                bundle.entry.push({
+                    resource: {
+                        resourceType: "Observation",
+                        id: uuidv4(),
+                        status: "final",
+                        code: { 
+                            coding: [
+                                { system: SYSTEM_ONKONO, code: `onkn.exposure.${key}`, display: key.replace(/_/g, ' ') }
+                            ]
+                        },
+                        subject: subjectRef,
+                        valueBoolean: value
+                    } as FhirObservation
+                });
+             }
+        });
+    }
+
     // Sexual Health Flags
     
     // MSM Behavior (onkn.sex.msm_behavior)
@@ -375,6 +397,7 @@ export const FhirMapperService = {
             key === 'physical_activity_ipaq' || 
             key === 'wcrf_score' ||
             key === 'alcohol_audit' ||
+            key === 'exposure_composites' ||
             key === 'sex.msm_behavior' ||
             key === 'sex.hpv_exposure_band'
         ) {

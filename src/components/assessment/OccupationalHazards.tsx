@@ -7,10 +7,9 @@ import { SearchableSelect, SearchableSelectOption } from '../ui/SearchableSelect
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Chip } from '../ui/chip';
 import { Textarea } from '../ui/textarea';
 import { cn } from '@/lib/utils';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 export interface HazardExposure {
   hazardId: string;
@@ -45,14 +44,20 @@ const HazardDetailItem = ({
   options: OccupationalHazardsProps['options'];
   questions: any[];
 }) => {
-  const t = useTranslations("AssessmentPage"); // Assuming generic translations or passed down
+  const locale = useLocale();
   const hazardLabel = options.exposures.find(e => e.value === hazardId)?.label || hazardId;
 
   const handleFieldChange = (field: string, val: any) => {
     onChange({ ...item, [field]: val });
   };
 
-  // Helper to interpret "options" string from JSON (e.g. "jobTitles")
+  const getLabel = (label: any) => {
+    if (typeof label === 'object' && label !== null) {
+      return label[locale] || label.en || Object.values(label)[0];
+    }
+    return label;
+  };
+
   const getOptions = (optRef: string | any[]) => {
     if (Array.isArray(optRef)) return optRef;
     if (optRef === 'jobTitles') return options.jobTitles;
@@ -64,12 +69,12 @@ const HazardDetailItem = ({
   return (
     <Card className="mb-4 bg-muted/20 animate-fade-in">
       <CardHeader>
-        <CardTitle className="text-base font-semibold">{hazardLabel}</CardTitle>
+        <CardTitle className="text-base font-semibold">{getLabel(hazardLabel)}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {questions?.map((q) => {
-          const label = typeof q.label === 'object' ? (q.label.en || q.label) : q.label; // Simplify locale access
-          const placeholder = typeof q.placeholder === 'object' ? (q.placeholder.en || q.placeholder) : q.placeholder;
+          const label = getLabel(q.label);
+          const placeholder = getLabel(q.placeholder);
 
           if (q.type === 'searchable_select') {
             return (
@@ -107,7 +112,7 @@ const HazardDetailItem = ({
                 <Label>{label}</Label>
                 <Select
                   value={Array.isArray(item[q.id]) ? item[q.id][0] : (item[q.id] || "")}
-                  onValueChange={(val) => handleFieldChange(q.id, [val])} // Keeping array format for compat with some types
+                  onValueChange={(val) => handleFieldChange(q.id, [val])}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder={placeholder || "Select..."} />
@@ -115,7 +120,7 @@ const HazardDetailItem = ({
                   <SelectContent>
                     {opts.map((opt: any) => (
                       <SelectItem key={opt.value} value={opt.value}>
-                        {typeof opt.label === 'object' ? opt.label.en : opt.label}
+                        {getLabel(opt.label)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -131,7 +136,7 @@ const HazardDetailItem = ({
                 <div className="flex space-x-2">
                   {opts.map((opt: any) => {
                     const val = typeof opt === 'object' ? opt.value : opt;
-                    const lbl = typeof opt === 'object' ? (opt.label.en || opt.label) : opt;
+                    const lbl = typeof opt === 'object' ? getLabel(opt.label) : opt;
                     return (
                       <button
                         key={val}
@@ -167,8 +172,8 @@ const HazardDetailItem = ({
           }
           if (q.type === 'checkbox_group') {
             const opts = getOptions(q.options).map((o: any) => ({
-              id: o.value, // Mapping value to id for CheckboxGroup
-              label: typeof o.label === 'object' ? (o.label.en || o.label) : o.label
+              id: o.value,
+              label: getLabel(o.label)
             }));
             return (
               <div key={q.id} className="space-y-2">

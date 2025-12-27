@@ -102,7 +102,7 @@ function calculateSmokingMetrics(smokingDetails?: { cigs_per_day?: number; inten
  * @param familyHistory - Array of family member health history.
  * @returns `true` if an early diagnosis is found, `false` otherwise, or `null` if no relevant data.
  */
-function calculateEarlyAgeFamilyDx(familyHistory?: { relation?: string; age_dx?: number }[]): boolean | null {
+function calculateEarlyAgeFamilyDx(familyHistory?: any[]): boolean | null {
     if (!familyHistory || !Array.isArray(familyHistory) || familyHistory.length === 0) {
         return null;
     }
@@ -114,7 +114,8 @@ function calculateEarlyAgeFamilyDx(familyHistory?: { relation?: string; age_dx?:
             relative.relation &&
             firstDegreeRelatives.includes(relative.relation) &&
             relative.age_dx &&
-            relative.age_dx < 50
+            relative.age_dx < 50 &&
+            (relative.is_blood_related !== false)
     );
     
     return hasEarlyDx;
@@ -140,6 +141,9 @@ function calculateFamilySiteMetrics(familyHistory?: any[]): Record<string, any> 
         let youngestAge: number | null = null;
 
         familyHistory.forEach(member => {
+            // Filter non-blood relatives (e.g. step-parents)
+            if (member.is_blood_related === false) return;
+
             // Check if member has this cancer (cancers array or single cancer_type)
             const memberCancers = member.cancers || (member.cancer_type ? [{cancer_type: member.cancer_type, age_dx: member.age_dx}] : []);
             
@@ -332,12 +336,14 @@ function calculateWcrf(
 function calculateFamilyClusters(familyHistory?: any[]): Record<string, boolean> {
     if (!familyHistory || !Array.isArray(familyHistory)) return {};
 
-    const relatives = familyHistory.map(f => ({
-        relation: f.relation,
-        cancer: f.cancer_type ? f.cancer_type.toLowerCase() : '',
-        age: f.age_dx,
-        side: f.side_of_family
-    }));
+    const relatives = familyHistory
+        .filter(f => f.is_blood_related !== false) // Filter non-blood
+        .map(f => ({
+            relation: f.relation,
+            cancer: f.cancer_type ? f.cancer_type.toLowerCase() : '',
+            age: f.age_dx,
+            side: f.side_of_family
+        }));
 
     // 1. Breast/Ovarian Cluster
     const breastOvarianCount = relatives.filter(r => 
@@ -402,11 +408,13 @@ function calculateFamilyClusters(familyHistory?: any[]): Record<string, boolean>
 function calculateSyndromeFlags(familyHistory?: any[]): Record<string, boolean> {
     if (!familyHistory || !Array.isArray(familyHistory)) return {};
     
-    const relatives = familyHistory.map(f => ({
-        cancer: f.cancer_type ? f.cancer_type.toLowerCase() : '',
-        age: f.age_dx,
-        side: f.side_of_family
-    }));
+    const relatives = familyHistory
+        .filter(f => f.is_blood_related !== false)
+        .map(f => ({
+            cancer: f.cancer_type ? f.cancer_type.toLowerCase() : '',
+            age: f.age_dx,
+            side: f.side_of_family
+        }));
     
     // Lynch: Amsterdam II criteria simplified
     const lynchCancers = ['colorectal', 'endometrial', 'ovarian', 'stomach', 'pancreatic', 'biliary', 'urinary', 'brain', 'skin', 'small intestine'];
@@ -645,7 +653,7 @@ function calculateFamilySyndromes(familyHistory?: any[]): string[] {
     if (clusters.pattern_breast_ovarian_cluster) syndromes.push('Cluster: Breast/Ovarian');
     if (clusters.pattern_colorectal_cluster) syndromes.push('Cluster: Colorectal');
     
-    const relatives = familyHistory?.map(f => ({
+    const relatives = familyHistory?.filter(f => f.is_blood_related !== false).map(f => ({
         cancer: f.cancer_type ? f.cancer_type.toLowerCase() : '',
         age: f.age_dx
     })) || [];

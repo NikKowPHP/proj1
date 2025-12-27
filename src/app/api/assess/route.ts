@@ -101,6 +101,15 @@ export async function POST(request: NextRequest) {
     const derivedVariables = DerivedVariablesService.calculateAll(standardizedPayload);
     logger.info("[API:assess] Derived variables calculation complete.", { derivedVariables });
     
+    // Check Age Gate
+    if (derivedVariables.adult_gate_ok === false) {
+        logger.warn("[API:assess] Request rejected: User is underage.");
+        return NextResponse.json(
+            { error: "Assessment limited to adults (18+)." },
+            { status: 403 }
+        );
+    }
+    
     // 3. Run deterministic guideline engine
     logger.info(`[API:assess] Starting guideline engine for locale: ${locale}...`);
     const guidelinePlan = generatePlan(answers, derivedVariables, locale);

@@ -29,7 +29,26 @@ const evaluateCondition = (
 
   // Handle direct question dependency
   const { questionId, operator, value } = condition;
-  const answer = answers[questionId];
+  let answer = answers[questionId];
+
+  // Special case: 'age' is a derived variable, calculate it from 'dob' if missing
+  if (questionId === 'age' && answer === undefined && answers['dob']) {
+    const dob = String(answers['dob']);
+    if (/^\d{4}$/.test(dob)) {
+      answer = new Date().getFullYear() - parseInt(dob);
+    } else {
+      const birthDate = new Date(dob);
+      if (!isNaN(birthDate.getTime())) {
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        answer = age;
+      }
+    }
+  }
 
   // If we don't have a structured condition (legacy format: {questionId, value})
   if (operator === undefined) {

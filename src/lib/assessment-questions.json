@@ -15,8 +15,8 @@
         },
         {
           "id": "dob",
-          "type": "year_input",
-          "text": { "en": "Year of birth", "pl": "Rok urodzenia" },
+          "type": "date_input",
+          "text": { "en": "Date of birth", "pl": "Data urodzenia" },
           "validation": { "required": true, "message": { "en": "Required for age calculation.", "pl": "Wymagane do obliczenia wieku." } }
         },
         {
@@ -312,7 +312,7 @@
                 
                 {"id": "sexhx.partner_genders", "text": {"en": "Partners' gender", "pl": "Płeć partnerów"}, "type": "checkbox_group", "options": [{"id": "Only men", "label": {"en": "Only men", "pl": "Tylko mężczyźni"}}, {"id": "Only women", "label": {"en": "Only women", "pl": "Tylko kobiety"}}, {"id": "Men and women", "label": {"en": "Men and women", "pl": "Mężczyźni i kobiety"}}, {"id": "Partners of other genders", "label": {"en": "Partners of other genders", "pl": "Inne płcie"}}, {"id": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.sex_sites_ever", "text": {"en": "Sexual practices (Lifetime)", "pl": "Praktyki (Całe życie)"}, "type": "checkbox_group", "options": [{"id": "Vaginal sex", "label": {"en": "Vaginal", "pl": "Pochwowy"}}, {"id": "Anal sex – receptive", "label": {"en": "Anal (receptive)", "pl": "Analny (bierny)"}}, {"id": "Anal sex – insertive", "label": {"en": "Anal (insertive)", "pl": "Analny (czynny)"}}, {"id": "Oral sex", "label": {"en": "Oral", "pl": "Oralny"}}, {"id": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
+                {"id": "sexhx.sex_sites_ever", "text": {"en": "Sexual practices (Lifetime)", "pl": "Praktyki (Całe życie)"}, "type": "checkbox_group", "options": [{"id": "Vaginal sex", "label": {"en": "Vaginal", "pl": "Pochwowy"}}, {"id": "Anal sex – receptive", "label": {"en": "Anal (receptive)", "pl": "Analny (bierny)"}}, {"id": "Anal sex – insertive", "label": {"en": "Anal (insertive)", "pl": "Analny (czynny)"}}, {"id": "Oral sex (give)", "label": {"en": "Oral sex you give to partner", "pl": "Seks oralny (wykonywany u partnera)"}}, {"id": "Oral sex (receive)", "label": {"en": "Oral sex to your genitals/anus", "pl": "Seks oralny (otrzymywany)"}}, {"id": "Other", "label": {"en": "Other sexual contact (genital rubbing, sex toys only, etc.)", "pl": "Inne kontakty seksualne (pocieranie narządów, zabawki itp.)"}}, {"id": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
                 {"id": "sexhx.sex_sites_12m", "text": {"en": "Sexual practices (12m)", "pl": "Praktyki (12 mies.)"}, "type": "checkbox_group", "options": [{"id": "Vaginal sex", "label": {"en": "Vaginal", "pl": "Pochwowy"}}, {"id": "Anal sex – receptive", "label": {"en": "Anal (receptive)", "pl": "Analny (bierny)"}}, {"id": "Anal sex – insertive", "label": {"en": "Anal (insertive)", "pl": "Analny (czynny)"}}, {"id": "Oral sex", "label": {"en": "Oral", "pl": "Oralny"}}, {"id": "None in past 12 months", "label": {"en": "None", "pl": "Żadne"}}, {"id": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
@@ -1032,14 +1032,20 @@
             { "id": "formaldehyde", "label": "Formaldehyde" },
             { "id": "pesticides", "label": "Pesticides" },
             { "id": "radiation", "label": "Ionizing Radiation" },
-            { "id": "radon", "label": "Radon" },
             { "id": "uv_sunlight", "label": "Outdoor work (UV)" },
             { "id": "shift_night", "label": "Night shift work" },
             { "id": "firefighter", "label": "Firefighter smoke" },
             { "id": "hairdresser", "label": "Hairdresser chemicals" },
             { "id": "painter", "label": "Paints/Solvents" },
+            { "id": "occ.hazard.other", "label": { "en": "Other long-term exposure to carcinogenic dusts, fumes, chemicals or radiation (please describe)", "pl": "Inne długotrwałe narażenie na pyły rakotwórcze, opary, chemikalia lub promieniowanie (proszę opisać)" } },
             { "id": "none", "label": "None" }
           ]
+        },
+        {
+          "id": "occ.hazard.other_desc",
+          "type": "text_input",
+          "text": { "en": "Please describe other exposure", "pl": "Proszę opisać inne narażenie" },
+          "dependsOn": { "questionId": "occ.hazards.subs", "operator": "array_contains", "value": "occ.hazard.other" }
         },
         {
           "id": "advanced_modules_occ",
@@ -1073,7 +1079,7 @@
                 ]
               },
               "questions": [
-                { "id": "main_job_title", "label": { "en": "Job Title", "pl": "Stanowisko" }, "type": "searchable_select", "options": "jobTitles", "allowCustom": true },
+                { "id": "main_job_title", "label": { "en": "Job Title", "pl": "Stanowisko" }, "type": "searchable_select", "options": "jobTitles", "allowCustom": false },
                 { "id": "years_total", "label": { "en": "Years Exposed", "pl": "Lata narażenia" }, "type": "number_input", "placeholder": "e.g. 10" },
                 { "id": "year_first_exposed", "label": { "en": "Year First Exposed", "pl": "Rok pierwszego narażenia" }, "type": "number_input", "placeholder": "e.g. 1990" },
                 { "id": "hours_per_week", "label": { "en": "Hours per week", "pl": "Godziny na tydzień" }, "type": "number_input", "placeholder": "e.g. 40", "min": 0, "max": 168 },

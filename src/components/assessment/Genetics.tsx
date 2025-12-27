@@ -106,6 +106,24 @@ export const Genetics = ({ answers, onAnswer, questions, errors: externalErrors 
               </div>
             );
           case 'text_input':
+            if (key.endsWith('_other_label')) {
+              return (
+                <div key={key} className="space-y-2 animate-fade-in">
+                  <Label htmlFor={key}>{q.text}</Label>
+                  <Input
+                    id={key}
+                    value={answers[key] || ""}
+                    maxLength={30}
+                    onChange={(e) => {
+                      const uppercased = e.target.value.toUpperCase();
+                      handleValidatedChange(key, uppercased);
+                    }}
+                    aria-invalid={!!error}
+                  />
+                  {error && <p className="text-sm text-destructive">{error}</p>}
+                </div>
+              );
+            }
             return (
               <div key={key} className="space-y-2 animate-fade-in">
                 <Label htmlFor={key}>{q.text}</Label>

@@ -15,7 +15,7 @@
         },
         {
           "id": "dob",
-          "type": "date_input",
+          "type": "year_input",
           "text": { "en": "Date of birth", "pl": "Data urodzenia" },
           "validation": { "required": true, "message": { "en": "Required for age calculation.", "pl": "Wymagane do obliczenia wieku." } }
         },
@@ -320,7 +320,7 @@
                 
                 {"id": "sexhx.sex_work_ever", "text": {"en": "Ever exchanged sex for money/goods?", "pl": "Seks za pieniądze/korzyści?"}, "type": "radio", "options": [{"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
-                {"id": "sexhx.sex_work_role", "text": {"en": "Role in sex work", "pl": "Rola"}, "type": "checkbox_group", "options": [{"id": "Mainly provided", "label": {"en": "Provided", "pl": "Świadczenie"}}, {"id": "Mainly received", "label": {"en": "Received", "pl": "Korzystanie"}}, {"id": "Both", "label": {"en": "Both", "pl": "Obie role"}}, {"id": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.sex_work_ever", "value": "Yes"}},
+                {"id": "sexhx.sex_work_role", "text": {"en": "Role in sex work", "pl": "Rola"}, "type": "checkbox_group", "options": [{"id": "Mainly provided", "label": {"en": "Mainly provided", "pl": "Głównie świadczenie"}}, {"id": "Mainly received", "label": {"en": "Mainly received", "pl": "Głównie korzystanie"}}, {"id": "Both", "label": {"en": "Both", "pl": "Obie role"}}, {"id": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.sex_work_ever", "value": "Yes"}},
                 
                 {"id": "sexhx.sti_history_other", "text": {"en": "History of other STIs?", "pl": "Historia innych STI?"}, "type": "radio", "options": [{"value": "No", "label": {"en": "No", "pl": "Nie"}}, {"value": "Yes", "label": {"en": "Yes", "pl": "Tak"}}, {"value": "Not sure", "label": {"en": "Not sure", "pl": "Nie wiem"}}, {"value": "Prefer not to say", "label": {"en": "Prefer not to say", "pl": "Wolę nie podawać"}}], "dependsOn": {"questionId": "sexhx.ever_sexual_contact", "value": "Yes"}},
                 
@@ -491,8 +491,10 @@
             { "id": "Maternal Grandfather", "label": { "en": "Maternal Grandfather", "pl": "Dziadek (Matka)" } },
             { "id": "Paternal Grandmother", "label": { "en": "Paternal Grandmother", "pl": "Babcia (Ojciec)" } },
             { "id": "Paternal Grandfather", "label": { "en": "Paternal Grandfather", "pl": "Dziadek (Ojciec)" } },
+            { "id": "Cousin", "label": { "en": "First Cousin", "pl": "Kuzyn/ka (pierwszego stopnia)" } },
             { "id": "Other", "label": { "en": "Other", "pl": "Inni" } }
-          ]
+          ],
+          "helperText": { "en": "Include parents, siblings (half-siblings too), grandparents, aunts/uncles, first cousins. Exclude step-family or adopted.", "pl": "Rodzina biologiczna = rodzice, dzieci, rodzeństwo (także przyrodnie), dziadkowie, ciocie/wujkowie, kuzynostwo (pierwszego stopnia)." }
         },
         {
           "id": "famhx.quick_relatives_other",
@@ -719,6 +721,8 @@
                   {"id": "mTOR", "label": { "en": "mTOR inhibitor", "pl": "Inhibitor mTOR" }},
                   {"id": "Thiopurine", "label": { "en": "Thiopurine", "pl": "Tiopuryna" }},
                   {"id": "Anti-TNF", "label": { "en": "Anti-TNF", "pl": "Lek przeciw TNF" }},
+                  {"id": "JAK inhibitor", "label": { "en": "JAK inhibitor", "pl": "Inhibitor JAK" }},
+                  {"id": "Methotrexate", "label": { "en": "Methotrexate", "pl": "Metotreksat" }},
                   {"id": "Other biologic", "label": { "en": "Other biologic", "pl": "Inny lek biologiczny" }},
                   {"id": "Steroid", "label": { "en": "Chronic steroid", "pl": "Przewlekłe stosowanie steroidów" }},
                   {"id": "Other", "label": { "en": "Other", "pl": "Inny" }}
@@ -1019,24 +1023,24 @@
           "dependsOn": { "questionId": "occ.exposure_any", "value": ["Yes", "Not sure"] },
           "exclusiveOptionId": "none",
           "options": [
-            { "id": "asbestos", "label": "Asbestos" },
-            { "id": "silica", "label": "Silica/Rock dust" },
-            { "id": "wood_dust", "label": "Wood dust" },
-            { "id": "leather_dust", "label": "Leather dust" },
-            { "id": "diesel", "label": "Diesel exhaust" },
-            { "id": "metal_fluids", "label": "Metalworking fluids" },
-            { "id": "welding", "label": "Welding fumes" },
-            { "id": "soot", "label": "Soot/Coal tar/Pitch" },
-            { "id": "rubber_chem", "label": "Rubber chemicals" },
-            { "id": "benzene", "label": "Benzene/Solvents" },
-            { "id": "formaldehyde", "label": "Formaldehyde" },
-            { "id": "pesticides", "label": "Pesticides" },
-            { "id": "radiation", "label": "Ionizing Radiation" },
-            { "id": "uv_sunlight", "label": "Outdoor work (UV)" },
-            { "id": "shift_night", "label": "Night shift work" },
-            { "id": "firefighter", "label": "Firefighter smoke" },
-            { "id": "hairdresser", "label": "Hairdresser chemicals" },
-            { "id": "painter", "label": "Paints/Solvents" },
+            { "id": "occ.hazard.asbestos", "label": "Asbestos" },
+            { "id": "occ.hazard.silica", "label": "Silica/Rock dust" },
+            { "id": "occ.hazard.wood_dust", "label": "Wood dust" },
+            { "id": "occ.hazard.leather_dust", "label": { "en": "Leather dust / boot and shoe production or repair (intensive sanding, buffing)", "pl": "Pył skórzany / produkcja lub naprawa obuwia (intensywne szlifowanie, polerowanie)" } },
+            { "id": "occ.hazard.diesel", "label": "Diesel exhaust" },
+            { "id": "occ.hazard.metal_fluids", "label": "Metalworking fluids" },
+            { "id": "occ.hazard.welding", "label": "Welding fumes" },
+            { "id": "occ.hazard.soot", "label": { "en": "Soot, coal tar, pitch, bitumen – chimney sweeping, roofing with tar/asphalt, coke ovens, aluminium works, asphalt plants", "pl": "Sadzę, smoła węglowa, pak, lepik/bitum (kominiarze, dekarze, koksownie, huty aluminium, wytwórnie asfaltu)" } },
+            { "id": "occ.hazard.rubber_chem", "label": "Rubber chemicals" },
+            { "id": "occ.hazard.benzene", "label": "Benzene/Solvents" },
+            { "id": "occ.hazard.formaldehyde", "label": "Formaldehyde" },
+            { "id": "occ.hazard.pesticides", "label": "Pesticides" },
+            { "id": "occ.hazard.radiation", "label": "Ionizing Radiation" },
+            { "id": "occ.hazard.uv_sunlight", "label": "Outdoor work (UV)" },
+            { "id": "occ.hazard.shift_night", "label": "Night shift work" },
+            { "id": "occ.hazard.firefighter", "label": "Firefighter smoke" },
+            { "id": "occ.hazard.hairdresser", "label": "Hairdresser chemicals" },
+            { "id": "occ.hazard.painter", "label": "Paints/Solvents" },
             { "id": "occ.hazard.other", "label": { "en": "Other long-term exposure to carcinogenic dusts, fumes, chemicals or radiation (please describe)", "pl": "Inne długotrwałe narażenie na pyły rakotwórcze, opary, chemikalia lub promieniowanie (proszę opisać)" } },
             { "id": "none", "label": "None" }
           ]
@@ -1053,7 +1057,7 @@
           "modules": [
             {
               "id": "occupational_hazards",
-              "title": { "en": "Occupational Details", "pl": "Szczegóły Zawodowe" },
+              "title": { "en": "Occupational hazards (work-related exposures)", "pl": "Narażenia zawodowe (czynniki związane z pracą)" },
               "dependsOn": { "questionId": "occ.exposure_any", "value": ["Yes", "Not sure"] },
               "options": {
                 "jobTitles": [
@@ -1125,11 +1129,11 @@
         
         { "id": "env.water.main_source_10y", "type": "select", "text": {"en": "Main water source >10y?", "pl": "Główne źródło wody >10 lat?"}, "options": ["Municipal", "Private well", "Bottled"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "private_well"} },
         { "id": "env.water.official_advisory_30d", "type": "radio", "text": { "en": "Official notice not to drink tap water >30 days?", "pl": "Oficjalne ostrzeżenie, by nie pić wody >30 dni?" }, "options": ["Yes", "No", "Not sure"], "dependsOn": { "questionId": "env.water.main_source_10y", "value": "Municipal" } },
-        { "id": "env.water.well_contam_notice", "type": "radio", "text": {"en": "Ever told about contamination (arsenic/nitrates)?", "pl": "Informacja o skażeniu (arsen/azotany)?"}, "options": ["Yes", "No"], "dependsOn": {"questionId": "env.water.main_source_10y", "value": "Private well"} },
+        { "id": "env.water.well_contam_notice", "type": "radio", "text": {"en": "Ever told about contamination (arsenic/nitrates)?", "pl": "Informacja o skażeniu (arsen/azotany)?"}, "options": ["No", "Yes – problem resolved", "Yes – problem ongoing / not sure", "Not sure / never tested"], "dependsOn": {"questionId": "env.water.main_source_10y", "value": "Private well"} },
         
         { "id": "env.pesticide.use_freq_year", "type": "number_input", "text": {"en": "Times/year mixing pesticides?", "pl": "Ile razy w roku mieszasz pestycydy?"}, "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
         { "id": "env.pesticide.years_use", "type": "number_input", "text": {"en": "Years used?", "pl": "Lata używania?"}, "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
-        { "id": "env.pesticide.protection", "type": "select", "text": {"en": "Protective gear used?", "pl": "Odzież ochronna?"}, "options": ["Almost always", "Sometimes", "Almost never"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
+        { "id": "env.pesticide.protection", "type": "select", "text": {"en": "Protective gear used?", "pl": "Odzież ochronna?"}, "options": ["Almost always", "Sometimes", "Almost never", "Not sure", "Not applicable"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "pesticides"} },
         
         { "id": "env.uv.sunbed_use", "type": "select", "text": {"en": "Lifetime sunbed use", "pl": "Użycie solarium w życiu"}, "options": ["Never", "Few (<10)", "Occasional (10-50)", "Frequent (>50)"], "dependsOn": {"questionId": "env.summary", "operator": "array_contains", "value": "sunbed"} },
         { "id": "env.uv.sunburn_child", "type": "number_input", "text": {"en": "Blistering sunburns <18y", "pl": "Oparzenia z pęcherzami <18 lat"}, "min": 0, "max": 20 },
@@ -1146,6 +1150,7 @@
           "text": { "en": "Which of the following preventive screenings / exams have you ever had?", "pl": "Które z poniższych badań przesiewowych kiedykolwiek wykonywałaś/eś?" },
           "options": [
             { "id": "Colonoscopy", "label": { "en": "Colonoscopy", "pl": "Kolonoskopia" } },
+            { "id": "Stool Test", "label": { "en": "Stool Test (FIT/DNA)", "pl": "Test na krew utajoną (FIT/DNA)" } },
             { "id": "Mammogram", "label": { "en": "Mammogram", "pl": "Mammografia" }, "dependsOn": { "questionId": "sex_at_birth", "value": "Female" } },
             { "id": "Pap/HPV", "label": { "en": "Pap/HPV Test", "pl": "Test Pap/HPV" }, "dependsOn": { "questionId": "sex_at_birth", "value": "Female" } },
             { "id": "PSA", "label": { "en": "PSA Test", "pl": "Test PSA" }, "dependsOn": { "questionId": "sex_at_birth", "value": "Male" } },
@@ -1230,12 +1235,21 @@
                   ]
                 },
                 {
+                  "id": "stool_test",
+                  "text": { "en": "Stool Test (FIT/DNA)", "pl": "Test na krew utajoną (FIT/DNA)" },
+                  "dependsOn": { "questionId": "screen.summary", "operator": "array_contains", "value": "Stool Test" },
+                  "questions": [
+                    { "id": "screen.stool.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
+                    { "id": "screen.stool.result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Positive (Abnormal)", "Unsure"] }
+                  ]
+                },
+                {
                   "id": "mammogram",
                   "text": { "en": "Mammogram", "pl": "Mammografia" },
                   "dependsOn": { "questionId": "screen.summary", "operator": "array_contains", "value": "Mammogram" },
                   "questions": [
                     { "id": "screen.mammo.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
-                    { "id": "screen.breast.mammo_last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Benign", "Abnormal", "Unsure"] }
+                    { "id": "screen.breast.mammo_last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Benign changes only (no cancer)", "Required extra tests or biopsy", "Don’t know", "Prefer not to say"] }
                   ]
                 },
                 {
@@ -1245,7 +1259,7 @@
                   "questions": [
                     { "id": "screen.pap.date", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
                     { "id": "screen.cervix.last_type", "text": {"en": "Type", "pl": "Typ"}, "type": "select", "options": ["Pap only", "HPV only", "Co-testing"] },
-                    { "id": "screen.cervix.last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Abnormal", "Unsure"] }
+                    { "id": "screen.cervix.last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Abnormal – follow-up was recommended", "Don’t know", "Prefer not to say"] }
                   ]
                 },
                 {
@@ -1263,7 +1277,7 @@
                   "dependsOn": { "questionId": "screen.summary", "operator": "array_contains", "value": "Lung CT" },
                   "questions": [
                     { "id": "screen.lung.ldct_last_year", "text": {"en": "Year", "pl": "Rok"}, "type": "year_input" },
-                    { "id": "screen.lung.ldct_last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Nodules", "Unsure"] }
+                    { "id": "screen.lung.ldct_last_result", "text": {"en": "Result", "pl": "Wynik"}, "type": "select", "options": ["Normal", "Nodules found – monitoring only", "Required further tests or treatment", "Don’t know"] }
                   ]
                 },
                 {

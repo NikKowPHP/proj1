@@ -1,8 +1,4 @@
-/**
- * Job-Exposure Matrix (JEM)
- * Maps ISCO-08 job codes (from job-titles.map.ts) to suggested
- * occupational exposure keys (from occupational-exposures.map.ts).
- */
+
 export const jemMap: Record<string, string[]> = {
   '7212': ['welding_fumes'], // Welder
   '8111': ['silica', 'diesel_exhaust'], // Miner

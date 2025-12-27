@@ -15,5 +15,9 @@ export const jobTitlesMap: Record<string, string> = {
   'firefighter': '5411',
   'construction worker': '9313',
   'healthcare worker': '2221', 
-  // ... add more from spec as needed
+  'chemical plant operator': '8131',
+  'factory worker': '9329',
+  'insulation worker': '7124',
+  'shipyard worker': '7214',
+  'laboratory worker': '3111'
 };

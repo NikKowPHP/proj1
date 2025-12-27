@@ -1,6 +1,7 @@
 {
   "screening_thresholds": {
     "cervix_years_since": 3,
+    "cervix_hpv_years_since": 5,
     "breast_years_since": 2,
     "lung_pack_years_min": 20,
     "lung_age_min": 50,
@@ -11,7 +12,9 @@
     "crc_interval_years_high_risk": 2,
     "crc_interval_years_standard": 10,
     "tetanus_booster_years": 10,
-    "hcc_ibd_years_min": 8
+    "hcc_surveillance_interval_years": 1,
+    "hcc_ibd_years_min": 8,
+    "covid_booster_interval_years": 1
   },
   "risk_factors": {
     "radon_high_options": ["High (>=300)", "Moderate (100-299)"],

@@ -294,6 +294,34 @@ export const FhirMapperService = {
         bundle.entry.push({ resource: hpvBandObs });
     }
 
+    // Sexual Health: New Partner 12m
+    if (derived['sex.new_partner_12m']) {
+         bundle.entry.push({
+             resource: {
+                resourceType: "Observation",
+                id: uuidv4(),
+                status: "final",
+                code: { coding: [{ system: SYSTEM_ONKONO, code: "onkn.sex.new_partner_12m", display: "New Partner in last 12 months" }] },
+                subject: subjectRef,
+                valueString: derived['sex.new_partner_12m']
+             } as FhirObservation
+         });
+    }
+
+    // Sexual Health: Sex Work Ever
+    if (derived['sex.sex_work_ever']) {
+         bundle.entry.push({
+             resource: {
+                resourceType: "Observation",
+                id: uuidv4(),
+                status: "final",
+                code: { coding: [{ system: SYSTEM_ONKONO, code: "onkn.sex.sex_work_ever", display: "History of Sex Work" }] },
+                subject: subjectRef,
+                valueString: derived['sex.sex_work_ever']
+             } as FhirObservation
+         });
+    }
+
     // --- Screening Results (Observations) ---
     const screening = standardized.advanced?.screening_immunization || {};
     
@@ -378,7 +406,7 @@ export const FhirMapperService = {
                 status: "final",
                 code: { 
                     coding: [
-                        { system: SYSTEM_ONKONO, code: "onkn.screen.psa.abnormal", display: "PSA Elevated Flag" }
+                        { system: SYSTEM_ONKONO, code: "onkn.screen.prostate.psa_abnormal_or_biopsy", display: "PSA Elevated Flag" }
                     ]
                 },
                 subject: subjectRef,
@@ -505,6 +533,73 @@ export const FhirMapperService = {
         bundle.entry.push({ resource: hpvImm });
     }
 
+    // Tdap Vaccine
+    if (imm['imm.td_tdap.year_last']) {
+         bundle.entry.push({
+             resource: {
+                resourceType: "Immunization",
+                id: uuidv4(),
+                status: "completed",
+                patient: subjectRef,
+                vaccineCode: { coding: [{ system: SYSTEM_SNOMED, code: "396428003", display: "Tdap" }] },
+                occurrenceDateTime: `${imm['imm.td_tdap.year_last']}`
+             } as FhirImmunization
+         });
+    }
+
+    // Influenza Vaccine
+    if (imm['imm.flu.last_season'] === 'Yes') {
+         bundle.entry.push({
+             resource: {
+                resourceType: "Immunization",
+                id: uuidv4(),
+                status: "completed",
+                patient: subjectRef,
+                vaccineCode: { coding: [{ system: SYSTEM_SNOMED, code: "712610006", display: "Influenza vaccine" }] }
+             } as FhirImmunization
+         });
+    }
+
+    // Pneumococcal Vaccine
+    if (imm['imm.pneumo.ever'] === 'Yes') {
+         bundle.entry.push({
+             resource: {
+                resourceType: "Immunization",
+                id: uuidv4(),
+                status: "completed",
+                patient: subjectRef,
+                vaccineCode: { coding: [{ system: SYSTEM_SNOMED, code: "12866006", display: "Pneumococcal vaccine" }] }
+             } as FhirImmunization
+         });
+    }
+
+    // Zoster Vaccine
+    if (imm['imm.zoster.ever'] === 'Yes') {
+         bundle.entry.push({
+             resource: {
+                resourceType: "Immunization",
+                id: uuidv4(),
+                status: "completed",
+                patient: subjectRef,
+                vaccineCode: { coding: [{ system: SYSTEM_SNOMED, code: "409516000", display: "Zoster vaccine" }] }
+             } as FhirImmunization
+         });
+    }
+
+    // COVID-19 Vaccine
+    if (imm['imm.covid.doses'] && Number(imm['imm.covid.doses']) > 0) {
+         bundle.entry.push({
+             resource: {
+                resourceType: "Immunization",
+                id: uuidv4(),
+                status: "completed",
+                patient: subjectRef,
+                vaccineCode: { coding: [{ system: SYSTEM_SNOMED, code: "840536004", display: "COVID-19 vaccine" }] },
+                protocolApplied: [{ doseNumberPositiveInt: Number(imm['imm.covid.doses']) }]
+             } as FhirImmunization
+         });
+    }
+
     // --- 8. Procedures (Screenings) ---
     // Colonoscopy
     if (imm['screen.colon.ever'] === 'Yes' || imm['screen.colonoscopy.date']) {
@@ -551,6 +646,133 @@ export const FhirMapperService = {
             };
             bundle.entry.push({ resource: genCond });
         });
+    }
+
+    // Genetic Test Metadata (Observation)
+    if (standardized.advanced?.genetics?.tested && standardized.advanced?.genetics?.type) {
+         const types = Array.isArray(standardized.advanced.genetics.type) 
+             ? standardized.advanced.genetics.type.join(', ')
+             : standardized.advanced.genetics.type;
+             
+         const genTestObs: FhirObservation = {
+             resourceType: "Observation",
+             id: uuidv4(),
+             status: "final",
+             code: { coding: [{ system: SYSTEM_ONKONO, code: "onkn.gen.test_type", display: "Genetic Test Type" }] },
+             subject: subjectRef,
+             valueString: types
+         };
+         if (standardized.advanced.genetics.year) {
+             genTestObs.effectiveDateTime = `${standardized.advanced.genetics.year}`;
+         }
+         bundle.entry.push({ resource: genTestObs });
+    }
+
+    // --- 10. Consent (Ephemeral) ---
+    const consent: any = {
+        resourceType: "Consent",
+        id: uuidv4(),
+        status: "active",
+        scope: {
+            coding: [{ system: "http://terminology.hl7.org/CodeSystem/consentscope", code: "patient-privacy", display: "Privacy Consent" }]
+        },
+        category: [{
+            coding: [{ system: "http://terminology.hl7.org/CodeSystem/v3-ActCode", code: "INFAO", display: "access to information" }] // healthcare/care purpose
+        }],
+        patient: subjectRef,
+        dateTime: new Date().toISOString(),
+        policy: [{ uri: "http://onkono.com/policies/privacy" }],
+        provision: {
+            type: "permit",
+            purpose: [{ system: "http://terminology.hl7.org/CodeSystem/v3-ActReason", code: "CAREMGT" }] 
+        }
+    };
+    bundle.entry.push({ resource: consent });
+
+    // --- 11. Personal Cancer History (Conditions) ---
+    if (standardized.advanced?.personal_cancer_history) {
+        // The structure might be an array of objects if detailed, or handled via answers if simple. 
+        // Based on derived-var usage: const personalCancerHistory = advanced.personal_cancer_history || [];
+        // And assessment: it seems to be captured in a custom module? No, assessment-questions shows "personal_cancer_history" as an advanced module with ID "personal_cancer_history". 
+        // Usually these modules produce an array of objects if multiple entries allowed, or a single object if fields are flat.
+        // Looking at assessment-questions, "personal_cancer_history" module has "cancerTypes" options but doesn't explicitly look like a repeater.
+        // However, standard advanced modules usually map to an array in `standardized`.
+        // I will assume `standardized.advanced.personal_cancer_history` is an array of objects { cancer_type, year_dx, treatment_types... }
+        // BUT wait, in derived variables it does: `const personalCancerHistory = advanced.personal_cancer_history || [];`
+        // So I'll treat it as an array.
+        
+        const personalHx = Array.isArray(standardized.advanced.personal_cancer_history) 
+            ? standardized.advanced.personal_cancer_history 
+            : [];
+
+        personalHx.forEach((item: any) => {
+             // item should have cancer_type, year_dx
+             if (item.cancer_type) {
+                const code = cancerTypesMap[item.cancer_type];
+                const cond: FhirCondition = {
+                    resourceType: "Condition",
+                    id: uuidv4(),
+                    subject: subjectRef,
+                    code: {
+                        coding: code 
+                            ? [{ system: SYSTEM_SNOMED, code: code, display: item.cancer_type }]
+                            : [],
+                        text: `History of ${item.cancer_type} cancer`
+                    },
+                    clinicalStatus: { 
+                         // Historical cancer is usually 'active' (survivor) or 'resolved'. 
+                         // Without specific status field, 'resolved' (remission) or 'active' is ambiguous.
+                         // But for "History of", usually implies past. Snomed codes in cancerTypesMap are usually the disorder itself.
+                         // If we want "History of", we usually use different codes. 
+                         // But requirement says "Each cancer[i] -> FHIR Condition (code = site-specific cancer, SNOMED/ICD-10)".
+                         // So we use the cancer code.
+                         coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-clinical", code: "resolved" }] 
+                    },
+                    onsetDateTime: item.year_dx ? `${item.year_dx}` : undefined
+                };
+                bundle.entry.push({ resource: cond });
+             }
+        });
+    }
+
+    // --- 12. Prophylactic Surgery (Procedures) ---
+    // standardized.advanced.prophylactic_surgery is likely an object: { type: ['Mastectomy'], year: 2020 }
+    if (standardized.advanced?.prophylactic_surgery) {
+        const proph = standardized.advanced.prophylactic_surgery;
+        const year = proph.year || proph['ca.prophylactic_surgery.year']; // Handle both flat/nested key styles depending on parser
+        
+        // The type might be in 'type' (parsed) or 'ca.prophylactic_surgery.type' (raw keys)
+        // Usually standardized keys are cleaner, e.g. just 'type'. I'll check for both array sources.
+        const types = proph.type || proph['ca.prophylactic_surgery.type'];
+
+        if (Array.isArray(types)) {
+            types.forEach((surgeryType: string) => {
+                 let sctCode = "";
+                 switch(surgeryType) {
+                     case "Mastectomy": sctCode = "172043006"; break; // Total mastectomy 
+                     case "Oophorectomy": sctCode = "83152002"; break; // Oophorectomy
+                     case "Hysterectomy": sctCode = "236886002"; break; // Hysterectomy
+                     case "Salpingectomy": sctCode = "31221008"; break; // Salpingectomy
+                     default: sctCode = "392021009"; break; // Procedure (History)
+                 }
+
+                 const proc: FhirProcedure = {
+                     resourceType: "Procedure",
+                     id: uuidv4(),
+                     status: "completed",
+                     subject: subjectRef,
+                     code: {
+                         coding: [{ system: SYSTEM_SNOMED, code: sctCode, display: surgeryType }]
+                     },
+                     reasonCode: [{
+                         coding: [{ system: SYSTEM_SNOMED, code: "704295000", display: "Risk reducing surgery" }],
+                         text: "risk-reducing"
+                     }],
+                     performedDateTime: year ? `${year}` : undefined
+                 };
+                 bundle.entry.push({ resource: proc });
+            });
+        }
     }
 
     return bundle;

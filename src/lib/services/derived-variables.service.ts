@@ -295,8 +295,7 @@ function calculateWcrf(
     const upfShare = diet.upf_share_pct || 0;
 
     if (fastFoodFreq <= 1) {
-        if (upfShare < 40) compB = 1.0;
-        else compB = 0.5;
+        compB = 1.0;
     } else if (fastFoodFreq <= 3) {
         compB = 0.5;
     } else {

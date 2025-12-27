@@ -115,13 +115,34 @@ export const StandardizationService = {
         standardized.advanced.symptom_details = symptomDetails;
       }
       
-      // Family History - UPDATED KEYS
+      // Family History - UPDATED KEYS and FLATTENING
       if (answers.family_cancer_history) {
-        const familyHistory = safeJsonParse(answers.family_cancer_history);
-        standardized.advanced.family = familyHistory.map((member: any) => ({
-          ...member,
-          cancer_code: cancerTypesMap[member.cancer_type] || undefined,
-        }));
+        const rawFamily = safeJsonParse(answers.family_cancer_history);
+        const flattened: any[] = [];
+        
+        rawFamily.forEach((member: any) => {
+            if (member.cancers && Array.isArray(member.cancers) && member.cancers.length > 0) {
+                // Frontend structure with nested cancers
+                member.cancers.forEach((c: any) => {
+                    flattened.push({
+                        ...member,
+                        // Override cancer specific fields
+                        cancer_type: c.cancer_type || c.cancerId,
+                        age_dx: c.age_dx,
+                        cancer_code: cancerTypesMap[c.cancer_type || c.cancerId] || undefined,
+                        // Clean up nested arrays from the flattened object to avoid confusion
+                        cancers: undefined 
+                    });
+                });
+            } else {
+                // Legacy or single entry structure
+                flattened.push({
+                  ...member,
+                  cancer_code: cancerTypesMap[member.cancer_type] || undefined,
+                });
+            }
+        });
+        standardized.advanced.family = flattened;
       }
       
       // Genetics - UPDATED KEYS

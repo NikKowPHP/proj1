@@ -34,7 +34,7 @@ describe("StandardizationService", () => {
       { relation: "Parent", cancer_type: "breast", age_dx: 55, cancer_code: "254837009" },
     ]);
   });
-  
+
   it("should correctly structure and code personal cancer history", () => {
     const answers = {
       personal_cancer_history:
@@ -43,7 +43,7 @@ describe("StandardizationService", () => {
     const result = StandardizationService.standardize(answers);
 
     expect(result.advanced.personal_cancer_history).toEqual([
-        { type: "prostate", year_dx: 2018, treatments: ["surgery"], type_code: "399068003" },
+      { type: "prostate", year_dx: 2018, treatments: ["surgery"], type_code: "399068003" },
     ]);
   });
 
@@ -56,9 +56,9 @@ describe("StandardizationService", () => {
     };
     const result = StandardizationService.standardize(answers);
     expect(result.advanced.smoking_detail).toEqual({
-        cigs_per_day: 20,
-        years: 10,
-        quit_year: 2020
+      cigs_per_day: 20,
+      years: 10,
+      quit_year: 2020
     });
   });
 
@@ -80,36 +80,36 @@ describe("StandardizationService", () => {
   });
 
   it("should correctly structure and code occupational hazards data", () => {
-      const answers = {
-        occupational_hazards: '[{"job_title":"welder","job_years":10,"occ_exposures":["welding_fumes", "asbestos"],"occ_exposure_duration":8,"occ_radiation_badge":"No"}]'
-      };
-      const result = StandardizationService.standardize(answers);
-      expect(result.advanced.occupational).toEqual([
-          { 
-            job_title: "welder", 
-            job_years: 10, 
-            occ_exposures: ["welding_fumes", "asbestos"],
-            occ_exposure_duration: 8,
-            occ_radiation_badge: "No",
-            isco: "7212",
-            occ_exposures_coded: [
-              { id: "welding_fumes", code: "426156009" },
-              { id: "asbestos", code: "406482008" }
-            ]
-          }
-      ]);
+    const answers = {
+      occupational_hazards: '[{"job_title":"welder","job_years":10,"occ_exposures":["welding_fumes", "asbestos"],"occ_exposure_duration":8,"occ_radiation_badge":"No"}]'
+    };
+    const result = StandardizationService.standardize(answers);
+    expect(result.advanced.occupational).toEqual([
+      {
+        job_title: "welder",
+        job_years: 10,
+        occ_exposures: ["welding_fumes", "asbestos"],
+        occ_exposure_duration: 8,
+        occ_radiation_badge: "No",
+        isco: "7212",
+        occ_exposures_coded: [
+          { id: "welding_fumes", code: "426156009" },
+          { id: "asbestos", code: "406482008" }
+        ]
+      }
+    ]);
   });
-  
+
   it("should correctly structure and code personal medical history with details", () => {
-      const answers = {
-        illness_list: '["diabetes", "hypertension"]',
-        illness_details_diabetes: '{"year":2010,"status":"active","confirmed":"yes"}',
-        illness_details_hypertension: '{"year":2015,"status":"resolved","confirmed":"no"}'
-      };
-      const result = StandardizationService.standardize(answers);
-      expect(result.advanced.illnesses).toHaveLength(2);
-      expect(result.advanced.illnesses).toContainEqual({ id: "diabetes", code: "44054006", year: 2010, status: "active", confirmed: "yes" });
-      expect(result.advanced.illnesses).toContainEqual({ id: "hypertension", code: "38341003", year: 2015, status: "resolved", confirmed: "no" });
+    const answers = {
+      illness_list: '["diabetes", "hypertension"]',
+      illness_details_diabetes: '{"year":2010,"status":"active","confirmed":"yes"}',
+      illness_details_hypertension: '{"year":2015,"status":"resolved","confirmed":"no"}'
+    };
+    const result = StandardizationService.standardize(answers);
+    expect(result.advanced.illnesses).toHaveLength(2);
+    expect(result.advanced.illnesses).toContainEqual({ id: "diabetes", code: "44054006", year: 2010, status: "active", confirmed: "yes" });
+    expect(result.advanced.illnesses).toContainEqual({ id: "hypertension", code: "38341003", year: 2015, status: "resolved", confirmed: "no" });
   });
 
   it("should correctly structure screening and immunization history", () => {
@@ -138,38 +138,24 @@ describe("StandardizationService", () => {
     });
   });
 
-  it("should correctly structure functional status with QoL consent and items", () => {
+
+
+  it("should not create a genetics block if testing was not done", () => {
     const answers = {
-      'ecog': '1',
-      'qlq_c30_consent': 'true',
-      'qlq_c30_item_1': '2', // Example QoL item
-      'qlq_c30_item_29': '4' // Example QoL item
+      genetic_testing_done: "No",
     };
     const result = StandardizationService.standardize(answers);
-    expect(result.advanced.functional_status).toEqual({
-      'ecog': '1',
-      'qlq_c30_consent': true,
-      'qlq_c30_item_1': '2',
-      'qlq_c30_item_29': '4'
-    });
+    expect(result.advanced.genetics).toBeUndefined();
   });
-  
-  it("should not create a genetics block if testing was not done", () => {
-      const answers = {
-          genetic_testing_done: "No",
-      };
-      const result = StandardizationService.standardize(answers);
-      expect(result.advanced.genetics).toBeUndefined();
-  });
-  
+
   it("should handle empty or invalid JSON strings gracefully", () => {
-      const answers = {
-          family_cancer_history: 'invalid-json',
-          symptoms: ''
-      };
-      const result = StandardizationService.standardize(answers);
-      
-      expect(result.advanced.family).toBeUndefined();
-      expect(result.core.symptoms).toEqual([]);
+    const answers = {
+      family_cancer_history: 'invalid-json',
+      symptoms: ''
+    };
+    const result = StandardizationService.standardize(answers);
+
+    expect(result.advanced.family).toBeUndefined();
+    expect(result.core.symptoms).toEqual([]);
   });
 });

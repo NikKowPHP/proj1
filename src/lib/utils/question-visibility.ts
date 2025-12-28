@@ -29,7 +29,24 @@ const evaluateCondition = (
 
   // Handle direct question dependency
   const { questionId, operator, value } = condition;
-  let answer = answers[questionId];
+  let answer;
+
+  // Special Case: Virtual question 'derived.has_cervix'
+  // Used for screening visibility.
+  if (questionId === 'derived.has_cervix') {
+      // Check prophylactic surgery
+      const prophylaxis = answers['prophylactic_surgery.type'] || [];
+      const hasHysterectomy = Array.isArray(prophylaxis) && prophylaxis.includes('Hysterectomy');
+      
+      // Note: We don't check therapeutic hysterectomy (from personal cancer history) here deeply 
+      // because that structure is complex to parse in frontend visibility logic without duplicating the service.
+      // However, if the user explicitly selected "Hysterectomy" in prophylaxis, we know they don't have a cervix.
+      // We assume true (has cervix) by default unless evidence to contrary.
+      const hasCervix = !hasHysterectomy;
+      answer = hasCervix;
+  } else {
+      answer = answers[questionId];
+  }
 
   // Special case: 'age' is a derived variable, calculate it from 'dob' if missing
   if (questionId === 'age' && answer === undefined && answers['dob']) {

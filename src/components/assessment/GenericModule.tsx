@@ -116,7 +116,8 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                                             type="button"
                                             onClick={() => {
                                                 const val = Number(answers[key] || 0);
-                                                handleValidatedChange(key, Math.max(0, val - 1));
+                                                const step = q.step || 1;
+                                                handleValidatedChange(key, Math.max(0, val - step));
                                             }}
                                             className="h-10 w-10 flex items-center justify-center  border bg-muted hover:bg-muted/80"
                                         >
@@ -125,6 +126,7 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                                         <Input
                                             type="number"
                                             inputMode="decimal"
+                                            step={q.step || 1}
                                             id={key}
                                             value={answers[key] || ""}
                                             onChange={(e) => handleValidatedChange(key, e.target.value)}
@@ -135,7 +137,8 @@ export const GenericModule = ({ answers, onAnswer, questions, errors: externalEr
                                             type="button"
                                             onClick={() => {
                                                 const val = Number(answers[key] || 0);
-                                                handleValidatedChange(key, val + 1);
+                                                const step = q.step || 1;
+                                                handleValidatedChange(key, val + step);
                                             }}
                                             className="h-10 w-10 flex items-center justify-center  border bg-muted hover:bg-muted/80"
                                         >

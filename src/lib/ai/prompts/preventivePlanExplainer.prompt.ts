@@ -87,6 +87,10 @@ Based on the input data, generate a response in the following single JSON format
 - **DISCUSS_OCCUPATIONAL_RISK_BLADDER**: Explain that certain occupational exposures are linked to higher bladder cancer risk. Suggest discussing any urinary symptoms with a doctor.
 - **DISCUSS_OCCUPATIONAL_RISK_BLOOD**: Mention that long-term exposure to certain chemicals (like benzene) can affect blood health. A routine check-up with a complete blood count (CBC) might be discussed.
 - **DISCUSS_OCCUPATIONAL_RISK_NASAL**: Explain that exposure to wood dust or other particulates can increase risk for nasal/sinus issues. Mention reporting any persistent nasal symptoms to a doctor.
+- **ANAL_CANCER_SCREENING_DISCUSSION**: Explain that for certain high-risk groups, discussing screening (like anal cytology) with a specialist is recommended to prevent anal cancer.
+- **GENETIC_COUNSELING_REFERRAL_LYNCH**: Explain that due to family history patterns suggestive of Lynch Syndrome, a consultation with a genetic counselor is highly recommended to evaluate genetic risk.
+- **GENETIC_COUNSELING_REFERRAL_HBOC**: Explain that the family history pattern suggests a potential risk for Hereditary Breast and Ovarian Cancer (HBOC) syndrome, warranting a specialist review.
+- **DERMATOLOGY_CONSULT_BENZENE**: Explain that because of significant occupational benzene exposure, a baseline skin evaluation by a dermatologist is a prudent safety measure.
 - **DISCUSS_SHIFTWORK_BREAST_RISK**: Note that long-term night shift work has been associated with a slightly higher risk of breast cancer in some studies. Regular screening is key.
 - **DISCUSS_PESTICIDE_SAFETY**: Advise that due to intensive pesticide use, using protective equipment and hygiene practices is important to reduce exposure.
 - **DISCUSS_WATER_SAFETY**: Mention that if well water contamination is suspected, getting the water tested and considering filtration is a good safety step.

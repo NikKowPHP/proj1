@@ -15,6 +15,7 @@ const answersSchema = z.record(z.string(), z.any());
 const assessRequestSchema = z.object({
   answers: answersSchema,
   locale: z.string().optional().default("en"),
+  units: z.enum(["metric", "imperial"]).optional().default("metric"),
 });
 
 // Zod schema for the AI response to ensure type safety. Matches `ActionPlan`.
@@ -77,9 +78,9 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    
-    const { answers, locale } = parsedRequest.data;
-    
+
+    const { answers, locale, units } = parsedRequest.data;
+
     // Explicit Consent Check
     if (answers['consent.health'] !== 'true' && answers['consent.health'] !== true) {
       logger.warn("[API:assess] Request rejected due to missing health consent.");
@@ -92,24 +93,24 @@ export async function POST(request: NextRequest) {
     logger.info("[API:assess] Raw answers successfully parsed.");
 
     // 1. Standardize the raw answers into a structured payload
-    logger.info("[API:assess] Standardizing user answers...");
-    const standardizedPayload = StandardizationService.standardize(answers);
+    logger.info(`[API:assess] Standardizing user answers (Units: ${units})...`);
+    const standardizedPayload = StandardizationService.standardize(answers, units);
     logger.info("[API:assess] Standardization complete.");
 
     // 2. Calculate derived variables (e.g., BMI, age_years)
     logger.info("[API:assess] Calculating derived variables...");
     const derivedVariables = DerivedVariablesService.calculateAll(standardizedPayload);
     logger.info("[API:assess] Derived variables calculation complete.", { derivedVariables });
-    
+
     // Check Age Gate
     if (derivedVariables.adult_gate_ok === false) {
-        logger.warn("[API:assess] Request rejected: User is underage.");
-        return NextResponse.json(
-            { error: "Assessment limited to adults (18+)." },
-            { status: 403 }
-        );
+      logger.warn("[API:assess] Request rejected: User is underage.");
+      return NextResponse.json(
+        { error: "Assessment limited to adults (18+)." },
+        { status: 403 }
+      );
     }
-    
+
     // 3. Run deterministic guideline engine
     logger.info(`[API:assess] Starting guideline engine for locale: ${locale}...`);
     const guidelinePlan = generatePlan(answers, derivedVariables, locale);
@@ -128,6 +129,7 @@ export async function POST(request: NextRequest) {
       derived_variables: derivedVariables,
       guideline_plan: guidelinePlan,
       fhir_data: fhirBundle,
+      genetic_report_ref: answers['gen.upload'] || undefined,
     };
 
     // 6. Get AI-powered explanation for the generated plan
@@ -173,4 +175,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-      

@@ -3,9 +3,9 @@
  * Aligned with HL7 FHIR Specification
  */
 
-export type ResourceType = 
-  | "Bundle" | "Patient" | "QuestionnaireResponse" | "Condition" 
-  | "Observation" | "Procedure" | "Immunization" | "MedicationStatement" 
+export type ResourceType =
+  | "Bundle" | "Patient" | "QuestionnaireResponse" | "Condition"
+  | "Observation" | "Procedure" | "Immunization" | "MedicationStatement"
   | "FamilyMemberHistory" | "Consent";
 
 export interface FhirResource {
@@ -82,6 +82,14 @@ export interface FhirObservation extends FhirResource {
   valueBoolean?: boolean;
   valueString?: string;
   effectiveDateTime?: string;
+  component?: {
+    code: FhirCodeableConcept;
+    valueQuantity?: FhirQuantity;
+    valueCodeableConcept?: FhirCodeableConcept;
+    valueBoolean?: boolean;
+    valueString?: string;
+    valueDateTime?: string;
+  }[];
 }
 
 export interface FhirProcedure extends FhirResource {
@@ -108,6 +116,7 @@ export interface FhirMedicationStatement extends FhirResource {
   medicationCodeableConcept: FhirCodeableConcept;
   subject: FhirReference;
   effectivePeriod?: { start?: string; end?: string };
+  reasonCode?: FhirCodeableConcept[];
 }
 
 export interface FhirFamilyMemberHistory extends FhirResource {

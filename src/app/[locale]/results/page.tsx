@@ -47,7 +47,7 @@ export default function ResultsPage() {
   const params = useParams();
   const locale = typeof params.locale === "string" ? params.locale : "en";
 
-  const { answers, reset } = useAssessmentStore();
+  const { answers, reset, units } = useAssessmentStore();
   const {
     mutate: assess,
     data: assessment,
@@ -75,9 +75,9 @@ export default function ResultsPage() {
 
   useEffect(() => {
     if (Object.keys(answers).length > 0 && !assessment) {
-      assess({ answers, locale });
+      assess({ answers, locale, units });
     }
-  }, [answers, assess, assessment, locale]);
+  }, [answers, assess, assessment, locale, units]);
 
   useEffect(() => {
     if (isPending) {

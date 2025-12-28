@@ -10,6 +10,7 @@ export const useRiskAssessment = () => {
     mutationFn: (payload: {
       answers: Record<string, string>;
       locale: string;
+      units?: "metric" | "imperial";
     }): Promise<ActionPlan> => apiClient.assessment.assess(payload),
     onError: (error: any) => {
       toast({
@@ -23,4 +24,3 @@ export const useRiskAssessment = () => {
     },
   });
 };
-      

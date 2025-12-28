@@ -12,6 +12,7 @@ export const apiClient = {
     assess: async (payload: {
       answers: Record<string, string>;
       locale: string;
+      units?: "metric" | "imperial";
     }): Promise<ActionPlan> => {
       const { data } = await axios.post<ActionPlan>(
         "/api/assess",

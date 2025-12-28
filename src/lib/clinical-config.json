@@ -14,34 +14,136 @@
     "tetanus_booster_years": 10,
     "hcc_surveillance_interval_years": 1,
     "hcc_ibd_years_min": 8,
-    "covid_booster_interval_years": 1
+    "covid_booster_interval_years": 1,
+    "pneumo_age_min": 65,
+    "flu_priority_age_min": 65,
+    "zoster_age_min": 50
   },
   "risk_factors": {
-    "radon_high_options": ["High (>=300)", "Moderate (100-299)"],
-    "hpv_partners_high": ["20 or more", "20 lub więcej", "10-19"],
-    "hpv_partners_recent_high": ["4-5", "6 or more", "6 lub więcej", "6+"]
+    "radon_high_options": [
+      "High (>=300)",
+      "Moderate (100-299)"
+    ],
+    "hpv_partners_high": [
+      "20 or more",
+      "20 lub więcej",
+      "10-19"
+    ],
+    "hpv_partners_recent_high": [
+      "4-5",
+      "6 or more",
+      "6 lub więcej",
+      "6+"
+    ]
   },
   "genetics": {
-    "high_penetrance_genes": ["BRCA1", "BRCA2", "PALB2", "TP53", "PTEN", "CDH1", "STK11", "MLH1", "MSH2", "MSH6", "PMS2", "EPCAM", "APC", "MUTYH", "POLE", "POLD1", "SMAD4", "BMPR1A", "VHL", "MEN1", "RET", "Lynch", "Lynch (MLH1/MSH2/MSH6/PMS2/EPCAM)"],
-    "moderate_penetrance_genes": ["ATM", "CHEK2", "BARD1", "BRIP1", "RAD51C", "RAD51D", "NTHL1", "MITF", "CDKN2A"],
-    "lynch_genes": ["MLH1", "MSH2", "MSH6", "PMS2", "EPCAM", "Lynch", "Lynch (MLH1/MSH2/MSH6/PMS2/EPCAM)"],
-    "polyposis_genes": ["APC", "MUTYH", "POLE", "POLD1", "SMAD4", "BMPR1A", "NTHL1"]
+    "high_penetrance_genes": [
+      "BRCA1",
+      "BRCA2",
+      "PALB2",
+      "TP53",
+      "PTEN",
+      "CDH1",
+      "STK11",
+      "MLH1",
+      "MSH2",
+      "MSH6",
+      "PMS2",
+      "EPCAM",
+      "APC",
+      "POLE",
+      "POLD1",
+      "SMAD4",
+      "BMPR1A",
+      "VHL",
+      "MEN1",
+      "RET",
+      "Lynch",
+      "Lynch (MLH1/MSH2/MSH6/PMS2/EPCAM)"
+    ],
+    "moderate_penetrance_genes": [
+      "ATM",
+      "CHEK2",
+      "BARD1",
+      "BRIP1",
+      "RAD51C",
+      "RAD51D",
+      "NTHL1",
+      "MITF",
+      "CDKN2A"
+    ],
+    "lynch_genes": [
+      "MLH1",
+      "MSH2",
+      "MSH6",
+      "PMS2",
+      "EPCAM",
+      "Lynch",
+      "Lynch (MLH1/MSH2/MSH6/PMS2/EPCAM)"
+    ],
+    "polyposis_genes": [
+      "APC",
+      "MUTYH",
+      "POLE",
+      "POLD1",
+      "SMAD4",
+      "BMPR1A",
+      "NTHL1"
+    ]
   },
   "occupational": {
-      "lung_carcinogens": [
-        "asbestos", "silica", "diesel", "welding", "painting", "painter", "radon", 
-        "arsenic", "cadmium", "chromium", "nickel", "beryllium", "soot", "metal_fluids",
-        "pahs", "firefighter", "mineral_oil", "rubber_chem", "welder"
-      ],
-      "bladder_carcinogens": ["diesel", "mineral_oil", "rubber_chem", "painter", "hairdresser", "pahs"],
-      "skin_chem_carcinogens": ["mineral_oil", "pahs", "rubber_chem"],
-      "blood_carcinogens": ["benzene", "formaldehyde", "radiation", "pesticides"],
-      "nasal_carcinogens": ["wood_dust", "leather_dust", "formaldehyde", "welding", "metals_welding"],
-      "high_risk_years_min": 10,
-      "bladder_years_min": 5,
-      "skin_chem_years_min": 5,
-      "blood_years_min": 2,
-      "nasal_years_min": 5,
-      "breast_shiftwork_years_min": 5
+    "lung_carcinogens": [
+      "asbestos",
+      "silica",
+      "diesel",
+      "welding",
+      "painting",
+      "painter",
+      "radon",
+      "arsenic",
+      "cadmium",
+      "chromium",
+      "nickel",
+      "beryllium",
+      "soot",
+      "metal_fluids",
+      "pahs",
+      "firefighter",
+      "mineral_oil",
+      "rubber_chem",
+      "welder"
+    ],
+    "bladder_carcinogens": [
+      "diesel",
+      "mineral_oil",
+      "rubber_chem",
+      "painter",
+      "hairdresser",
+      "pahs"
+    ],
+    "skin_chem_carcinogens": [
+      "mineral_oil",
+      "pahs",
+      "rubber_chem"
+    ],
+    "blood_carcinogens": [
+      "benzene",
+      "formaldehyde",
+      "radiation",
+      "pesticides"
+    ],
+    "nasal_carcinogens": [
+      "wood_dust",
+      "leather_dust",
+      "formaldehyde",
+      "welding",
+      "metals_welding"
+    ],
+    "high_risk_years_min": 10,
+    "bladder_years_min": 5,
+    "skin_chem_years_min": 5,
+    "blood_years_min": 2,
+    "nasal_years_min": 5,
+    "breast_shiftwork_years_min": 5
   }
 }

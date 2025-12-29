@@ -8,6 +8,7 @@ import { YearInput } from '../ui/YearInput';
 import { CheckboxGroup } from '../ui/CheckboxGroup';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Checkbox } from '../ui/checkbox';
+import { useTranslations } from 'next-intl';
 
 interface CancerDiagnosis {
   type?: string;
@@ -53,6 +54,7 @@ interface PersonalCancerHistoryProps {
 }
 
 export const PersonalCancerHistory = ({ value, onChange, options, errors: externalErrors }: PersonalCancerHistoryProps) => {
+  const t = useTranslations("AssessmentPage");
   const [errors, setErrors] = useState<Record<number, { year_dx?: string, last_followup?: string }>>({});
 
   const handleAdd = () => {
@@ -86,12 +88,12 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
       values={value}
       onAdd={handleAdd}
       onRemove={handleRemove}
-      addLabel="Add Diagnosis"
+      addLabel={t('addDiagnosis')}
     >
       {(item, index) => (
         <div className="space-y-4 border-b pb-4 mb-4 last:border-0 last:pb-0 last:mb-0 animate-fade-in">
           <div className="space-y-2">
-            <Label>Type of Cancer</Label>
+            <Label>{t('typeOfCancer')}</Label>
             <SearchableSelect
               value={item.type}
               onChange={(val) => handleFieldChange(index, 'type', val)}
@@ -102,7 +104,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Year of Diagnosis</Label>
+              <Label>{t('yearOfDiagnosis')}</Label>
               <YearInput
                 value={item.year_dx}
                 onChange={(val) => handleFieldChange(index, 'year_dx', val)}
@@ -112,7 +114,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
               {errors[index]?.year_dx && <p className="text-sm text-destructive">{errors[index].year_dx}</p>}
             </div>
             <div className="space-y-2">
-              <Label>Age at Diagnosis (Optional)</Label>
+              <Label>{t('ageAtDiagnosisOptional')}</Label>
               <input
                 type="number"
                 className="flex h-10 w-full  border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -122,7 +124,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
               />
             </div>
             <div className="space-y-2">
-              <Label>Last Follow-up Year</Label>
+              <Label>{t('lastFollowUpYear')}</Label>
               <YearInput
                 value={item.last_followup}
                 onChange={(val) => handleFieldChange(index, 'last_followup', val)}
@@ -135,7 +137,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Stage at Diagnosis</Label>
+              <Label>{t('stageAtDiagnosis')}</Label>
               <Select value={item.stage_group} onValueChange={(val) => handleFieldChange(index, 'stage_group', val)}>
                 <SelectTrigger><SelectValue placeholder="Select stage" /></SelectTrigger>
                 <SelectContent>
@@ -156,7 +158,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Laterality</Label>
+              <Label>{t('laterality')}</Label>
               <Select value={item.laterality} onValueChange={(val) => handleFieldChange(index, 'laterality', val)}>
                 <SelectTrigger><SelectValue placeholder="Select side" /></SelectTrigger>
                 <SelectContent>
@@ -182,7 +184,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
                 checked={item.recurrence_ever}
                 onCheckedChange={(c) => handleFieldChange(index, 'recurrence_ever', !!c)}
               />
-              <Label htmlFor={`recurrence_${index}`} className="font-normal">Recurrence ever?</Label>
+              <Label htmlFor={`recurrence_${index}`} className="font-normal">{t('recurrenceEver')}</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
@@ -190,7 +192,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
                 checked={item.metastatic_ever}
                 onCheckedChange={(c) => handleFieldChange(index, 'metastatic_ever', !!c)}
               />
-              <Label htmlFor={`metastatic_${index}`} className="font-normal">Metastatic ever?</Label>
+              <Label htmlFor={`metastatic_${index}`} className="font-normal">{t('metastaticEver')}</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
@@ -198,12 +200,12 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
                 checked={item.genetic_flag}
                 onCheckedChange={(c) => handleFieldChange(index, 'genetic_flag', !!c)}
               />
-              <Label htmlFor={`genetic_${index}`} className="font-normal">Linked to known genetic syndrome?</Label>
+              <Label htmlFor={`genetic_${index}`} className="font-normal">{t('linkedToGenetic')}</Label>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Current Status</Label>
+            <Label>{t('currentStatus')}</Label>
             <Select value={item.status_current} onValueChange={(val) => handleFieldChange(index, 'status_current', val)}>
               <SelectTrigger><SelectValue placeholder="Select current status" /></SelectTrigger>
               <SelectContent>
@@ -227,7 +229,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
           {/* Granular Surgery Details (Example for Breast Cancer) */}
           {(item.treatments || []).includes('surgery') && (item.type?.toLowerCase().includes('breast')) && (
             <div className="space-y-2 animate-fade-in">
-              <Label>Surgery Type</Label>
+              <Label>{t('surgeryType')}</Label>
               <Select value={item.surgery_type} onValueChange={(val) => handleFieldChange(index, 'surgery_type', val)}>
                 <SelectTrigger><SelectValue placeholder="Select surgery type" /></SelectTrigger>
                 <SelectContent>
@@ -242,9 +244,9 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
           {/* Radiotherapy Details */}
           {(item.treatments || []).includes('radio') && (
             <div className="space-y-4 border p-4 rounded-md mt-4 animate-fade-in bg-slate-50 dark:bg-slate-900/50">
-              <h4 className="font-semibold text-sm">Radiotherapy Details</h4>
+              <h4 className="font-semibold text-sm">{t('radiotherapyDetails')}</h4>
               <div className="space-y-2">
-                <Label>Which area(s) received radiotherapy?</Label>
+                <Label>{t('radiotherapyAreas')}</Label>
                 <CheckboxGroup
                   options={[
                     { id: "head_neck", label: "Head/neck/brain" },
@@ -261,11 +263,11 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Age at first RT</Label>
+                  <Label>{t('ageFirstRt')}</Label>
                   <input type="number" className="flex h-10 w-full border border-input px-3" value={item.rt_age_first || ""} onChange={e => handleFieldChange(index, 'rt_age_first', Number(e.target.value))} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Year of last RT</Label>
+                  <Label>{t('yearLastRt')}</Label>
                   <YearInput value={item.rt_year_last} onChange={val => handleFieldChange(index, 'rt_year_last', val)} />
                 </div>
               </div>
@@ -275,9 +277,9 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
           {/* Systemic/Drug Details */}
           {((item.treatments || []).includes('chemo') || (item.treatments || []).includes('immuno')) && (
             <div className="space-y-4 border p-4 rounded-md mt-4 animate-fade-in bg-slate-50 dark:bg-slate-900/50">
-              <h4 className="font-semibold text-sm">Drug Treatment Details</h4>
+              <h4 className="font-semibold text-sm">{t('drugTreatmentDetails')}</h4>
               <div className="space-y-2">
-                <Label>Type of drug treatment?</Label>
+                <Label>{t('drugTreatmentType')}</Label>
                 <CheckboxGroup
                   options={[
                     { id: "chemo_classic", label: "Classic Chemo" },
@@ -291,7 +293,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
                 />
               </div>
               <div className="space-y-2">
-                <Label>Are you still taking these?</Label>
+                <Label>{t('stillTaking')}</Label>
                 <Select value={item.sys_current} onValueChange={(val) => handleFieldChange(index, 'sys_current', val)}>
                   <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                   <SelectContent>
@@ -302,7 +304,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
               </div>
               {item.sys_current === 'No' && (
                 <div className="space-y-2">
-                  <Label>Year finished</Label>
+                  <Label>{t('yearFinished')}</Label>
                   <YearInput value={item.sys_year_last} onChange={val => handleFieldChange(index, 'sys_year_last', val)} />
                 </div>
               )}
@@ -312,9 +314,9 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
           {/* Endocrine Details */}
           {(item.treatments || []).includes('endo') && (
             <div className="space-y-4 border p-4 rounded-md mt-4 animate-fade-in bg-slate-50 dark:bg-slate-900/50">
-              <h4 className="font-semibold text-sm">Hormone Therapy Details</h4>
+              <h4 className="font-semibold text-sm">{t('hormoneTherapyDetails')}</h4>
               <div className="space-y-2">
-                <Label>Indication</Label>
+                <Label>{t('indication')}</Label>
                 <Select value={item.endo_indication} onValueChange={(val) => handleFieldChange(index, 'endo_indication', val)}>
                   <SelectTrigger><SelectValue placeholder="Select indication" /></SelectTrigger>
                   <SelectContent>
@@ -325,7 +327,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Currently taking?</Label>
+                <Label>{t('currentlyTaking')}</Label>
                 <Select value={item.endo_current} onValueChange={(val) => handleFieldChange(index, 'endo_current', val)}>
                   <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                   <SelectContent>
@@ -335,7 +337,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Total duration (years)</Label>
+                <Label>{t('totalDurationYears')}</Label>
                 <input type="number" step="0.5" className="flex h-10 w-full border border-input px-3" value={item.endo_years_total || ""} onChange={e => handleFieldChange(index, 'endo_years_total', Number(e.target.value))} />
               </div>
             </div>

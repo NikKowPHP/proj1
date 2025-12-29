@@ -148,13 +148,13 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
         values={value}
         onAdd={() => handleAdd()}
         onRemove={handleRemove}
-        addLabel="Add Custom Relative"
+        addLabel={t('addCustomRelative')}
       >
         {(item, index) => (
           <div className="space-y-4 border-b pb-4 mb-4 last:border-0 last:pb-0 last:mb-0 animate-fade-in">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Relation</Label>
+                <Label>{t('relation')}</Label>
                 <Select
                   value={item.relation}
                   onValueChange={(val) => handleFieldChange(index, "relation", val)}
@@ -172,7 +172,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Side of Family {['Aunt', 'Uncle', 'Grandmother', 'Grandfather', 'Cousin'].some(r => item.relation?.includes(r)) && <span className="text-red-500">*</span>}</Label>
+                <Label>{t('sideOfFamily')} {['Aunt', 'Uncle', 'Grandmother', 'Grandfather', 'Cousin'].some(r => item.relation?.includes(r)) && <span className="text-red-500">*</span>}</Label>
                 <Select
                   value={item.side_of_family}
                   onValueChange={(val) => handleFieldChange(index, "side_of_family", val)}
@@ -193,7 +193,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Sex at Birth</Label>
+                <Label>{t('sexAtBirth')}</Label>
                 <Select
                   value={item.sex_at_birth}
                   onValueChange={(val) => handleFieldChange(index, "sex_at_birth", val)}
@@ -214,14 +214,14 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                     checked={item.is_blood_related}
                     onCheckedChange={(c) => handleFieldChange(index, "is_blood_related", !!c)}
                   />
-                  <Label htmlFor={`blood_related_${index}`} className="font-normal">Blood Related?</Label>
+                  <Label htmlFor={`blood_related_${index}`} className="font-normal">{t('bloodRelated')}</Label>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Vital Status</Label>
+                <Label>{t('vitalStatus')}</Label>
                 <Select
                   value={item.vital_status}
                   onValueChange={(val) => handleFieldChange(index, "vital_status", val)}
@@ -237,7 +237,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>{item.vital_status === 'Deceased' ? 'Age at Death' : 'Current Age'}</Label>
+                <Label>{item.vital_status === 'Deceased' ? t('ageAtDeath') : t('currentAge')}</Label>
                 <Input
                   type="number"
                   value={item.age_now_death ?? ""}
@@ -250,7 +250,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
 
             {/* Cancer History - Nested Repeating Group */}
             <div className="space-y-2">
-              <Label className="font-semibold">Cancer History</Label>
+              <Label className="font-semibold">{t('cancerHistory')}</Label>
               <div className="pl-4 border-l-2 border-gray-200 space-y-3">
                 {(item.cancers || []).map((cancer, cancerIndex) => (
                   <div key={cancerIndex} className="space-y-2 bg-gray-50 p-3 rounded relative animate-fade-in">
@@ -259,10 +259,10 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                       onClick={() => handleRemoveCancer(index, cancerIndex)}
                       className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm"
                     >
-                      Remove
+                      {t('remove')}
                     </button>
                     <div className="space-y-2">
-                      <Label>Type of Cancer</Label>
+                      <Label>{t('typeOfCancer')}</Label>
                       <SearchableSelect
                         value={cancer.cancer_type}
                         onChange={(val) => handleCancerFieldChange(index, cancerIndex, "cancer_type", val)}
@@ -271,7 +271,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Age at Diagnosis</Label>
+                      <Label>{t('ageAtDiagnosis')}</Label>
                       <Input
                         type="number"
                         value={cancer.age_dx ?? ""}
@@ -282,7 +282,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Laterality (if applicable)</Label>
+                      <Label>{t('laterality')}</Label>
                       <Select
                         value={cancer.laterality}
                         onValueChange={(val) => handleCancerFieldChange(index, cancerIndex, "laterality", val)}
@@ -302,7 +302,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                         onCheckedChange={(c) => handleCancerFieldChange(index, cancerIndex, "multiple_primaries", !!c)}
                       />
                       <Label htmlFor={`multiple_primaries_${index}_${cancerIndex}`} className="font-normal text-sm">
-                        Bilateral or multiple primary cancers?
+                        {t('bilateralOrMultiple')}
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 pt-1">
@@ -312,7 +312,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                         onCheckedChange={(c) => handleCancerFieldChange(index, cancerIndex, "known_genetic_syndrome", !!c)}
                       />
                       <Label htmlFor={`genetic_syndrome_${index}_${cancerIndex}`} className="font-normal text-sm">
-                        Linked to known genetic syndrome?
+                        {t('linkedToGenetic')}
                       </Label>
                     </div>
                   </div>
@@ -322,7 +322,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                   onClick={() => handleAddCancer(index)}
                   className="text-sm text-blue-600 hover:text-blue-800"
                 >
-                  + Add Cancer
+                  + {t('addCancer')}
                 </button>
               </div>
             </div>

@@ -401,7 +401,21 @@ function calculateFamilyClusters(familyHistory?: any[]): Record<string, boolean>
 
     const twoSameSide = (maternalCrcCount >= 2) || (paternalCrcCount >= 2);
 
-    const patternColorectal = fdrYoungCrc || twoSameSide;
+    // Lynch-associated cancers for Mix Rule: Colorectal, Endometrial, Ovarian, Stomach, Pancreas, Biliary, Urinary, Brain, Skin
+    const lynchAssociated = relatives.filter(r => 
+        ['colorectal', 'colon', 'rectal', 'endometrial', 'ovarian', 'stomach', 'pancreas', 'biliary', 'urinary', 'brain', 'skin', 'small intestine'].some(c => r.cancer.includes(c))
+    );
+
+    const hasMixRule = (sideRelatives: any[]) => {
+        const hasCrc = sideRelatives.some(r => r.cancer.includes('colorectal') || r.cancer.includes('colon') || r.cancer.includes('rectal'));
+        const hasOtherLynch = sideRelatives.some(r => ['endometrial', 'ovarian', 'stomach', 'pancreas', 'biliary', 'urinary', 'brain', 'skin', 'small intestine'].some(c => r.cancer.includes(c)) && !r.cancer.includes('colorectal') && !r.cancer.includes('colon') && !r.cancer.includes('rectal'));
+        return hasCrc && hasOtherLynch;
+    };
+
+    const maternalMix = hasMixRule(lynchAssociated.filter(r => isMaternalSide(r) || nuclear.includes(r.relation)));
+    const paternalMix = hasMixRule(lynchAssociated.filter(r => isPaternalSide(r) || nuclear.includes(r.relation)));
+
+    const patternColorectal = fdrYoungCrc || twoSameSide || maternalMix || paternalMix;
 
     // 3. Childhood or Rare Cluster
     // "true if ≥2 blood relatives with sarcoma, brain_cns, leukemia, or childhood_other and at least one diagnosis <18 or multiple diagnoses <30."
@@ -589,7 +603,7 @@ function calculateOccupationalFlags(history?: any[]): Record<string, boolean> {
         }
     });
 
-    if (totalHighRiskYears >= config.high_risk_years_min) {
+    if (totalHighRiskYears >= config.high_risk_years_min || lungRisk || mesoFlag || bladderRisk || skinUvRisk || skinChemRisk || bloodCancerRisk || nasalSinusRisk || breastShiftRisk) {
         anyHighRisk = true;
     }
 
@@ -1263,9 +1277,15 @@ export const DerivedVariablesService = {
             derived['screen.crc_due'] = crcDue;
 
             // ADDED: screen.hcc_surveillance_due
+            const hccIntervalUser = screening['screen.hcc.us_interval'];
+            let hccInterval = (thresholds as any).hcc_surveillance_interval_years || 1;
+
+            if (hccIntervalUser === 'Every 6 months') hccInterval = 0.5;
+            else if (hccIntervalUser === 'Every 12 months') hccInterval = 1.0;
+
             derived['screen.hcc_surveillance_due'] =
                 derived['hcc.surveillance_candidate'] &&
-                (screening['screen.hcc.us_ever'] === 'No' || yearsSince(lastHccUsYear) >= (thresholds as any).hcc_surveillance_interval_years);
+                (screening['screen.hcc.us_ever'] === 'No' || yearsSince(lastHccUsYear) >= hccInterval);
 
             derived['screen.any_overdue'] =
                 derived['screen.cervix_due'] ||

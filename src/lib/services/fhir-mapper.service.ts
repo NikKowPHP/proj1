@@ -403,6 +403,14 @@ export const FhirMapperService = {
                     });
                 }
 
+                // Hours per week
+                if (job.hours_week) {
+                    jobObs.component?.push({
+                        code: { coding: [{ system: SYSTEM_ONKONO, code: "onkn.occ.hours_per_week", display: "Hours per week" }] },
+                        valueQuantity: { value: Number(job.hours_week), unit: "h/wk", system: SYSTEM_UCUM, code: "h/wk" }
+                    });
+                }
+
                 // We don't have explicit 'year_first_exposed' in the standardized object shown in derived-vars, 
                 // but if it exists in the source, we map it. 
                 // Assuming strict output mapping requirement, we include it if present.
@@ -687,8 +695,9 @@ export const FhirMapperService = {
 
         // --- 6. Family History ---
         // --- 6. Family History ---
+        // --- 6. Family History ---
         try {
-            const rawFamily = answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : [];
+            const rawFamily = standardized?.advanced?.family || (answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : []);
             if (Array.isArray(rawFamily)) {
                 rawFamily.forEach((member: any) => {
                     const fmh: FhirFamilyMemberHistory = {
@@ -714,6 +723,27 @@ export const FhirMapperService = {
                                     onsetAge: diagnosisAge ? { value: Number(diagnosisAge), unit: "a", system: SYSTEM_UCUM, code: "a" } : undefined
                                 });
                             }
+                        });
+                    } else if (member.cancer_type) {
+                         // Handle flattened structure
+                         const type = member.cancer_type;
+                         const diagnosisAge = member.age_dx || member.age_at_diagnosis;
+                         const cancerCode = cancerTypesMap[type];
+                         fmh.condition?.push({
+                            code: {
+                                coding: cancerCode ? [{ system: SYSTEM_SNOMED, code: cancerCode, display: type }] : [],
+                                text: type
+                            },
+                            onsetAge: diagnosisAge ? { value: Number(diagnosisAge), unit: "a", system: SYSTEM_UCUM, code: "a" } : undefined
+                        });
+                    }
+
+                    // Add side_of_family extension if present
+                    if (member.side_of_family) {
+                        fmh.extension = fmh.extension || [];
+                        fmh.extension.push({
+                            url: "http://onkono.com/fhir/StructureDefinition/family-member-side",
+                            valueString: member.side_of_family // "Maternal" or "Paternal"
                         });
                     }
 
@@ -875,6 +905,36 @@ export const FhirMapperService = {
             bundle.entry.push({ resource: genTestObs });
         }
 
+        // Genetic Variant Found (Self) - High Level Observation
+        if (standardized.advanced?.genetics?.variant_self_status) {
+             bundle.entry.push({
+                resource: {
+                    resourceType: "Observation",
+                    id: uuidv4(),
+                    status: "final",
+                    code: { coding: [{ system: SYSTEM_ONKONO, code: "onkn.gen.path_variant_self", display: "Pathogenic Variant found in Self" }] },
+                    subject: subjectRef,
+                    valueString: standardized.advanced.genetics.variant_self_status // Yes, No, Not sure
+                } as FhirObservation
+            });
+        }
+
+        // Family Reported Genes (onkn.gen.family_genes)
+        if (standardized.advanced?.genetics?.family_genes && Array.isArray(standardized.advanced.genetics.family_genes)) {
+            standardized.advanced.genetics.family_genes.forEach((gene: string) => {
+                 bundle.entry.push({
+                    resource: {
+                        resourceType: "Observation",
+                        id: uuidv4(),
+                        status: "final",
+                        code: { coding: [{ system: SYSTEM_ONKONO, code: "onkn.gen.family_gene", display: "Family Reported Gene Mutation" }] },
+                        subject: subjectRef,
+                        valueString: gene
+                    } as FhirObservation
+                });
+            });
+        }
+
         // --- 10. Consent (Ephemeral) ---
         const consent: any = {
             resourceType: "Consent",
@@ -939,8 +999,60 @@ export const FhirMapperService = {
                     };
                     bundle.entry.push({ resource: cond });
                 }
-            });
-        }
+
+            // Treatments (Chemo, Immuno, Radiotherapy)
+            const treatments = item.treatment_types || [];
+            
+            // Helper for adding medications within this scope
+            const addMedication = (code: string, display: string, reason?: string) => {
+                 bundle.entry.push({
+                    resource: {
+                        resourceType: "MedicationStatement",
+                        id: uuidv4(),
+                        status: "completed",
+                        subject: subjectRef,
+                        medicationCodeableConcept: {
+                            coding: [{ system: SYSTEM_SNOMED, code: code, display: display }]
+                        },
+                        reasonCode: reason ? [{ text: reason }] : undefined
+                    } as FhirMedicationStatement
+                 });
+            };
+
+            if (Array.isArray(treatments)) {
+                if (treatments.includes('Chemotherapy')) {
+                    addMedication("367336001", "Chemotherapy", "Cancer treatment");
+                }
+                if (treatments.includes('Immunotherapy')) {
+                     addMedication("708187008", "Immunotherapy", "Cancer treatment");
+                }
+                if (treatments.includes('Radiotherapy')) {
+                    // Create Procedure for Radiotherapy
+                     const rtProc: FhirProcedure = {
+                        resourceType: "Procedure",
+                        id: uuidv4(),
+                        status: "completed",
+                        subject: subjectRef,
+                        code: { coding: [{ system: SYSTEM_SNOMED, code: "108290001", display: "Radiotherapy" }] },
+                        reasonReference: [{ reference: `Condition/${uuidv4()}` }] 
+                    };
+                     if (item.rt_region) {
+                         // Simplify: item.rt_region is string[] or string? Interface says string[]. 
+                         // Check standardization. If array, join or pick first.
+                         const regionText = Array.isArray(item.rt_region) ? item.rt_region.join(', ') : item.rt_region;
+                         rtProc.bodySite = [{ coding: [], text: regionText }];
+                     }
+                     if (item.year_dx) {
+                          rtProc.performedDateTime = `${item.year_dx}`;
+                     }
+                     bundle.entry.push({ resource: rtProc });
+                }
+                 if (treatments.includes('Hormone Therapy')) {
+                    addMedication("367336001", "Hormone Therapy", "Cancer treatment"); 
+                }
+            }
+        }); // Close forEach
+    }
 
         // --- 12. Prophylactic Surgery (Procedures) ---
         // standardized.advanced.prophylactic_surgery is likely an object: { type: ['Mastectomy'], year: 2020 }

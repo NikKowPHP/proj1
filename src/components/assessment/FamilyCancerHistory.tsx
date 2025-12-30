@@ -15,7 +15,7 @@ interface CancerDiagnosis {
   cancer_type?: string;
   age_dx?: number;
   laterality?: string;
-  multiple_primaries?: boolean;
+  multiple_primaries?: string;
   known_genetic_syndrome?: boolean;
 }
 
@@ -204,6 +204,9 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                   <SelectContent>
                     <SelectItem value="Female">Female</SelectItem>
                     <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Intersex">Intersex</SelectItem>
+                    <SelectItem value="Difference in sex development">Difference in sex development</SelectItem>
+                    <SelectItem value="Not sure">Not sure</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -232,7 +235,7 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                   <SelectContent>
                     <SelectItem value="Alive">Alive</SelectItem>
                     <SelectItem value="Deceased">Deceased</SelectItem>
-                    <SelectItem value="Unknown">Unknown</SelectItem>
+                    <SelectItem value="Not sure">Not sure</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -295,16 +298,25 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="flex items-center space-x-2 pt-2">
-                      <Checkbox
-                        id={`multiple_primaries_${index}_${cancerIndex}`}
-                        checked={cancer.multiple_primaries}
-                        onCheckedChange={(c) => handleCancerFieldChange(index, cancerIndex, "multiple_primaries", !!c)}
-                      />
-                      <Label htmlFor={`multiple_primaries_${index}_${cancerIndex}`} className="font-normal text-sm">
-                        {t('bilateralOrMultiple')}
-                      </Label>
-                    </div>
+                    {cancer.cancer_type && [
+                      'breast', 'kidney', 'colorectal', 'sarcoma', 'melanoma',
+                      'uterine', 'endometrial', 'ovarian', 'thyroid', 'brain', 'cns'
+                    ].some(site => cancer.cancer_type?.toLowerCase().includes(site)) && (
+                        <div className="space-y-2 pt-2">
+                          <Label className="font-normal text-sm">{t('bilateralOrMultiple')}</Label>
+                          <Select
+                            value={cancer.multiple_primaries}
+                            onValueChange={(val) => handleCancerFieldChange(index, cancerIndex, "multiple_primaries", val)}
+                          >
+                            <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Yes">Yes</SelectItem>
+                              <SelectItem value="No">No</SelectItem>
+                              <SelectItem value="Not sure">Not sure</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
                     <div className="flex items-center space-x-2 pt-1">
                       <Checkbox
                         id={`genetic_syndrome_${index}_${cancerIndex}`}

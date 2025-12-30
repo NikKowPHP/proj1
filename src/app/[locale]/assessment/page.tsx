@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/services/api-client.service";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Chip } from "@/components/ui/chip";
 import { useAssessmentStore } from "@/lib/stores/assessment.store";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -156,6 +157,41 @@ export default function AssessmentPage() {
     }
   }, [answers.symptoms, questionnaire]);
 
+  // Family History Connection: Pre-populate advanced module based on Core answers
+  useEffect(() => {
+    if (!answers['famhx.any_family_cancer']) return; // Wait for core answer
+
+    // Only pre-populate if advanced module is empty/undefined to avoid overwriting user edits
+    if (answers.family_cancer_history && answers.family_cancer_history !== '[]') return;
+
+    if (answers['famhx.any_family_cancer'] === 'No') {
+      // Can optionally clear it, but maybe safer to leave alone? 
+      // If they said No, the advanced module likely isn't shown or is irrelevant.
+      return;
+    }
+
+    if (answers['famhx.any_family_cancer'] === 'Yes') {
+      if (answers['famhx.quick_relatives_chips']) {
+        try {
+          const relatives = JSON.parse(answers['famhx.quick_relatives_chips']);
+          // Map to FamilyMember objects
+          const initialMembers = relatives.map((rel: string) => ({
+            id: crypto.randomUUID(),
+            relationship: rel,
+            cancers: []
+          }));
+          // Avoid infinite loop by only setting if different? 
+          // But we checked if answers.family_cancer_history is empty above.
+          if (initialMembers.length > 0) {
+            setAnswer('family_cancer_history', JSON.stringify(initialMembers));
+          }
+        } catch (e) {
+          console.error("Failed to parse quick relatives", e);
+        }
+      }
+    }
+  }, [answers['famhx.any_family_cancer'], answers['famhx.quick_relatives_chips']]);
+
   const handleNext = () => {
     if (!validateStep()) {
       // Find the first error and scroll to it if possible? 
@@ -210,6 +246,7 @@ export default function AssessmentPage() {
         const currentYear = new Date().getFullYear();
         if (isNaN(year)) error = t('validNumber');
         else if (year < 1900 || year > currentYear) error = `Year must be between 1900 and ${currentYear}`;
+        else if ((currentYear - year) < 18) error = "You must be 18 or older to use this service.";
       }
     }
 
@@ -286,6 +323,29 @@ export default function AssessmentPage() {
         }
       }
     });
+
+    // Custom Validation: Alcohol Percentages must sum to 100
+    // Check if any alcohol percentage fields are visible/present
+    if (isQuestionVisible({ id: 'alcohol.beer_pct', type: 'number_input' } as any, answers) ||
+      isQuestionVisible({ id: 'alcohol.wine_pct', type: 'number_input' } as any, answers) ||
+      isQuestionVisible({ id: 'alcohol.spirits_pct', type: 'number_input' } as any, answers)) {
+
+      const beer = Number(answers['alcohol.beer_pct'] || 0);
+      const wine = Number(answers['alcohol.wine_pct'] || 0);
+      const spirits = Number(answers['alcohol.spirits_pct'] || 0);
+
+      // Only validate if user has entered at least one non-zero value or if the fields are mandatory?
+      // Usually these appear if they drink. 
+      // If all are 0/empty, maybe not an error if they skip? But depends on requirements. 
+      // Let's assume strict sum if they are visible.
+      const total = beer + wine + spirits;
+      if (total !== 100) {
+        newErrors['alcohol.beer_pct'] = t('sum100');
+        newErrors['alcohol.wine_pct'] = t('sum100');
+        newErrors['alcohol.spirits_pct'] = t('sum100');
+        isValid = false;
+      }
+    }
 
     console.log('newErrors', newErrors);
     setLocalErrors(prev => ({ ...prev, ...newErrors }));
@@ -440,8 +500,28 @@ export default function AssessmentPage() {
                       )}
                     </>
                   )}
-                  {q.type === "year_input" && <><Input id={q.id} type="number" inputMode="numeric" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} placeholder="YYYY" /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
-                  {q.type === "date_input" && <><Input id={q.id} type="date" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} /><p className="text-sm text-destructive">{localErrors[q.id]}</p></>}
+                  {q.type === "year_input" && (
+                    <div className="flex items-center gap-2">
+                      <Input id={q.id} type="number" inputMode="numeric" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} placeholder="YYYY" />
+                      {q.id === 'dob' && answers[q.id] && !isNaN(parseInt(answers[q.id])) && parseInt(answers[q.id]) > 1900 && (
+                        <Chip className="bg-primary/10 text-primary border-primary/20 shrink-0 h-10 px-3">
+                          Age: {new Date().getFullYear() - parseInt(answers[q.id])} years
+                        </Chip>
+                      )}
+                      <p className="text-sm text-destructive">{localErrors[q.id]}</p>
+                    </div>
+                  )}
+                  {q.type === "date_input" && (
+                    <div className="flex items-center gap-2">
+                      <Input id={q.id} type="date" value={answers[q.id] || ""} onChange={(e) => handleInputChange(q.id, e.target.value, q.type)} aria-invalid={!!localErrors[q.id]} className={localErrors[q.id] ? "border-destructive" : ""} />
+                      {q.id === 'dob' && answers[q.id] && !isNaN(new Date(answers[q.id]).getFullYear()) && (
+                        <Chip className="bg-primary/10 text-primary border-primary/20 shrink-0 h-10 px-3">
+                          Age: {new Date().getFullYear() - new Date(answers[q.id]).getFullYear()} years
+                        </Chip>
+                      )}
+                      <p className="text-sm text-destructive">{localErrors[q.id]}</p>
+                    </div>
+                  )}
                   {q.type === "consent_checkbox" && <div className="flex flex-col gap-2"><div className={`flex items-start space-x-3  border p-4 ${localErrors[q.id] ? "border-destructive" : ""}`}><Checkbox id={q.id} checked={answers[q.id] === "true"} onCheckedChange={(c) => setAnswer(q.id, c ? "true" : "false")} /><div className="grid gap-1.5"><label htmlFor={q.id} className="text-sm leading-snug text-muted-foreground">{t.rich("consentHealth", { privacyLink: (chunks) => <Link href="/privacy" className="font-semibold text-primary hover:underline" target="_blank" rel="noopener noreferrer">{chunks}</Link> })}</label></div></div>{localErrors[q.id] && <p className="text-sm text-destructive">{localErrors[q.id]}</p>}</div>}
                   {q.type === "checkbox_group" && (
                     <>

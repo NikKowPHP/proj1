@@ -12,6 +12,7 @@ export interface FhirResource {
   resourceType: ResourceType;
   id?: string;
   meta?: { profile?: string[] };
+  extension?: { url: string; valueString?: string; valueBoolean?: boolean; valueInteger?: number; valueDate?: string }[];
 }
 
 export interface FhirCoding {
@@ -99,6 +100,8 @@ export interface FhirProcedure extends FhirResource {
   subject: FhirReference;
   performedDateTime?: string;
   reasonCode?: FhirCodeableConcept[];
+  bodySite?: FhirCodeableConcept[];
+  reasonReference?: FhirReference[];
 }
 
 export interface FhirImmunization extends FhirResource {

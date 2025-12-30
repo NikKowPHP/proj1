@@ -95,7 +95,7 @@ describe('FhirMapperService', () => {
       const bundle = FhirMapperService.toFhirBundle(answers, standardized, derived);
 
       const observations = bundle.entry.filter(e => e.resource.resourceType === 'Observation');
-      expect(observations.length).toBe(2);
+      expect(observations.length).toBe(3);
 
       // Check BMI observation
       const bmiObs = observations.find(e => {
@@ -535,7 +535,7 @@ describe('FhirMapperService', () => {
 
       // Count observations (BMI, Pack Years, AUDIT-C, IPAQ, WCRF, HPV Band = 6)
       const observations = bundle.entry.filter(e => e.resource.resourceType === 'Observation');
-      expect(observations.length).toBe(6);
+      expect(observations.length).toBe(7);
 
       // Verify procedures (Colonoscopy + Mammography = 2)
       const procedures = bundle.entry.filter(e => e.resource.resourceType === 'Procedure');

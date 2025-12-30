@@ -17,12 +17,12 @@ interface CancerDiagnosis {
   treatments?: string[];
   last_followup?: number;
   // New fields
-  stage_group?: string; // I, II, III, IV, 0
+  stage_group?: string; // I, II, III, IV, Not told, Don't remember
   laterality?: string; // Left, Right, Bilateral
-  recurrence_ever?: boolean;
-  metastatic_ever?: boolean;
-  genetic_flag?: boolean;
-  status_current?: string; // No evidence of disease, In remission, Active treatment, Stable
+  recurrence_ever?: string; // Yes, No, Not sure
+  metastatic_ever?: string; // Yes, No, Not sure
+  genetic_flag?: string; // Yes, No, Not sure
+  status_current?: string; // no_evidence, in_remission, active_treatment, stable, not_sure
   surgery_type?: string; // Mastectomy, Lumpectomy
 
   // Radiotherapy details
@@ -147,11 +147,12 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
                   {/* Fallback if options not passed */}
                   {!options.stageOptions && (
                     <>
-                      <SelectItem value="0">Stage 0</SelectItem>
                       <SelectItem value="I">Stage I</SelectItem>
                       <SelectItem value="II">Stage II</SelectItem>
                       <SelectItem value="III">Stage III</SelectItem>
                       <SelectItem value="IV">Stage IV</SelectItem>
+                      <SelectItem value="Not told">Not told</SelectItem>
+                      <SelectItem value="Don't remember">Don't remember</SelectItem>
                     </>
                   )}
                 </SelectContent>
@@ -178,29 +179,43 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
           </div>
 
           <div className="flex flex-wrap gap-4">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id={`recurrence_${index}`}
-                checked={item.recurrence_ever}
-                onCheckedChange={(c) => handleFieldChange(index, 'recurrence_ever', !!c)}
-              />
-              <Label htmlFor={`recurrence_${index}`} className="font-normal">{t('recurrenceEver')}</Label>
+            <div className="space-y-2">
+              <Label>{t('recurrenceEver')}</Label>
+              <Select value={item.recurrence_ever} onValueChange={(val) => handleFieldChange(index, 'recurrence_ever', val)}>
+                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="No">No</SelectItem>
+                  <SelectItem value="Yes">Yes</SelectItem>
+                  <SelectItem value="Not sure">Not sure</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id={`metastatic_${index}`}
-                checked={item.metastatic_ever}
-                onCheckedChange={(c) => handleFieldChange(index, 'metastatic_ever', !!c)}
-              />
-              <Label htmlFor={`metastatic_${index}`} className="font-normal">{t('metastaticEver')}</Label>
+            <div className="space-y-2">
+              <Label>{t('metastaticEver')}</Label>
+              <Select value={item.metastatic_ever} onValueChange={(val) => handleFieldChange(index, 'metastatic_ever', val)}>
+                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="No">No</SelectItem>
+                  <SelectItem value="Yes">Yes</SelectItem>
+                  <SelectItem value="Not sure">Not sure</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id={`genetic_${index}`}
-                checked={item.genetic_flag}
-                onCheckedChange={(c) => handleFieldChange(index, 'genetic_flag', !!c)}
-              />
-              <Label htmlFor={`genetic_${index}`} className="font-normal">{t('linkedToGenetic')}</Label>
+            <div className="space-y-2">
+              <Label htmlFor={`genetic_${index}`}>{t('linkedToGenetic')}</Label>
+              <Select
+                value={typeof item.genetic_flag === 'boolean' ? (item.genetic_flag ? 'Yes' : 'No') : item.genetic_flag}
+                onValueChange={(val) => handleFieldChange(index, 'genetic_flag', val)}
+              >
+                <SelectTrigger id={`genetic_${index}`}>
+                  <SelectValue placeholder="Select" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Yes">Yes</SelectItem>
+                  <SelectItem value="No">No</SelectItem>
+                  <SelectItem value="Not sure">Not sure</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -213,6 +228,7 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
                 <SelectItem value="in_remission">In remission</SelectItem>
                 <SelectItem value="active_treatment">Active treatment</SelectItem>
                 <SelectItem value="stable">Stable</SelectItem>
+                <SelectItem value="not_sure">Not sure</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -233,9 +249,13 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
               <Select value={item.surgery_type} onValueChange={(val) => handleFieldChange(index, 'surgery_type', val)}>
                 <SelectTrigger><SelectValue placeholder="Select surgery type" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="mastectomy">Mastectomy</SelectItem>
+                  <SelectItem value="mastectomy">Mastectomy (Single)</SelectItem>
+                  <SelectItem value="double_mastectomy">Double Mastectomy</SelectItem>
                   <SelectItem value="lumpectomy">Lumpectomy</SelectItem>
+                  <SelectItem value="reconstruction_only">Reconstruction Only</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="not_sure">Not sure</SelectItem>
+                  <SelectItem value="does_not_apply">Does not apply</SelectItem>
                 </SelectContent>
               </Select>
             </div>

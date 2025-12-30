@@ -45,6 +45,12 @@ export const SexualHealth = ({ answers, onAnswer, questions, errors }: SexualHea
     <div className="space-y-6">
       {visibleQuestions.map(q => (
         <div key={q.id} className="space-y-2">
+          {/* Static Info for Sexual Health Opt-in */}
+          {q.id === 'sexhx.section_opt_in' && (
+            <div className="bg-muted p-4 rounded-md text-sm text-muted-foreground mb-4">
+              This section is optional and covers sensitive topics related to sexual health. Your answers help us assess specific risks related to HPV and other factors. You may choose to opt out.
+            </div>
+          )}
           {/* Label handling for opt-in question which might be longer */}
           <Label htmlFor={q.id} className={q.id === 'sexhx.section_opt_in' ? "text-base font-semibold" : ""}>{q.text}</Label>
           {q.type === 'select' && (

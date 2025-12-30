@@ -176,6 +176,36 @@ export const SmokingDetails = ({ answers, onAnswer, questions, errors: externalE
                   step={q.id === 'smoking.intensity' && answers['smoking.intensity_unit'] === 'Packs per day' ? "0.1" : "1"}
                   className={cn(error && "border-destructive focus-visible:ring-destructive")}
                 />
+
+                {/* Helper text display - specifically for 20 cigs = 1 pack hint */}
+                {q.helperText && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {typeof q.helperText === 'object'
+                      ? (q.helperText[locale as string] || q.helperText.en)
+                      : q.helperText}
+                  </p>
+                )}
+
+                {q.id === 'smoking.years_smoked' && answers['smoking.intensity'] && answers['smoking.years_smoked'] && (
+                  <div className="mt-2 p-2 bg-muted rounded-md text-sm flex items-center gap-2 animate-fade-in">
+                    <span className="font-semibold text-primary">
+                      {(() => {
+                        const intensity = parseFloat(answers['smoking.intensity']);
+                        const years = parseFloat(answers['smoking.years_smoked']);
+                        const unit = answers['smoking.intensity_unit'];
+                        let packYears = 0;
+                        if (unit === 'Packs per day') {
+                          packYears = intensity * years;
+                        } else {
+                          packYears = (intensity / 20) * years;
+                        }
+                        return packYears.toFixed(1);
+                      })()} Pack-Years
+                    </span>
+                    <span className="text-muted-foreground text-xs">(20 cig = 1 pack)</span>
+                  </div>
+                )}
+
                 {error && <p className="text-sm text-destructive">{error}</p>}
               </>
             )}

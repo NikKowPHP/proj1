@@ -55,6 +55,22 @@ export const StandardizationService = {
         if (validWeight) validWeight = validWeight * LBS_TO_KG;
       }
 
+      // Alcohol Calculation Logic
+      const beerDrinks = Number(answers['alcohol.beer_drinks']) || 0;
+      const wineDrinks = Number(answers['alcohol.wine_drinks']) || 0;
+      const spiritsDrinks = Number(answers['alcohol.spirits_drinks']) || 0;
+      const totalDrinks = beerDrinks + wineDrinks + spiritsDrinks;
+
+      let beerPct = Number(answers['alcohol.beer_pct']);
+      let winePct = Number(answers['alcohol.wine_pct']);
+      let spiritsPct = Number(answers['alcohol.spirits_pct']);
+
+      if (totalDrinks > 0 && isNaN(beerPct) && isNaN(winePct) && isNaN(spiritsPct)) {
+         beerPct = (beerDrinks / totalDrinks) * 100;
+         winePct = (wineDrinks / totalDrinks) * 100;
+         spiritsPct = (spiritsDrinks / totalDrinks) * 100;
+      }
+
       standardized.core = {
         dob: answers.dob, // Year only now
         sex_at_birth: answers.sex_at_birth,
@@ -72,9 +88,15 @@ export const StandardizationService = {
         },
         // Alcohol Beverage Mix (Core)
         alcohol_mix: {
-          beer_pct: Number(answers['alcohol.beer_pct']) || undefined,
-          wine_pct: Number(answers['alcohol.wine_pct']) || undefined,
-          spirits_pct: Number(answers['alcohol.spirits_pct']) || undefined,
+          beer_pct: Number.isFinite(beerPct) ? beerPct : undefined,
+          wine_pct: Number.isFinite(winePct) ? winePct : undefined,
+          spirits_pct: Number.isFinite(spiritsPct) ? spiritsPct : undefined,
+        },
+        // Detailed Alcohol for Gram Calculation
+        alcohol_details: {
+           beer_drinks: beerDrinks,
+           wine_drinks: wineDrinks,
+           spirits_drinks: spiritsDrinks,
         },
         symptoms: safeJsonParse(answers.symptoms),
         family_cancer_any: answers['famhx.any_family_cancer'], // UPDATED KEY
@@ -167,6 +189,7 @@ export const StandardizationService = {
           variant_self_status: answers['gen.path_variant_self'],
           genes: answers['gen.self_genes'] ? safeJsonParse(answers['gen.self_genes']) : [],
           mutyh_biallelic: answers['gen.mutyh_biallelic'],
+          family_genes: answers['gen.family_genes'] ? safeJsonParse(answers['gen.family_genes']) : [], // Added family_genes
           // Map to internal structure
           variants_hgvs: null, // Removed from new JSON spec
         };
@@ -421,6 +444,13 @@ export const StandardizationService = {
         years: Number(answers['smoking.years_smoked']) || undefined,
         quit_date: parseYear(answers['smoking.quit_date'] ? String(answers['smoking.quit_date']).split('-')[0] : undefined),
         other_tobacco: safeJsonParse(answers['smoking.other_tobacco_smoked']),
+        other_tobacco_quantities: {
+            cigar_week: Number(answers['smoking.other_cigar_per_week']) || undefined,
+            cigarillos_week: Number(answers['smoking.other_cigarillos_per_week']) || undefined,
+            pipe_week: Number(answers['smoking.other_pipe_bowls_per_week']) || undefined,
+            hookah_week: Number(answers['smoking.other_hookah_sessions_per_week']) || undefined,
+            other_week: Number(answers['smoking.other_other_per_week']) || undefined
+        },
         vape: {
           status: answers['vape.status'],
           days_30d: Number(answers['vape.days_30d']) || undefined,

@@ -93,6 +93,10 @@
             "en": "Weight (kg)",
             "pl": "Waga (kg)"
           },
+          "helperText": {
+            "en": "It doesn't need to be exact.",
+            "pl": "Może być przybliżona wartość"
+          },
           "min": 30,
           "max": 300,
           "placeholder": "e.g. 70"
@@ -204,6 +208,10 @@
                   "text": {
                     "en": "On average, how many cigarettes do you smoke per day?",
                     "pl": "Średnio, ile papierosów palisz dziennie?"
+                  },
+                  "helperText": {
+                    "en": "20 cigarettes = 1 pack.",
+                    "pl": "20 papierosów = 1 paczka."
                   },
                   "type": "number_input",
                   "dependsOn": {
@@ -546,11 +554,13 @@
                 },
                 {
                   "id": "htp.sticks_per_day",
-                  "text": {
-                    "en": "Average tobacco sticks per day",
-                    "pl": "Średnia liczba wkładów dziennie"
+                  "label": {
+                    "en": "Sticks per day",
+                    "pl": "Wkłady na dzień"
                   },
                   "type": "number_input",
+                  "min": 0,
+                  "max": 40,
                   "dependsOn": {
                     "questionId": "htp.status",
                     "value": "Current"
@@ -723,6 +733,50 @@
           ]
         },
         {
+          "id": "advanced_modules_female",
+          "type": "advanced_modules",
+          "modules": [
+            {
+              "id": "female_health",
+              "title": {
+                "en": "Female Health",
+                "pl": "Zdrowie Kobiet"
+              },
+              "dependsOn": {
+                "questionId": "sex_at_birth",
+                "value": "Female"
+              },
+              "questions": [
+                {
+                  "id": "gyn.menopause_status",
+                  "text": {
+                    "en": "Menopause status",
+                    "pl": "Status menopauzy"
+                  },
+                  "type": "select",
+                  "options": [
+                    { "value": "Premenopausal", "label": { "en": "Premenopausal", "pl": "Przed menopauzą" } },
+                    { "value": "Perimenopausal", "label": { "en": "Perimenopausal", "pl": "W trakcie menopauzy" } },
+                    { "value": "Postmenopausal", "label": { "en": "Postmenopausal", "pl": "Po menopauzie" } }
+                  ]
+                },
+                {
+                  "id": "gyn.hysterectomy",
+                  "text": {
+                    "en": "Have you had a hysterectomy (removal of uterus)?",
+                    "pl": "Czy miała Pani histerektomię (usunięcie macicy)?"
+                  },
+                  "type": "radio",
+                  "options": [
+                    { "value": "No", "label": { "en": "No", "pl": "Nie" } },
+                    { "value": "Yes", "label": { "en": "Yes", "pl": "Tak" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
           "id": "alcohol.status",
           "type": "radio",
           "text": {
@@ -755,8 +809,8 @@
           "infoCard": {
             "id": "alcohol.std_unit_info",
             "text": {
-              "en": "Standard Drink = 10g pure ethanol",
-              "pl": "Standardowa porcja = 10g czystego alkoholu"
+              "en": "Standard Drink = 10g pure ethanol. Common examples: 500 ml 5% beer ≈ 2 drinks; 150 ml 12% wine ≈ 1.5 drinks.",
+              "pl": "Standardowa porcja = 10g czystego alkoholu. Przykłady: 500 ml piwa 5% ≈ 2 d; 150 ml wina 12% ≈ 1.5 d."
             }
           }
         },
@@ -913,18 +967,38 @@
           ]
         },
         {
+          "id": "alcohol.reporting_method",
+          "text": {
+             "en": "How would you like to detail your intake?",
+             "pl": "Jak chcesz podać spożycie?"
+          },
+          "type": "radio",
+          "options": [
+              { "value": "Percentage", "label": { "en": "Percentage share (%)", "pl": "Udział procentowy (%)" } },
+              { "value": "Drinks", "label": { "en": "Number of drinks", "pl": "Liczba drinków" } }
+          ],
+          "dependsOn": {
+            "questionId": "alcohol.status",
+            "value": "Current"
+          }
+        },
+        {
           "id": "alcohol.beer_pct",
           "text": {
             "en": "% Beer",
             "pl": "% Piwo"
           },
+          "helperText": {
+             "en": "Must sum to 100 with others.",
+             "pl": "Musi sumować się do 100."
+          },
           "type": "number_input",
           "min": 0,
           "max": 100,
-          "dependsOn": {
-            "questionId": "alcohol.status",
-            "value": "Current"
-          }
+          "dependsOn": [
+             { "questionId": "alcohol.status", "value": "Current" },
+             { "questionId": "alcohol.reporting_method", "value": "Percentage" }
+          ]
         },
         {
           "id": "alcohol.wine_pct",
@@ -935,30 +1009,73 @@
           "type": "number_input",
           "min": 0,
           "max": 100,
-          "dependsOn": {
-            "questionId": "alcohol.status",
-            "value": "Current"
-          }
+          "dependsOn": [
+             { "questionId": "alcohol.status", "value": "Current" },
+             { "questionId": "alcohol.reporting_method", "value": "Percentage" }
+          ]
         },
         {
           "id": "alcohol.spirits_pct",
           "text": {
             "en": "% Spirits",
-            "pl": "% Mocne alkohole"
+            "pl": "% Wódka/Inne"
           },
           "type": "number_input",
           "min": 0,
           "max": 100,
-          "dependsOn": {
-            "questionId": "alcohol.status",
-            "value": "Current"
-          }
+          "dependsOn": [
+             { "questionId": "alcohol.status", "value": "Current" },
+             { "questionId": "alcohol.reporting_method", "value": "Percentage" }
+          ]
+        },
+        {
+          "id": "alcohol.beer_drinks",
+          "text": {
+             "en": "Number of Beers (approx per week)",
+             "pl": "Liczba piw (tygodniowo)"
+          },
+          "type": "number_input",
+          "min": 0,
+          "dependsOn": [
+             { "questionId": "alcohol.status", "value": "Current" },
+             { "questionId": "alcohol.reporting_method", "value": "Drinks" }
+          ]
+        },
+        {
+          "id": "alcohol.wine_drinks",
+          "text": {
+             "en": "Number of Wines (approx per week)",
+             "pl": "Liczba lampek wina (tygodniowo)"
+          },
+          "type": "number_input",
+          "min": 0,
+          "dependsOn": [
+             { "questionId": "alcohol.status", "value": "Current" },
+             { "questionId": "alcohol.reporting_method", "value": "Drinks" }
+          ]
+        },
+        {
+          "id": "alcohol.spirits_drinks",
+          "text": {
+             "en": "Number of Spirits (approx per week)",
+             "pl": "Liczba drinków mocnych (tygodniowo)"
+          },
+          "type": "number_input",
+          "min": 0,
+          "dependsOn": [
+             { "questionId": "alcohol.status", "value": "Current" },
+             { "questionId": "alcohol.reporting_method", "value": "Drinks" }
+          ]
         },
         {
           "id": "diet.fv_portions_day",
           "text": {
-            "en": "Vegetables & Fruit (portions/day)",
-            "pl": "Warzywa i owoce (porcje/dzień)"
+            "en": "Fruit & Vegetables (portions/day)",
+            "pl": "Owoce i Warzywa (porcje/dzień)"
+          },
+          "helperText": {
+            "en": "1 medium fruit; 1/2 cup cooked veg.",
+            "pl": "1 średni owoc; 1/2 szklanki gotowanych warzyw."
           },
           "type": "number_input",
           "min": 0,
@@ -968,8 +1085,12 @@
         {
           "id": "diet.whole_grains_servings_day",
           "text": {
-            "en": "Whole grains servings per day",
-            "pl": "Pełne ziarna (porcje/dzień)"
+            "en": "Whole Grains (servings/day)",
+            "pl": "Pełnoziarniste (porcje/dzień)"
+          },
+          "helperText": {
+            "en": "1 serving ≈ 1 slice whole-grain bread or 1/2 cup cooked grain.",
+            "pl": "1 porcja ≈ 1 kromka pełnoziarnistego chleba lub 1/2 szklanki gotowanej kaszy."
           },
           "type": "number_input",
           "min": 0,
@@ -989,8 +1110,12 @@
         {
           "id": "diet.red_meat_servings_week",
           "text": {
-            "en": "Red meat (servings/week)",
-            "pl": "Czerwone mięso (porcje/tydzień)"
+            "en": "Red Meat (servings/week)",
+            "pl": "Czerwone Mięso (porcje/tydzień)"
+          },
+          "helperText": {
+            "en": "Size guide: 100 g ≈ deck of cards.",
+            "pl": "Wielkość porcji: 100 g ≈ talia kart."
           },
           "type": "number_input",
           "min": 0,
@@ -999,8 +1124,12 @@
         {
           "id": "diet.processed_meat_servings_week",
           "text": {
-            "en": "Processed meat (servings/week)",
-            "pl": "Przetworzone mięso (porcje/tydzień)"
+            "en": "Processed Meat (servings/week)",
+            "pl": "Przetworzone Mięso (porcje/tydzień)"
+          },
+          "helperText": {
+            "en": "Examples: ham, bacon, sausage, salami.",
+            "pl": "Przykłady: szynka, boczek, kiełbasa, salami."
           },
           "type": "number_input",
           "min": 0,
@@ -1077,8 +1206,12 @@
         {
           "id": "pa.activity_level",
           "text": {
-            "en": "Usual physical activity level",
-            "pl": "Typowy poziom aktywności fizycznej"
+            "en": "General activity level",
+            "pl": "Ogólny poziom aktywności"
+          },
+          "helperText": {
+            "en": "Sedentary: mostly sitting. Moderate: brisk walking. Vigorous: running/heavy lifting.",
+            "pl": "Siedzący: głównie siedzenie. Umiarkowany: szybki marsz. Intensywny: bieganie/ciężka praca."
           },
           "type": "radio",
           "options": [
@@ -1201,6 +1334,10 @@
                     "en": "Minutes sitting per day",
                     "pl": "Minuty siedzenia dziennie"
                   },
+                  "helperText": {
+                    "en": "Sitting includes: desk work, driving, TV.",
+                    "pl": "Siedzenie obejmuje: pracę przy biurku, prowadzenie samochodu, oglądanie telewizji."
+                  },
                   "type": "number_input",
                   "min": 0,
                   "max": 1440
@@ -1299,8 +1436,12 @@
                 {
                   "id": "sexhx.lifetime_partners_cat",
                   "text": {
-                    "en": "Lifetime partners count",
-                    "pl": "Liczba partnerów (całe życie)"
+                    "en": "Lifetime number of sexual partners",
+                    "pl": "Liczba partnerów seksualnych w ciągu całego życia"
+                  },
+                  "helperText": {
+                    "en": "Do not count multiple contacts with the same person separately.",
+                    "pl": "Nie liczymy wielokrotnych kontaktów z tą samą osobą oddzielnie."
                   },
                   "type": "select",
                   "options": [
@@ -1673,6 +1814,10 @@
                     "en": "Ever exchanged sex for money/goods?",
                     "pl": "Seks za pieniądze/korzyści?"
                   },
+                  "helperText": {
+                    "en": "This question is only used to tailor recommendations.",
+                    "pl": "To pytanie służy wyłącznie dopasowaniu zaleceń."
+                  },
                   "type": "radio",
                   "options": [
                     {
@@ -1907,8 +2052,12 @@
                 {
                   "id": "sexhx.hpv_precancer_history",
                   "text": {
-                    "en": "History of HPV precancer?",
-                    "pl": "Historia zmian przedrakowych HPV?"
+                    "en": "History of treated precancerous lesions (cervix/anus)?",
+                    "pl": "Historia leczonych zmian przedrakowych (szyjka macicy/odbyt)?"
+                  },
+                  "helperText": {
+                    "en": "You don't need to be exact – select what you remember.",
+                    "pl": "Nie musisz zaznaczać dokładnie – zaznacz to, co pamiętasz."
                   },
                   "type": "checkbox_group",
                   "options": [
@@ -1987,7 +2136,7 @@
             {
               "id": "HP:0001824",
               "label": {
-                "en": "Unintentional weight loss",
+                "en": "Unintentional weight loss — losing weight without trying (≥5% over 6–12 months)",
                 "pl": "Niewyjaśniona utrata wagi"
               },
               "red_flag": true,
@@ -2064,7 +2213,7 @@
             {
               "id": "onkn.symptom.lump_any",
               "label": {
-                "en": "New or enlarging lump (any site)",
+                "en": "New or enlarging lump — any site (e.g., breast, testis, soft tissue)",
                 "pl": "Nowy lub rosnący guzek (dowolna lokalizacja)"
               },
               "category": "Lumps / lymph nodes"
@@ -2791,6 +2940,34 @@
               }
             },
             {
+              "id": "Aunt",
+              "label": {
+                "en": "Aunt",
+                "pl": "Ciocia"
+              }
+            },
+            {
+              "id": "Uncle",
+              "label": {
+                "en": "Uncle",
+                "pl": "Wujek"
+              }
+            },
+            {
+              "id": "Niece",
+              "label": {
+                "en": "Niece",
+                "pl": "Siostrzenica/Branica"
+              }
+            },
+            {
+              "id": "Nephew",
+              "label": {
+                "en": "Nephew",
+                "pl": "Siostrzeniec/Bratanek"
+              }
+            },
+            {
               "id": "Cousin",
               "label": {
                 "en": "First Cousin",
@@ -2812,11 +2989,11 @@
         },
         {
           "id": "famhx.quick_relatives_other",
-          "type": "text_input",
           "text": {
             "en": "Other relatives (please specify)",
             "pl": "Inni krewni (proszę wpisać)"
           },
+          "type": "text_input",
           "dependsOn": {
             "questionId": "famhx.quick_relatives_chips",
             "operator": "array_contains",
@@ -2842,7 +3019,7 @@
                   {
                     "id": "HP:0001824",
                     "label": {
-                      "en": "Unintentional weight loss",
+                      "en": "Unintentional weight loss — losing weight without trying (≥5% over 6–12 months)",
                       "pl": "Niewyjaśniona utrata wagi"
                     },
                     "red_flag": true,
@@ -2919,7 +3096,7 @@
                   {
                     "id": "onkn.symptom.lump_any",
                     "label": {
-                      "en": "New or enlarging lump (any site)",
+                      "en": "New or enlarging lump — any site (e.g., breast, testis, soft tissue)",
                       "pl": "Nowy lub rosnący guzek (dowolna lokalizacja)"
                     },
                     "category": "Lumps / lymph nodes"
@@ -3029,7 +3206,7 @@
                   {
                     "id": "HP:0002015",
                     "label": {
-                      "en": "Difficulty swallowing (dysphagia)",
+                      "en": "Difficulty swallowing (dysfagia)",
                       "pl": "Trudności w połykaniu (dysfagia)"
                     },
                     "red_flag": true,
@@ -3223,8 +3400,12 @@
                 {
                   "id": "cond.hbv.status",
                   "text": {
-                    "en": "HBV Status",
-                    "pl": "Status HBV"
+                    "en": "Current status",
+                    "pl": "Obecny status"
+                  },
+                  "helperText": {
+                    "en": "Past = doctor confirmed cured.",
+                    "pl": "Przebyte = lekarz potwierdził wyleczenie"
                   },
                   "type": "radio",
                   "options": [
@@ -3420,10 +3601,17 @@
                       }
                     },
                     {
-                      "value": "Viral",
+                      "value": "HBV",
                       "label": {
-                        "en": "Viral",
-                        "pl": "Wirusowa"
+                        "en": "HBV",
+                        "pl": "HBV"
+                      }
+                    },
+                    {
+                      "value": "HCV",
+                      "label": {
+                        "en": "HCV",
+                        "pl": "HCV"
                       }
                     },
                     {
@@ -3517,7 +3705,7 @@
                 {
                   "id": "cond.hpylori.year_tx",
                   "text": {
-                    "en": "Year of eradication",
+                    "en": "Rok eradykacji",
                     "pl": "Rok eradykacji"
                   },
                   "type": "year_input",
@@ -3688,7 +3876,7 @@
                 {
                   "id": "cond.barrett.status",
                   "text": {
-                    "en": "Barrett's esophagus?",
+                    "en": "Przełyk Barretta?",
                     "pl": "Przełyk Barretta?"
                   },
                   "type": "radio",
@@ -4069,7 +4257,7 @@
                     {
                       "value": "Vaccinated (1 dose)",
                       "label": {
-                        "en": "Partially vaccinated (1 dose)",
+                        "en": "Partially vaccinated (1 dawka)",
                         "pl": "Częściowo zaszczepiony (1 dawka)"
                       }
                     },
@@ -4139,6 +4327,13 @@
                     {
                       "value": "PCV20",
                       "label": "PCV20"
+                    },
+                    {
+                      "value": "Combination",
+                      "label": {
+                        "en": "Combination",
+                        "pl": "Kombinacja"
+                      }
                     },
                     {
                       "value": "PPSV23",
@@ -4608,7 +4803,7 @@
                 {
                   "id": "func.falls_last_year",
                   "text": {
-                    "en": "Falls in last year?",
+                    "en": "Upadki w ostatnim roku?",
                     "pl": "Upadki w ostatnim roku?"
                   },
                   "type": "radio",
@@ -4777,7 +4972,7 @@
             "Low",
             "Moderate (100-299)",
             "High (>=300)",
-            "Don't know"
+            "Number not given / don’t remember"
           ],
           "dependsOn": {
             "questionId": "env.radon.tested",
@@ -4957,6 +5152,46 @@
             {
               "id": "MUTYH",
               "label": "MUTYH"
+            },
+            {
+              "id": "ATM",
+              "label": "ATM"
+            },
+            {
+              "id": "CHEK2",
+              "label": "CHEK2"
+            },
+            {
+              "id": "BARD1",
+              "label": "BARD1"
+            },
+            {
+              "id": "BRIP1",
+              "label": "BRIP1"
+            },
+            {
+              "id": "RAD51C",
+              "label": "RAD51C"
+            },
+            {
+              "id": "RAD51D",
+              "label": "RAD51D"
+            },
+            {
+              "id": "NBN",
+              "label": "NBN"
+            },
+            {
+              "id": "VHL",
+              "label": "VHL"
+            },
+            {
+              "id": "FH",
+              "label": "FH"
+            },
+            {
+              "id": "FLCN",
+              "label": "FLCN"
             },
             {
               "id": "Other",
@@ -5163,7 +5398,7 @@
             "pl": "Rok pierwszego badania"
           },
           "min": 1990,
-          "max": 2025,
+          "max": 2099,
           "dependsOn": {
             "questionId": "gen.testing_ever",
             "operator": "!=",
@@ -5424,7 +5659,7 @@
             {
               "id": "occ.hazard.other",
               "label": {
-                "en": "Other long-term exposure to carcinogenic dusts, fumes, chemicals or radiation (please describe)",
+                "en": "Other long-term exposure to carcinogenic dusts, chemicals, fumes or radiation (please describe)",
                 "pl": "Inne długotrwałe narażenie na pyły rakotwórcze, opary, chemikalia lub promieniowanie (proszę opisać)"
               }
             },
@@ -5600,17 +5835,17 @@
                     }
                   },
                   {
-                    "value": "Rarely",
+                    "value": "Rarely or never",
                     "label": {
-                      "en": "Rarely",
-                      "pl": "Rzadko"
+                      "en": "Rarely or never",
+                      "pl": "Rzadko lub nigdy"
                     }
                   },
                   {
-                    "value": "Never",
+                    "value": "Not sure",
                     "label": {
-                      "en": "Never",
-                      "pl": "Nigdy"
+                      "en": "Not sure",
+                      "pl": "Nie wiem"
                     }
                   }
                 ]
@@ -5629,16 +5864,19 @@
                 {
                   "id": "years_total",
                   "label": {
-                    "en": "Years Exposed",
+                    "en": "Lata narażenia",
                     "pl": "Lata narażenia"
                   },
                   "type": "number_input",
-                  "placeholder": "e.g. 10"
+                  "placeholder": "e.g. 10",
+                  "min": 0,
+                  "max": 60,
+                  "step": 0.5
                 },
                 {
                   "id": "year_first_exposed",
                   "label": {
-                    "en": "Year First Exposed",
+                    "en": "Rok pierwszego narażenia",
                     "pl": "Rok pierwszego narażenia"
                   },
                   "type": "number_input",
@@ -5647,18 +5885,19 @@
                 {
                   "id": "hours_per_week",
                   "label": {
-                    "en": "Hours per week",
+                    "en": "Godziny na tydzień",
                     "pl": "Godziny na tydzień"
                   },
                   "type": "number_input",
                   "placeholder": "e.g. 40",
                   "min": 0,
-                  "max": 80
+                  "max": 80,
+                  "step": 0.5
                 },
                 {
                   "id": "current_exposure",
                   "label": {
-                    "en": "Current exposure?",
+                    "en": "Obecne narażenie?",
                     "pl": "Obecne narażenie?"
                   },
                   "type": "radio",
@@ -5671,7 +5910,7 @@
                 {
                   "id": "ppe_use",
                   "label": {
-                    "en": "How often did you use appropriate PPE?",
+                    "en": "Jak często używano ŚOI?",
                     "pl": "Jak często używano ŚOI?"
                   },
                   "type": "select",
@@ -5680,7 +5919,7 @@
                 {
                   "id": "occ_exposures",
                   "label": {
-                    "en": "Specific Exposures",
+                    "en": "Konkretne narażenia",
                     "pl": "Konkretne narażenia"
                   },
                   "type": "checkbox_group",
@@ -5689,12 +5928,12 @@
                 {
                   "id": "notes",
                   "label": {
-                    "en": "Notes (optional)",
+                    "en": "Notatki (opcjonalne)",
                     "pl": "Notatki (opcjonalne)"
                   },
                   "type": "textarea",
                   "placeholder": {
-                    "en": "Anything important to add?",
+                    "en": "Coś ważnego do dodania?",
                     "pl": "Coś ważnego do dodania?"
                   },
                   "maxLength": 300
@@ -5850,7 +6089,8 @@
           "options": [
             "Closed stove/Chimney",
             "Open fire",
-            "No dedicated flue"
+            "No dedicated flue",
+            "Not sure"
           ],
           "dependsOn": {
             "questionId": "env.summary",
@@ -5887,7 +6127,7 @@
             "Low",
             "Moderate (100-299)",
             "High (>=300)",
-            "Don't know"
+            "Number not given / don’t remember"
           ],
           "dependsOn": {
             "questionId": "env.radon.tested",
@@ -5960,7 +6200,9 @@
           "options": [
             "Municipal",
             "Private well",
-            "Bottled"
+            "Bottled",
+            "Other",
+            "Not sure"
           ],
           "dependsOn": {
             "questionId": "env.summary",
@@ -6009,6 +6251,10 @@
             "en": "Have you ever had a Low Dose CT (LDCT) scan for lung cancer screening?",
             "pl": "Czy kiedykolwiek miałeś/aś niskodawkową tomografię komputerową (LDCT) w kierunku raka płuc?"
           },
+          "helperText": {
+            "en": "Low-dose CT is different from a regular diagnostic CT.",
+            "pl": "Niskodawkowa TK różni się od zwykłej diagnostycznej TK."
+          },
           "type": "radio",
           "options": [
             "Yes",
@@ -6024,8 +6270,8 @@
                 },
                 {
                     "or": [
-                        { "questionId": "smoking_status", "operator": "!=", "value": "Never" },
-                        { "questionId": "htp.status", "operator": "!=", "value": "Never" }
+                        { "questionId": "smoking_status", "operator": "in", "value": ["Former", "Current"] },
+                        { "questionId": "htp.status", "value": "Current" }
                     ]
                 }
             ]
@@ -6048,7 +6294,7 @@
           "id": "env.pesticide.years_use",
           "type": "number_input",
           "text": {
-            "en": "Years used?",
+            "en": "Lata używania?",
             "pl": "Lata używania?"
           },
           "dependsOn": {
@@ -6061,7 +6307,7 @@
           "id": "env.pesticide.protection",
           "type": "select",
           "text": {
-            "en": "Protective gear used?",
+            "en": "Odzież ochronna?",
             "pl": "Odzież ochronna?"
           },
           "options": [
@@ -6136,7 +6382,7 @@
             {
               "id": "Colonoscopy",
               "label": {
-                "en": "Colonoscopy",
+                "en": "Kolonoskopia",
                 "pl": "Kolonoskopia"
               }
             },
@@ -6301,7 +6547,7 @@
           "id": "imm.hpv.year_last",
           "type": "year_input",
           "text": {
-            "en": "Year of last HPV dose",
+            "en": "Rok ostatniej dawki HPV",
             "pl": "Rok ostatniej dawki HPV"
           },
           "dependsOn": {
@@ -6382,7 +6628,7 @@
           "id": "imm.hbv.year_last",
           "type": "year_input",
           "text": {
-            "en": "Year of last HBV dose",
+            "en": "Rok ostatniej dawki HBV",
             "pl": "Rok ostatniej dawki HBV"
           },
           "dependsOn": {
@@ -6404,7 +6650,7 @@
                 {
                   "id": "colonoscopy",
                   "text": {
-                    "en": "Colonoscopy",
+                    "en": "Kolonoskopia",
                     "pl": "Kolonoskopia"
                   },
                   "dependsOn": {
@@ -6416,7 +6662,7 @@
                     {
                       "id": "screen.colonoscopy.date",
                       "text": {
-                        "en": "Year",
+                        "en": "Rok",
                         "pl": "Rok"
                       },
                       "type": "year_input"
@@ -6424,7 +6670,7 @@
                     {
                       "id": "screen.crc.polyps_ever",
                       "text": {
-                        "en": "Have you ever been told that polyps or advanced changes were found on colonoscopy?",
+                        "en": "Czy kiedykolwiek stwierdzono polipy lub zmiany zaawansowane w kolonoskopii?",
                         "pl": "Czy kiedykolwiek stwierdzono polipy lub zmiany zaawansowane w kolonoskopii?"
                       },
                       "type": "radio",
@@ -6437,7 +6683,7 @@
                     {
                       "id": "screen.crc.last_result",
                       "text": {
-                        "en": "Result",
+                        "en": "Wynik",
                         "pl": "Wynik"
                       },
                       "type": "select",
@@ -6451,8 +6697,12 @@
                     {
                       "id": "screen.crc.followup_interval",
                       "text": {
-                        "en": "Recommended interval?",
+                        "en": "Zalecony odstęp?",
                         "pl": "Zalecony odstęp?"
+                      },
+                      "helperText": {
+                        "en": "If you don't remember exactly, select 'I don't know' – the app will generate general recommendations anyway.",
+                        "pl": "Jeśli nie pamiętasz dokładnie, wybierz »Nie wiem« – aplikacja i tak wygeneruje ogólne zalecenia."
                       },
                       "type": "select",
                       "options": [
@@ -6480,7 +6730,7 @@
                     {
                       "id": "screen.stool.date",
                       "text": {
-                        "en": "Year",
+                        "en": "Rok",
                         "pl": "Rok"
                       },
                       "type": "year_input"
@@ -6488,7 +6738,7 @@
                     {
                       "id": "screen.stool.result",
                       "text": {
-                        "en": "Result",
+                        "en": "Wynik",
                         "pl": "Wynik"
                       },
                       "type": "select",
@@ -6515,7 +6765,7 @@
                     {
                       "id": "screen.mammo.date",
                       "text": {
-                        "en": "Year",
+                        "en": "Rok",
                         "pl": "Rok"
                       },
                       "type": "year_input"
@@ -6523,7 +6773,7 @@
                     {
                       "id": "screen.breast.mammo_last_result",
                       "text": {
-                        "en": "Result",
+                        "en": "Wynik",
                         "pl": "Wynik"
                       },
                       "type": "select",
@@ -6552,7 +6802,7 @@
                     {
                       "id": "screen.pap.date",
                       "text": {
-                        "en": "Year",
+                        "en": "Rok",
                         "pl": "Rok"
                       },
                       "type": "year_input"
@@ -6560,20 +6810,21 @@
                     {
                       "id": "screen.cervix.last_type",
                       "text": {
-                        "en": "Type",
+                        "en": "Typ",
                         "pl": "Typ"
                       },
                       "type": "select",
                       "options": [
                         "Pap only",
                         "HPV only",
-                        "Co-testing"
+                        "Co-testing",
+                        "Not sure"
                       ]
                     },
                     {
                       "id": "screen.cervix.last_result",
                       "text": {
-                        "en": "Result",
+                        "en": "Wynik",
                         "pl": "Wynik"
                       },
                       "type": "select",
@@ -6601,7 +6852,7 @@
                     {
                       "id": "screen.psa.date",
                       "text": {
-                        "en": "Year",
+                        "en": "Rok",
                         "pl": "Rok"
                       },
                       "type": "year_input"
@@ -6609,8 +6860,8 @@
                     {
                       "id": "screen.prostate.psa_abnormal",
                       "text": {
-                        "en": "Was it elevated?",
-                        "pl": "Czy był podwyższony?"
+                        "en": "Have you ever been told your PSA was high or had a prostate biopsy because of PSA?",
+                        "pl": "Czy kiedykolwiek stwierdzono u Ciebie wysoki poziom PSA lub miałeś biopsję prostaty z powodu PSA?"
                       },
                       "type": "radio",
                       "options": [
@@ -6635,7 +6886,7 @@
                     {
                       "id": "screen.lung.ldct_last_year",
                       "text": {
-                        "en": "Year",
+                        "en": "Rok",
                         "pl": "Rok"
                       },
                       "type": "year_input"
@@ -6643,7 +6894,7 @@
                     {
                       "id": "screen.lung.ldct_last_result",
                       "text": {
-                        "en": "Result",
+                        "en": "Wynik",
                         "pl": "Wynik"
                       },
                       "type": "select",
@@ -6671,15 +6922,19 @@
                     {
                       "id": "screen.hcc.us_last_year",
                       "text": {
-                        "en": "Year of last exam",
+                        "en": "Rok ostatniego USG",
                         "pl": "Rok ostatniego USG"
+                      },
+                      "helperText": {
+                        "en": "Refers to cyclical exams.",
+                        "pl": "Chodzi o badania wykonywane cyklicznie."
                       },
                       "type": "year_input"
                     },
                     {
                       "id": "screen.hcc.us_interval",
                       "text": {
-                        "en": "How often?",
+                        "en": "Jak często?",
                         "pl": "Jak często?"
                       },
                       "type": "select",
@@ -6731,7 +6986,7 @@
                     {
                       "id": "screen.upper_endo.last_year",
                       "text": {
-                        "en": "Year of last exam",
+                        "en": "Rok ostatniego badania",
                         "pl": "Rok ostatniego badania"
                       },
                       "type": "year_input"
@@ -6739,7 +6994,7 @@
                     {
                       "id": "screen.upper_endo.reason",
                       "text": {
-                        "en": "Reason",
+                        "en": "Powód",
                         "pl": "Powód"
                       },
                       "type": "select",
@@ -6800,6 +7055,10 @@
                       "text": {
                         "en": "Have you ever had a full body skin exam by a doctor?",
                         "pl": "Czy kiedykolwiek miałeś/aś pełne badanie skóry przez lekarza?"
+                      },
+                      "helperText": {
+                        "en": "Routine skin checks are common for high-risk groups.",
+                        "pl": "Rutynowe badania skóry są częste w grupach ryzyka."
                       },
                       "type": "radio",
                       "options": [
@@ -6905,44 +7164,10 @@
                     "en": "COVID doses",
                     "pl": "Dawki COVID"
                   },
-                  "type": "select",
-                  "options": [
-                    {
-                      "value": "0",
-                      "label": {
-                        "en": "0",
-                        "pl": "0"
-                      }
-                    },
-                    {
-                      "value": "1",
-                      "label": {
-                        "en": "1",
-                        "pl": "1"
-                      }
-                    },
-                    {
-                      "value": "2",
-                      "label": {
-                        "en": "2",
-                        "pl": "2"
-                      }
-                    },
-                    {
-                      "value": "3",
-                      "label": {
-                        "en": "3",
-                        "pl": "3"
-                      }
-                    },
-                    {
-                      "value": "4+",
-                      "label": {
-                        "en": "4+",
-                        "pl": "4+"
-                      }
-                    }
-                  ]
+                  "type": "number_input",
+                  "min": 0,
+                  "max": 20
+
                 },
                 {
                   "id": "imm.td_tdap.year_last",

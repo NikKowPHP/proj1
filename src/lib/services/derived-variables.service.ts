@@ -870,17 +870,33 @@ export const DerivedVariablesService = {
         };
         const thresholds = clinicalConfig.screening_thresholds;
 
-        try {
+
             // --- 0. Alcohol Grams Calculation ---
-            // "Standard drink used here (info): 10 g pure ethanol" OR "grams = volume_ml × ABV × 0.789"
-            // We use the 10g rule on the 'drinks' count as primary, unless specific pct/vol data is robust.
-            // standardized.core.alcohol_details contains counts.
+            // Logic: Prioritize direct drink counts. If missing, estimate from AUDIT-C frequency * typical quantity.
+            // Standard drink = 10g ethanol.
             let alcohol_g_wk = 0;
-            if (standardizedData.core && standardizedData.core.alcohol_details) { // Added check for core
-                 const { beer_drinks, wine_drinks, spirits_drinks } = standardizedData.core.alcohol_details;
-                 const total_drinks = (beer_drinks || 0) + (wine_drinks || 0) + (spirits_drinks || 0);
-                 // Assuming the input 'drinks' (servings/week) ~ 1 Standard Drink = 10g
-                 alcohol_g_wk = total_drinks * 10;
+            const alcoholDetails = standardizedData.core?.alcohol_details || {};
+            const auditRaw = standardizedData.core?.alcohol_audit || {};
+
+            // Method A: Direct Counts (Drinks per week per type)
+            const total_drinks_reported = (alcoholDetails.beer_drinks || 0) + (alcoholDetails.wine_drinks || 0) + (alcoholDetails.spirits_drinks || 0);
+
+            if (total_drinks_reported > 0) {
+                alcohol_g_wk = total_drinks_reported * 10;
+            } 
+            // Method B: Estimation via AUDIT-C (Frequency * Quantity)
+            else if (auditRaw.q1 !== undefined && auditRaw.q2 !== undefined) {
+                // Map Q1 (Frequency) to days per week
+                // 1="Monthly or less" (~0.25/wk), 2="2-4/mo" (~0.75/wk), 3="2-3/wk" (~2.5/wk), 4="4+/wk" (~5.5/wk)
+                const daysMap: Record<number, number> = { 0: 0, 1: 0.25, 2: 0.75, 3: 2.5, 4: 5.5 };
+                const daysPerWeek = daysMap[auditRaw.q1] || 0;
+
+                // Map Q2 (Typical Quantity) to drinks per sitting
+                // 0="1-2" (1.5), 1="3-4" (3.5), 2="5-6" (5.5), 3="7-9" (8), 4="10+" (12)
+                const drinksMap: Record<number, number> = { 0: 1.5, 1: 3.5, 2: 5.5, 3: 8.0, 4: 12.0 };
+                const drinksPerSitting = drinksMap[auditRaw.q2] || 0;
+
+                alcohol_g_wk = daysPerWeek * drinksPerSitting * 10;
             }
             derived['alcohol_g_wk'] = alcohol_g_wk;
 
@@ -1042,6 +1058,10 @@ export const DerivedVariablesService = {
             const hasFdrCancer = familyHistory.some((f: any) => f.is_blood_related !== false && firstDegree.includes(f.relation) && (f.cancer_type || (f.cancers && f.cancers.length > 0)));
             derived['famhx.first_degree_any'] = hasFdrCancer;
 
+            // ADDED: Explicit Family History Status Flags
+            derived['famhx.adopted_unknown'] = core.family_cancer_any === 'Adopted/Unknown';
+            derived['famhx.none'] = core.family_cancer_any === 'No';
+
             // Occupational
             const exposures = calculateExposureComposites(advanced.occupational);
             if (exposures) derived.exposure_composites = exposures;
@@ -1061,10 +1081,13 @@ export const DerivedVariablesService = {
             if (sexAtBirth === 'Male') {
                 if (Array.isArray(partnerGenders)) {
                     if (partnerGenders.some((g: string) =>
-                        g === 'Only men' || g === 'Men and women' || g.toLowerCase() === 'male' || g.toLowerCase() === 'same sex'
+                        g === 'only_men' || g === 'men_and_women' || g === 'both' ||
+                        g === 'Only men' || g === 'Men and women' || // Legacy support
+                        g.toLowerCase() === 'male' || g.toLowerCase() === 'same sex'
                     )) msmBehavior = true;
                 } else if (typeof partnerGenders === 'string') {
                     if (
+                        partnerGenders === 'only_men' || partnerGenders === 'men_and_women' || partnerGenders === 'both' ||
                         partnerGenders === 'Only men' || partnerGenders === 'Men and women' ||
                         partnerGenders.toLowerCase() === 'male' || partnerGenders.toLowerCase() === 'both' ||
                         partnerGenders.toLowerCase() === 'same sex'
@@ -1081,11 +1104,14 @@ export const DerivedVariablesService = {
             const hasImmunosuppression = meds.immunosuppression_now === 'Yes';
             const sexSitesEver = sexHistory['sexhx.sex_sites_ever'] || [];
 
-            // Fix: Matching precise option string from questionnaire
-            const hasAnalReceptive = Array.isArray(sexSitesEver) && sexSitesEver.includes('Anal sex – receptive');
+            // Fix: Matching precise option string from questionnaire or possible simplified inputs
+            const hasAnalReceptive = Array.isArray(sexSitesEver) && (
+                sexSitesEver.includes('Anal sex – receptive') || 
+                sexSitesEver.includes('Anal (receptive)') // robustness for slight label variations
+            );
 
             const hpvPrecancer = sexHistory['sexhx.hpv_precancer_history'] || [];
-            const hasAnalPrecancer = Array.isArray(hpvPrecancer) && hpvPrecancer.includes('Anus');
+            const hasAnalPrecancer = Array.isArray(hpvPrecancer) && (hpvPrecancer.includes('Anus') || hpvPrecancer.includes('Odbyt'));
 
             // ADDED: derived.sex.anal_receptive_ever
             derived['sex.anal_receptive_ever'] = hasAnalReceptive;
@@ -1223,7 +1249,8 @@ export const DerivedVariablesService = {
 
             // ADDED: Hereditary Pattern Possible
             // Logic: multiple_primaries OR young_onset_breast_gyn OR (childhood_survivor AND another adult cancer) OR prophylactic_surgery OR genetic_flag
-            const hasGeneticFlag = personalCancerHistory.some((c: any) => c.genetic_flag === true);
+            // Logic: multiple_primaries OR young_onset_breast_gyn OR (childhood_survivor AND another adult cancer) OR prophylactic_surgery OR genetic_flag
+            const hasGeneticFlag = personalCancerHistory.some((c: any) => c.genetic_flag === true || c.genetic_flag === 'Yes');
             const childhoodPlusAdult = childhoodSurvivor && distinctCancers >= 2; // Approximation: if childhood survivor and has 2+ cancers, one is likely adult/later
             derived['ca.hereditary_pattern_possible'] = derived['ca.multiple_primaries'] || youngOnsetBreastGyn || childhoodPlusAdult || derived['ca.prophylactic_surgery_flag'] || hasGeneticFlag;
 
@@ -1483,13 +1510,7 @@ export const DerivedVariablesService = {
 
             // Syndromes logic...
             
-        } catch (error) {
-            console.error("CRASH IN CALCULATE ALL:", error);
-            logger.error("Failed to calculate derived variables", {
-                error,
-                standardizedData
-            });
-        }
+
 
         return derived;
     },

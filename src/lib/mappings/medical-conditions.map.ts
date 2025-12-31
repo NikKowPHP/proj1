@@ -17,6 +17,6 @@ export const medicalConditionsMap: Record<string, string> = {
   'immunosuppression': '702434007', // Immunosuppression status (finding)
   'psc': '235902008', // Primary sclerosing cholangitis (disorder)
   'pancreatitis': '196898004', // Chronic pancreatitis (disorder)
-  'copd': '13645005', // Chronic obstructive lung disease (disorder)
+  'cond.copd': '13645005', // Chronic obstructive lung disease (disorder)
   'other': '74964007' // Other (qualifier value)
 };

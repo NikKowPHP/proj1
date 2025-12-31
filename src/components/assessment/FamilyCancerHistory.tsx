@@ -273,6 +273,17 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                         placeholder="Search cancer type..."
                       />
                     </div>
+                    {cancer.cancer_type === 'other' && (
+                      <div className="space-y-2 animate-fade-in">
+                        <Label>{t('specifyOther') || "Specify Other Cancer"}</Label>
+                        <Input
+                          type="text"
+                          value={(cancer as any).cancer_type_other || ""}
+                          onChange={(e) => handleCancerFieldChange(index, cancerIndex, "cancer_type_other" as any, e.target.value)}
+                          placeholder="e.g. Bone Cancer"
+                        />
+                      </div>
+                    )}
                     <div className="space-y-2">
                       <Label>{t('ageAtDiagnosis')}</Label>
                       <Input

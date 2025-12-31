@@ -102,6 +102,19 @@ export const PersonalCancerHistory = ({ value, onChange, options, errors: extern
             />
           </div>
 
+          {item.type === 'other' && (
+            <div className="space-y-2 animate-fade-in">
+              <Label>{t('specifyOther') || "Specify Other Cancer"}</Label>
+              <input
+                type="text"
+                className="flex h-10 w-full border border-input bg-background px-3"
+                value={(item as any).type_other || ""}
+                onChange={(e) => handleFieldChange(index, 'type_other' as any, e.target.value)}
+                placeholder="e.g. Adrenal Cancer"
+              />
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{t('yearOfDiagnosis')}</Label>

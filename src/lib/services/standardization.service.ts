@@ -137,6 +137,19 @@ export const StandardizationService = {
         };
       }
 
+      // Labs & Imaging
+      if (answers.labs_and_imaging) {
+        const labs = safeJsonParse(answers.labs_and_imaging);
+        standardized.advanced.labs_and_imaging = labs.map((entry: any) => ({
+            category: entry.study_category,
+            type: entry.study_type, // This is the ID/value from the select
+            date: entry.study_date,
+            result_summary: entry.study_result, // For imaging
+            value: entry.result_value, // For labs
+            unit: entry.result_unit // For labs
+        }));
+      }
+
       // Symptom Details
       const symptomDetails: Record<string, any> = {};
       standardized.core.symptoms.forEach((symptomId: string) => {
@@ -161,7 +174,7 @@ export const StandardizationService = {
               flattened.push({
                 ...member,
                 // Override cancer specific fields
-                cancer_type: c.cancer_type || c.cancerId,
+                cancer_type: (c.cancer_type === 'other' && c.cancer_type_other) ? c.cancer_type_other : (c.cancer_type || c.cancerId),
                 age_dx: c.age_dx,
                 cancer_code: cancerTypesMap[c.cancer_type || c.cancerId] || undefined,
                 // Clean up nested arrays from the flattened object to avoid confusion
@@ -172,6 +185,7 @@ export const StandardizationService = {
             // Legacy or single entry structure
             flattened.push({
               ...member,
+              cancer_type: (member.cancer_type === 'other' && member.cancer_type_other) ? member.cancer_type_other : member.cancer_type,
               cancer_code: cancerTypesMap[member.cancer_type] || undefined,
             });
           }
@@ -188,11 +202,20 @@ export const StandardizationService = {
           findings_present: answers['gen.path_variant_self'] === 'Yes',
           variant_self_status: answers['gen.path_variant_self'],
           genes: answers['gen.self_genes'] ? safeJsonParse(answers['gen.self_genes']) : [],
+          genes_other: answers['gen.self_genes_other_label'],
           mutyh_biallelic: answers['gen.mutyh_biallelic'],
-          family_genes: answers['gen.family_genes'] ? safeJsonParse(answers['gen.family_genes']) : [], // Added family_genes
-          // Map to internal structure
-          variants_hgvs: null, // Removed from new JSON spec
+          family_genes: answers['gen.family_genes'] ? safeJsonParse(answers['gen.family_genes']) : [],
+          family_genes_other: answers['gen.family_genes_other_label'],
+          variants_hgvs: null,
         };
+
+        // Normalize "Other" genes into main arrays for risk calculation
+        if (standardized.advanced.genetics.genes_other) {
+            standardized.advanced.genetics.genes.push(standardized.advanced.genetics.genes_other.toUpperCase());
+        }
+        if (standardized.advanced.genetics.family_genes_other) {
+            standardized.advanced.genetics.family_genes.push(standardized.advanced.genetics.family_genes_other.toUpperCase());
+        }
       }
 
       // PRS
@@ -249,6 +272,8 @@ export const StandardizationService = {
         const personalCancerHistory = safeJsonParse(answers.personal_cancer_history);
         standardized.advanced.personal_cancer_history = personalCancerHistory.map((cancer: any) => ({
           ...cancer,
+          // If type is 'other' and text provided, override for AI clarity
+          type: (cancer.type === 'other' && cancer.type_other) ? cancer.type_other : cancer.type,
           type_code: cancerTypesMap[cancer.type] || undefined,
         }));
       }
@@ -270,6 +295,16 @@ export const StandardizationService = {
             occ_exposures: entry.occ_exposures // Map specific exposures if present
           };
         });
+
+        // Capture standalone "Other" hazard description
+        if (answers['occ.hazard.other_desc']) {
+            standardized.advanced.occupational.push({
+                hazard: 'occ.hazard.other',
+                job_title: 'Other Self-Reported Exposure',
+                notes: answers['occ.hazard.other_desc'],
+                years: 0
+            });
+        }
       }
 
       // Screening and Immunization - UPDATED KEYS
@@ -302,6 +337,7 @@ export const StandardizationService = {
         'imm.covid.doses',
         'imm.td_tdap.year_last',
         'imm.pneumo.ever',
+        'imm.pneumo.vaccine_type',
         'imm.zoster.ever',
         'imm.zoster.vaccine_type',
         'screen.skin.biopsy_ever',
@@ -463,6 +499,7 @@ export const StandardizationService = {
         shs: {
           home_freq: answers['shs.home_freq'],
           work_freq: answers['shs.work_freq'],
+          hours_7d: Number(answers['shs.hours_7d']) || 0,
         }
       };
 

@@ -607,6 +607,24 @@ export const FhirMapperService = {
                     } as FhirObservation
                 });
             }
+
+            // ADL Help
+            if (func['func.adl_help']) {
+                bundle.entry.push({
+                    resource: {
+                        resourceType: "Observation",
+                        id: uuidv4(),
+                        status: "final",
+                        code: {
+                            coding: [
+                                { system: SYSTEM_ONKONO, code: "onkn.func.adl_help", display: "Needs help with Activities of Daily Living" }
+                            ]
+                        },
+                        subject: subjectRef,
+                        valueBoolean: func['func.adl_help'] === 'Yes'
+                    } as FhirObservation
+                });
+            }
         }
 
         // --- Derived Eligibility Flags & Risk Observations ---
@@ -648,6 +666,24 @@ export const FhirMapperService = {
                         },
                         subject: subjectRef,
                         valueBoolean: value
+                    } as FhirObservation
+                });
+            }
+
+            // Map string array (joined) - e.g. hereditary_syndromes
+            if (Array.isArray(value) && value.every(v => typeof v === 'string')) {
+                bundle.entry.push({
+                    resource: {
+                        resourceType: "Observation",
+                        id: uuidv4(),
+                        status: "final",
+                        code: {
+                            coding: [
+                                { system: SYSTEM_ONKONO, code: key.startsWith('onkn.') ? key : `onkn.derived.${key}`, display: key }
+                            ]
+                        },
+                        subject: subjectRef,
+                        valueString: value.join(', ')
                     } as FhirObservation
                 });
             }
@@ -987,16 +1023,32 @@ export const FhirMapperService = {
                             text: `History of ${item.cancer_type} cancer`
                         },
                         clinicalStatus: {
-                            // Historical cancer is usually 'active' (survivor) or 'resolved'. 
-                            // Without specific status field, 'resolved' (remission) or 'active' is ambiguous.
-                            // But for "History of", usually implies past. Snomed codes in cancerTypesMap are usually the disorder itself.
-                            // If we want "History of", we usually use different codes. 
-                            // But requirement says "Each cancer[i] -> FHIR Condition (code = site-specific cancer, SNOMED/ICD-10)".
-                            // So we use the cancer code.
                             coding: [{ system: "http://terminology.hl7.org/CodeSystem/condition-clinical", code: "resolved" }]
                         },
-                        onsetDateTime: item.year_dx ? `${item.year_dx}` : undefined
+                        onsetDateTime: item.year_dx ? `${item.year_dx}` : undefined,
+                        extension: []
                     };
+
+                    // Add extensions for clinical flags
+                    if (item.genetic_flag) {
+                        cond.extension?.push({
+                            url: "http://onkono.com/fhir/StructureDefinition/genetic-flag",
+                            valueString: String(item.genetic_flag)
+                        });
+                    }
+                    if (item.recurrence_ever) {
+                        cond.extension?.push({
+                            url: "http://onkono.com/fhir/StructureDefinition/recurrence-ever",
+                            valueString: String(item.recurrence_ever)
+                        });
+                    }
+                    if (item.metastatic_ever) {
+                        cond.extension?.push({
+                            url: "http://onkono.com/fhir/StructureDefinition/metastatic-ever",
+                            valueString: String(item.metastatic_ever)
+                        });
+                    }
+
                     bundle.entry.push({ resource: cond });
                 }
 

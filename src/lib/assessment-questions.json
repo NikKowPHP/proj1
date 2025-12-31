@@ -1593,28 +1593,28 @@
                   "type": "checkbox_group",
                   "options": [
                     {
-                      "id": "Only men",
+                      "value": "only_men",
                       "label": {
                         "en": "Only men",
                         "pl": "Tylko mężczyźni"
                       }
                     },
                     {
-                      "id": "Only women",
+                      "value": "only_women",
                       "label": {
                         "en": "Only women",
                         "pl": "Tylko kobiety"
                       }
                     },
                     {
-                      "id": "Men and women",
+                      "value": "men_and_women",
                       "label": {
                         "en": "Men and women",
                         "pl": "Mężczyźni i kobiety"
                       }
                     },
                     {
-                      "id": "Partners of other genders",
+                      "value": "partners_of_other_genders",
                       "label": {
                         "en": "Partners of other genders",
                         "pl": "Inne płcie"
@@ -4562,6 +4562,21 @@
                 "value": "Yes"
               },
               "options": {
+                "recurrenceOptions": [
+                   { "value": "Yes", "label": "Yes" },
+                   { "value": "No", "label": "No" },
+                   { "value": "Not sure", "label": "Not sure" }
+                ],
+                "metastaticOptions": [
+                   { "value": "Yes", "label": "Yes" },
+                   { "value": "No", "label": "No" },
+                   { "value": "Not sure", "label": "Not sure" }
+                ],
+                "geneticOptions": [
+                   { "value": "Yes", "label": "Yes" },
+                   { "value": "No", "label": "No" },
+                   { "value": "Not sure", "label": "Not sure" }
+                ],
                 "cancerTypes": [
                   {
                     "value": "breast",
@@ -4640,7 +4655,7 @@
                     "label": "Other"
                   }
                 ],
-                "treatmentTypes": [
+              "treatmentTypes": [
                   {
                     "id": "surgery",
                     "label": "Surgery"
@@ -4665,6 +4680,25 @@
                     "id": "hsct",
                     "label": "Stem-cell Transplant"
                   }
+                ],
+                "stageOptions": [
+                   { "value": "I", "label": "I" },
+                   { "value": "II", "label": "II" },
+                   { "value": "III", "label": "III" },
+                   { "value": "IV", "label": "IV" },
+                   { "value": "0", "label": "0 / In Situ" },
+                   { "value": "Not told", "label": "Not told" },
+                   { "value": "Don't remember", "label": "Don't remember" }
+                ],
+                "booleanOptions": [
+                   { "value": "Yes", "label": "Yes" },
+                   { "value": "No", "label": "No" },
+                   { "value": "Not sure", "label": "Not sure" }
+                ],
+                "definitions": [
+                  { "id": "genetic_flag", "type": "select", "options": "booleanOptions" },
+                  { "id": "recurrence_ever", "type": "select", "options": "booleanOptions" },
+                  { "id": "metastatic_ever", "type": "select", "options": "booleanOptions" }
                 ]
               }
             },
@@ -5346,6 +5380,19 @@
               "label": "Other"
             }
           ]
+        },
+        {
+          "id": "gen.family_genes_other_label",
+          "type": "text_input",
+          "text": {
+            "en": "Other Gene Name (Family)",
+            "pl": "Nazwa innego genu (Rodzina)"
+          },
+          "dependsOn": {
+            "questionId": "gen.family_genes",
+            "operator": "array_contains",
+            "value": "Other"
+          }
         },
         {
           "id": "gen.test_type",

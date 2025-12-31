@@ -157,38 +157,47 @@ export default function AssessmentPage() {
     }
   }, [answers.symptoms, questionnaire]);
 
-  // Family History Connection: Pre-populate advanced module based on Core answers
+  // Family History Connection: Smart Pre-populate
   useEffect(() => {
-    if (!answers['famhx.any_family_cancer']) return; // Wait for core answer
+    // Only run if user said "Yes" to family history
+    if (answers['famhx.any_family_cancer'] !== 'Yes') return;
 
-    // Only pre-populate if advanced module is empty/undefined to avoid overwriting user edits
-    if (answers.family_cancer_history && answers.family_cancer_history !== '[]') return;
+    const quickRelativesRaw = answers['famhx.quick_relatives_chips'];
+    if (!quickRelativesRaw) return;
 
-    if (answers['famhx.any_family_cancer'] === 'No') {
-      // Can optionally clear it, but maybe safer to leave alone? 
-      // If they said No, the advanced module likely isn't shown or is irrelevant.
-      return;
-    }
+    try {
+      const selectedRelatives: string[] = JSON.parse(quickRelativesRaw);
 
-    if (answers['famhx.any_family_cancer'] === 'Yes') {
-      if (answers['famhx.quick_relatives_chips']) {
-        try {
-          const relatives = JSON.parse(answers['famhx.quick_relatives_chips']);
-          // Map to FamilyMember objects
-          const initialMembers = relatives.map((rel: string) => ({
-            id: crypto.randomUUID(),
-            relationship: rel,
-            cancers: []
-          }));
-          // Avoid infinite loop by only setting if different? 
-          // But we checked if answers.family_cancer_history is empty above.
-          if (initialMembers.length > 0) {
-            setAnswer('family_cancer_history', JSON.stringify(initialMembers));
-          }
-        } catch (e) {
-          console.error("Failed to parse quick relatives", e);
-        }
+      // Parse existing advanced history
+      let currentHistory: any[] = [];
+      try {
+        currentHistory = answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : [];
+      } catch {
+        currentHistory = [];
       }
+
+      // Identify which selected relatives are NOT yet in the detailed history
+      // We check by relationship label.
+      const existingRelations = new Set(currentHistory.map(item => item.relation));
+      const missingRelatives = selectedRelatives.filter(rel => !existingRelations.has(rel) && rel !== 'Other');
+
+      if (missingRelatives.length > 0) {
+        const newEntries = missingRelatives.map(rel => ({
+          id: crypto.randomUUID(),
+          relation: rel,
+          // Auto-infer side for simple cases to save user clicks
+          side_of_family: rel.includes('Maternal') || rel === 'Mother' ? 'Maternal' :
+            rel.includes('Paternal') || rel === 'Father' ? 'Paternal' :
+              ['Sister', 'Brother'].includes(rel) ? 'N/A' :
+                ['Daughter', 'Son'].includes(rel) ? 'Both parents' : undefined,
+          cancers: []
+        }));
+
+        const updatedHistory = [...currentHistory, ...newEntries];
+        setAnswer('family_cancer_history', JSON.stringify(updatedHistory));
+      }
+    } catch (e) {
+      console.error("Failed to sync family history", e);
     }
   }, [answers['famhx.any_family_cancer'], answers['famhx.quick_relatives_chips']]);
 

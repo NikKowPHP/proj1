@@ -19,5 +19,12 @@ export const jobTitlesMap: Record<string, string> = {
   'factory worker': '9329',
   'insulation worker': '7124',
   'shipyard worker': '7214',
-  'laboratory worker': '3111'
+  'laboratory worker': '3111',
+  // Specific high-risk roles from spec
+  'shoemaker': '7536', // Leather dust risk
+  'cobbler': '7536',
+  'chimney sweep': '9629', // Soot/PAH risk
+  'roofer': '7121', // Bitumen/Tar/Asbestos risk
+  'radiologist': '221', // Radiation
+  'radiographer': '3211' // Radiation
 };

@@ -17,7 +17,10 @@ export const cancerTypesMap: Record<string, string> = {
   'bladder': '363455001', // Malignant neoplasm of bladder
   'brain': '109841003', // Malignant neoplasm of brain
   'thyroid': '363478007', // Malignant neoplasm of thyroid gland
-  'sarcoma': '420120006', // Sarcoma
+  'sarcoma': '420120006', // Sarcoma derived (generic)
+  'sarcoma_bone': '254909002', // Bone sarcoma
+  'sarcoma_soft_tissue': '363404001', // Malignant neoplasm of soft tissues
+  'neuroendocrine': '734002008', // Malignant neuroendocrine tumor
   'lymphoma': '118600007', // Malignant lymphoma
   'leukemia': '93143009', // Leukemia
   'myeloma': '109989006', // Multiple myeloma

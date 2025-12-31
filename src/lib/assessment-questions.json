@@ -225,6 +225,10 @@
                     "en": "Total years you have smoked",
                     "pl": "Łączna liczba lat palenia"
                   },
+                  "helperText": {
+                    "en": "Pack-years = Packs per day x Years smoked. Used to assess lung cancer risk.",
+                    "pl": "Paczko-lata = Paczki dziennie x Lata palenia. Używane do oceny ryzyka raka płuc."
+                  },
                   "type": "number_input",
                   "min": 0.1,
                   "max": 80
@@ -782,6 +786,10 @@
           "text": {
             "en": "Which statement best describes your alcohol use?",
             "pl": "Które stwierdzenie najlepiej opisuje Twoje spożycie alkoholu?"
+          },
+          "helperText": {
+            "en": "Standard drink = 10g pure alcohol (e.g. 250ml beer, 100ml wine, 30ml vodka).",
+            "pl": "Standardowa porcja = 10g czystego alkoholu (np. 250ml piwa, 100ml wina, 30ml wódki)."
           },
           "options": [
             {
@@ -4708,6 +4716,10 @@
                 "en": "Family Cancer Details",
                 "pl": "Szczegóły Rodzinne"
               },
+              "helperText": {
+                "en": "Biological family: parents, siblings, children, grandparents, aunts, uncles, nieces, nephews. Half-siblings are included.",
+                "pl": "Rodzina biologiczna: rodzice, rodzeństwo, dzieci, dziadkowie, ciotki, wujkowie, siostrzenice, bratankowie. Rodzeństwo przyrodnie jest wliczone."
+              },
               "dependsOn": {
                 "questionId": "famhx.any_family_cancer",
                 "value": "Yes"
@@ -4788,8 +4800,16 @@
                     "label": "Thyroid"
                   },
                   {
-                    "value": "sarcoma",
-                    "label": "Sarcoma"
+                    "value": "sarcoma_bone",
+                    "label": "Sarcoma - bone"
+                  },
+                  {
+                    "value": "sarcoma_soft_tissue",
+                    "label": "Sarcoma - soft tissue"
+                  },
+                  {
+                    "value": "neuroendocrine",
+                    "label": "Neuroendocrine"
                   },
                   {
                     "value": "leukemia",
@@ -5864,6 +5884,10 @@
                   {
                     "value": "radon",
                     "label": "Radon"
+                  },
+                  {
+                    "value": "other",
+                    "label": "Other"
                   }
                 ],
                 "ppe": [
@@ -5971,6 +5995,19 @@
                   },
                   "type": "checkbox_group",
                   "options": "exposures"
+                },
+                {
+                  "id": "occ_exposure_other",
+                  "label": {
+                    "en": "Specify Other Exposure",
+                    "pl": "Określ inne narażenie"
+                  },
+                  "type": "text_input",
+                  "dependsOn": {
+                    "questionId": "occ_exposures",
+                    "operator": "array_contains",
+                    "value": "other"
+                  }
                 },
                 {
                   "id": "notes",

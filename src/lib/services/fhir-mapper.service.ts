@@ -15,7 +15,8 @@ const SYSTEM_LOINC = "http://loinc.org";
 const SYSTEM_UCUM = "http://unitsofmeasure.org";
 const SYSTEM_HGNC = "http://www.genenames.org";
 const SYSTEM_HPO = "http://human-phenotype-ontology.org";
-const SYSTEM_ONKONO = "http://onkono.com/fhir/CodeSystem/measures"; // Internal system for derived scores
+const SYSTEM_ONKONO = "http://onkono.com/fhir/CodeSystem/measures";
+const SYSTEM_ONKONO_EXT = "http://onkono.com/fhir/StructureDefinition"; // Internal system for derived scores
 const SYSTEM_HL7_ROLE = "http://terminology.hl7.org/CodeSystem/v3-RoleCode";
 
 export const FhirMapperService = {
@@ -729,9 +730,7 @@ export const FhirMapperService = {
             }
         });
 
-        // --- 6. Family History ---
-        // --- 6. Family History ---
-        // --- 6. Family History ---
+        // --- 6. Family History (With Extensions) ---
         try {
             const rawFamily = standardized?.advanced?.family || (answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : []);
             if (Array.isArray(rawFamily)) {
@@ -742,45 +741,53 @@ export const FhirMapperService = {
                         status: "completed",
                         patient: subjectRef,
                         relationship: { text: member.relation, coding: [] },
-                        condition: []
+                        condition: [],
+                        extension: []
                     };
 
-                    if (Array.isArray(member.cancers)) {
-                        member.cancers.forEach((cancer: any) => {
-                            const type = cancer.cancer_type;
-                            const diagnosisAge = cancer.age_at_diagnosis;
-                            if (type) {
-                                const cancerCode = cancerTypesMap[type];
-                                fmh.condition?.push({
-                                    code: {
-                                        coding: cancerCode ? [{ system: SYSTEM_SNOMED, code: cancerCode, display: type }] : [],
-                                        text: type
-                                    },
-                                    onsetAge: diagnosisAge ? { value: Number(diagnosisAge), unit: "a", system: SYSTEM_UCUM, code: "a" } : undefined
-                                });
-                            }
+                    if (member.side_of_family) {
+                        fmh.extension?.push({
+                            url: `${SYSTEM_ONKONO_EXT}/family-member-side`,
+                            valueString: member.side_of_family
                         });
-                    } else if (member.cancer_type) {
-                         // Handle flattened structure
+                    }
+                    
+                    if (member.is_blood_related !== undefined) {
+                        fmh.extension?.push({
+                            url: `${SYSTEM_ONKONO_EXT}/is-blood-related`,
+                            valueBoolean: member.is_blood_related
+                        });
+                    }
+
+                    if (member.cancer_type) {
                          const type = member.cancer_type;
                          const diagnosisAge = member.age_dx || member.age_at_diagnosis;
                          const cancerCode = cancerTypesMap[type];
-                         fmh.condition?.push({
+                         
+                         const conditionEntry: any = {
                             code: {
                                 coding: cancerCode ? [{ system: SYSTEM_SNOMED, code: cancerCode, display: type }] : [],
                                 text: type
                             },
-                            onsetAge: diagnosisAge ? { value: Number(diagnosisAge), unit: "a", system: SYSTEM_UCUM, code: "a" } : undefined
-                        });
-                    }
+                            onsetAge: diagnosisAge ? { value: Number(diagnosisAge), unit: "a", system: SYSTEM_UCUM, code: "a" } : undefined,
+                            extension: []
+                        };
 
-                    // Add side_of_family extension if present
-                    if (member.side_of_family) {
-                        fmh.extension = fmh.extension || [];
-                        fmh.extension.push({
-                            url: "http://onkono.com/fhir/StructureDefinition/family-member-side",
-                            valueString: member.side_of_family // "Maternal" or "Paternal"
-                        });
+                        // Add extensions for cancer details (bilateral, genetic syndrome)
+                        if (member.bilateral_or_multiple) {
+                            conditionEntry.extension.push({
+                                url: `${SYSTEM_ONKONO_EXT}/bilateral-or-multiple`,
+                                valueString: member.bilateral_or_multiple
+                            });
+                        }
+                        if (member.known_genetic_syndrome !== undefined) {
+                            conditionEntry.extension.push({
+                                url: `${SYSTEM_ONKONO_EXT}/known-genetic-syndrome`,
+                                valueBoolean: member.known_genetic_syndrome === true || member.known_genetic_syndrome === 'Yes'
+                            });
+                        }
+
+                        fmh.condition?.push(conditionEntry);
                     }
 
                     bundle.entry.push({ resource: fmh });

@@ -8,7 +8,7 @@ const VERSION_TAG = "v2025.1";
 // Red flag symptoms for triage
 const RED_FLAGS: Record<string, string> = {
     'HP:0033840': 'Urgent: Postmenopausal bleeding',
-    'HP:0002027': 'Emergency: Severe abdominal pain',
+    'HP:0002027': 'Urgent: Persistent abdominal pain/bloating',
     'HP:0002015': 'Urgent: Dysphagia',
     'HP:0000790': 'Urgent: Visible Hematuria',
     'HP:0002105': 'Urgent: Hemoptysis',
@@ -671,7 +671,10 @@ function calculateOccupationalFlags(history?: any[]): Record<string, boolean> {
         }
 
         // Any High Risk
-        if (job.hazard && job.hazard !== 'none' && job.hazard !== 'occ.hazard.other') {
+        // Check rawHazards (includes job title match if risky, exposures, etc.)
+        // We use rawHazards to capture "other" descriptions if they were mapped
+        const hasHazards = rawHazards.some(h => h && h !== 'none' && h !== 'occ.hazard.other' && h !== 'other');
+        if (hasHazards) {
             totalHighRiskYears += years;
         }
     });

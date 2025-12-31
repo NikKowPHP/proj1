@@ -97,6 +97,7 @@ export const StandardizationService = {
            beer_drinks: beerDrinks,
            wine_drinks: wineDrinks,
            spirits_drinks: spiritsDrinks,
+           reporting_method: answers['alcohol.reporting_method'] // 'Percentage' or 'Drinks'
         },
         symptoms: safeJsonParse(answers.symptoms),
         family_cancer_any: answers['famhx.any_family_cancer'], // UPDATED KEY
@@ -177,16 +178,24 @@ export const StandardizationService = {
                 cancer_type: (c.cancer_type === 'other' && c.cancer_type_other) ? c.cancer_type_other : (c.cancer_type || c.cancerId),
                 age_dx: c.age_dx,
                 cancer_code: cancerTypesMap[c.cancer_type || c.cancerId] || undefined,
+                // Ensure critical lineage fields are preserved
+                side_of_family: member.side_of_family,
+                is_blood_related: member.is_blood_related,
+                // Specific cancer flags
+                bilateral_or_multiple: c.multiple_primaries, // Maps to UI field
+                known_genetic_syndrome: c.known_genetic_syndrome,
                 // Clean up nested arrays from the flattened object to avoid confusion
                 cancers: undefined
               });
             });
           } else {
-            // Legacy or single entry structure
+            // Legacy or single entry structure (or relative with no cancer but added)
             flattened.push({
               ...member,
               cancer_type: (member.cancer_type === 'other' && member.cancer_type_other) ? member.cancer_type_other : member.cancer_type,
               cancer_code: cancerTypesMap[member.cancer_type] || undefined,
+              side_of_family: member.side_of_family,
+              is_blood_related: member.is_blood_related
             });
           }
         });
@@ -275,6 +284,11 @@ export const StandardizationService = {
           // If type is 'other' and text provided, override for AI clarity
           type: (cancer.type === 'other' && cancer.type_other) ? cancer.type_other : cancer.type,
           type_code: cancerTypesMap[cancer.type] || undefined,
+          // Explicitly map surgery type to support prophylactic logic
+          surgery: { gyn_prophylactic: cancer.surgery_type === 'does_not_apply' ? 'No' : (cancer.surgery_type ? 'Yes' : undefined) } // Approximation, or check if 'surgery' includes Oophorectomy/Hysterectomy keywords if present in `treatments`.
+          // Actually, the `surgery_type` in `PersonalCancerHistory.tsx` is specific to breast mainly in the UI ("Mastectomy").
+          // But for gyn prophylactic, we usually look at the "Prophylactic Surgery" module.
+          // However, if therapeutic surgery happened, we preserve it.
         }));
       }
 
@@ -292,7 +306,17 @@ export const StandardizationService = {
             year_first: entry.year_first_exposed,
             current: entry.current_exposure,
             ppe: entry.ppe_use,
-            occ_exposures: entry.occ_exposures // Map specific exposures if present
+            occ_exposures: (() => {
+                const exposures = Array.isArray(entry.occ_exposures) ? [...entry.occ_exposures] : [];
+                if (entry.occ_exposure_other) {
+                    // Remove generic 'other' and add the specific description
+                    const filtered = exposures.filter(e => e !== 'other' && e !== 'occ.hazard.other');
+                    filtered.push(entry.occ_exposure_other);
+                    return filtered;
+                }
+                return exposures;
+            })(),
+            notes: entry.notes // Preserve notes
           };
         });
 
@@ -422,6 +446,27 @@ export const StandardizationService = {
         }
 
         standardized.advanced.sexual_health = sexualHealth;
+      }
+
+      // Medications & Iatrogenic
+      const medications: Record<string, any> = {};
+      if (answers['meds.immunosupp.current']) {
+        medications.immunosuppression_now = answers['meds.immunosupp.current'];
+        medications.immunosuppression_start_year = parseYear(answers['meds.immunosupp.start_year']);
+        medications.immunosuppression_classes = safeJsonParse(answers['meds.immunosupp.classes']);
+        if (answers['meds.immunosupp.classes_other']) {
+             if (Array.isArray(medications.immunosuppression_classes)) {
+                 medications.immunosuppression_classes.push(answers['meds.immunosupp.classes_other']);
+             }
+        }
+      }
+      if (answers['meds.hrt.use']) {
+          medications.hrt_use = answers['meds.hrt.use'];
+          medications.hrt_type = answers['meds.hrt.type'];
+          medications.hrt_duration = Number(answers['meds.hrt.duration_yrs']);
+      }
+      if (Object.keys(medications).length > 0) {
+          standardized.advanced.medications_iatrogenic = medications;
       }
 
       // Environmental Exposures - UPDATED KEYS

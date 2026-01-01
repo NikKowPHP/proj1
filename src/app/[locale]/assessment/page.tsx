@@ -403,7 +403,7 @@ export default function AssessmentPage() {
         </DialogContent>
       </Dialog>
       <div className="flex flex-grow md:grid md:grid-cols-2">
-        <div className="hidden md:flex flex-col justify-between p-12 bg-white text-black"><AppHeaderContent /><DisclaimerFooterContent /></div>
+        <div className="hidden md:flex flex-col justify-between p-12 bg-white text-black sticky top-0 h-screen overflow-y-auto"><AppHeaderContent /><DisclaimerFooterContent /></div>
         <main className="bg-black text-white w-full flex flex-col flex-grow sm:items-center sm:justify-center p-4 pb-24 md:pb-4">
           <div className="w-full max-w-md space-y-8">
             <div className="flex justify-center w-full hidden sm:flex gap-4"><LanguageSwitcher /><UnitToggle /></div>

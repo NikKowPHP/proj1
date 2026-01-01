@@ -8,7 +8,7 @@ export const UnitToggle = () => {
   const t = useTranslations('AssessmentPage');
 
   return (
-    <div className="flex items-center space-x-1 border rounded-md p-1 bg-muted/20">
+    <div className="flex items-center space-x-1 border p-1 bg-muted/20">
       <Button
         variant={units === 'metric' ? 'default' : 'ghost'}
         size="sm"

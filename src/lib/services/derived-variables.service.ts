@@ -1079,11 +1079,12 @@ export const DerivedVariablesService = {
 
             if (sexAtBirth === 'Male') {
                 if (Array.isArray(partnerGenders)) {
-                    if (partnerGenders.some((g: string) =>
-                        g === 'only_men' || g === 'men_and_women' || g === 'both' ||
+                    if (partnerGenders.some((g: string) => {
+                        if (!g) return false;
+                        return g === 'only_men' || g === 'men_and_women' || g === 'both' ||
                         g === 'Only men' || g === 'Men and women' || // Legacy support
-                        g.toLowerCase() === 'male' || g.toLowerCase() === 'same sex'
-                    )) msmBehavior = true;
+                        g.toLowerCase() === 'male' || g.toLowerCase() === 'same sex';
+                    })) msmBehavior = true;
                 } else if (typeof partnerGenders === 'string') {
                     if (
                         partnerGenders === 'only_men' || partnerGenders === 'men_and_women' || partnerGenders === 'both' ||

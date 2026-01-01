@@ -74,6 +74,7 @@ export const SexualHealth = ({ answers, onAnswer, questions, errors }: SexualHea
             <CheckboxGroup
               options={q.options.map((opt: any) => ({
                 ...opt,
+                id: opt.id || opt.value,
                 label: getOptionLabel(opt)
               }))}
               value={answers[q.id] ? JSON.parse(answers[q.id]) : []}

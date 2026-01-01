@@ -558,7 +558,7 @@
                 },
                 {
                   "id": "htp.sticks_per_day",
-                  "label": {
+                  "text": {
                     "en": "Sticks per day",
                     "pl": "Wkłady na dzień"
                   },
@@ -1684,13 +1684,15 @@
                       }
                     },
                     {
-                      "id": "Prefer not to say",
+                      "id": "prefer_not_to_say",
+                      "value": "prefer_not_to_say",
                       "label": {
                         "en": "Prefer not to say",
                         "pl": "Wolę nie podawać"
                       }
                     }
                   ],
+                  "exclusiveOptionId": "prefer_not_to_say",
                   "dependsOn": {
                     "questionId": "sexhx.ever_sexual_contact",
                     "value": "Yes"

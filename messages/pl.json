@@ -106,6 +106,7 @@
     "heightPlaceholderImperial": "np. 69",
     "weightPlaceholderMetric": "np. 70",
     "weightPlaceholderImperial": "np. 154",
+    "sum100": "Suma procentów musi wynosić 100%.",
     "consentHealth": "Wyrażam zgodę na przetwarzanie moich danych o stanie zdrowia w celu wygenerowania tego jednorazowego planu profilaktycznego. Rozumiem, że te dane nie są przechowywane i zapoznałem/am się z <privacyLink>Polityką Prywatności</privacyLink>.",
     "consentGenetics": "Wyrażam szczególną zgodę na przetwarzanie moich danych genetycznych w celu tej oceny. Rozumiem, że te informacje są wrażliwe i objęte <privacyLink>Polityką Prywatności</privacyLink>.",
     "safetyBannerTitle": "Ważna Uwaga",
@@ -160,14 +161,18 @@
       "HP:0003418": "Pilne: Zalecana ocena bólu pleców/ucisku nerbów.",
       "HP:0002315": "Pilne: Ocena neurologiczna nowego wzorca bólu głowy.",
       "HP:0001609": "Pilne: Ocena Laryngologiczna (chrypka).",
-      "onkn.symptom.indigestion_alarm": "Pilne: Gastroskopia (niestrawność z objawami alarmowymi).",
       "HP:0001031": "Pilne: Ocena dermatologiczna.",
-      "onkn.symptom.skin_ulcer": "Pilne: Ocena dermatologiczna.",
       "HP:0032408": "Pilne: Skierowanie do poradni chorób piersi.",
       "HP:0001250": "Nagłe: Nowe napady drgawkowe wymagają natychmiastowej pomocy.",
       "HP:0001324": "Nagłe: Ogniskowe osłabienie wymaga natychmiastowej oceny (udar).",
-      "onkn.symptom.neuro_other": "Pilne: Zalecana ocena neurologiczna.",
-      "fallback": "Wymagana pilna ocena."
+      "fallback": "Wymagana pilna ocena.",
+      "onkn": {
+        "symptom": {
+          "indigestion_alarm": "Pilne: Gastroskopia (niestrawność z objawami alarmowymi).",
+          "skin_ulcer": "Pilne: Ocena dermatologiczna.",
+          "neuro_other": "Pilne: Zalecana ocena neurologiczna."
+        }
+      }
     }
   },
   "ResultsPage": {

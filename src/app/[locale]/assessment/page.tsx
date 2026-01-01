@@ -61,7 +61,7 @@ import { isQuestionVisible } from "@/lib/utils/question-visibility";
 interface Question {
   id: string;
   text?: string;
-  type: "select" | "number_input" | "date_input" | "consent_checkbox" | "checkbox_group" | "advanced_modules" | "radio" | "year_input" | "text_input" | "slider";
+  type: "select" | "number_input" | "date_input" | "consent_checkbox" | "checkbox_group" | "advanced_modules" | "radio" | "year_input" | "text_input" | "slider" | "checkbox";
   options?: any; // Can be string[], CheckboxOption[], or complex objects for modules
   dependsOn?: any;
   exclusiveOptionId?: string;
@@ -308,7 +308,7 @@ export default function AssessmentPage() {
         try {
           if (!value || JSON.parse(value).length === 0) isFieldValid = false;
         } catch { isFieldValid = false; }
-      } else if (q.type === "advanced_modules") {
+      } else if (q.type === "advanced_modules" || q.type === "checkbox") {
         isFieldValid = true;
       } else {
         // Standard fields
@@ -334,10 +334,11 @@ export default function AssessmentPage() {
     });
 
     // Custom Validation: Alcohol Percentages must sum to 100
-    // Check if any alcohol percentage fields are visible/present
-    if (isQuestionVisible({ id: 'alcohol.beer_pct', type: 'number_input' } as any, answers) ||
-      isQuestionVisible({ id: 'alcohol.wine_pct', type: 'number_input' } as any, answers) ||
-      isQuestionVisible({ id: 'alcohol.spirits_pct', type: 'number_input' } as any, answers)) {
+    // Only validate if these questions are in the current step and visible
+    const alcoholFields = ['alcohol.beer_pct', 'alcohol.wine_pct', 'alcohol.spirits_pct'];
+    const stepHasAlcoholFields = visibleQuestions.some(q => alcoholFields.includes(q.id));
+
+    if (stepHasAlcoholFields) {
 
       const beer = Number(answers['alcohol.beer_pct'] || 0);
       const wine = Number(answers['alcohol.wine_pct'] || 0);
@@ -540,6 +541,29 @@ export default function AssessmentPage() {
                       {localErrors[q.id] && <p className="text-sm text-destructive">{localErrors[q.id]}</p>}
                     </>
                   )}
+                  {q.type === "checkbox" && (
+                    <div className="flex flex-col gap-2">
+                      <div className={`flex items-start space-x-3 border p-4 ${localErrors[q.id] ? "border-destructive" : ""}`}>
+                        <Checkbox
+                          id={q.id}
+                          checked={answers[q.id] === "true"}
+                          onCheckedChange={(c) => setAnswer(q.id, c ? "true" : "false")}
+                        />
+                        <div className="grid gap-1.5">
+                          <label
+                            htmlFor={q.id}
+                            className="text-sm leading-snug text-muted-foreground font-medium"
+                          >
+                            {/* For single checkboxes, we can use the main question text as the label */}
+                            {q.text}
+                          </label>
+                          {/* If there's an internal label/description for the checkbox specifically, render it here too,
+                               but q.text usually covers it for single checkboxes like "Use detailed calculator?" */}
+                        </div>
+                      </div>
+                      {localErrors[q.id] && <p className="text-sm text-destructive">{localErrors[q.id]}</p>}
+                    </div>
+                  )}
                   {q.type === 'advanced_modules' && <Accordion type="multiple" className="w-full">{q.modules?.filter(m => isQuestionVisible(m, answers)).map(m => <AccordionItem value={m.id} key={m.id}><AccordionTrigger>{typeof m.title === 'string' ? m.title : (m.title[locale] || m.title.en)}</AccordionTrigger><AccordionContent>
                     {m.id === 'symptom_details' && <SymptomDetails selectedSymptoms={answers.symptoms ? questionnaire?.steps.flatMap(s => s.questions).find(q => q.id === 'symptoms')?.options?.filter((o: any) => JSON.parse(answers.symptoms).includes(o.id)) || [] : []} value={Object.keys(answers).reduce((acc, k) => { if (k.startsWith('symptom_details_')) { const sId = k.replace('symptom_details_', ''); acc[sId] = JSON.parse(answers[k]); } return acc; }, {} as Record<string, any>)} onChange={(sId, d) => setAnswer(`symptom_details_${sId}`, JSON.stringify(d))} symptomOptions={(symptomDetailsOptions?.symptomList || []).map((s: any) => ({ value: s.id, label: typeof s.label === 'object' ? s.label[locale] : s.label }))} featureOptions={(symptomDetailsOptions?.associatedFeatures || []).map((f: any) => ({ id: f.id, label: typeof f.label === 'object' ? f.label[locale] : f.label }))} errors={localErrors} />}
                     {m.id === 'family_cancer_history' && <FamilyCancerHistory value={answers.family_cancer_history ? JSON.parse(answers.family_cancer_history) : []} onChange={(v) => setAnswer('family_cancer_history', JSON.stringify(v))} options={m.options} errors={localErrors} />}
@@ -556,6 +580,7 @@ export default function AssessmentPage() {
                     {m.id === 'functional_status' && <FunctionalStatus answers={answers} onAnswer={setAnswer} questions={m.questions} errors={localErrors} />}
                     {m.id === 'physical_activity_details' && <GenericModule answers={answers} onAnswer={setAnswer} questions={m.questions} errors={localErrors} />}
                     {m.id === 'smoking_details' && <SmokingDetails answers={answers} onAnswer={setAnswer} questions={m.questions} errors={localErrors} />}
+                    {m.id === 'prophylactic_surgery_details' && <GenericModule answers={answers} onAnswer={setAnswer} questions={m.questions} errors={localErrors} />}
                   </AccordionContent></AccordionItem>)}</Accordion>}
 
                   {q.infoCard && (

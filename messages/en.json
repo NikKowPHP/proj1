@@ -106,6 +106,7 @@
     "heightPlaceholderImperial": "e.g., 69",
     "weightPlaceholderMetric": "e.g., 70",
     "weightPlaceholderImperial": "e.g., 154",
+    "sum100": "Total percentage must equal 100%.",
     "consentHealth": "I consent to the processing of my health data for the purpose of generating this one-time preventive plan. I understand this data is not stored and I have read the <privacyLink>Privacy Policy</privacyLink>.",
     "consentGenetics": "I give specific consent to process my genetic data for this assessment. I understand this information is sensitive and is covered by the <privacyLink>Privacy Policy</privacyLink>.",
     "safetyBannerTitle": "Important Note",
@@ -121,6 +122,9 @@
     "addCancer": "+ Add Cancer",
     "addCustomRelative": "Add Custom Relative",
     "adultGateError": "This version of the tool is designed for adults. Please discuss any concerns with a paediatrician / family doctor.",
+    "biologicalFamilyHelper": "Biological family = parents, children, siblings (including half-siblings), grandparents, aunts/uncles, nieces/nephews, cousins.",
+    "decadeHelper": "Tip: Sum up all smoking periods. 10 years = 1 decade.",
+    "approximateOk": "Approximate answers are fine.",
     "symptomDetails": {
       "noSymptoms": "No symptoms selected in the previous step.",
       "searchPlaceholder": "Select or refine symptom...",
@@ -157,14 +161,18 @@
       "HP:0003418": "Urgent: Evaluation for nerve compression/back pain recommended.",
       "HP:0002315": "Urgent: Neurological evaluation for new headache pattern.",
       "HP:0001609": "Urgent: ENT evaluation for persistent hoarseness.",
-      "onkn.symptom.indigestion_alarm": "Urgent: Gastroscopy for indigestion with alarm features.",
       "HP:0001031": "Urgent: Dermatology evaluation for changing mole.",
-      "onkn.symptom.skin_ulcer": "Urgent: Dermatology evaluation for non-healing skin ulcer.",
       "HP:0032408": "Urgent: Breast clinic referral recommended.",
       "HP:0001250": "Emergency: New onset seizures require immediate care.",
       "HP:0001324": "Emergency: Acute focal weakness requires immediate stroke assessment.",
-      "onkn.symptom.neuro_other": "Urgent: Neurological evaluation recommended.",
-      "fallback": "Urgent evaluation required."
+      "fallback": "Urgent evaluation required.",
+      "onkn": {
+        "symptom": {
+          "indigestion_alarm": "Urgent: Gastroscopy for indigestion with alarm features.",
+          "skin_ulcer": "Urgent: Dermatology evaluation for non-healing skin ulcer.",
+          "neuro_other": "Urgent: Neurological evaluation recommended."
+        }
+      }
     }
   },
   "ResultsPage": {

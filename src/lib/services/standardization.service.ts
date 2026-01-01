@@ -97,7 +97,11 @@ export const StandardizationService = {
            beer_drinks: beerDrinks,
            wine_drinks: wineDrinks,
            spirits_drinks: spiritsDrinks,
-           reporting_method: answers['alcohol.reporting_method'] // 'Percentage' or 'Drinks'
+           reporting_method: answers['alcohol.reporting_method'], // 'Percentage' or 'Drinks'
+           // Custom detailed inputs
+           volume_ml: Number(answers['alcohol.custom_volume_ml']) || undefined,
+           abv: Number(answers['alcohol.custom_abv']) || undefined,
+           freq_per_week: Number(answers['alcohol.custom_freq']) || undefined
         },
         symptoms: safeJsonParse(answers.symptoms),
         family_cancer_any: answers['famhx.any_family_cancer'], // UPDATED KEY
@@ -182,7 +186,7 @@ export const StandardizationService = {
                 side_of_family: member.side_of_family,
                 is_blood_related: member.is_blood_related,
                 // Specific cancer flags
-                bilateral_or_multiple: c.multiple_primaries, // Maps to UI field
+                bilateral_or_multiple: c.bilateral_or_multiple, // Maps to UI field
                 known_genetic_syndrome: c.known_genetic_syndrome,
                 // Clean up nested arrays from the flattened object to avoid confusion
                 cancers: undefined

@@ -18,6 +18,7 @@ const SYSTEM_HPO = "http://human-phenotype-ontology.org";
 const SYSTEM_ONKONO = "http://onkono.com/fhir/CodeSystem/measures";
 const SYSTEM_ONKONO_EXT = "http://onkono.com/fhir/StructureDefinition"; // Internal system for derived scores
 const SYSTEM_HL7_ROLE = "http://terminology.hl7.org/CodeSystem/v3-RoleCode";
+import { VERSION_TAG } from "./derived-variables.service";
 
 export const FhirMapperService = {
 
@@ -666,7 +667,8 @@ export const FhirMapperService = {
                             ]
                         },
                         subject: subjectRef,
-                        valueBoolean: value
+                        valueBoolean: value,
+                        note: [{ text: `Derived by logic ${VERSION_TAG}` }]
                     } as FhirObservation
                 });
             }

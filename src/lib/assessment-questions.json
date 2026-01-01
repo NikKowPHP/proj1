@@ -821,6 +821,61 @@
               "pl": "Standardowa porcja = 10g czystego alkoholu. Przykłady: 500 ml piwa 5% ≈ 2 d; 150 ml wina 12% ≈ 1.5 d."
             }
           }
+
+        },
+        {
+          "id": "alcohol.use_custom_calculator",
+          "type": "checkbox",
+          "text": {
+            "en": "Use detailed unit calculator?",
+            "pl": "Użyć dokładnego kalkulatora jednostek?"
+          },
+          "dependsOn": {
+            "questionId": "alcohol.status",
+            "value": "Current"
+          }
+        },
+        {
+          "id": "alcohol.custom_volume_ml",
+          "type": "number_input",
+          "text": {
+            "en": "Volume per drink (ml)",
+            "pl": "Objętość porcji (ml)"
+          },
+          "min": 1,
+          "max": 2000,
+          "dependsOn": {
+            "questionId": "alcohol.use_custom_calculator",
+            "value": "true"
+          }
+        },
+        {
+          "id": "alcohol.custom_abv",
+          "type": "number_input",
+          "text": {
+            "en": "Alcohol By Volume (%)",
+            "pl": "Zawartość alkoholu (%)"
+          },
+          "min": 0.1,
+          "max": 99,
+          "dependsOn": {
+            "questionId": "alcohol.use_custom_calculator",
+            "value": "true"
+          }
+        },
+        {
+          "id": "alcohol.custom_freq",
+          "type": "number_input",
+          "text": {
+            "en": "Number of these drinks per week",
+            "pl": "Liczba takich porcji w tygodniu"
+          },
+          "min": 1,
+          "max": 100,
+          "dependsOn": {
+            "questionId": "alcohol.use_custom_calculator",
+            "value": "true"
+          }
         },
         {
           "id": "alcohol.former_since",
@@ -5709,7 +5764,10 @@
             },
             {
               "id": "occ.hazard.shift_night",
-              "label": "Night shift work"
+              "label": {
+                "en": "Night shift work (regular work between 23:00–06:00 at least some nights/month for several years)",
+                "pl": "Praca w trybie nocnym (regularna praca między 23:00 a 06:00 przynajmniej kilka nocy w miesiącu przez kilka lat)"
+              }
             },
             {
               "id": "occ.hazard.firefighter",
@@ -6060,7 +6118,7 @@
               "id": "radon",
               "label": {
                 "en": "High radon area",
-                "pl": "Obszar o wysokim radonie"
+                "pl": "Oficjalnie wysoki region radonowy lub wynik badania „podwyższony”"
               }
             },
             {

@@ -15,7 +15,7 @@ interface CancerDiagnosis {
   cancer_type?: string;
   age_dx?: number;
   laterality?: string;
-  multiple_primaries?: string;
+  bilateral_or_multiple?: string;
   known_genetic_syndrome?: boolean;
 }
 
@@ -316,8 +316,8 @@ export const FamilyCancerHistory = ({ value, onChange, options, errors: external
                         <div className="space-y-2 pt-2">
                           <Label className="font-normal text-sm">{t('bilateralOrMultiple')}</Label>
                           <Select
-                            value={cancer.multiple_primaries}
-                            onValueChange={(val) => handleCancerFieldChange(index, cancerIndex, "multiple_primaries", val)}
+                            value={cancer.bilateral_or_multiple}
+                            onValueChange={(val) => handleCancerFieldChange(index, cancerIndex, "bilateral_or_multiple", val)}
                           >
                             <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
                             <SelectContent>

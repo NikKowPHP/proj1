@@ -17,7 +17,15 @@
     "covid_booster_interval_years": 1,
     "pneumo_age_min": 65,
     "flu_priority_age_min": 65,
-    "zoster_age_min": 50
+    "zoster_age_min": 50,
+    "cervical_screening_age_bands": [
+      "30-39",
+      "40-44",
+      "45-49",
+      "50-54",
+      "55-59",
+      "60-69"
+    ]
   },
   "risk_factors": {
     "radon_high_options": [
@@ -136,7 +144,6 @@
       "wood_dust",
       "leather_dust",
       "formaldehyde",
-      "welding",
       "metals_welding"
     ],
     "high_risk_years_min": 10,

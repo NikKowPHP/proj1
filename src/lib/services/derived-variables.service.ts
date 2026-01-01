@@ -3,7 +3,7 @@ import { differenceInYears } from 'date-fns';
 import clinicalConfig from '@/lib/clinical-config.json';
 import { occupationalExposuresMap } from '@/lib/mappings/occupational-exposures.map';
 
-const VERSION_TAG = "v2025.1";
+export const VERSION_TAG = "v2025.1";
 
 // Red flag symptoms for triage
 const RED_FLAGS: Record<string, string> = {
@@ -247,29 +247,16 @@ function calculateAuditC(answers?: { q1?: number, q2?: number, q3?: number }, se
     // Calculate grams per week if details provided
     let grams_per_week = 0;
     if (alcoholDetails) {
-        // Standard drink = 10g ethanol
-        // Need to parse beer/wine/spirits percentages and volumes if available.
-        // Or if we have simple frequency * quantity.
-        // The spec mentions: "Unit converter (background): grams = volume_ml × ABV × 0.789"
-        // And "If % must sum to 100".
-        // Let's assume we have `alcohol.beer_pct`, `alcohol.wine_pct`, etc. and a total volume/frequency logic.
-        // However, the derived service usually receives standardized answers.
-        // If standardized has `alcohol_grams_week` pre-calced, we use it. 
-        // If not, we calculate here if we have inputs. 
-        // For now, if inputs are missing, default to 0.
-        // Wait, standardizer doesn't do this yet.
-        // Let's look at what we have in standardized `core.alcohol` or `advanced.alcohol`.
-        // If the calculation is complex and relies on raw inputs (volume per week), we should probably do it here.
-        // But the discrepancy report says: "no logic to calculate alcohol grams from beer_pct/wine_pct".
-        
-        // Let's implement a basic calculation based on available fields if they existed, 
-        // but since we might not have standardized volume fields yet, we'll setup the structure.
-        // Actually, if we look at `assessment-questions.json` or `standardization`, we might find volume inputs.
-        // If not, we can't calculate. 
-        // Discrepancy says: "keep conversion silent unless user opens details". 
-        // Meaning we should calculate it.
-        
-        if (alcoholDetails.grams_week) {
+        if (alcoholDetails.total_grams_week !== undefined) {
+             grams_per_week = alcoholDetails.total_grams_week;
+        } else if (alcoholDetails.volume_ml && alcoholDetails.abv) {
+             // Formula: volume_ml * (ABV/100) * 0.789 = grams per drink
+             // Then multiply by frequency (drinks per week or similar)
+             // Assuming alcoholDetails might have 'freq_per_week'
+             const gramsPerDrink = alcoholDetails.volume_ml * (alcoholDetails.abv / 100) * 0.789;
+             const freq = alcoholDetails.drinks_per_week || alcoholDetails.freq_per_week || 0;
+             grams_per_week = gramsPerDrink * freq;
+        } else if (alcoholDetails.grams_week) {
              grams_per_week = alcoholDetails.grams_week;
         } else if (alcoholDetails.drinks_per_week) {
              grams_per_week = alcoholDetails.drinks_per_week * 10; // Simple approximation if no details
@@ -277,6 +264,15 @@ function calculateAuditC(answers?: { q1?: number, q2?: number, q3?: number }, se
     }
 
     return { score, risk, grams_per_week };
+}
+
+/**
+ * Helper to calculate ethanol grams from volume and ABV.
+ * Formula: grams = volume_ml * (ABV/100) * 0.789
+ */
+export function calculateEthanolGrams(volume_ml: number, abv: number): number {
+    if (!volume_ml || !abv) return 0;
+    return parseFloat((volume_ml * (abv / 100) * 0.789).toFixed(2));
 }
 
 /**
@@ -1363,7 +1359,7 @@ export const DerivedVariablesService = {
 
             derived['screen.cervix_due'] =
                 Boolean(hasCervix) &&
-                ['30-39', '40-44', '45-49', '50-54', '55-59', '60-69'].includes(ageBand) &&
+                (clinicalConfig.screening_thresholds.cervical_screening_age_bands || ['30-39', '40-44', '45-49', '50-54', '55-59', '60-69']).includes(ageBand) &&
                 (yearsSince(lastPapYear) >= cervixInterval);
 
             derived['screen.breast_due'] =

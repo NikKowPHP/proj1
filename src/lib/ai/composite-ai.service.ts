@@ -1,39 +1,26 @@
-import { CerebrasService } from "./cerebras-service";
-import { GroqService } from "./groq-service";
 import { GeminiService } from "./gemini-service";
 import { executeWithFallbacks, ProviderConfig } from "./composite-executor";
 
 import { getPreventivePlanExplainerPrompt } from "./prompts/preventivePlanExplainer.prompt";
-import type { GuidelinePlan } from "@/lib/types";
-import { AIModel, TextAIProvider } from "./types";
-import { TutorChatMessage } from "../types";
+import { AIModel } from "./types";
 
 // Define model configuration from environment variables
 const MODEL_CONFIG = {
   large: {
-    CEREBRAS:
-      process.env.CEREBRAS_LARGE_MODEL || "qwen-3-235b-a22b-thinking-2507",
-    GROQ: process.env.GROQ_LARGE_MODEL || "moonshotai/kimi-k2-instruct",
-    GEMINI: process.env.GEMINI_LARGE_MODEL || "gemini-2.5-flash",
+    GEMINI: process.env.GEMINI_LARGE_MODEL || "gemini-2.0-flash-exp",
   },
   small: {
-    CEREBRAS: process.env.CEREBRAS_SMALL_MODEL || "qwen-3-32b",
-    GROQ: process.env.GROQ_SMALL_MODEL || "qwen/qwen3-32b",
-    GEMINI: process.env.GEMINI_SMALL_MODEL || "gemini-2.5-flash",
+    GEMINI: process.env.GEMINI_SMALL_MODEL || "gemini-2.0-flash-exp",
   },
 };
 
 export class CompositeAIService {
   private providers: {
-    cerebras: CerebrasService;
-    groq: GroqService;
     gemini: GeminiService;
   };
 
   constructor() {
     this.providers = {
-      cerebras: new CerebrasService(),
-      groq: new GroqService(),
       gemini: new GeminiService(),
     };
   }
@@ -41,11 +28,6 @@ export class CompositeAIService {
   private getProviderChain(size: "large" | "small"): ProviderConfig[] {
     const modelConfig = MODEL_CONFIG[size];
     return [
-      {
-        provider: this.providers.cerebras,
-        model: modelConfig.CEREBRAS as AIModel,
-      },
-      { provider: this.providers.groq, model: modelConfig.GROQ as AIModel },
       { provider: this.providers.gemini, model: modelConfig.GEMINI as AIModel },
     ];
   }

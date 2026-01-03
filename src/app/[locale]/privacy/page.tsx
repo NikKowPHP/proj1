@@ -28,7 +28,7 @@ export default function PrivacyPage() {
             <Button
               variant="ghost"
               className="pl-0 mb-8"
-              onClick={() => router.back()}
+              onClick={() => router.push("/")}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               {t("backToHome")}
